@@ -1,5 +1,5 @@
 *
-!.gitignore
+.gitignore
 *.tgz
 vendor
 composer.phar
@@ -10,6 +10,10 @@ composer.lock
 /composer.lock
 /vendor
 
+/frontend/config/main-local.php
+/backend/config/main-local.php
+/console/config/main-local.php
+/common/config/main-local.php
 /nbproject/private/
 *.sqlite
 // System / Log files 
