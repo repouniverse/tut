@@ -1,5 +1,4 @@
-*
-.gitignore
+*.gitignore
 *.tgz
 vendor
 composer.phar
@@ -15,6 +14,7 @@ composer.lock
 /console/config/main-local.php
 /common/config/main-local.php
 /nbproject/private/
+
 *.sqlite
 // System / Log files 
 *.DS_Store
@@ -56,12 +56,16 @@ ad.js
 *.exe
 *.zip
 *.png
+*.md
 *.jpeg
 *.xls
+*.yml
 *.xlsx
 *.docx
 *.doc
 *.ppt
+*.bat
+*.sh
 *.pptx
 *.txt
 *.csv
@@ -133,7 +137,7 @@ nbproject
 # windows thumbnail cache
 
 # composer vendor dir
-/vendor
+
 
 # composer itself is not needed
 composer.phar

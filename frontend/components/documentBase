@@ -1,0 +1,80 @@
+<?php
+namespace frontend\components;
+use common\models\masters\Documentos;
+use yii\db\ActiveRecord;
+
+
+class documentBase extends ActiveRecord implements documentBaseInterface {
+  private $_title;
+  private $_number; 
+  private $documento;
+  
+  public function init(){
+      parent::init();
+    /*  if(empty($this->codocu))
+          throw new \yii\base\Exception(yii::t('base.errors','Property "codocu" is empty'));*/
+  
+  }
+  
+  
+  public function __construct(/*Documents $documentox, $codigo*/){
+      //$this->documento=$documentox::findOne($codigo);   
+      
+  }
+  
+    public function behaviors()
+{
+        $bh=parent::behaviors();
+        $bb['auditoria'] =[
+			'class' => \common\behaviors\AuditBehavior::className()
+		];
+	return $bb;
+}
+  
+  public function getDocumento()
+    {
+       if(!$this->isNewRecord)
+        return $this->hasMany(Documentos::className(), ['codocu' => 'codocu']);
+       return Documentos::find()->where(['codocu'=>$this->codocu])->one();
+       }
+ public function isAusdith(){
+     return $this->documento->withaudit;
+ }
+  
+  public function gettTitle(){
+      return $this->documento->desdocu;
+  }  
+  public function gettClase(){
+      return $this->documento->clase;
+  }
+  public function gettAbreviatura(){
+      return $this->documento->abreviatura;
+  }
+  public function gettPrefijo(){
+      return $this->documento->prefijo;
+  }
+  public function isComprobante(){
+      return ($this->documento->escomprobante=='1')?true:false;
+   }
+  public function gettTipo(){
+      return $this->documento->tipo;
+  }  
+    public function printDocument();
+    public function viewDocument();
+    public function gettCentro();    
+    public function gettEstado();
+    public function hasChilds();
+    public function getNumber();
+  
+ /*
+  * Funcion que devuleve un data provider 
+  * con los parameetros de configuracion del documento 
+  * 
+  */
+ public function dataConfig(){
+     
+ }   
+    
+    
+    
+}
