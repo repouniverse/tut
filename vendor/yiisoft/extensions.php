@@ -501,15 +501,6 @@ return array (
       '@kv4nt/owlcarousel' => $vendorDir . '/kv4nt/yii2-owl-carousel2',
     ),
   ),
-  'rmrevin/yii2-fontawesome' => 
-  array (
-    'name' => 'rmrevin/yii2-fontawesome',
-    'version' => '2.10.3.0',
-    'alias' => 
-    array (
-      '@rmrevin/yii/fontawesome' => $vendorDir . '/rmrevin/yii2-fontawesome',
-    ),
-  ),
   '2amigos/yii2-chartjs-widget' => 
   array (
     'name' => '2amigos/yii2-chartjs-widget',
@@ -589,6 +580,33 @@ return array (
     'alias' => 
     array (
       '@kriss/calendarSchedule' => $vendorDir . '/kriss/yii2-calendar-schedule/src',
+    ),
+  ),
+  'yii2mod/yii2-tree' => 
+  array (
+    'name' => 'yii2mod/yii2-tree',
+    'version' => '1.3.2.0',
+    'alias' => 
+    array (
+      '@yii2mod/tree' => $vendorDir . '/yii2mod/yii2-tree',
+    ),
+  ),
+  'miloschuman/yii2-highcharts-widget' => 
+  array (
+    'name' => 'miloschuman/yii2-highcharts-widget',
+    'version' => '7.1.3.0',
+    'alias' => 
+    array (
+      '@miloschuman/highcharts' => $vendorDir . '/miloschuman/yii2-highcharts-widget/src',
+    ),
+  ),
+  'rmrevin/yii2-fontawesome' => 
+  array (
+    'name' => 'rmrevin/yii2-fontawesome',
+    'version' => '2.17.1.0',
+    'alias' => 
+    array (
+      '@rmrevin/yii/fontawesome' => $vendorDir . '/rmrevin/yii2-fontawesome',
     ),
   ),
 );

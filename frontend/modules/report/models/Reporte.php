@@ -141,15 +141,16 @@ class Reporte extends \common\models\base\modelBase
     /*
      * Hace l acbecera del reporte*
      */
-    public function putCabecera($id,$idfiltro){        
+    public function putCabecera($id,$idfiltro,$campofiltro=null){        
         /* $hijos= registros que deen pintarse en la cabcera del reporte   */
              $hijosCabecera=$this->getReportedetalle()->where(['and', "esdetalle='0'", ['or', "visiblelabel='1'", "visiblecampo='1'"]])->all();
 		//var_dump($hijosCabecera);die();
              $HTML_cabecera="";
                //var_dump($hijosCabecera);die();
+             $modelin=$this->modelToRepor($idfiltro);
      foreach( $hijosCabecera as $record) {
           // var_dump($this->modelToRepor($idfiltro));die();
-		 $HTML_cabecera.=$record->putStyleField($record->nombre_campo,$this->modelToRepor($idfiltro)->{$record->nombre_campo}); 
+		 $HTML_cabecera.=$record->putStyleField($record->nombre_campo,$modelin->{$record->nombre_campo}); 
                }
            unset($modeloToReport);unset($hijosCabecera);unset($clase);
          return $HTML_cabecera;
@@ -165,9 +166,15 @@ class Reporte extends \common\models\base\modelBase
       }
       
     
-    public function modelToRepor($id){
-      $clase=trim($this->modelo);        
-        return $clase::find()->where(['id'=>$id])->one();  
+    public function modelToRepor($id,$campofiltro=null){
+      $clase=trim($this->modelo); 
+      if(is_null($campofiltro)){
+          
+          return $clase::find()->where(['id'=>$id])->one();  
+      }else{
+          return $clase::find()->where([$campofiltro=>$id])->one();  
+      }
+        
     }
     /*
      * Devuel una ruta competa para

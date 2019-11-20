@@ -10,9 +10,10 @@ use yii\widgets\Pjax;
 $this->title = Yii::t('base.names', 'Aulas');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+ <h4><?= Html::encode($this->title) ?></h4>
 <div class="aulas-index">
 <div class="box box-success">
-    <h4><?= Html::encode($this->title) ?></h4>
+   
     <?php Pjax::begin(); ?>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -93,45 +94,13 @@ $gridColumns = [
     'filterRowOptions' => ['class' => 'kartik-sheet-style'],
     'pjax' => true, // pjax is set to always true for this demo
     // set your toolbar
-    'toolbar' =>  [
-        [
-            'content' =>
-                Html::button('<i class="fas fa-plus"></i>', [
-                    'class' => 'btn btn-success',
-                    'title' => Yii::t('base.names', 'Add Book'),
-                    'onclick' => 'alert("This will launch the book creation form.\n\nDisabled for this demo!");'
-                ]) . ' '.
-                Html::a('<i class="fas fa-redo"></i>', ['grid-demo'], [
-                    'class' => 'btn btn-outline-secondary',
-                    'title'=>Yii::t('base.names', 'Reset Grid'),
-                    'data-pjax' => 0, 
-                ]), 
-            'options' => ['class' => 'btn-group mr-2']
-        ],
-        '{export}',
-        '{toggleData}',
-    ],
-    'toggleDataContainer' => ['class' => 'btn-group mr-2'],
-    // set export properties
-    'export' => [
-        'fontAwesome' => true
-    ],
-    // parameters from the demo form
-   /* 'bordered' => $bordered,
-    'striped' => $striped,
-    'condensed' => $condensed,
-    'responsive' => $responsive,
-    'hover' => $hover,
-    'showPageSummary' => $pageSummary,*/
-    'panel' => [
-        'type' => GridView::TYPE_WARNING,
-        //'heading' => $heading,
-    ],
+  
+   
     'persistResize' => false,
     'toggleDataOptions' => ['minCount' => 10],
     //'exportConfig' => $exportConfig,
-    'itemLabelSingle' => 'book',
-    'itemLabelPlural' => 'books'
+    'itemLabelSingle' => 'Aula',
+    'itemLabelPlural' => 'Aulas'
 ]);  
 
 ?>

@@ -21,6 +21,7 @@ if(!$this->existsTable($table)) {
         'tipo'=>$this->char(3)->notNull()->append($this->collateColumn()),
         'codmon'=>$this->string(5)->notNull()->append($this->collateColumn()),
         'codpro'=>$this->char(6)->notNull()->append($this->collateColumn()),
+       'activa'=>$this->char(1)->append($this->collateColumn()),
         'nombre'=>$this->string(60)->notNull()->append($this->collateColumn()),
         'numero'=>$this->string(100)->notNull()->append($this->collateColumn()),
         'banco_id'=>$this->integer(11)->notNull(),
@@ -39,7 +40,11 @@ if(!$this->existsTable($table)) {
               'banco_id', static::NAME_TABLE_BANCOS,'id');
       $this->addForeignKey($this->generateNameFk($table), $table,
               'edificio_id', static::NAME_TABLE_EDIFICIOS,'id');
-            
+            $this->putCombo($table, 'tipo',[
+                 'CUENTA CORRIENTE',
+                 'CUENTA SUELDO',
+                 'CUENTA PERSONAL',                 
+             ]);
             } 
  }
 

@@ -12,7 +12,7 @@ use common\helpers\h;
 ?>
 
 <div class="box box-success">
-  
+  <div class="box-body">
     
     <?php $form = ActiveForm::begin([
         'id'=>'myformulario'/*,'enableAjaxValidation'=>true*/
@@ -54,8 +54,8 @@ use common\helpers\h;
  </div> 
  
 <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12">
-    <?=Html::label(yii::t('sigi.labels','Edificio'),'desedi23',['class'=>'form-group'])?>
-     <?=Html::textInput( 'desedi23',Edificios::findOne($id)->nombre, ['id'=>'desedi23','disabled'=>true] )?>
+    <?=Html::label(yii::t('sigi.labels','Edificio'),'desedi23',['class'=>'control-label'])?>
+     <?=Html::textInput( 'desedi23',Edificios::findOne($id)->nombre, ['id'=>'desedi23','disabled'=>true,'class'=>'form-group form-control'] )?>
 
   </div>
    
@@ -63,4 +63,4 @@ use common\helpers\h;
     <?php ActiveForm::end(); ?>
 
 </div>
-    
+  </div>  

@@ -1,3 +1,3 @@
-<div id="carga">
-    vacio
+<div id="carga_estructura">
+    
 </div>

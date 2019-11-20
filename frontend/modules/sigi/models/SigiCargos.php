@@ -17,6 +17,8 @@ use Yii;
  */
 class SigiCargos extends \common\models\base\modelBase
 {
+  
+    public $booleanFields=['esegreso','regular'];
     /**
      * {@inheritdoc}
      */
@@ -31,8 +33,13 @@ class SigiCargos extends \common\models\base\modelBase
     public function rules()
     {
         return [
-            [['codcargo', 'descargo', 'esegreso', 'regular'], 'required'],
-            [['codcargo'], 'string', 'max' => 5],
+            [['codcargo', 'descargo'], 'required'],
+             [['codcargo'], 'unique'],
+            [['codcargo'], 'match',
+                'pattern'=>'/[1-9]{1}[0-9]{2}/',
+                'message'=>yii::t('sigi.errors','El formato debe de ser numérico de 3 dígitos y no comenzar por cero')
+             ],
+            [['codcargo'], 'string', 'max' => 4],
             [['descargo'], 'string', 'max' => 40],
             [['esegreso', 'regular'], 'string', 'max' => 1],
         ];
@@ -44,21 +51,21 @@ class SigiCargos extends \common\models\base\modelBase
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('sigi.labels', 'ID'),
-            'codcargo' => Yii::t('sigi.labels', 'Codcargo'),
-            'descargo' => Yii::t('sigi.labels', 'Descargo'),
-            'esegreso' => Yii::t('sigi.labels', 'Esegreso'),
-            'regular' => Yii::t('sigi.labels', 'Regular'),
+            'id' => Yii::t('app', 'ID'),
+            'codcargo' => Yii::t('app', 'Cod. Concepto'),
+            'descargo' => Yii::t('app', 'Descripción'),
+            'esegreso' => Yii::t('app', 'Esegreso'),
+            'regular' => Yii::t('app', 'Regular'),
         ];
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getSigiCargosedificios()
+   /* public function getSigiCargosedificios()
     {
         return $this->hasMany(SigiCargosedificio::className(), ['cargo_id' => 'id']);
-    }
+    }*/
 
     /**
      * {@inheritdoc}

@@ -38,7 +38,7 @@ class SigiUnidades extends \common\models\base\modelBase
     public function rules()
     {
         return [
-            [['codtipo', 'npiso','codpro', 'edificio_id', 'numero', 'nombre'], 'required'],
+            [['codtipo', 'npiso','codpro', 'edificio_id', 'numero', 'nombre','area'], 'required'],
             [['npiso', 'edificio_id', 'parent_id'], 'integer'],
            ['numero', 'unique', 'targetAttribute' => ['edificio_id','numero']],
             [['area', 'participacion'], 'number'],
@@ -69,14 +69,15 @@ class SigiUnidades extends \common\models\base\modelBase
     {
         return [
             'id' => Yii::t('sigi.labels', 'ID'),
-            'codtipo' => Yii::t('sigi.labels', 'Codtipo'),
-            'npiso' => Yii::t('sigi.labels', 'Npiso'),
-            'edificio_id' => Yii::t('sigi.labels', 'Edificio ID'),
+            'codtipo' => Yii::t('sigi.labels', 'Tipo'),
+             'codpro' => Yii::t('sigi.labels', 'Apoderado'),
+            'npiso' => Yii::t('sigi.labels', 'Piso'),
+            'edificio_id' => Yii::t('sigi.labels', 'Edificio'),
             'numero' => Yii::t('sigi.labels', 'Numero'),
             'nombre' => Yii::t('sigi.labels', 'Nombre'),
-            'area' => Yii::t('sigi.labels', 'Area'),
-            'participacion' => Yii::t('sigi.labels', 'Participacion'),
-            'parent_id' => Yii::t('sigi.labels', 'Parent ID'),
+            'area' => Yii::t('sigi.labels', 'Area (m2)'),
+            'participacion' => Yii::t('sigi.labels', '% Part'),
+            'parent_id' => Yii::t('sigi.labels', 'Padre'),
             'detalles' => Yii::t('sigi.labels', 'Detalles'),
         ];
     }
@@ -148,5 +149,28 @@ class SigiUnidades extends \common\models\base\modelBase
     
     public function isEntregado(){
         return (empty($this->estreno))?false:true;
+    }
+    
+    
+    
+    /*CALCULA LA PARTICIPACION */
+    
+    public function participacion($porcentaje=false){
+      if($this->isNewRecord){
+          return 0;
+      }else{
+         $areaTotal=$this->edificio->area();
+         if(!$porcentaje)
+           $areaTotal=$areaTotal*100;
+         return $areaTotal;
+         
+        if($areaTotal>0){
+            return $this->area/$areaTotal;
+        }else{
+           return 0; 
+        }  
+      }
+       
+        
     }
 }

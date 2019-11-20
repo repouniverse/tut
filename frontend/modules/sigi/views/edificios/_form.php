@@ -19,7 +19,7 @@ use common\widgets\selectwidget\selectWidget;
         <div class="col-md-12">
             <div class="form-group no-margin">
                 
-        <?= Html::submitButton(Yii::t('sigi.labels', 'Gurdar'), ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('<span class="fa fa-save"></span>'.'  '.Yii::t('sigi.labels', 'Guardar'), ['class' => 'btn btn-success']) ?>
             
 
             </div>
@@ -37,7 +37,7 @@ use common\widgets\selectwidget\selectWidget;
             'form'=>$form,
             'campo'=>'codtra',
          'ordenCampo'=>2,
-         'addCampos'=>[3,4,5],
+         'addCampos'=>[3,4],
         ]);  ?>
 
  </div> 
@@ -174,6 +174,14 @@ use common\widgets\selectwidget\selectWidget;
                         ]
                     )  ?>
 </div>
+    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+     <?= Html::label(yii::t('base.names','Area'),'45545rret',['class' => 'control-label']) ?>
+           
+            <?=  Html::textInput('45545rret',  $model->area(),['disabled'=>true,'class' => 'form-control form-group']) ?>
+          
+ </div>    
+          
+          
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
      <?= $form->field($model, 'detalles')->textarea(['rows' => 6]) ?>
 

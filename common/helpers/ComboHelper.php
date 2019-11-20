@@ -191,4 +191,16 @@ class ComboHelper  {
              'G'=>yii::t('base.names','GENERAL'),
                         ];
     }
+    
+     public static function getCboBancos(){
+         return ArrayHelper::map(
+                        \common\models\masters\Bancos::find()->all(),
+                'id','nombre');
+    }
+    
+    public static function getCboMonedas(){
+         return ArrayHelper::map(
+                        \common\models\masters\Monedas::find()->all(),
+                'codmon','codmon');
+    }
 }

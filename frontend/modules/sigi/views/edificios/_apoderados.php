@@ -6,13 +6,13 @@ use yii\helpers\Url;
 use yii\widgets\Pjax;
 use frontend\modules\sigi\models\SigiApoderadosSearch;
 ?>
-<div class="edificios-index">
+<div class="edificios-indexhghg">
 
      <div class="box-body">
          
 <?php
  $url= Url::to(['agrega-apoderado','id'=>$model->id,'gridName'=>'grilla-apoderados','idModal'=>'buscarvalor']);
-   echo  Html::button(yii::t('base.verbs','Insertar Apoderado'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Apoderado'),'id'=>'btn_contacts', 'class' => 'botonAbre btn btn-success']); 
+   echo  Html::button(yii::t('base.verbs','Insertar Apoderado'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Apoderado'),'id'=>'btn_apoderado', 'class' => 'botonAbre btn btn-success']); 
 ?> 
          
     <?php Pjax::begin(['id'=>'grilla-apoderados']); ?>
@@ -33,5 +33,5 @@ use frontend\modules\sigi\models\SigiApoderadosSearch;
     <?php Pjax::end(); ?>
 
     </div>
-
+ </div>
        

@@ -34,13 +34,14 @@ class selectWidget extends \yii\base\Widget
      */
      public $attribute=null;
      public $value=null;
-      public $options=null;
+      public $options=[];
       /********************************/
       
     public function init()
     {
        //echo "e";die();
-       $this->options=$this->inputOptions;
+        
+       //$this->options=$this->inputOptions;
       // $this->_orden=1;
         parent::init();
         //var_dump($this->model);die();
@@ -84,11 +85,11 @@ class selectWidget extends \yii\base\Widget
               'datos'=>$this->getDataSelectedByUser(),
               'orden'=>$this->_orden,
               'opciones'=>$this->inputOptions,
-             // 'valores'=>$valores,
+              'opcionesBase'=>$this->options,
                // 'idcontrolprefix'=>$this->getIdControl(),
                 ]);
         }else{
-            
+            //var_dump($this->options);die();
             //$valores=[$model->{$campo}=>
             //$this->getModelForeign()->{$this->getSecondField()}];
              return  $this->render('controls',[
@@ -101,7 +102,8 @@ class selectWidget extends \yii\base\Widget
                  'multiple'=>$this->multiple,
                   'datos'=>$this->getDataSelectedByUser(),
                   'orden'=>$this->_orden,
-                 'opciones'=>$this->inputOptions,
+                'opciones'=>$this->inputOptions,
+              'opcionesBase'=>$this->options,
                //  'valores'=>$valores,
                //  'idcontrolprefix'=>$this->getIdControl(),
                 ]);

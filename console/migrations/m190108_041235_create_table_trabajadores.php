@@ -44,7 +44,14 @@ if(!$this->existsTable($table)){
         $this->createIndex(uniqid('k_nombres'), static::NAME_TABLE, 'nombres');
           $this->createIndex(uniqid('k_nombrescompletos'), static::NAME_TABLE, ['nombres','ap','am']);
     
-    $this->putCombo($table, 'codpuesto', 'SUPERVISOR');      
+    $this->putCombo($table, 'codpuesto',
+            [
+                'EMPLEADO',
+                 'SUPERVISOR',
+                'DOCENTE',
+                'TUTOR',
+                'GERENTE GENERAL'
+                ]);      
   }
     
     

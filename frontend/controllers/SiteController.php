@@ -81,10 +81,14 @@ class SiteController extends Controller
             if(\backend\components\Installer::readEnv('APP_INSTALLED')=='false'){
                           
                 $this->redirect($urlBackend);             
-            }else{ 
+            }else{
+                
                 if(yii::$app->user->isGuest){
-                   $this->redirect('site/login'); 
+                   // echo "holsa"; die();
+                  return  $this->redirect(['site/login']);
+                    
                 }else{
+                    
                      return $this->render('index');
                 }
                
@@ -106,12 +110,12 @@ class SiteController extends Controller
      */
     public function actionLogin()
     {
-       
+      
         $this->layout="install";
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
- Yii::info(" paracopmrobar   ", __METHOD__);  
+ //Yii::info(" paracopmrobar   ", __METHOD__);  
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
                  $this->redirect(['sta/default/']);      

@@ -98,7 +98,7 @@
 }
 
 .grid-view table thead {
-    background-color: #eeeeee;
+    background-color: #eee;
 }
 .grid-view table thead a {
    color: #3d7711;
@@ -106,9 +106,17 @@ text-shadow: 1px 1px 1px rgba(58,97,19,0.4);
    font-weight:normal;
 }
 
+.grid-view table thead  {
+   color: #c16e19;
+   text-shadow: 1px 1px 0px rgba(230, 177, 26, 0.4);
+   /* font-weight:normal; */
+}
+
   .grid-view table td  {
    color: #8c6f07;
    text-shadow: 0px 0px 2px rgba(160, 159, 113, 0.94);
    font-size:12px;
 }
+
+
 

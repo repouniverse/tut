@@ -92,6 +92,7 @@ class ComposerStaticInitdb0b409cd7b5708c1b63db5a098648e5
             'yii\\composer\\' => 13,
             'yii\\bootstrap\\' => 14,
             'yii\\' => 4,
+            'yii2mod\\tree\\' => 13,
             'yii2mod\\settings\\' => 17,
             'yii2mod\\notify\\' => 15,
             'yii2mod\\enum\\' => 13,
@@ -128,6 +129,7 @@ class ComposerStaticInitdb0b409cd7b5708c1b63db5a098648e5
         ),
         'm' => 
         array (
+            'miloschuman\\highcharts\\' => 23,
             'mdm\\admin\\' => 10,
         ),
         'l' => 
@@ -300,6 +302,10 @@ class ComposerStaticInitdb0b409cd7b5708c1b63db5a098648e5
         array (
             0 => __DIR__ . '/..' . '/yiisoft/yii2',
         ),
+        'yii2mod\\tree\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/yii2mod/yii2-tree',
+        ),
         'yii2mod\\settings\\' => 
         array (
             0 => __DIR__ . '/..' . '/yii2mod/yii2-settings',
@@ -373,6 +379,10 @@ class ComposerStaticInitdb0b409cd7b5708c1b63db5a098648e5
         'nemmo\\attachments\\' => 
         array (
             0 => __DIR__ . '/..' . '/nemmo/yii2-attachments/src',
+        ),
+        'miloschuman\\highcharts\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/miloschuman/yii2-highcharts-widget/src',
         ),
         'mdm\\admin\\' => 
         array (

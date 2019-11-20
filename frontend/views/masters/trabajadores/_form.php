@@ -24,7 +24,7 @@ use yii\widgets\ActiveForm;
     <div class="box-header">
         <div class="col-md-12">
             <div class="form-group no-margin">
-                <?= Html::submitButton(Yii::t('base.verbs', 'Save'), ['class' => 'btn btn-success']) ?>
+                <?= Html::submitButton(Yii::t('base.verbs', 'Grabar'), ['class' => 'btn btn-success']) ?>
             </div>
         </div>
     </div>

@@ -18,9 +18,10 @@ if(!$this->existsTable($table)) {
                'codperiodo'=>$this->string(7)->append($this->collateColumn()),
                'periodo'=>$this->string(40)->append($this->collateColumn()),
              'activa'=>$this->char(1)->append($this->collateColumn()),
+        'tolerancia'=>$this->integer(2),
        
         ],$this->collateTable());
-   $this->addPrimaryKey('pk_codper',$table, 'codperiodo');
+   $this->addPrimaryKey('pk_codpe534r',$table, 'codperiodo');
             }
  }
 

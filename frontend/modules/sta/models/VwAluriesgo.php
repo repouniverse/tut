@@ -1,7 +1,7 @@
 <?php
 
 namespace frontend\modules\sta\models;
-
+use frontend\modules\sta\models\Alumnos;
 use Yii;
 
 /**
@@ -41,7 +41,7 @@ class VwAluriesgo extends \common\models\base\modelBase
     public function rules()
     {
         return [
-            [['id', 'nveces', 'creditos', 'ciclo'], 'integer'],
+            [['id', 'nveces'], 'integer'],
             [['codcur', 'codalu', 'codperiodo'], 'required'],
             [['ap', 'am', 'nombres', 'nomcur'], 'string', 'max' => 40],
             [['codfac'], 'string', 'max' => 8],
@@ -51,7 +51,7 @@ class VwAluriesgo extends \common\models\base\modelBase
             [['codcur'], 'string', 'max' => 10],
             [['codperiodo'], 'string', 'max' => 7],
             [['codcar'], 'string', 'max' => 6],
-            [['electivo'], 'string', 'max' => 1],
+           
         ];
     }
 
@@ -75,9 +75,7 @@ class VwAluriesgo extends \common\models\base\modelBase
             'codperiodo' => Yii::t('sta.labels', 'Codperiodo'),
             'codcar' => Yii::t('sta.labels', 'Codcar'),
             'nomcur' => Yii::t('sta.labels', 'Nomcur'),
-            'creditos' => Yii::t('sta.labels', 'Creditos'),
-            'electivo' => Yii::t('sta.labels', 'Electivo'),
-            'ciclo' => Yii::t('sta.labels', 'Ciclo'),
+            
         ];
     }
 
@@ -89,4 +87,13 @@ class VwAluriesgo extends \common\models\base\modelBase
     {
         return new VwAluriesgoQuery(get_called_class());
     }
+    
+     public function getAlumno()
+    {
+        return $this->hasOne(Alumnos::className(), ['codalu' => 'codalu']);
+    }
+    
+     public function getUrlImage(){
+       $this->alumno->getUrlImage();
+   }
 }

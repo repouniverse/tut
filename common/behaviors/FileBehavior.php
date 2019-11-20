@@ -124,6 +124,13 @@ class FileBehavior extends  Fileb
  }
  
  
+  public function countFiles(){
+     //return $this->files[0]->path;
+    return(count($this->files));
+     
+ }
+ 
+ 
  /*
   * Borra un archivo adjunto, solo le pasa el id
   * del registro

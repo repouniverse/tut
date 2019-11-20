@@ -1,6 +1,9 @@
 <?php
 
 namespace frontend\modules\sta\models;
+use frontend\modules\import\models\ImportCargamasiva as Cargamasiva;
+use frontend\modules\import\models\ImportCargamasivaUser;
+use common\helpers\h;
 use common\behaviors\FileBehavior;
 use Yii;
 
@@ -127,10 +130,58 @@ class Entregas extends \common\models\base\DocumentBase
         if($insert){
             //$this->prefijo=$this->codfac;
            $this->resolveCodocu();
+           $this->createUpload();
             $this->numero=$this->correlativo('numero');
         }
         
         return parent::beforeSave($insert);
        
     }
+    
+     private function createUpload(){
+      
+     if(!($this->cargamasiva_id >0 )){ //si no tiene carga masiva asociada aun 
+                $model=New CargaMasiva();
+                    $model->setAttributes([
+                         'user_id'=>h::userId(),
+                          'insercion'=>'1',
+                           'escenario'=>$this->escenario,
+                           'format'=>'csv',
+                                    //'tienecabecera'=>'1',
+                            'descripcion'=>$this->descripcion,
+                          'modelo'=>$this->modelo,
+                           ]);
+              if($model->save())
+                 $model->refresh();
+          
+     }else{
+         $model= CargaMasiva::findOne($this->cargamasiva_id);
+     }
+     
+     $this->cargamasiva_id=$model->id; //Enlazando entregas con Carga masiva   
+        $attributes=[
+            'cargamasiva_id'=>$model->id,
+             'descripcion'=>'CARGA MASIVA-'. uniqid(),
+            'activo'=>'10',
+             'tienecabecera'=>$this->tienecabecera,
+             // 'current_linea'=>1,
+             //'current_linea_test'=>1,
+             'user_id'=>h::userId(),
+            ];        
+        if(ImportCargamasivaUser::firstOrCreateStatic($attributes,'minimo')){
+            $carguita= ImportCargamasivaUser::lastRecordCreated();
+           // $carguita=$model->importCargamasivaUser[0];
+         if($this->hasAttachments()){
+            
+                $mensaje= $carguita->
+            attachFromPath($this->files[0]->getPath());
+            $carguita->total_linea=$carguita->csv->numberLinesToImport();
+            $carguita->save(); 
+         }
+            
+            //$datos['success']=$mensaje."<br>".yii::t('sta.messages','Se creó el detalla de carga exitosamente');
+        }
+        
+   
+   }
 }

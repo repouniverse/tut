@@ -14,19 +14,17 @@ use common\models\masters\Direcciones;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-    
-<div class="box box-success">
 
 
 
-    <?php $form = ActiveForm::begin(); ?>
+
+    <?php $form = ActiveForm::begin([
+        'id'=>'mycliproform',
+        'enableAjaxValidation' => true]); ?>
     <div class="box-footer">
         <div class="col-md-12">
             <div class="form-group no-margin">
-                <?= Html::submitButton("<span class=\"fa fa-save\"></span>".($model->isNewRecord) ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
-       
-            
-                <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+                <?= Html::submitButton("<span class=\"fa fa-cog\"></span>".($model->isNewRecord) ? 'Grabar' : 'Grabar', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
        
             </div>
         </div>
@@ -36,18 +34,20 @@ use common\models\masters\Direcciones;
     <?= $form->field($model, 'codpro')->textInput(['disabled'=>'disabled','maxlength' => true]) ?>
     </div>
        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
-    <?= $form->field($model, 'rucpro')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'rucpro',['enableAjaxValidation'=>true])->textInput(['maxlength' => true]) ?>
       </div>
-    <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
-    <?= $form->field($model, 'despro')->textInput(['maxlength' => true]) ?>
-    </div>
-        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+         <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
     <?= $form->field($model, 'telpro')->textInput(['maxlength' => true]) ?>
          </div>
-        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+        
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+    <?= $form->field($model, 'despro')->textInput(['maxlength' => true]) ?>
+    </div>
+       
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
     <?= $form->field($model, 'web')->textInput(['maxlength' => true]) ?>
           </div>
-        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <?= $form->field($model, 'deslarga')->textarea(['rows' => 6]) ?>
         </div>
    </div>
@@ -55,4 +55,4 @@ use common\models\masters\Direcciones;
     <?php ActiveForm::end(); ?>
 
 
-</div>
+

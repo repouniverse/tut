@@ -160,8 +160,14 @@ class CliproController extends baseController {
 
 
         $model = new Clipro();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if (h::request()->isAjax && $model->load(h::request()->post())) {
+                h::response()->format = \yii\web\Response::FORMAT_JSON;
+                return \yii\widgets\ActiveForm::validate($model);
+        }
+        
+        
+        
+        if ($model->load(h::request()->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->codpro]);
         }
 
@@ -201,7 +207,14 @@ class CliproController extends baseController {
             return $this->editField();
 
         $model = $this->findModel($id);
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if (h::request()->isAjax && $model->load(h::request()->post())) {
+                h::response()->format = \yii\web\Response::FORMAT_JSON;
+                return \yii\widgets\ActiveForm::validate($model);
+        }
+        
+        
+        
+        if ($model->load(h::request()->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->codpro]);
         }
         $searchModel = new DireccionesSearch();

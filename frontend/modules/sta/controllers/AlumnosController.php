@@ -4,11 +4,14 @@ namespace frontend\modules\sta\controllers;
 
 use Yii;
 use frontend\modules\sta\models\Alumnos;
+use frontend\modules\sta\models\Aluriesgo;
 use frontend\modules\sta\models\AlumnosSearch;
+use frontend\modules\sta\models\VwAluriesgoSearch;
 use frontend\controllers\base\baseController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-
+use common\helpers\h;
+use frontend\modules\sta\staModule;
 /**
  * AlumnosController implements the CRUD actions for Alumnos model.
  */
@@ -41,6 +44,21 @@ class AlumnosController extends baseController
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+    
+    
+    
+    public function actionAlumnosRiesgo()
+    {
+        
+        //var_dump(\frontend\modules\sta\models\Facultades::find()->select('codfac')->asArray()->all());die();
+        $searchModel = new VwAluriesgoSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('alumnosRiesgo', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
@@ -126,4 +144,34 @@ class AlumnosController extends baseController
 
         throw new NotFoundHttpException(Yii::t('sta.labels', 'The requested page does not exist.'));
     }
+    
+    
+   public function actionVerDetalles($id){
+       $model=$this->findModel($id);
+       //var_dump(Aluriesgo::cursosByStudentPeriod());
+       $dataProviders=$this->generateProviders($model->codalu,$model->periodsInRisk());
+       return $this->render('/alumnos/auxiliares/_form_view_alu',
+               ['model'=>$model,
+                'dataProviders'=>$dataProviders,
+                'codperiodo'=>staModule::getCurrentPeriod()]);
+   } 
+   private function generateProviders($codalu,$periods){
+       $arr=[];
+    foreach($periods as $period){
+        $arr[$period]= Aluriesgo::cursosByStudentPeriodProvider($codalu,$period);
+     }
+     return $arr;
+   }
+   
+   public function actionAjaxRenderInforme(){
+       if(h::request()->isAjax){
+           //$codalu=h::request()->get('codalu');
+          // $urlReport=h::request()->get('idreport');
+           $this->layout="install";
+          return $this->render('/alumnos/auxiliares/_informePDF',[
+               //'codalu'=>$codalu,
+               // 'urlReport'=>$urlReport,
+           ]);
+       }
+   }
 }

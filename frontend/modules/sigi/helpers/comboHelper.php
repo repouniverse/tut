@@ -10,6 +10,7 @@
 namespace frontend\modules\sigi\helpers;
 use common\helpers\ComboHelper as Combito;
 use yii\helpers\ArrayHelper;
+use yii;
 class comboHelper extends Combito
 {
      public static function getCboEdificios(){
@@ -68,6 +69,29 @@ class comboHelper extends Combito
       }
        
     }
+    
+    public static function getCboPisos($init=-3,$top=50){
+        $pisos=[];
+        for ($x = $init; $x <= $top; $x++) {
+              if($x<0){
+                  $prefijo=yii::t('sigi.labels','SÓTANO');
+              }else{
+                  $prefijo=yii::t('sigi.labels','PISO'); 
+              }
+             $pisos[$x]=$prefijo.' '.abs($x);
+            }
+        return $pisos;
+    }
+    
+   public static function getCboGrupos($id_edificio){
+        $apode= \frontend\modules\sigi\models\SigiCargosgrupoedificio::find()
+                ->where(['edificio_id'=>$id_edificio])
+                ->all();
+ 
+        return ArrayHelper::map($apode,
+                'codgrupo','descripcion');
+        
+    }  
 }
 
 

@@ -8,7 +8,9 @@ use common\helpers\h;
 use common\models\User;
 use frontend\modules\sta\models\UserFacultades;
 use frontend\modules\sta\models\Facultades;
+use frontend\modules\sta\models\Aluriesgo;
 use mdm\admin\models\searchs\User as UserSearch;
+use yii\web\NotFoundHttpException;
 use yii\helpers\ArrayHelper;
 /**
  * Default controller for the `sta` module
@@ -104,5 +106,30 @@ class DefaultController extends Controller
         }
         
     }
+    
+    public function actionResumenFacultad($codfac){
+        $model=$this->loadFacultad($codfac);
+        $provAlumnos= Aluriesgo::worstStudentsByFacProvider($codfac);
+        $provCursos= Aluriesgo::worstCursosByFacProvider($codfac);
+        $nalumnos=Aluriesgo::studentsInRiskByFacQuery($codfac)->count();
+        //var_dump($provCursos);die();
+        return $this->render('resumenFacultad',[
+                   'model'=>$model,
+            'nalumnos'=>$nalumnos,
+                   'provAlumnos'=>$provAlumnos,
+                   'provCursos'=>$provCursos,
+                    ]);
+    } 
+    
+    private function loadFacultad($codfac){
+        
+       if (($model = Facultades::findOne($codfac)) !== null) {
+            return $model;
+        }
+        throw new NotFoundHttpException(Yii::t('base.names', 'The requested page does not exist.'));
+             
+
+    } 
+    
     
 }

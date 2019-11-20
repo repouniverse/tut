@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use kartik\grid\GridView;
 use yii\widgets\Pjax;
 use frontend\modules\sigi\models\SigiUnidadesSearch;
@@ -75,7 +76,10 @@ $gridColumns = [
 ],
 ];
 
-    
+
+ $url= Url::to(['agrega-unidad','id'=>$model->id,'gridName'=>'grilla-unidades','idModal'=>'buscarvalor']);
+   echo  Html::button(yii::t('base.verbs','Agregar Unidad'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Unidad'),'id'=>'btn_contacts', 'class' => 'botonAbre btn btn-success']); 
+Pjax::begin(['id'=>'grilla-unidades']);
   echo GridView::widget([
     'id' => 'kv-grid-demo',
     'dataProvider' => (New SigiUnidadesSearch())->searchByEdificio($model->id),
@@ -111,6 +115,10 @@ $gridColumns = [
     'itemLabelPlural' => yii::t('sta.labels','Unidades'),
 ]);  
 
+  
+  
+  Pjax::end();
+  
 ?>
     
   

@@ -46,47 +46,53 @@ class Installer
     
      public static function getRutas() {
          return [
-             'rbac'=>[
+             'RBAC'=>[
         '/admin/permission/index'=>Yii::t('base.names', 'Permisos'),
-        '/admin/permission/create'=>Yii::t('base.actions', 'Crear Permiso'),
+       // '/admin/permission/create'=>Yii::t('base.actions', 'Crear Permiso'),
          '/admin/role/index'=>Yii::t('base.names', 'Roles'),
-        '/admin/role/create'=>Yii::t('base.actions', 'Crear Rol'),
+        '/admin'=>Yii::t('base.actions', 'Asignaciones'),
+                 
          '/admin/rule/index'=>Yii::t('base.names', 'Reglas'),
-        '/admin/rule/create'=>Yii::t('base.actions', 'Crear Regla'),
+       // '/admin/rule/create'=>Yii::t('base.actions', 'Crear Regla'),
            ],
-             'user'=>[
-                        '/admin/user/logout'=>Yii::t('base.actions', 'Salir'),
+             'User'=>[
+                        //'/admin/user/logout'=>Yii::t('base.actions', 'Salir'),
                         '/admin/user/signup'=>Yii::t('base.actions', 'Registrarse'),
-                        '/admin/user/request-password-reset'=>Yii::t('base.actions', 'Cambiar pass'),
+                        //'/admin/user/request-password-reset'=>Yii::t('base.actions', 'Solicitar'),
                         //'/admin/user/reset-password'=>Yii::t('base.actions', 'Reset Pwd'),
                         '/admin/user/change-password'=>Yii::t('base.actions', 'Cambiar Pass'),
                   ],
              
-             'menu'=>[
-                        '/admin/menu/create'=>Yii::t('base.actions', 'Crear Menu'),
+             'Menu'=>[
+                        //'/admin/menu/create'=>Yii::t('base.actions', 'Crear Menu'),
                         '/admin/menu/index'=>Yii::t('base.names', 'Menu'),
                         '/admin/route/index'=>Yii::t('base.names', 'Rutas'),
-                        '/admin/route/create'=>Yii::t('base.actions', 'Crear Ruta'),
+                       // '/admin/route/create'=>Yii::t('base.actions', 'Crear Ruta'),
                        
                   ],
-             
-             'masters'=>[
-                        '/masters/centros/index'=>Yii::t('base.names', 'Centros'),
-                        '/masters/combovalores/index'=>Yii::t('base.names', 'Valores Tablas'),
-                       /// '/masters/combovalores/create'=>Yii::t('base.actions', 'Crear Tabla'),
-                        '/masters/documents/index'=>Yii::t('base.names', 'Documentos'), 
+             'Masters'=>[
+                        '/masters/trabajadores/index'=>Yii::t('base.names', 'Colaboradores'),
+                        '/masters/clipro/index'=>Yii::t('base.names', 'Proveedores'),
+                        '/masters/bancos/index'=>Yii::t('base.actions', 'Bancos'),
+                        '/documentos/index'=>Yii::t('base.names', 'Documentos'), 
                   ],
-             'parameters'=>[
+                 'Gestion'=>[
+                        '/sigi/edificios/index'=>Yii::t('base.names', 'Edificios'),
+                        '/sigi/cargos/index'=>Yii::t('base.names', 'Cargos'),
+                        '/sigi/unidades/index'=>Yii::t('base.actions', 'Unidades'),
+                      
+                  ],
+             //'parameters'=>[
                         //'/parameteres/createmaster'=>Yii::t('base.actions', 'Crear Parametro'),
                         //'/parameters/createparamdocu'=>Yii::t('base.actions', 'Crear Paramaeters Documents'),
-                        '/parameters/index'=>Yii::t('base.names', 'Param Centros'),
-                        '/parameters/indexmaster'=>Yii::t('base.names', 'Parametros'),
-                        '/parameters/indexparamdocu'=>Yii::t('base.names', 'Param Docum'), 
-                  ],
+                        //'/parameters/index'=>Yii::t('base.names', 'Param Centros'),
+                        //'/parameters/indexmaster'=>Yii::t('base.names', 'Parametros'),
+                        //'/parameters/indexparamdocu'=>Yii::t('base.names', 'Param Docum'), 
+                  //],
              
              ];
         }
-    public static function getPurerutas(){
+    public static function  getPurerutas(){
         $rutas=[];
         foreach(static::getRutas() as $clave=>$matriz){
             $rutas=array_merge($rutas,array_keys($matriz));
@@ -482,7 +488,9 @@ public static function createBasicRole(){
     if(yii::$app->hasModule('admin')){
         static::createRoutes(); 
         
-         $idUser=yii::$app->session->get('newUser');
+         //Recuerde que ya se almaceno el id del pirmer usuario 
+        //en sesion , aqui solo se consulta la sesion
+        $idUser=yii::$app->session->get('newUser');
         if(is_null($idUser))
          $idUser= \mdm\admin\models\User::findOne()->id;
         

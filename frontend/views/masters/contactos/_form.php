@@ -44,19 +44,28 @@ use yii\widgets\ActiveForm;
     
 });",yii\web\View::POS_END) ?>
 <div class="contactos-form">
-
+<div class="box box-body">
     <?php  
    // PRINT_r($aditionalParams);DIE();
     $form = ActiveForm::begin(['action'=>h::request()->url]); ?>
     <?= $form->errorSummary($model,['errorOptions' => ['encode' => false,'class' => 'help-block']]); ?>
- <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+ 
+     <div class="box-header">
+        <div class="col-md-12">
+            <div class="form-group no-margin">
+                <?= Html::submitButton(Yii::t('base.verbs', 'Save'), ['class' => 'btn btn-success']) ?>
+            </div>/
+        </div>
+    </div>
+    
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
    <?= $form->field($model, 'nombres')->textInput(['maxlength' => true]) ?>
-  </div><div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  </div>
+    
+    <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
     <?= $form->field($model, 'moviles')->textInput(['maxlength' => true]) ?>
  </div><div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
     <?= $form->field($model, 'mail')->textInput(['maxlength' => true]) ?>
- </div><div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
-    <?= $form->field($model, 'mail1')->textInput(['maxlength' => true]) ?>
  </div>
      <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
       <?php if(!h::request()->isAjax){
@@ -82,13 +91,12 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'fenac')->textInput(['maxlength' => true]) ?>
  </div>
 
-        <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>
-    
     <?php ActiveForm::end(); ?>
      <?php 
-   echo \yii\helpers\Html::a('pinchar', \yii\helpers\Url::toRoute(['/masters/clipro/createcontact','id'=>'370003',  'final'=>'si']), []);
+  // echo \yii\helpers\Html::a('pinchar', \yii\helpers\Url::toRoute(['/masters/clipro/createcontact','id'=>'370003',  'final'=>'si']), []);
   // $this->registerJs("$('#btn_prueba').on('click', function (ev) { $.pjax({container:'grilla-contactos'}); });",View::POS_HEAD); 
    //$this->registerJs("$('#btn_prueba').on('click',  alert('caramba'))",View::POS_READY); 
   // echo Html::button('Press me!', ['onClick' => "$('#mibotonmodal').click();"]) ;
    ?> 
+</div>
 </div>

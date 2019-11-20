@@ -13,6 +13,9 @@ use Yii;
  */
 class Periodos extends \common\models\base\modelBase
 {
+   
+    
+    public $booleanFields=['activa'];
     /**
      * {@inheritdoc}
      */
@@ -54,5 +57,14 @@ class Periodos extends \common\models\base\modelBase
     public static function find()
     {
         return new PeriodosQuery(get_called_class());
+    }
+    
+    
+    public function beforeSave($insert) {
+        if($this->activa){
+           $this->updateAll(['activa' => 0], "codperiodo <>'".$this->codperiodo."'");
+        }
+        return parent::beforeSave($insert);
+        
     }
 }

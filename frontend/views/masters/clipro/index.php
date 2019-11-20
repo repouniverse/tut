@@ -1,5 +1,5 @@
 <?php
-
+use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
@@ -14,9 +14,11 @@ $this->title = Yii::t('base.names', 'Clipros');
 <div class="clipro-index">
 
     <h4><?= Html::encode($this->title) ?></h4>
-    <?php Pjax::begin(); ?>
+    <?php Pjax::begin(['id'=>'clipropj']); ?>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
+      <p>
+        <?= Html::a('<span class="fa fa-industry"></span>'.'  '.Yii::t('app', 'Crear Empresa'), ['create'], ['class' => 'btn btn-success']) ?>
+    </p>
     
 
     <?= GridView::widget([
@@ -25,30 +27,56 @@ $this->title = Yii::t('base.names', 'Clipros');
          'summary' => '',
         //'tableOptions'=>['class'=>".thead-dark table table-condensed table-hover table-bordered table-striped"],
         'columns' => [
-           [
-                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{view} {update}',
-                /*'buttons' => [
-                'myButton' => function($url, $model, $key) {     // render your custom button
-                    return Html::a('holis',null,["onClick"=>"alert('holis');"]);
-                }
-               ]*/
-                
-                
-                
+           ['class' => 'yii\grid\ActionColumn',
+                'template'=>'{update}{view}{delete}',
+                'buttons'=>[
+                    'update'=>function($url,$model){
+                        $url=\yii\helpers\Url::toRoute(['edit','id'=>$model->codpro]);
+                        return \yii\helpers\Html::a(
+                                '<span class="btn btn-success glyphicon glyphicon-pencil"></span>',
+                                $url,
+                                ['data-pjax'=>'0']
+                                );
+                     },
+                     'view'=>function($url,$model){
+                        $url=\yii\helpers\Url::toRoute(['view','id'=>$model->codpro]);
+                        return \yii\helpers\Html::a(
+                                '<span class="btn btn-success glyphicon glyphicon-search"></span>',
+                                $url,
+                                ['data-pjax'=>'0']
+                                );
+                     },
+                             'delete' => function ($url,$model) {
+			    $url = \yii\helpers\Url::toRoute($this->context->id.'/deletemodel-for-ajax');
+                             return \yii\helpers\Html::a('<span class="btn btn-danger glyphicon glyphicon-trash"></span>', '#', ['title'=>$url,/*'id'=>$model->codparam,*/'family'=>'holas','id'=>\yii\helpers\Json::encode(['id'=>$model->codpro,'modelito'=> str_replace('@','\\',get_class($model))]),/*'title' => 'Borrar'*/]);
+                            }
+                   ]
                 ],
            
             'codpro',
             'despro',
             'rucpro',
-            'telpro',
-            'web',
+           
             //'deslarga:ntext',
 
               
         ],
     ]); ?>
+    
+    
+    <?php 
+   echo linkAjaxGridWidget::widget([
+           'id'=>'widgetgridBancos',
+            'idGrilla'=>'clipropj',
+            'family'=>'holas',
+          'type'=>'POST',
+           'evento'=>'click',
+            //'foreignskeys'=>[1,2,3],
+        ]); 
+   ?>
+    
     <?php Pjax::end(); ?>
 </div>
     
 </div>
+

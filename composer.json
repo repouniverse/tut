@@ -46,7 +46,7 @@
         "linslin/yii2-curl": "*",
         "ruskid/yii2-csv-importer": "dev-master",
         "kv4nt/yii2-owl-carousel2": "*",
-        "rmrevin/yii2-fontawesome": "2.10.*",
+        "rmrevin/yii2-fontawesome": "~2.9",
         "2amigos/yii2-chartjs-widget": "~2.0",
         "kartik-v/yii2-detail-view": "@dev",
         "kartik-v/yii2-datecontrol": "dev-master",
@@ -54,7 +54,9 @@
         "fxp/composer-asset-plugin": "*",
         "ptrnov/yii2-scheduler-fullcalendar": "*",
         "kriss/yii2-calendar-schedule": "^1.0" ,
-        "myclabs/deep-copy": "=1.9.3"
+        "myclabs/deep-copy": "=1.9.3",
+        "yii2mod/yii2-tree": "*",
+        "miloschuman/yii2-highcharts-widget": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

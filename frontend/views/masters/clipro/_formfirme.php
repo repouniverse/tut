@@ -31,21 +31,21 @@ echo TabsX::widget([
             'active' => true
         ],
         [
-            'label' => yii::t('base.names','Contacts'),
+            'label' => yii::t('base.names','Contactos'),
          'content' => $this->render('_tab_contactos',['dpContactos'=>$dpContactos,'model'=>$model]),
             'headerOptions' => ['style'=>'font-weight:bold'],
             'options' => ['id' => 'myveryownID1'],
             'active' => false
         ],
         [
-            'label' => yii::t('base.names','Addresses'),
+            'label' => yii::t('base.names','Direcciones'),
             'content' => $this->render('_tab_direcciones',['dpDirecciones'=>$dpDirecciones,'model'=>$model]),
             'headerOptions' => ['style'=>'font-weight:bold'],
             'options' => ['id' => 'myveryownID2'],
             'active' => false
         ],
         [
-            'label' => yii::t('base.names','Materials'),
+            'label' => yii::t('base.names','Materiales'),
             'content' => $this->render('_tab_materiales',['dpMaestroclipro'=>$dpMaestroclipro,'model'=>$model]),
             'headerOptions' => ['style'=>'font-weight:bold'],
             'options' => ['id' => 'myveryownID3'],
@@ -53,7 +53,7 @@ echo TabsX::widget([
         ],
         
         [
-            'label' => yii::t('base.names','Objects'),
+            'label' => yii::t('base.names','Objetos'),
             'content' => $this->render('_tab_objetos',['dpObjetosCliente' =>$dpObjetosCliente ,'model'=>$model]),
             'headerOptions' => ['style'=>'font-weight:bold'],
             'options' => ['id' => 'myveryowdfgnID3'],

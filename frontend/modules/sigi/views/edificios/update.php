@@ -11,8 +11,8 @@ ECHO \common\widgets\spinnerWidget\spinnerWidget::widget();
 /* @var $this yii\web\View */
 /* @var $model frontend\modules\sigi\models\Edificios */
 
-$this->title = Yii::t('sigi.labels', 'Update Edificios: {name}', [
-    'name' => $model->id,
+$this->title = Yii::t('sigi.labels', 'Editar Edificio: {name}', [
+    'name' => $model->nombre,
 ]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('sigi.labels', 'Edificios'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
@@ -45,11 +45,26 @@ $this->params['breadcrumbs'][] = Yii::t('sigi.labels', 'Update');
           'label'=>'<i class="fa fa-users"></i> '.yii::t('sta.labels','Apoderados'), //$this->context->countDetail() obtiene el contador del detalle
             'content'=> $this->render('_apoderados',[ 'model' => $model]),
             'active' => false,
-             'options' => ['id' => 'myveryoddwnID4'],
+             'options' => ['id' => 'dwnID4'],
         ],
-       
-        
-       
+       [
+          'label'=>'<i class="fa fa-users"></i> '.yii::t('sta.labels','Documentos'), //$this->context->countDetail() obtiene el contador del detalle
+            'content'=> $this->render('_docus',[ 'model' => $model]),
+            'active' => false,
+             'options' => ['id' => 'cnID4'],
+        ],
+        [
+          'label'=>'<i class="fa fa-users"></i> '.yii::t('sta.labels','Cuentas'), //$this->context->countDetail() obtiene el contador del detalle
+            'content'=> $this->render('_cuentas',[ 'model' => $model]),
+            'active' => false,
+             'options' => ['id' => 'cnID6'],
+        ],
+       [
+          'label'=>'<i class="fa fa-users"></i> '.yii::t('sta.labels','Grupos'), //$this->context->countDetail() obtiene el contador del detalle
+            'content'=> $this->render('_grupocargos',[ 'model' => $model]),
+            'active' => false,
+             'options' => ['id' => 'cnID7'],
+        ],
     ],
 ]);  ?>
 

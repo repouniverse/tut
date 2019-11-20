@@ -7,6 +7,7 @@ $params = array_merge(
 );
 
 return [
+    'name'=>'Backend',
     //'language'=>'es_PE',
     'id' => 'backend',
     'basePath' => dirname(__DIR__),
@@ -27,7 +28,7 @@ return [
        'view' => [ //yii\base\View|yii\web\View
          'theme' => [
              'pathMap' => [
-                '@app/views' => '@vendor/dmstr/yii2-adminlte-asset/example-views/yiisoft/yii2-app-backend'
+                '@app/views' => '@app/views/yii2-app-backend'
              ],
          ],
           ],

@@ -68,7 +68,7 @@ class DocumentosController extends Controller
      */
     public function actionCreate()
     {
-       echo "ola";die();
+       
         $model = new Documentos();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {

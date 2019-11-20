@@ -18,16 +18,22 @@ use common\helpers\h;
 
   <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
      <?= Html::label(yii::t('base.names','Facultad'),'45545rret',['class' => 'control-label']) ?>
-    <?=  Html::input('text', 'namefacu', $model->facultad->desfac,['disabled'=>'disabled','class' => 'form-control']) ?>
-            
-
+           <?php if( $model->hasProperty('facultad')){ ?>
+            <?=  Html::input('text', 'namefacu', $model->facultad->desfac,['disabled'=>'disabled','class' => 'form-control']) ?>
+           <?php } else { ?>
+            <?=  Html::input('text', 'namefacu', $model->desfac,['disabled'=>'disabled','class' => 'form-control']) ?>
+           <?php }  ?>
  </div>
   
    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
      <?= Html::label(yii::t('base.names','Carrera'),'4u5545rret',['class' => 'control-label']) ?>
-    <?=  Html::input('text', 'namefacu', $model->carrera->descar,['disabled'=>'disabled','class' => 'form-control']) ?>
-            
-
+     <?php if( $model->hasProperty('carrera')){ ?>
+            <?=  Html::input('text', 'namefacxu', $model->carrera->descar,['disabled'=>'disabled','class' => 'form-control']) ?>
+           <?php } else { ?>
+            <?=  Html::input('text', 'namefacxu', $model->descar,['disabled'=>'disabled','class' => 'form-control']) ?>
+           <?php }  ?>
+                   
+                  
  </div>
           
           
@@ -74,10 +80,7 @@ use common\helpers\h;
   
           
           
-  <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
-     <?= $form->field($model, 'fecna')->textInput(['disabled' => 'disabled']) ?>
-
- </div>
+  
           
           
           

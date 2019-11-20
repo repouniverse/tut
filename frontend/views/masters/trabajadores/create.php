@@ -3,15 +3,13 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\masters\Trabajadores */
+/* @var $model common\models\Sociedades */
 
-$this->title = Yii::t('base.actions', 'Create Worker', [
-    'name' => $model->codigotra,
-]);
-$this->params['breadcrumbs'][] = ['label' => Yii::t('control.errors', 'Trabajadores'), 'url' => ['index']];
+$this->title = Yii::t('base.actions', 'Crear colaborador');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('control.errors', 'Colaboradores'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="trabajadores-create">
+<div class="sociedades-create">
 
     <h4><?= Html::encode($this->title) ?></h4>
 
@@ -20,3 +18,4 @@ $this->params['breadcrumbs'][] = $this->title;
     ]) ?>
 
 </div>
+

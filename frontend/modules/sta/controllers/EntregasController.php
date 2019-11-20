@@ -189,7 +189,7 @@ class EntregasController extends baseController
      
         $id=h::request()->get('id');
         $entrega= $this->findModel($id);
-   if($entrega->hasAttachments()){
+   //if($entrega->hasAttachments()){
      if(!($entrega->cargamasiva_id >0 )){ //si no tiene carga masiva asociada aun 
                     $model=New CargaMasiva();
                          $model->setAttributes([
@@ -221,12 +221,18 @@ class EntregasController extends baseController
              'user_id'=>h::userId(),
             ];        
         if(ImportCargamasivaUser::firstOrCreateStatic($attributes,'minimo')){
-           // $carguita=$model->importCargamasivaUser[0];
             $carguita= ImportCargamasivaUser::lastRecordCreated();
-        $mensaje= $carguita->
+           // $carguita=$model->importCargamasivaUser[0];
+             yii::error('holis');
+            
+         if($entrega->hasAttachments()){
+            yii::error(' --->  el path desde qe jala   '.$entrega->files[0]->getPath());
+                $mensaje= $carguita->
             attachFromPath($entrega->files[0]->getPath());
             $carguita->total_linea=$carguita->csv->numberLinesToImport();
-            $carguita->save();
+            $carguita->save(); 
+         }
+            
             //$datos['success']=$mensaje."<br>".yii::t('sta.messages','Se creó el detalla de carga exitosamente');
         }
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;  
@@ -234,9 +240,10 @@ class EntregasController extends baseController
            'model'=>$carguita,
            'identrega'=>$entrega->id,
                ]);
-   } else{
-        
-    }
+   //} else{
+      //Yii::$app->response->format = \yii\web\Response::FORMAT_JSON; 
+     // return ['error'=>'Este registro todavía no tiene un archivo de carga adjunto'];
+   // }
    
    }
    /*
@@ -254,4 +261,8 @@ class EntregasController extends baseController
                 'id' => $carga->id]);
        }
    
+       
+      
+       
+       
 }

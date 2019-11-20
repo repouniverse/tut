@@ -10,7 +10,7 @@ class m190919_034012_create_table_entrega extends baseMigration
 {
      const NAME_TABLE='{{%sta_entregas}}';
    const NAME_TABLE_PERIODOS='{{%sta_periodos}}';
-    // const NAME_TABLE_MATERIAS='{{%sta_materias}}';
+     const NAME_TABLE_FACU='{{%sta_facultades}}';
        const NAME_TABLE_ALUMNOS='{{%sta_alu}}';
     public function safeUp()
     {
@@ -20,7 +20,7 @@ if(!$this->existsTable($table)) {
          'id'=>$this->primaryKey(),
         'descripcion'=>$this->string(40)->append($this->collateColumn())->notNull(),
         
-         // 'codfac'=>$this->string(8)->append($this->collateColumn())->notNull(),
+         'codfac'=>$this->string(8)->append($this->collateColumn())->notNull(),
           'fecha'=>$this->char(10)->append($this->collateColumn())->notNull(),
          'fechacorte'=>$this->char(10)->append($this->collateColumn())->notNull(),
         'version'=>$this->char(1)->append($this->collateColumn()),
@@ -40,8 +40,8 @@ if(!$this->existsTable($table)) {
        
         ],$this->collateTable());
    //$this->addPrimaryKey('pk_codmateria',$table, 'codcur');
-  /*  $this->addForeignKey($this->generateNameFk($table), $table,
-              'codfac', static::NAME_TABLE_FACU,'codfac');*/
+    $this->addForeignKey($this->generateNameFk($table), $table,
+              'codfac', static::NAME_TABLE_FACU,'codfac');
        
         $this->addForeignKey($this->generateNameFk($table), $table,
               'codperiodo', static::NAME_TABLE_PERIODOS,'codperiodo');

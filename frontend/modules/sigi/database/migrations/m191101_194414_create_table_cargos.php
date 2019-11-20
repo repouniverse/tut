@@ -20,8 +20,8 @@ if(!$this->existsTable($table)) {
         'id'=>$this->primaryKey(),
         'codcargo'=>$this->char(5)->notNull()->append($this->collateColumn()),
         'descargo'=>$this->string(40)->notNull()->append($this->collateColumn()),
-        'esegreso'=>$this->char(1)->notNull()->append($this->collateColumn()),
-        'regular'=>$this->char(1)->notNull()->append($this->collateColumn()),        
+        'esegreso'=>$this->char(1)->append($this->collateColumn()),
+        'regular'=>$this->char(1)->append($this->collateColumn()),        
         ],$this->collateTable());
      
             } 

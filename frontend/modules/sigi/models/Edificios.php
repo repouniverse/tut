@@ -2,6 +2,7 @@
 
 namespace frontend\modules\sigi\models;
 use common\models\masters\Trabajadores;
+use frontend\modules\sigi\models\SigiUnidades;
 use common\models\masters\Centros;
 use Yii;
 
@@ -103,5 +104,16 @@ class Edificios extends \common\models\base\modelBase
     public static function find()
     {
         return new EdificiosQuery(get_called_class());
+    }
+    
+    private function queryUnidades(){
+        return SigiUnidades::find()->where(['[[edificio_id]]'=>$this->id]);
+    }
+    
+    public function area(){
+        if($this->isNewRecord)
+        return 0;
+        //var_dump($this->queryUnidades()->sum('[[area]]'));die();
+        return $this->queryUnidades()->sum('[[area]]');
     }
 }

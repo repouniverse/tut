@@ -6,6 +6,7 @@ use yii\web\Controller;
 use yii\helpers\Html;
 use yii\web\Response;
 use yii\widgets\ActiveForm;
+use common\models\base\modelBase as modeloBase;
 /**
  * CliproController implements the CRUD actions for Clipro model.
  */
@@ -171,25 +172,24 @@ private static function findKeyArrayInPost(){
 	//$modelClass=unserialize(h::request()->get(static::NOMBRE_CLASE_PARAMETER));
        // $id=h::request()->get(static::ID_CLASE_PARAMETER);
         $model=$modelClass::findOne($id);
-        if($model instanceof modelBase){           
+        if($model instanceof modeloBase){           
                 if($model->hasChilds()){
-                    $datos['error']=yii::t('base.errors','The record has Childs Records ');  
+                    $datos['error']=yii::t('base.errors','El registro tiene otros registros hijos ');  
                 }else{
                       try{ 
                              if($model->delete()<> false){
-                                 $datos['success']=yii::t('base.errors','The record was deleted successfully...!');  
+                                 $datos['success']=yii::t('base.errors','El registro fue borrado sin problemas...!');  
                             }
                           } catch (Exception $ex) {
-                             $datos['error']=yii::t('base.errors','There are some troubles by deleting this record : {mensaje} ',['mensaje'=>$ex->getMessage()]);  
+                             $datos['error']=yii::t('base.errors','Hubo un problema al intentar borrar este registro : {mensaje} ',['mensaje'=>$ex->getMessage()]);  
                 
                             }
                 }              
         }else{
             if(is_null($model)){
-                $datos['error']=yii::t('base.errors','Record not found for delete  for this key: {identidad} ',['identidad'=>$id]);  
-             
-            }else{
-             $datos['error']=yii::t('base.errors','The class : "{clase}" is not Instance of "baseModel" ',['clase'=>$modelClass]);  
+                $datos['error']=yii::t('base.errors','No se encontró ningún registro con este id: {identidad} ',['identidad'=>$id]);  
+             }else{
+             $datos['error']=yii::t('base.errors','La clase : "{clase}" no es una instancia de "baseModel" ',['clase'=>$modelClass]);  
             
             }    
         }

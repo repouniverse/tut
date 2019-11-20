@@ -58,7 +58,15 @@ class SettingsController extends Controller
            yii::$app->session->set('codmon',$model->moneda);
             $comp=New Sociedades();            
             $vale=$comp->firstOrCreate(['socio'=>'B','rucsoc'=>$model->rucCompany,'dsocio'=>$model->companyName,'mail'=>$model->emailCompany]);
-           $this->redirect(Yii::$app->urlManager->createUrl("install/settings/mail"));
+           \Yii::$app->db->createCommand()->
+             batchInsert('{{%centros}}',
+             ['codcen','nomcen','codsoc'], 
+              [['1204','CENTRO OP LIMA','B'],
+                ['1450','CENTRO OP SUR','B'],
+                  ['1580','CENTRO OP NORTE','B']]       
+                     )->execute();
+    
+            $this->redirect(Yii::$app->urlManager->createUrl("install/settings/mail"));
         }
         return $this->render('create',['model'=>$model]);
     }

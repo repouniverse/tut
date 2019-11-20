@@ -22,11 +22,11 @@
               type: 'get',
               data:{id:".$model->id."},
               dataType: 'json', 
-              error:  function(xhr, textStatus, error){               
+               error:  function(xhr, textStatus, error){               
                             var n = Noty('id');                      
                               $.noty.setText(n.options.id, error);
                               $.noty.setType(n.options.id, 'error');       
-                                }, 
+                                },  
               success: function(json) {  
                        $.pjax.reload({container: '#grilla-cargas'});
                         }

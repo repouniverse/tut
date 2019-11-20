@@ -11,11 +11,11 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('base.names', 'Clipros'), 'u
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
-<div class="box box-success">
+
 <div class="clipro-view">
 
     <h4><?= Html::encode($this->title) ?></h4>
-
+<div class="box box-success">
     <p>
         <?= Html::a(Yii::t('base.verbs', 'Update'), ['update', 'id' => $model->codpro], ['class' => 'btn btn-primary']) ?>
        
@@ -33,5 +33,4 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]) ?>
 
-</div>
-</div>
+</div></DIV>

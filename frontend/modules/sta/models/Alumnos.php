@@ -150,6 +150,8 @@ class Alumnos extends \common\models\base\modelBase implements PersonInterface ,
         return $this->hasOne(Profile::className(), ['id' => 'profile_id']);
     }
     
+    
+    
 
     /**
      * {@inheritdoc}
@@ -233,5 +235,24 @@ class Alumnos extends \common\models\base\modelBase implements PersonInterface ,
            return staModule::getPathImage($this->codalu);        
        }
    }
-    
+    /*
+     * Cuantos cursos itiene en riresgo ene lactual periodo
+     */
+   public function howManyRisks(){
+       return Aluriesgo::find()->where([
+           '[[codalu]]'=>$this->codalu,
+           '[[codperiodo]]'=> staModule::getCurrentPeriod(),
+               ])->count();
+       
+   }
+   
+     /*
+      * Que periodos son los que ha etado en riesgo
+      */
+   public function periodsInRisk(){
+       return array_column(Aluriesgo::find()->select('[[codperiodo]]')->where([
+           '[[codalu]]'=>$this->codalu])->asArray()->all(),'codperiodo');
+       
+   }
+   
 }

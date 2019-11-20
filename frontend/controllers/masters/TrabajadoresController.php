@@ -6,7 +6,7 @@ use Yii;
 use common\models\masters\Trabajadores;
 use common\models\config\Configuracion;
 use common\models\masters\TrabajadoresSearch;
-
+use frontend\controllers\base\baseController;
 use common\models\base\modelBase;
 use common\helpers\h;
 use yii\web\Controller;
@@ -18,7 +18,7 @@ use Carbon\Carbon;
 /**
  * TrabajadoresController implements the CRUD actions for Trabajadores model.
  */
-class TrabajadoresController extends Controller
+class TrabajadoresController extends baseController
 {
     /**
      * {@inheritdoc}
@@ -41,12 +41,36 @@ class TrabajadoresController extends Controller
      */
     public function actionIndex()
     { 
-       //echo date('w');die();
-       $carboncito = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s','2019-08-23 15:34:12')->endOfDay(
+     /*$rows=\frontend\modules\sta\models\Aluriesgo::find()->from('{{%sta_aluriesgo}} t ')->select([
+         'count([[t.codcur]]) as cant',
+         'm.codalu','t.codperiodo',
+         ])->innerJoin('{{%sta_alu}} m ','[[t.codalu]]=m.codalu')
+         ->addSelect(['m.ap','m.am','m.nombres'])->where(['[[t.codfac]]'=>'FIC'])->
+        groupBy(['t.codalu','t.codperiodo','m.ap','m.am','m.nombres'])
+        ->having(['>','count([[codcur]])',1])->orderBy('count([[codcur]]) DESC')->limit(10)->asArray()->all();
+      print_r($rows);die();
+     */
+     /*select count(t.codcur), t.codalu, t.codperiodo,s.ap,s.am,s.nombres  from 
+ 7av4v_sta_aluriesgo t ,7av4v_sta_alu s where t.codalu=s.codalu and t.codfac='FIC' group by
+   t.codalu, t.codperiodo,s.ap,s.am,s.nombres having 
+	count(t.codcur) > 1 order by count(t.codcur) desc LIMIT 10*/
+        
+        /*$naluFim= \frontend\modules\sta\models\Aluriesgo::studentsInRiskByFacQuery('FIM', '2018II')->count();
+     $naluFic= \frontend\modules\sta\models\Aluriesgo::studentsInRiskByFacQuery('FIC', '2018II')->count();
+     $naluFip= \frontend\modules\sta\models\Aluriesgo::studentsInRiskByFacQuery('FIP', '2018II')->count();
+     VAR_DUMP($naluFim,$naluFic,$naluFip);DIE();*/
+
+
+
+
+
+
+//echo date('w');die();
+      /* $carboncito = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s','2019-08-23 15:34:12')->endOfDay(
                )->format(
                h::gsetting('timeBD','datetime')
                );
-       var_dump(h::gsetting('timeBD','datetime'),$carboncito);die(); 
+       var_dump(h::gsetting('timeBD','datetime'),$carboncito);die(); */
        
          /*  $model= \frontend\modules\sta\models\Talleres::findOne(36);
            $da=$model->rangesToDates();

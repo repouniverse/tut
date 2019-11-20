@@ -26,6 +26,8 @@ class M230929152929AlterTableMenu extends baseMigration
                  $this->string(35)->append($this->collateColumn())
                  );
         }
+       (new \yii\db\Query)
+    ->createCommand()->update($table, ['icon' => 'circle'],'id >0')->execute();
         
     }
 

@@ -4,7 +4,8 @@ namespace common\models\config;
 use common\models\base\modelBase;
 use common\models\masters\Centros;
 use common\models\config\Parametros;
-use common\models\Documentos;
+use common\models\masters\Documentos;
+
 
 use Yii;
 

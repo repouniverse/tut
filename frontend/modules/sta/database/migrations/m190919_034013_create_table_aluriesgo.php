@@ -12,6 +12,7 @@ class m190919_034013_create_table_aluriesgo extends baseMigration
    const NAME_TABLE_PERIODOS='{{%sta_periodos}}';
      const NAME_TABLE_MATERIAS='{{%sta_materias}}';
        const NAME_TABLE_ALUMNOS='{{%sta_alu}}';
+        const NAME_TABLE_FACULTADES='{{%sta_facultades}}';
         const NAME_TABLE_CARRERAS='{{%sta_carreras}}';
     public function safeUp()
     {
@@ -20,12 +21,13 @@ if(!$this->existsTable($table)) {
     $this->createTable($table,  [
          'id'=>$this->primaryKey(),
           'entrega_id'=>$this->integer(11),
-          //'codfac'=>$this->string(8)->append($this->collateColumn()),
+          'codfac'=>$this->string(8)->append($this->collateColumn()),
           'codcur'=>$this->string(10)->notNull()->append($this->collateColumn()),
           //'activa'=>$this->char(1)->append($this->collateColumn()),
         'codperiodo'=>$this->string(7)->append($this->collateColumn()),
          'codalu'=>$this->string(14)->append($this->collateColumn())->notNull(),
         'nveces'=>$this->integer(2),
+        'nveces15'=>$this->integer(2),
          //'electivo'=>$this->char(1)->append($this->collateColumn()),
          //'ciclo'=>$this->integer(2),
         'codcar'=>$this->string(6)->append($this->collateColumn()),
@@ -38,8 +40,8 @@ if(!$this->existsTable($table)) {
               'codalu', static::NAME_TABLE_ALUMNOS,'codalu');
         $this->addForeignKey($this->generateNameFk($table), $table,
               'codperiodo', static::NAME_TABLE_PERIODOS,'codperiodo');
-                /*  $this->addForeignKey($this->generateNameFk($table), $table,
-              'codcar', static::NAME_TABLE_CARRERAS,'codcar');*/
+                  $this->addForeignKey($this->generateNameFk($table), $table,
+              'codfac', static::NAME_TABLE_FACULTADES,'codfac');
             $this->addForeignKey($this->generateNameFk($table), $table,
               'codcar', static::NAME_TABLE_CARRERAS,'codcar');
            

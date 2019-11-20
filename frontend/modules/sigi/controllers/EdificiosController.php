@@ -5,6 +5,7 @@ namespace frontend\modules\sigi\controllers;
 use Yii;
 use frontend\modules\sigi\models\Edificios;
 use frontend\modules\sigi\models\EdificiosSearch;
+use frontend\modules\sigi\models\SigiCargosedificioSearch;
 use frontend\controllers\base\baseController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -39,6 +40,9 @@ class EdificiosController extends baseController
      */
     public function actionIndex()
     {
+        /*$MODELI=\frontend\modules\sigi\models\SigiCargosgrupoedificio::findOne(7);
+        VAR_DUMP($MODELI->hasChilds());DIE();
+        */
         $searchModel = new EdificiosSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -174,5 +178,184 @@ class EdificiosController extends baseController
        
        
     }
+    
+    
+     public function actionAgregaUnidad($id){        
+         $this->layout = "install";
+         
+        $modeledificio = $this->findModel($id);        
+       $model=New \frontend\modules\sigi\models\SigiUnidades();
+       $model->edificio_id=$id;
+       
+       $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                $model->save();
+                //$model->assignStudentsByRandom();
+                  return ['success'=>1,'id'=>$model->edificio_id];
+            }
+        }else{
+           return $this->renderAjax('_modal_unidad', [
+                        'model' => $model,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                        //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+       
+       
+    }
+    
+    public function actionAgregaDocu($id){        
+         $this->layout = "install";
+         
+        $modeledificio = $this->findModel($id);        
+       $model=New \frontend\modules\sigi\models\SigiEdificiodocus();
+       $model->edificio_id=$id;
+       
+       $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                $model->save();
+                //$model->assignStudentsByRandom();
+                  return ['success'=>1,'id'=>$model->edificio_id];
+            }
+        }else{
+           return $this->renderAjax('_modal_documento', [
+                        'model' => $model,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                        //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+       
+       
+    }
+    
+     public function actionAgregaCuenta($id){        
+         $this->layout = "install";
+         
+        $modeledificio = $this->findModel($id);        
+       $model=New \frontend\modules\sigi\models\SigiCuentas();
+       $model->edificio_id=$id;
+       
+       $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                $model->save();
+                //$model->assignStudentsByRandom();
+                  return ['success'=>1,'id'=>$model->edificio_id];
+            }
+        }else{
+           return $this->renderAjax('_modal_cuenta', [
+                        'model' => $model,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                        //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+       
+       
+    }
+ public function actionAgregaGrupo($id){        
+         $this->layout = "install";
+         
+        $modeledificio = $this->findModel($id);        
+       $model=New \frontend\modules\sigi\models\SigiCargosgrupoedificio();
+       $model->edificio_id=$id;
+       
+       $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                $model->save();
+                //$model->assignStudentsByRandom();
+                  return ['success'=>1,'id'=>$model->edificio_id];
+            }
+        }else{
+           return $this->renderAjax('_modal_grupocargo', [
+                        'model' => $model,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                        //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+    }
+    
+    
+    /*CARGA LOS CONCEPTOS PAR AUN EDIFICIO DETERMINADO*/
+    
+  public function actionCargaConceptos($id){
+      
+   $model = $this->findModel($id);        
+        $searchModel = new SigiCargosedificioSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('cargaConceptos', [
+            'model'=>$model,
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'id'=>$id,
+        ]); 
+  }  
+  
+
+public function actionAgregaConcepto($id){
+    $this->layout = "install";
+         
+        $modeledificio = $this->findModel($id);        
+       $model=New \frontend\modules\sigi\models\SigiCargosedificio();
+       $model->edificio_id=$id;
+       
+       $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                $model->save();
+                //$model->assignStudentsByRandom();
+                  return ['success'=>1,'id'=>$model->edificio_id];
+            }
+        }else{
+           return $this->renderAjax('_modal_concepto', [
+                        'model' => $model,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                        //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+}  
     
 }

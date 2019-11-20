@@ -260,17 +260,17 @@ class MakeController extends baseController
         }
   } 
   
-  public function actionCreareporte($id, $idfiltro){
+  public function actionCreareporte($id, $idfiltro,$campofiltro=null){
      // echo $this->putLogo($id, $idfiltro);die();
-       $model=$this->findModel($id); 
+       //$model=$this->findModel($id); 
        $this->layout='blank';
       // return $this->render('reporte_1');
-      
+     // var_dump($id, $idfiltro);die();
       $model=$this->findModel($id);      
       $logo=($model->tienelogo)?$this->putLogo($id, $idfiltro):'';      
          $header=$model->putHeaderReport($id, $idfiltro); 
          
-          $cabecera=$model->putCabecera($id,$idfiltro);
+          $cabecera=$model->putCabecera($id,$idfiltro,$campofiltro=null);
          
       /*$pdf->methods=[ 
            'SetHeader'=>[($model->tienecabecera)?$header:''], 

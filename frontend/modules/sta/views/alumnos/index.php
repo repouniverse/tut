@@ -30,9 +30,27 @@ $this->title = Yii::t('sta.labels', 'Alumnos');
 <?php
 
 $gridColumns = [
-                    [ 
+                     [
                 'class' => 'yii\grid\ActionColumn',
-                     ], 
+                'template' => '{update}{view}',
+                'buttons' => [
+                    'update' => function($url, $model) {                        
+                        $options = [
+                            'title' => Yii::t('base.verbs', 'Update'),                            
+                        ];
+                        return Html::a('<span class="btn btn-info btn-sm glyphicon glyphicon-pencil"></span>', $url, $options/*$options*/);
+                         },
+                          'view' => function($url, $model) {    
+                             $url=\yii\helpers\Url::toRoute(['ver-detalles','id'=>$model->id]);
+                        $options = [
+                            'data-pjax'=>'0',
+                            'title' => Yii::t('base.verbs', 'Detalles'),                            
+                        ];
+                        return Html::a('<span class="btn btn-warning btn-sm glyphicon glyphicon-search"></span>', $url, $options/*$options*/);
+                         },
+                         
+                    ]
+                ],
                 [
                 'class' => 'kartik\grid\ExpandRowColumn',
                 'width' => '50px',
@@ -45,6 +63,18 @@ $gridColumns = [
                     //'headerOptions' => ['class' => 'kartik-sheet-style'], 
                     'expandOneOnly' => true
                 ],
+                ['attribute' => 'Riesgo',
+                    'format'=>'raw',
+                    'value' => function ($model, $key, $index, $column) {
+                                $veces=$model->howManyRisks();
+                                if($veces>0){
+                                    return "<span class='label label-danger' >$veces</span>";
+                                }else{
+                                    return '';
+                                }
+                            
+                                },
+                    ],
                 ['attribute' => 'ap',],
                 ['attribute' => 'nombres'],
                 [ 'attribute' => 'codalu'],

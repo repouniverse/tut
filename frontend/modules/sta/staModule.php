@@ -6,9 +6,13 @@ use frontend\modules\sta\components\Profile;
 use frontend\modules\sta\models\StaInterlocutor;
 use common\helpers\FileHelper;
 use frontend\modules\sta\filters\FilterComplete;
+use frontend\modules\sta\models\Aluriesgo;
 use linslin\yii2\curl;
 use frontend\modules\sta\models\UserFacultades;
-USE \yii2mod\settings\models\enumerables\SettingType;
+USE yii2mod\settings\models\enumerables\SettingType;
+use frontend\modules\sta\models\Periodos;
+use  yii\web\ServerErrorHttpException;
+use yii;
 /**
  * sta module definition class
  */
@@ -21,7 +25,7 @@ class staModule extends \yii\base\Module
      * {@inheritdoc}
      */
     public $controllerNamespace = 'frontend\modules\sta\controllers';
-
+    public $_currentPeriod=null;
     /**
      * {@inheritdoc}
      */
@@ -39,6 +43,8 @@ class staModule extends \yii\base\Module
     {
         parent::init();
         static::putSettingsModule();
+        //$this->_currentPeriod=
+        static::getCurrentPeriod();
         /*if(is_null(static::getInterlocutor())){
              //var_dump(\yii::$app->controller)  ;die();
         }
@@ -122,6 +128,22 @@ class staModule extends \yii\base\Module
    }
     
    
-   
+   public function getCurrentPeriod(){
+    //if(is_null($this->_currentPeriod)){
+      $modelo=Periodos::findOne(['activa'=>'1']);
+     if(is_null($modelo))
+          throw new ServerErrorHttpException(Yii::t('sta.errors', 'No se encontró ningun periodo Activo, debe activar un Periodo'));
+         return $modelo->codperiodo;  
+    
+     
+   }
+   /*
+    * Retormna un font awseome de acuerdo a la facultad*/
+    
+  public static function faAwesomeFac($codfac){
+      return [
+          'FIIS'=>'<span class="fa fa "></span>'
+      ];
+  }
   
 }
