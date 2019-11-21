@@ -52,6 +52,13 @@ public function safeDown()
  }  
 
  
+  /*Talleresdet*/
+ 
+ 
+ 
+ 
+ 
+ 
  public function getWhere(){
       return " b.codalu=a.codalu".//Alu riesgo Con Alu                
              // self::_AND."b.codcur=c.codcur".self::_AND." b.codcar=c.codcar ".self::_AND." c.electivo <> 'E' ".self::_AND." activa= '1' ".//Alu riesgo Con Materias

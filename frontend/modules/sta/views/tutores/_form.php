@@ -105,12 +105,7 @@ echo CalendarScheduleWidget::widget([
                     return Html::a($model->codalu, '#', $options);
                         },
 ],
-
 ];
-   
-  
-   
-   
    ?>
         <?php 
         Pjax::begin(['id'=>'sumilla']);
@@ -135,3 +130,4 @@ echo CalendarScheduleWidget::widget([
      </div>         
 </div>
     </div>
+<a href="<?=\yii\helpers\Url::toRoute("prueba-modal") ?>" class="btn btn-success botonAbre">picha aqui</a>

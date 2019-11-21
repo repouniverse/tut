@@ -17,7 +17,7 @@ class VwAlutallerSearch extends VwAlutaller
     public function rules()
     {
         return [
-           [['codfac','codtra', 'ap', 'am', 'nombres',  'codalu', 'dni', 'correo', 'fijos', 'celulares', 'fijos','nomcur'], 'safe'],
+           [['cantidad','codfac','codtra', 'ap', 'am', 'nombres',  'codalu', 'dni', 'correo', 'fijos', 'celulares', 'fijos','nomcur'], 'safe'],
      
         ];
     }
@@ -60,6 +60,7 @@ class VwAlutallerSearch extends VwAlutaller
         $query->andFilterWhere(['like', 'nombres', $this->nombres])
             ->andFilterWhere(['like', 'ap', $this->ap])
               ->andFilterWhere(['like', 'am', $this->am])
+                 ->andFilterWhere(['like','cantidad', $this->cantidad])
             ->andFilterWhere(['like', 'dni', $this->dni])
            // ->andFilterWhere(['like', 'nombres', $this->nombres])
            ->andFilterWhere(['like', 'correo', $this->correo])
@@ -99,6 +100,7 @@ class VwAlutallerSearch extends VwAlutaller
             ->andFilterWhere(['like', 'dni', $this->dni])
             ->andWhere(['codfac'=>$codfac])
            ->andFilterWhere(['like', 'correo', $this->correo])
+                 ->andFilterWhere(['like','cantidad', $this->cantidad])
             ->andFilterWhere(['like', 'codalu', $this->codalu])
             //->andFilterWhere(['like', 'dni', $this->dni])
             ->andFilterWhere(['like', 'nombres', $this->nombres])

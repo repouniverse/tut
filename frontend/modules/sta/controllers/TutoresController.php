@@ -5,6 +5,7 @@ use frontend\modules\sta\models\Talleres;
 use frontend\modules\sta\models\TalleresSearch;
 use frontend\modules\sta\models\Tallerpsico;
 use frontend\modules\sta\models\VwAlutallerSearch;
+use frontend\modules\sta\models\AlumnosSearch;
 use frontend\controllers\base\baseController;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -108,6 +109,20 @@ protected function findModel($id)
 
         throw new NotFoundHttpException(Yii::t('sta.labels', 'No se encontro el registro '));
     }
-   
+ 
+    
+   public function actionPruebaModal(){
+     $this->layout = "install";
+      $searchModel = new AlumnosSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+         return $this->renderAjax('_alumnos', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+       
+       
+     } 
+  
+    
 
 }

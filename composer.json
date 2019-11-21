@@ -21,7 +21,7 @@
         "codeception/codeception": "^2.5",
         "yii2mod/yii2-settings": "*",
         "reportico/yii2-reportico": "dev-master",        
-        "dmstr/yii2-adminlte-asset": "^2.1",
+        "dmstr/yii2-adminlte-asset": "^2.4",
         "yidas/yii2-adminlte": "^2.2",
         "kartik-v/yii2-widget-typeahead": "dev-master",
         "nemmo/yii2-attachments": "1.0.0.0-beta3",

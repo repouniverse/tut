@@ -16,13 +16,16 @@ class viewMigration extends baseMigration
    }   
        
     
-   public function createView($vista,$Fields,$Tables,$Where){
+   public function createView($vista,$Fields,$Tables,$Where,$groups=null){
        //$this->dropView($vista);
        $comando= $this->db->createCommand(); 
         $q=new \yii\db\Query();
         $q->select($Fields)
                 ->from($Tables)
                 ->andWhere($Where);
+        if(!is_null($groups)){
+            $q->groupBy($groups);
+        }
         $comando->createView($vista, $q)->execute();
    }
    

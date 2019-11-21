@@ -102,6 +102,12 @@ class ProgramasController extends baseController
         
         
         $model = $this->findModel($id);
+        
+        
+  
+        
+        
+      
         //yii::error('eNCONTOR MODELO');
 //print_r($model->studentsInRiskForThis()); die();
          $searchStaff = new TallerpsicoSearch();
@@ -398,7 +404,7 @@ class ProgramasController extends baseController
 
   //Id del programa
   public function actionCreateCita($id){
-     $this->layout = "install";
+    // $this->layout = "install";
         $modelTaller = $this->findModel($id); 
         $model=new Citas();
         $datos=[];

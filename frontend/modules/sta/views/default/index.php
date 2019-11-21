@@ -4,7 +4,7 @@ use dosamigos\chartjs\ChartJs;
 ?>
 <div class="box box-success">
     <section class="content">
-      <div class="container-fluid">
+      
         <!-- Info boxes -->
         
         <div class="btn-group">
@@ -36,7 +36,7 @@ use dosamigos\chartjs\ChartJs;
            <div class="panel panel-success">
                <div class="panel-heading"><h3 class="panel-title" >FIA</h3></div> 
                <div class="panel-body">
-          <a href="<?=\yii\helpers\Url::to("masters/centros")  ?>"><span class="info-box-icon bg-green-gradient"><i class="fa fa-envira"></i></span></a>
+          <a href="<?=\yii\helpers\Url::to(["/sta/default/resumen-facultad",'codfac'=>'FIA'])  ?>"><span class="info-box-icon bg-green-gradient"><i class="fa fa-tree"></i></span></a>
            </div> 
                </div> 
         </div> 
@@ -44,7 +44,7 @@ use dosamigos\chartjs\ChartJs;
            <div class="panel panel-success">
                <div class="panel-heading"><h3 class="panel-title" >FAUA</h3></div> 
                <div class="panel-body">
-            <a href="<?=\yii\helpers\Url::to("settings")  ?>"><span class="info-box-icon bg-aqua"><i class="fa fa-hospital-o"></i></span></a>
+            <a href="<?=\yii\helpers\Url::to(["/sta/default/resumen-facultad",'codfac'=>'FAUA'])  ?>"><span class="info-box-icon bg-aqua"><i class="fa fa-city"></i></span></a>
        </div> 
         </div> 
         </div>
@@ -54,7 +54,7 @@ use dosamigos\chartjs\ChartJs;
            <div class="panel panel-success">
                <div class="panel-heading"><h3 class="panel-title" >FIQ</h3></div> 
                <div class="panel-body">
-               <a href="<?=\yii\helpers\Url::to("masters/parametros")  ?>"><span class="info-box-icon bg-orange-active"><i class="fa fa-flask"></i></span></a>
+               <a href="<?=\yii\helpers\Url::to(["/sta/default/resumen-facultad",'codfac'=>'FIQ'])  ?>"><span class="info-box-icon bg-orange-active"><i class="fa fa-flask"></i></span></a>
        </div> 
         </div> 
         </div>
@@ -63,7 +63,7 @@ use dosamigos\chartjs\ChartJs;
             <div class="panel panel-success">
                <div class="panel-heading"><h3 class="panel-title" >FIC</h3></div> 
                <div class="panel-body">
-               <a href="<?=\yii\helpers\Url::to("masters/documents")  ?>"><span class="info-box-icon bg-light-blue-gradient"><i class="fa fa-building"></i></span></a>
+               <a href="<?=\yii\helpers\Url::to(["/sta/default/resumen-facultad",'codfac'=>'FIC'])   ?>"><span class="info-box-icon bg-light-blue-gradient"><i class="fa fa-building"></i></span></a>
         </div> 
         </div> 
         </div>
@@ -71,9 +71,9 @@ use dosamigos\chartjs\ChartJs;
         
             <div class="col-12 col-sm-6 col-md-3"> 
                 <div class="panel panel-success">
-               <div class="panel-heading"><h3 class="panel-title" >FSCE</h3></div> 
+               <div class="panel-heading"><h3 class="panel-title" >FIEECS</h3></div> 
                <div class="panel-body">
-                 <a href="<?=\yii\helpers\Url::to("masters/documents")  ?>"><span class="info-box-icon bg-red-gradient"><i class="fa fa-usd"></i></span></a>
+                 <a href="<?=\yii\helpers\Url::to(["/sta/default/resumen-facultad",'codfac'=>'FIEECS']) ?>"><span class="info-box-icon bg-red-gradient"><i class="fa fa-usd"></i></span></a>
               </div> 
              </div>    
             </div> 
@@ -82,7 +82,7 @@ use dosamigos\chartjs\ChartJs;
               <div class="panel panel-success">
                <div class="panel-heading"><h3 class="panel-title" >FIIS</h3></div> 
                <div class="panel-body">   
-                  <a href="<?=\yii\helpers\Url::to("masters/documents")  ?>"><span class="info-box-icon bg-purple-gradient"><i class="fa fa-industry"></i></span></a>
+                  <a href="<?=\yii\helpers\Url::to(["/sta/default/resumen-facultad",'codfac'=>'FIIS'])   ?>"><span class="info-box-icon bg-purple-gradient"><i class="fa fa-industry"></i></span></a>
             </div> 
             </div> 
            </div>
@@ -90,17 +90,42 @@ use dosamigos\chartjs\ChartJs;
                  <div class="panel panel-success">
                <div class="panel-heading"><h3 class="panel-title" >FIM</h3></div> 
                <div class="panel-body"> 
-                  <a href="<?=\yii\helpers\Url::to("masters/documents")  ?>"><span class="info-box-icon bg-aqua"><i class="fa fa-wrench"></i></span></a>
+                  <a href="<?=\yii\helpers\Url::to(["/sta/default/resumen-facultad",'codfac'=>'FIM'])  ?>"><span class="info-box-icon bg-aqua"><i class="fa fa-wrench"></i></span></a>
         </div> 
                </div> 
            </div>
         
             <div class="col-12 col-sm-6 col-md-3"> 
                  <div class="panel panel-success">
-               <div class="panel-heading"><h3 class="panel-title" >FIIE</h3></div> 
+               <div class="panel-heading"><h3 class="panel-title" >FIEE</h3></div> 
                <div class="panel-body"> 
-                 <a href="<?=\yii\helpers\Url::to("masters/documents")  ?>"><span class="info-box-icon bg-blue-active"><i class="fa fa-microchip"></i></span></a>
-        </div>  
+                 <a href="<?=\yii\helpers\Url::to(["/sta/default/resumen-facultad",'codfac'=>'FIIE']) ?>"><span class="info-box-icon bg-blue-active"><i class="fa fa-microchip"></i></span></a>
+                 </div>  
+                 </div> 
+           </div>
+        
+          <div class="col-12 col-sm-6 col-md-3"> 
+                 <div class="panel panel-success">
+               <div class="panel-heading"><h3 class="panel-title" >FIC</h3></div> 
+               <div class="panel-body"> 
+                 <a href="<?=\yii\helpers\Url::to(["/sta/default/resumen-facultad",'codfac'=>'FIC'])  ?>"><span class="info-box-icon bg-yellow-gradient"><i class="fa fa-atom"></i></span></a>
+                 </div>  
+                 </div> 
+           </div>
+        <div class="col-12 col-sm-6 col-md-3"> 
+                 <div class="panel panel-success">
+               <div class="panel-heading"><h3 class="panel-title" >FIGMM</h3></div> 
+               <div class="panel-body"> 
+                 <a href="<?=\yii\helpers\Url::to(["/sta/default/resumen-facultad",'codfac'=>'FIGMM'])   ?>"><span class="info-box-icon bg-gray-active"><i class="fa fa-bacon"></i></span></a>
+                 </div>  
+                 </div> 
+           </div>
+        <div class="col-12 col-sm-6 col-md-3"> 
+                 <div class="panel panel-success">
+               <div class="panel-heading"><h3 class="panel-title" >FIP</h3></div> 
+               <div class="panel-body"> 
+                 <a href="<?=\yii\helpers\Url::to(["/sta/default/resumen-facultad",'codfac'=>'FIP']) ?>"><span class="info-box-icon bg-purple-gradient"><i class="fa fa-fill-drip"></i></span></a>
+                 </div>  
                  </div> 
            </div>
             
@@ -199,3 +224,4 @@ use dosamigos\chartjs\ChartJs;
 </div>
     </section>
 </div>
+        

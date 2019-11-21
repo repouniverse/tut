@@ -25,6 +25,15 @@ use frontend\modules\sta\helpers\comboHelper;
    $dataTutores= comboHelper::getCboTutoresByProg($model->id);
    //print_r($dataTutores);die();
    $gridColumns = [
+[  'attribute' => 'cantidad',
+    'format'=>'raw',
+    'value' => function ($model, $key, $index, $column) {
+                    $options=['id'=>$model->codalu,
+                              'class'=>'class_link_ajax'
+                               ];
+                    return Html::a('<span class="badge badge-danger">'.$model->cantidad.'</span>', '#', $options);
+                        }
+],
 [  'attribute' => 'ap',
 ],
 [  'attribute' => 'nombres', 
@@ -36,6 +45,7 @@ use frontend\modules\sta\helpers\comboHelper;
                     $options=['id'=>$model->codalu,
                               'class'=>'class_link_ajax'
                                ];
+                    $url=\yii\helpers\Url::to();
                     return Html::a($model->codalu, '#', $options);
                         },
 ],
