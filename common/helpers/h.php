@@ -137,6 +137,9 @@ class h {
     public static function getFormatShowDate(){
       return h::settings()->get('timeUser','date');
     }
+     public static function getFormatShowDateTime(){
+      return h::settings()->get('timeUser','datetime');
+    }
     
     
     public static function getCurrenciesNames(){

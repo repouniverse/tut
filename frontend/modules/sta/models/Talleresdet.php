@@ -85,7 +85,7 @@ class Talleresdet extends \common\models\base\modelBase
      */
     public function getAlumno()
     {
-        return $this->hasOne(Alu::className(), ['codalu' => 'codalu']);
+        return $this->hasOne(Alumnos::className(), ['codalu' => 'codalu']);
     }
 
     /**
@@ -95,5 +95,9 @@ class Talleresdet extends \common\models\base\modelBase
     public static function find()
     {
         return new TalleresdetQuery(get_called_class());
+    }
+    
+    public function lastCita(){
+        
     }
 }

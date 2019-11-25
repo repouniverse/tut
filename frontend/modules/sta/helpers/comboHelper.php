@@ -71,6 +71,21 @@ class comboHelper extends Combito
          
         }
 
+        
+    public static function getCboTestByPrograma($idtaller){
+        $tests= \frontend\modules\sta\models\StaTestTalleres::find()
+                 ->select(['codtest'])
+                 ->where(['taller_id'=>$idtaller])->asArray()->all();
+        $codigos=ArrayHelper::getColumn($tests, 'codtest');
+        return ArrayHelper::map(
+               \frontend\modules\sta\models\Test::find()->
+                where(['in',
+              'codtest', $codigos
+               ])->all(),
+                'codtest','descripcion');
+    
+    }    
+        
 }
 
 

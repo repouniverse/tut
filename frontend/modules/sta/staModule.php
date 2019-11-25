@@ -94,6 +94,7 @@ class staModule extends \yii\base\Module
     }
     
     private static function putSettingsModule(){
+         h::getIfNotPutSetting('sta','formatDateFullCalendar',"YYYY-MM-DD HH:mm:ss", SettingType::STRING_TYPE);
         h::getIfNotPutSetting('sta','extensionimagesalu','.jpg', SettingType::STRING_TYPE);
          h::getIfNotPutSetting('sta','urlimagesalu','http:://www.orce.uni.edu.pe/alumnos/', SettingType::STRING_TYPE);
          h::getIfNotPutSetting('sta','prefiximagesalu','0060', SettingType::STRING_TYPE);
@@ -145,5 +146,13 @@ class staModule extends \yii\base\Module
           'FIIS'=>'<span class="fa fa "></span>'
       ];
   }
+  
+  
+  public static function formatDateFullCalendar(){
+      return h::gsetting('sta','formatDateFullCalendar');
+      
+  }
+
+      
   
 }

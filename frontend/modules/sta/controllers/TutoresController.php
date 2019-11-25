@@ -91,11 +91,20 @@ class TutoresController extends baseController
     {
         $model=  $this->findModel($id);
         //$codfacultad=$model->taller->codfac;
+        $citasPendientes=$model->eventosPendientes();
          $searchAlumnos = new VwAlutallerSearch();
         $dataProviderAlumnos = $searchAlumnos->searchByFacultad(
                 h::request()->queryParams,$model->taller->codfac);
+        $items=$model->alumnosPendientes();
+        //sacamos las citas pendientes de este Psicólogo
+        //desde el presente hasta el futuro
+        
+        
+        
       return $this->render('consola_psicologo',[
                     'model'=>$model,
+                    'items'=>$items,
+                     'citasPendientes'=>$citasPendientes,
                        'dataProvider'=> $dataProviderAlumnos
                     ] ); 
         

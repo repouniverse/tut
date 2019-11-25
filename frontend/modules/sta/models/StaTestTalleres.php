@@ -1,7 +1,7 @@
 <?php
 
 namespace frontend\modules\sta\models;
-
+use common\behaviors\FileBehavior;
 use Yii;
 
 /**
@@ -24,7 +24,14 @@ class StaTestTalleres extends \common\models\base\modelBase
     {
         return '{{%sta_testtalleres}}';
     }
-
+ public function behaviors()
+          {
+	return [
+		'fileBehavior' => [
+			'class' => FileBehavior::className()
+		]
+	];
+         }
     /**
      * {@inheritdoc}
      */

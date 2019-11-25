@@ -213,7 +213,7 @@ class FileHelper extends FileHelperOriginal {
    /*
     * FORMTEA BYTES EN OTRAS UNIDEDADES
     */
-   function formatBytes($bytes, $precision = 2) { 
+  public static function formatBytes($bytes, $precision = 2) { 
     $units = array('B', 'KB', 'MB', 'GB', 'TB'); 
 
     $bytes = max($bytes, 0); 
@@ -227,4 +227,10 @@ class FileHelper extends FileHelperOriginal {
     return round($bytes, $precision) . ' ' . $units[$pow]; 
 } 
    
+
+
+public static function extDocs(){
+    return array('ppt','pptx','doc','docx','xls','xlsx','pdf','jpg','jpeg'); 
+}
+
 }

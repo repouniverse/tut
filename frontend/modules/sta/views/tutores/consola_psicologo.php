@@ -28,7 +28,7 @@ $this->params['breadcrumbs'][] = Yii::t('sta.labels', 'Update');
     'items' => [
         [
           'label'=>'<i class="fa fa-home"></i> '.yii::t('sta.labels','Principal'), //$this->context->countDetail() obtiene el contador del detalle
-            'content'=> $this->render('_form',['model' => $model,'dataProvider'=>$dataProvider]),
+            'content'=> $this->render('_form',['items'=>$items,'citasPendientes'=>$citasPendientes,'model' => $model,'dataProvider'=>$dataProvider]),
 //'content' => $this->render('detalle',['form'=>$form,'orden'=>$this->context->countDetail(),'modelDetail'=>$modelDetail]),
             'active' => true,
              'options' => ['id' => 'tabid1'],

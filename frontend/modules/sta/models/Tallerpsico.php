@@ -6,7 +6,8 @@ use frontend\modules\sta\models\Talleresdet;
 use frontend\modules\sta\models\Citas;
 use Yii;
 use common\interfaces\rangeInterface;
-
+use common\helpers\timeHelper;
+use common\helpers\h;
 /**
  * This is the model class for table "{{%sta_tallerpsico}}".
  *
@@ -91,17 +92,31 @@ class Tallerpsico extends \common\models\base\modelBase
         return $this->hasMany(Citas::className(), 
                 [  'talleres_id'=>'id',
                     'codtra'=>$this->codtra,
-                    'duracion'=>0,
+                    'finicio'=> timeHelper::getDateTimeInitial(),
+                    
                     ]);
     }
     
-    public function getCitasRealizadas()
+    /*
+     * Pendientes solo del futuro
+     */
+    public function citasPendientesQuery()
     {
-        return $this->hasMany(Citas::className(), 
-                [  'talleres_id'=>'id',
+        return Citas::find()->where( 
+                [  'talleres_id'=>$this->talleres_id,
                     'codtra'=>$this->codtra,
-                    'duracion'>0,
+                    'finicio'=> timeHelper::getDateTimeInitial(),
+                    
                     ]);
+    }
+    
+    
+    public function citasRealizadasQuery()
+    {
+        return Citas::find()->where( 
+                [  'talleres_id'=>'id',
+                    'codtra'=>$this->codtra,                    
+                    ])->andWhere(['>','finical',timeHelper::getDateTimeInitial()]);
     }
     
     
@@ -328,4 +343,67 @@ class Tallerpsico extends \common\models\base\modelBase
          }
      } 
    
+     
+  /*fUNCION QUE DEVUELVE UN REGISTRO DE TALLERESDET 
+   * solo con le id de este modelo y el codigo de una alumno
+   * 
+   */   
+     public  function getTalleresdet($codalu){
+          return Talleresdet::find()->where([
+              'talleres_id' => $this->talleres_id,
+              'codalu'=>$codalu,
+              ])->one();
+                ;
+     }
+     
+     
+     /*
+    Un array con eventosd pendientes
+     * deriva del citasPendientesQuery
+     *      */
+    public function eventosPendientes(){
+        $eventos=[];
+        $filas=$this->citasPendientesQuery()->all();
+        //var_dump(timeHelper::getDateTimeInitial(),$filas);die();
+        foreach($filas as $filaCita){
+            $eventos[]=$filaCita->evento();
+        }
+        return $eventos;
+    }
+    
+     /*
+    Un array con eventosd pendientes
+     * deriva del citasPendientesQuery
+     *      */
+    public function alumnosPendientes($nveces=null){
+        $items=[];
+        $consulta=Talleresdet::find()->select('[[codalu]]')->
+        where(['talleres_id'=>$this->talleres_id])->asArray()->all();
+        foreach($consulta as $row){
+            $items[]=['name'=>$row['codalu'],'color'=>'#234564'];
+        }
+        
+        
+       
+        
+        return $items;
+       
+         
+
+
+
+
+
+//print_r(array_flip($consulta,'colorete'));die();
+       // echo count($consulta); die();
+        
+        return array_combine(array_column($consulta,'colorete'),array_column($consulta,'rgb'));
+        return array_merge(
+        array_combine(array_column($consulta,'colorete'),array_column($consulta,'rgb')),
+        array_combine(array_column($consulta,'nombre'),array_column($consulta,'codalu')));
+        
+       // return $eventos;
+    }
+     
+     
 }

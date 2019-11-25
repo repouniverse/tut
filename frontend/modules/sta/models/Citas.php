@@ -6,6 +6,8 @@ use Yii;
 use common\interfaces\rangeInterface;
 use common\helpers\RangeDates;
 use common\helpers\h;
+use common\models\masters\Trabajadores;
+use frontend\modules\sta\staModule;
 /**
  * This is the model class for table "{{%sta_citas}}".
  *
@@ -30,14 +32,31 @@ use common\helpers\h;
  */
 class Citas extends \common\models\base\modelBase implements rangeInterface
 {
-    
+   
+    /*public $nombreAlumno='';
+     public $nombrePrograma='';
+     public $nombrePsicologo='';
+     public $nombreFacultad='';
+     public $numeroPrograma='';*/
+     
+    const SCE_CREACION_BASICA='crea_basica';
+    const SCENARIO_ASISTIO='asistio';
     use timeTrait;
     public $dateorTimeFields=[
         'fechaprog'=>self::_FDATETIME,
          'finicio'=>self::_FDATETIME,
         'ftermino'=>self::_FDATETIME
     ];
-   
+   public $booleanFields=['asistio'];
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios(); 
+        $scenarios[self::SCE_CREACION_BASICA] = ['talleres_id','talleresdet_id','duracion','fechaprog','codtra'];
+        $scenarios[self::SCENARIO_ASISTIO] = ['asistio'];
+        return $scenarios;
+    }
+    
+    
     
     public function range($fecha){
         $this->resolveDuration();
@@ -93,14 +112,14 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
     public function rules()
     {
         return [
-            [['talleresdet_id', 'talleres_id', 'codtra', 'fregistro'], 'required'],
-            [['talleresdet_id', 'talleres_id', 'nalumnos','duracion'], 'integer'],
+            [['talleresdet_id', 'talleres_id', 'codtra'], 'required'],
+            [['talleresdet_id', 'talleres_id', 'duracion'], 'integer'],
             [['detalles'], 'string'],
              [['duracion'], 'safe'],
             [['fechaprog', 'finicio', 'ftermino'], 'string', 'max' => 19],
             [['codtra'], 'string', 'max' => 6],
-            [['fingreso', 'codaula', 'fregistro'], 'string', 'max' => 10],
-            [['calificacion'], 'string', 'max' => 1],
+            [['fingreso', 'codaula'], 'string', 'max' => 10],
+           // [['calificacion'], 'string', 'max' => 1],
             [['talleresdet_id'], 'exist', 'skipOnError' => true, 'targetClass' => Talleresdet::className(), 'targetAttribute' => ['talleresdet_id' => 'id']],
             [['talleres_id'], 'exist', 'skipOnError' => true, 'targetClass' => Talleres::className(), 'targetAttribute' => ['talleres_id' => 'id']],
             [['codtra'], 'exist', 'skipOnError' => true, 'targetClass' => Trabajadores::className(), 'targetAttribute' => ['codtra' => 'codigotra']],
@@ -123,9 +142,9 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
             'fingreso' => Yii::t('sta.labels', 'Fingreso'),
             'detalles' => Yii::t('sta.labels', 'Detalles'),
             'codaula' => Yii::t('sta.labels', 'Codaula'),
-            'nalumnos' => Yii::t('sta.labels', 'Nalumnos'),
-            'fregistro' => Yii::t('sta.labels', 'Fregistro'),
-            'calificacion' => Yii::t('sta.labels', 'Calificacion'),
+            //'nalumnos' => Yii::t('sta.labels', 'Nalumnos'),
+            //'fregistro' => Yii::t('sta.labels', 'Fregistro'),
+            //'calificacion' => Yii::t('sta.labels', 'Calificacion'),
         ];
     }
 
@@ -170,8 +189,12 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
         return new CitasQuery(get_called_class());
     }
     public function beforeSave($insert) {
-       
-        $this->duracion=$this->resolveDuration();
+       if($insert){
+          $this->duracion=0;
+          $this->asistio=false;
+       }
+           
+        //$this->resolveDuration();
         return parent::beforeSave($insert);
        
     } 
@@ -190,13 +213,16 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
             $this->duracion=$this->toCarbon('ftermino')->
                     diffInMinutes($this->toCarbon('finicio'));
         }else{
+            //yii::error('buscanco');
             $this->validateFieldTalleres();
-            $stringHora= $this->tallerProg()->duracioncita;            
+            $stringHora= $this->tallerProg()->duracioncita;
+           //yii::error('stringhora : '.$stringHora);            
             $hora=(integer)substr($stringHora,0,2);
              $minuto=(integer)substr($stringHora,3,2);
              $carbonF=$this->toCarbon('fechaprog')->hour(0)->minute(0);
              $carbonD= $carbonF->copy();
              $carbonD->hour($hora)->minute($minuto);
+            // yii::error('LÑA duracion es : '.$carbonD->diffInMinutes($carbonF));
              $this->duracion= $carbonD->diffInMinutes($carbonF);
         }
     }
@@ -357,4 +383,71 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
             }
     }
     
+     
+    public function createBasic($campos){
+        $oldScenario=$this->getScenario();
+        $this->setScenario(self::SCE_CREACION_BASICA);
+        $this->setAttributes($campos);  
+        $this->save();
+        $this->setScenario($oldScenario);
+        return $this->getErrors($attribute);
+    }
+    
+    /*
+     * Genera un evento FullCalendar 
+     * com los datos del mismo registro
+     */
+    public function evento(){
+        $formatDB=h::gsetting(self::_FORMATBD, self::_FDATETIME); // = "Y-m-d H:i:s"
+        return [
+            'title'=>$this->tallerdet->codalu,
+            'start'=>$this->swichtDate('fechaprog', false),
+            'end'=>date($formatDB, strtotime($this->swichtDate('fechaprog', false))+60*$this->duracion),
+            'color'=>'#5cb85c',
+        ];
+    }
+    
+    
+     public function citasPendientes()
+    {
+        return Citas::find()->where(
+                [ 'talleres_id'=>$this->talleres_id,
+                    'codtra'=>$this->codtra,
+                    'asistio'=>'0',
+                   // 'finicio'=> timeHelper::getDateTimeInitial(),
+                    
+                    ])->all(); 
+    }
+    
+    public function eventosPendientes()
+    {
+        $eventos=[];
+      $citas= $this->citasPendientes();
+      foreach ($citas as $cita){
+          $eventos[]=$cita->evento();
+      }
+      return $eventos;
+    }
+   
+    public function putColorThisCodalu($events,$color='#ff0000'){
+        $codalu=$this->tallerdet->codalu;
+       foreach($events as $index=>$event) {
+           if(trim(strtoupper($codalu))==trim(strtoupper($event['title'])))
+            $events[$index]['color']=$color;
+       }
+       return $events;
+    }
+  
+    
+    /*Ubica la cita inmediatamente superior
+     * en tiempo , segun el alumno
+     * Return : id de la siguiente cita
+     */
+    public function nextCitaByStudent(){
+    $this->find()->min()->where([
+        
+      ]);
+        
+        
+    }
 }

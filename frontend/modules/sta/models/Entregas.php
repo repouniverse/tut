@@ -39,15 +39,13 @@ class Entregas extends \common\models\base\DocumentBase
 
     
      public function behaviors()
-{
+          {
 	return [
-		
 		'fileBehavior' => [
 			'class' => FileBehavior::className()
 		]
-		
 	];
-}
+         }
     /**
      * {@inheritdoc}
      */

@@ -50,6 +50,46 @@ class ProgramasController extends baseController
      */
     public function actionIndex()
     {
+       
+        /*select 
+        d.ap as aptutor,d.am as amtutor,d.nombres as nombretutor,
+                s.codperiodo,
+                b.codalu,
+                c.ap,c.am,c.nombres,c.codfac,c.codcar,
+                a.* from
+ ((((7av4v_sta_talleresdet b inner join 7av4v_sta_alu c 
+ on c.codalu=b.codalu)  
+                inner join 7av4v_sta_talleres s on s.id=b.talleres_id)  
+ left join  7av4v_sta_citas a 
+on a.talleresdet_id=b.id)  left join
+                        7av4v_trabajadores d on d.codigotra=a.codtra 
+  );*/
+        
+        
+   /* $CADENA=   (new \yii\db\Query())
+    ->select([
+         'd.ap as aptutor',
+         'd.am as amtutor',
+         'd.nombres as nombrestutor',
+        's.codperiodo',
+        'b.codalu',
+         'c.ap','c.am','c.nombres','c.codfac','c.codcar',
+         'a.*',
+        ])
+    ->from(['b'=>'{{%sta_talleresdet}}'])->
+     innerJoin('{{%sta_alu}} c', 'c.codalu=b.codalu')->
+     innerJoin('{{%sta_talleres}} s', 's.id=b.talleres_id')->          
+      leftJoin('{{%sta_citas}} a', 'a.talleresdet_id=b.id')->
+      leftJoin('{{%trabajadores}} d', 'd.codigotra=a.codtra')->
+      createCommand()->execute();
+    ECHO $CADENA; DIE();*/
+     
+        
+        
+        
+        
+        
+        
         $searchModel = new TalleresSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -442,4 +482,45 @@ public function actionProgramarCitas($id){
          
      }
 }
+
+/*
+ * $id del detalle
+ */
+public function actionMakeCitaByStudent(){
+    if(h::request()->isAjax){
+        $id=h::request()->get('id');
+        $codalu=h::request()->get('codalu');
+        $fecha=h::request()->get('fecha');
+        $model= Tallerpsico::findOne($id);
+       // print_r($model->getTalleresdet($codalu)->attributes);
+        //var_dump($model->talleres_id);die();
+        $validator = new \yii\validators\RegularExpressionValidator(['pattern'=> h::gsetting('sta', 'regexcodalu')]);
+        if($validator->validate($codalu, $error) && !is_null($model)) {
+            $attributes=[
+                'talleres_id'=>$model->talleres_id,
+                'talleresdet_id'=>$model->getTalleresdet($codalu)->id,
+                'fechaprog'=>$model::SwichtFormatDate($fecha,$model::_FDATETIME,true),
+                'codtra'=>$model->codtra,
+            ];
+           // var_dump($fecha,$model::_FDATETIME,$model::SwichtFormatDate($fecha,$model::_FDATETIME,true));die();
+           
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            if(Citas::firstOrCreateStatic($attributes,Citas::SCE_CREACION_BASICA)){
+              $datos['success']=yii::t('sta.errors','Se ha creado la cita satisfactoriamente');
+                
+            }else{
+              $datos['error']=yii::t('sta.errors','Hubo un problema interno al grabar el registro de las citas ');
+              
+            }
+                
+           return $datos; 
+            
+            
+                } 
+ 
+       
+    }
+}
+
+
 }

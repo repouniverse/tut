@@ -150,6 +150,7 @@ use  yii\web\ServerErrorHttpException;
 use common\models\base\modelBaseTrait;
 use common\interfaces\documents\baseInterface;
 use common\models\Documentos;
+use common\helpers\h;
 
 class modelBase extends \yii\db\ActiveRecord  implements baseInterface
 
@@ -558,18 +559,39 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
             // if($show)yii::error('foramto para analizar :'.$formatToAnalize);
              // if($show)yii::error('foramto para mostrar :'.$formatToShow);
                //if($show)yii::error('typ :'.$typ);
-             $objetof=DateTime::createFromFormat($this->getGeneralFormat($formatToAnalize,$typ,$show),$this->{$field});
+             //$objetof=DateTime::createFromFormat($this->getGeneralFormat($formatToAnalize,$typ,$show),$this->{$field});
                   
           $resultado=Yii::$app->formatter->asDate(
-                                                    DateTime::createFromFormat(
-                                                                      $this->getGeneralFormat($formatToAnalize,$typ,$show),
-                                                                       (!$literal)?$this->{$field}:$field
+                         DateTime::createFromFormat(
+                               $this->getGeneralFormat($formatToAnalize,$typ,$show),
+                                                 (!$literal)?$this->{$field}:$field
                                                                             ),
                                                     'php:'.$this->getGeneralFormat($formatToShow,$typ,$show)
                                                        );
                   //yii::error(' El resultado : '.$resultado);
              return $resultado;
         }
+        
+        /*
+         * valor:  El valor de la cadena que representa la fecha 
+         * tipo:  cadena 'time', 'date', 'datetime'
+         * show : Define el formatoq ue se le dara a la cadena $valor  true  valor para mostrar, false valor para alamecenar en labase de
+         * datos 
+         */
+       public static function SwichtFormatDate($valor,$tipo,$show){
+           $key=($show)?static::_FORMATUSER:static::_FORMATBD;//llave para buscar en la tabla settings
+           //puede ser 'timeUser' o 'timeBD'
+           $formatToShow= h::gsetting($key, $tipo);  
+           $formatToAnalize= h::gsetting(static::reverseKey($key), $tipo); 
+           
+            return Yii::$app->formatter->asDate(
+                         DateTime::createFromFormat(
+                 static::getGeneralFormat($formatToAnalize,$tipo,$show),
+                   $valor
+                      ),
+                'php:'.static::getGeneralFormat($formatToShow,$tipo,$show)
+               );
+       }
         
         
         /*
@@ -675,7 +697,7 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
          * o el parámetro $format de la funcion createfromFormat($format) de CARBON 
          * 
          */
-        public function  getGeneralFormat($format,$type,$show){
+        public static function  getGeneralFormat($format,$type,$show){
             $expresion="/[^a-zA-Z0-9]/";   
             preg_match($expresion,$format,$valores);
             $delimiter=$valores[0]; 
@@ -712,7 +734,7 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
            
         }
         
-        private function reverseKey($key){
+        private static function reverseKey($key){
             if($key==static::_FORMATUSER)return static::_FORMATBD;
             if($key==static::_FORMATBD)return static::_FORMATUSER;
               
@@ -736,7 +758,7 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
                        //print_r($model->attributes);die();
                        
                  IF(!$model->insert()){
-                     //yii::error($model->getErrors(),__METHOD__);
+                     yii::error($model->getErrors(),__METHOD__);
                       //print_r($model->getErrors());die();
                      return false;
                  }
@@ -745,7 +767,7 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
                     //echo "ok  ----->";
                         return true;
                 } catch (\yii\db\Exception $exception) {
-                    //yii::error($exception->getMessage());
+                    yii::error($exception->getMessage());
                   //  echo "    --->  error  :    ". $exception->getMessage();
                      return false;
              } 

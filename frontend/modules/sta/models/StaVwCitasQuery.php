@@ -3,11 +3,11 @@
 namespace frontend\modules\sta\models;
 
 /**
- * This is the ActiveQuery class for [[Examenes]].
+ * This is the ActiveQuery class for [[StaVwCitas]].
  *
- * @see Examenes
+ * @see StaVwCitas
  */
-class ExamenesQuery extends \yii\db\ActiveQuery
+class StaVwCitasQuery extends \frontend\modules\sta\components\ActiveQueryScope
 {
     /*public function active()
     {
@@ -16,7 +16,7 @@ class ExamenesQuery extends \yii\db\ActiveQuery
 
     /**
      * {@inheritdoc}
-     * @return Examenes[]|array
+     * @return StaVwCitas[]|array
      */
     public function all($db = null)
     {
@@ -25,7 +25,7 @@ class ExamenesQuery extends \yii\db\ActiveQuery
 
     /**
      * {@inheritdoc}
-     * @return Examenes|array|null
+     * @return StaVwCitas|array|null
      */
     public function one($db = null)
     {

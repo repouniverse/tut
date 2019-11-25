@@ -31,7 +31,7 @@ class timeHelper {
    }
    
    
-   public function cboAnnos(){
+   public static  function cboAnnos(){
        return [
            '2018'=>'2018',
             '2019'=>'2019',
@@ -40,7 +40,13 @@ class timeHelper {
            '2022'=>'2022',
        ];
    }
-   
+ 
+   public static function getDateTimeInitial(){
+       return '1970-01-01 00:00:00';
+   }
+   public static function getDateInitial(){
+       return '1970-01-01';
+   }
    
    } 
    

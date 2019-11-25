@@ -1,5 +1,5 @@
 <?php
-
+use kartik\export\ExportMenu;
 use yii\helpers\Html;
 use kartik\grid\GridView;
 use yii\widgets\Pjax;
@@ -93,20 +93,21 @@ echo $this->render('_search', ['model' => $searchModel]);
   ?>
    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"> 
   <?php
- 
-  echo GridView::widget([
+ echo ExportMenu::widget([
+    'dataProvider' => $dataProvider,
+    'columns' => $gridColumns,
+    'dropdownOptions' => [
+        'label' => yii::t('sta.labels','Exportar'),
+        'class' => 'btn btn-success'
+    ]
+]) . "<hr>\n".GridView::widget([
     'id' => 'kv-grid-demo',
     'dataProvider' => $dataProvider,
    'columns' => $gridColumns, // check the configuration for grid columns by clicking button above
-    'containerOptions' => ['style' => 'overflow: auto'], // only set when $responsive = false
-    'headerRowOptions' => ['class' => 'kartik-sheet-style'],
-    'filterRowOptions' => ['class' => 'kartik-sheet-style'],
+    
     'pjax' => true, // pjax is set to always true for this demo
    'responsive' => TRUE,
-    'panel' => [
-        'type' => '',
-        //'heading' => $heading,
-    ],
+    
 ]);
   Pjax::end();
 ?>

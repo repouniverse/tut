@@ -1,7 +1,7 @@
 <?php
 
 namespace frontend\modules\sta\models;
-
+use common\behaviors\FileBehavior;
 use Yii;
 
 /**
@@ -25,6 +25,17 @@ class Examenes extends \common\models\base\modelBase
         return '{{%sta_examenes}}';
     }
 
+    
+    public function behaviors()
+            {
+	return [
+		
+		'fileBehavior' => [
+			'class' => FileBehavior::className()
+		]
+		
+                ];
+            }
     /**
      * {@inheritdoc}
      */
@@ -35,8 +46,8 @@ class Examenes extends \common\models\base\modelBase
             [['citas_id'], 'integer'],
             [['detalles'], 'string'],
             [['codtest'], 'string', 'max' => 8],
-            [['codtest'], 'exist', 'skipOnError' => true, 'targetClass' => StaTest::className(), 'targetAttribute' => ['codtest' => 'codtest']],
-            [['citas_id'], 'exist', 'skipOnError' => true, 'targetClass' => StaCitas::className(), 'targetAttribute' => ['citas_id' => 'id']],
+            [['codtest'], 'exist', 'skipOnError' => true, 'targetClass' => Test::className(), 'targetAttribute' => ['codtest' => 'codtest']],
+            [['citas_id'], 'exist', 'skipOnError' => true, 'targetClass' => Citas::className(), 'targetAttribute' => ['citas_id' => 'id']],
         ];
     }
 
@@ -56,17 +67,26 @@ class Examenes extends \common\models\base\modelBase
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCodtest0()
+    public function getTest()
     {
-        return $this->hasOne(StaTest::className(), ['codtest' => 'codtest']);
+        return $this->hasOne(Test::className(), ['codtest' => 'codtest']);
+    }
+    
+    public function getTestTalleres()
+    {
+     // var_dump($this->cita->tallerdet->id);/*talleres->id);*/die();
+        return  StaTestTalleres::find()->where(
+                ['codtest' => $this->codtest,
+            'taller_id' => $this->cita->talleres_id,
+            ])->one();
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCitas()
+    public function getCita()
     {
-        return $this->hasOne(StaCitas::className(), ['id' => 'citas_id']);
+        return $this->hasOne(Citas::className(), ['id' => 'citas_id']);
     }
 
     /**

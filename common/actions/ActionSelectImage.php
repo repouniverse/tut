@@ -18,6 +18,7 @@ class ActionSelectImage extends \yii\base\Action
         $isImage=h::request()->get('isImage');
         $id=h::request()->get('modelid');
         $ext=h::request()->get('extension');
+       
         if(!is_numeric($id))
           throw new \yii\base\Exception(Yii::t('base.errors', 'Id is invalid'));
         $this->controller->layout = "install";
@@ -34,7 +35,16 @@ class ActionSelectImage extends \yii\base\Action
                 print_r($model->getErrors());die();
             }
           if(!is_null($ext)){
-             $allowedExtensions=[str_replace('.','',$ext)]; 
+              $allowedExtensions=json_decode($ext);
+              if(!is_null($allowedExtensions) && is_array($allowedExtensions) ){
+                  foreach($allowedExtensions as $index=>$ext){
+                      $allowedExtensions[$index]=str_replace('.','',$ext);
+                  }
+                 
+              }else{
+                 $allowedExtensions=[str_replace('.','',$ext)];   
+              }
+            
           }else{
             $allowedExtensions=($isImage==1)?['jpg','png','gif','jpeg']:['doc','docx','pdf','xls','xlsx','csv','txt','ppt','pptx'];  
           }

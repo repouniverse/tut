@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
+use common\helpers\FileHelper;
 use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
 use frontend\modules\sta\models\StaTestTalleres;
 ?>
@@ -39,15 +40,23 @@ use frontend\modules\sta\models\StaTestTalleres;
          
          [
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{delete}{view}',
+                'template' => '{delete}{attachCarga}',
                 'buttons' => [
                    
-                          'view' => function($url, $model) {                        
+                            'attachCarga' => function($url, $model) {  
+                         $url=\yii\helpers\Url::toRoute(['/finder/selectimage','extension'=> json_encode(FileHelper::extDocs()),'isImage'=>false,'idModal'=>'imagemodal','modelid'=>$model->id,'nombreclase'=> str_replace('\\','_',get_class($model))]);
                         $options = [
-                            'title' => Yii::t('base.verbs', 'View'),                            
+                            'title' => Yii::t('sta.labels', 'Subir Archivo'),
+                            //'aria-label' => Yii::t('rbac-admin', 'Activate'),
+                            //'data-confirm' => Yii::t('rbac-admin', 'Are you sure you want to activate this user?'),
+                            'data-method' => 'get',
+                            //'data-pjax' => '0',
                         ];
-                        return Html::a('<span class="btn btn-warning btn-sm glyphicon glyphicon-search"></span>', $url, $options/*$options*/);
-                         },
+                        return Html::a('<span class="btn btn-info btn-sm glyphicon glyphicon-paperclip"></span>', $url, ['title' => 'Editar Adjunto', 'class' => 'botonAbre']);
+                        //return Html::a('<span class="btn btn-success glyphicon glyphicon-pencil"></span>', Url::toRoute(['view-profile','iduser'=>$model->id]), []/*$options*/);
+                     
+                        
+                        },
                          'delete' => function ($url,$model) {
 			    $url = Url::toRoute($this->context->id.'/ajax-detach-psico',['id'=>$model->id]);
                              return Html::a('<span class="btn btn-danger btn-sm glyphicon glyphicon-trash"></span>', '#', ['title'=>$url,/*'id'=>$model->codparam,*/'family'=>'holas','id'=> \yii\helpers\Json::encode(['id'=>$model->id,'modelito'=> str_replace('@','\\',get_class($model))]),/*'title' => 'Borrar'*/]);
@@ -62,7 +71,18 @@ use frontend\modules\sta\models\StaTestTalleres;
 
            'codtest',
             'test.descripcion',
-                            
+                 [
+    'attribute' => 'adjunto',
+    'format' => 'raw',
+    'value' => function ($model) {
+       if($model->hasAttachments()){
+           return '<span class="label label-danger">'.$model->files[0]->type.'</span>'.Html::a($model->files[0]->name,$model->files[0]->url);
+       }else{
+         return '';  
+       }
+             },
+
+              ],            
                                 [
     'attribute' => 'obligatorio',
     'format' => 'raw',

@@ -30,6 +30,7 @@ if(!$this->existsTable($table)) {
         'fechaprog'=>$this->string(19)->append($this->collateColumn()),
         'codtra'=>$this->string(14)->notNull()->append($this->collateColumn()),
         'finicio'=>$this->string(19)->append($this->collateColumn()),
+        'asistio'=>$this->char(1)->append($this->collateColumn()),
          'ftermino'=>$this->string(19)->append($this->collateColumn()),
         'fingreso'=>$this->char(10)->append($this->collateColumn()),
         'detalles'=>$this->text()->append($this->collateColumn()),
