@@ -19,7 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a(Yii::t('sigi.labels', 'Create Edificios'), ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a(Yii::t('sigi.labels', 'Crear'), ['create'], ['class' => 'btn btn-success']) ?>
     </p>
     <div style='overflow:auto;'>
     <?= GridView::widget([
@@ -61,17 +61,16 @@ $this->params['breadcrumbs'][] = $this->title;
          
          
 
-            'id',
-            'codtra',
+            'codigo',
+           
             'nombre',
-            'latitud',
-            'meridiano',
-            //'proyectista',
+           
+            'proyectista',
             //'tipo',
             //'npisos',
             //'detalles:ntext',
             //'codcen',
-            //'direccion',
+            'direccion',
             //'coddepa',
             //'codprov',
 

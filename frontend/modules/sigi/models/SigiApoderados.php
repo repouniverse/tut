@@ -24,11 +24,14 @@ class SigiApoderados extends \common\models\base\modelBase
     /**
      * {@inheritdoc}
      */
+   
     public static function tableName()
     {
         return '{{%sigi_apoderados}}';
     }
 
+     
+    
     /**
      * {@inheritdoc}
      */
@@ -38,6 +41,7 @@ class SigiApoderados extends \common\models\base\modelBase
             [['edificio_id', 'codpro'], 'required'],
             [['edificio_id'], 'integer'],
             [['detalles'], 'string'],
+            
             [['codpro'], 'string', 'max' => 6],
             [['facturaigv', 'permite1', 'permite2', 'permiteventa', 'permitealquiler'], 'string', 'max' => 1],
             [['codpro'], 'exist', 'skipOnError' => true, 'targetClass' => Clipro::className(), 'targetAttribute' => ['codpro' => 'codpro']],

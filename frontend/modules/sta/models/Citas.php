@@ -14,7 +14,7 @@ use frontend\modules\sta\staModule;
  * @property int $id
  * @property int $talleresdet_id
  * @property int $talleres_id
- * @property string $fechaprog
+ * @property string $$maximafechafechaprog
  * @property string $codtra
  * @property string $finicio
  * @property string $ftermino
@@ -444,10 +444,59 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
      * Return : id de la siguiente cita
      */
     public function nextCitaByStudent(){
-    $this->find()->min()->where([
+       /*echo $this->find()->select('id')->where([
+        'talleresdet_id'=>$this->talleresdet_id,        
+      ])->andWhere(['>','fechaprog',$this->fechaprog])->
+           orderBy('fechaprog ASC')->createCommand()->getRawSql();
+       die();*/
+   return  $this->find()->select('id')->where([
+        'talleresdet_id'=>$this->talleresdet_id,        
+      ])->andWhere(['>','fechaprog',$this->swichtDate('fechaprog',false)])->
+           orderBy('fechaprog ASC')->limit(1)->scalar();
         
-      ]);
         
-        
+    }
+    
+    public function previousCitaByStudent(){
+       /* echo $this->find()->select('id')->where([
+        'talleresdet_id'=>$this->talleresdet_id,        
+      ])->andWhere(['<','fechaprog',$this->fechaprog])->
+           orderBy('fechaprog DESC')->createCommand()->getRawSql();
+       die(); */
+   return  $this->find()->select('id')->where([
+        'talleresdet_id'=>$this->talleresdet_id,        
+      ])->andWhere(['<','fechaprog',$this->swichtDate('fechaprog',false)])
+           ->orderBy('fechaprog DESC')->limit(1)->
+           scalar();
+    } 
+    
+     public function lastCitaByStudent(){
+     $maximafecha=  $this->find()->select('max(fechaprog)')->where([
+        'talleresdet_id'=>$this->talleresdet_id,        
+      ])->scalar();
+     if($maximafecha===false)return $maximafecha;
+   return  $this->find()->select('id')->where([
+        'talleresdet_id'=>$this->talleresdet_id,        
+      ])->andWhere(['fechaprog'=>$maximafecha])->scalar();
+           
+    }
+     public function firstCitaByStudent(){
+     $minimafecha=  $this->find()->select('min(fechaprog)')->where([
+        'talleresdet_id'=>$this->talleresdet_id,        
+      ])->scalar();
+     if($minimafecha===false)return $minimafecha;
+   return  $this->find()->select('id')->where([
+        'talleresdet_id'=>$this->talleresdet_id,        
+      ])->andWhere(['fechaprog'=>$minimafecha])->scalar();
+           
+    }
+    
+    public function breadCrumbsByStudent(){
+        return [
+            yii::t('sta.labels','Primera cita')=>$this->firstCitaByStudent(),
+            yii::t('sta.labels','Cita Previa')=>$this->previousCitaByStudent(),
+            yii::t('sta.labels','Siguiente Cita')=>$this->nextCitaByStudent(),
+            yii::t('sta.labels','Ultima cita')=>$this->lastCitaByStudent(),
+        ];
     }
 }

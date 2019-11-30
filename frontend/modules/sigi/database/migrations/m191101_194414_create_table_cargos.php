@@ -18,7 +18,7 @@ class m191101_194414_create_table_cargos extends baseMigration
 if(!$this->existsTable($table)) {
     $this->createTable($table,  [
         'id'=>$this->primaryKey(),
-        'codcargo'=>$this->char(5)->notNull()->append($this->collateColumn()),
+        'codcargo'=>$this->char(4)->notNull()->append($this->collateColumn()),
         'descargo'=>$this->string(40)->notNull()->append($this->collateColumn()),
         'esegreso'=>$this->char(1)->append($this->collateColumn()),
         'regular'=>$this->char(1)->append($this->collateColumn()),        

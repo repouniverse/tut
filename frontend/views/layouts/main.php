@@ -1,83 +1,117 @@
 <?php
+use yii\helpers\Html;
 
-/* @var $this \yii\web\View */
+/* @var $this \yii\web\\View */
 /* @var $content string */
 
-use yii\helpers\Html;
-use yii\bootstrap\Nav;
-use yii\bootstrap\NavBar;
-use yii\widgets\Breadcrumbs;
-use frontend\assets\AppAsset;
-use common\widgets\Alert;
 
-AppAsset::register($this);
-?>
-<?php $this->beginPage() ?>
-<!DOCTYPE html>
-<html lang="<?= Yii::$app->language ?>">
-<head>
-    <meta charset="<?= Yii::$app->charset ?>">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <?= Html::csrfMetaTags() ?>
-    <title><?= Html::encode($this->title) ?></title>
-    <?php $this->head() ?>
-</head>
-<body>
-<?php $this->beginBody() ?>
 
-<div class="wrap">
-    <?php
-    NavBar::begin([
-        'brandLabel' => Yii::$app->name,
-        'brandUrl' => Yii::$app->homeUrl,
-        'options' => [
-            'class' => 'navbar-inverse navbar-fixed-top',
-        ],
-    ]);
-    $menuItems = [
-        ['label' => 'Home', 'url' => ['/site/index']],
-        ['label' => 'About', 'url' => ['/site/about']],
-        ['label' => 'Contact', 'url' => ['/site/contact']],
-    ];
-    if (Yii::$app->user->isGuest) {
-        $menuItems[] = ['label' => 'Signup', 'url' => ['/site/signup']];
-        $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
+    if (class_exists('frontend\assets\AppAsset')) {
+        frontend\assets\AppAsset::register($this);
+       
     } else {
-        $menuItems[] = '<li>'
-            . Html::beginForm(['/site/logout'], 'post')
-            . Html::submitButton(
-                'Logout (' . Yii::$app->user->identity->username . ')',
-                ['class' => 'btn btn-link logout']
-            )
-            . Html::endForm()
-            . '</li>';
+        app\assets\AppAsset::register($this);
     }
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav navbar-right'],
-        'items' => $menuItems,
-    ]);
-    NavBar::end();
+
+    dmstr\web\AdminLteAsset::register($this);
+
+    $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed2010/adminlte/dist');
     ?>
+    <?php $this->beginPage() ?>
+    <!DOCTYPE html>
+    <html lang="<?= Yii::$app->language ?>">
+    <head>
+          <meta charset="<?= Yii::$app->charset ?>"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <?= Html::csrfMetaTags() ?>
+        <title><?= Html::encode($this->title) ?></title>
+        <?php $this->head() ?>
+        
+       
+              
+        
+        
+        
+        
+       <link rel="icon" type="image/ico" href="<?=\yii\helpers\Url::home()?>img/diar.ico" />  
+        
+        
+    </head>
+  
 
-    <div class="container">
-        <?= Breadcrumbs::widget([
-            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-        ]) ?>
-        <?= Alert::widget() ?>
-        <?= $content ?>
+    
+    
+    
+    <body class="<?= \dmstr\helpers\AdminLteHelper::skinClass() ?>">
+    <?php $this->beginBody(); ?>
+    <div class="wrapper">
+
+      
+ 
+        
+        
+        
+        
+        
+        
+        
+        
+             <?php
+
+
+use lo\widgets\modal\ModalAjax;
+
+echo ModalAjax::widget([
+    'id' => 'buscarvalor',
+    'header' => 'Buscar Valor',
+    'toggleButton' => false,
+    //'mode'=>ModalAjax::MODE_MULTI,
+    'selector'=>'.botonAbre',
+   // 'url' => $url, // Ajax view with form to load
+    'ajaxSubmit' => true, // Submit the contained form as ajax, true by default
+    //para que no se esconda la ventana cuando presionas una tecla fuera del marco
+    'clientOptions' => ['tabindex'=>'','backdrop' => 'static', 'keyboard' => FALSE]
+    // ... any other yii2 bootstrap modal option you need
+]);
+ ?>  
+         <?php \shifrin\noty\NotyWidget::widget([
+    'options' => [ // you can add js options here, see noty plugin page for available options
+        'dismissQueue' => true,
+        'layout' => 'center',
+        'theme' => 'relax',
+        'animation' => [
+            'open' => 'animated flipInX',
+            'close' => 'animated flipOutX',
+        ],
+        'timeout' => false,
+    ],
+    'enableSessionFlash' => true,
+    'enableIcon' => true,
+    'registerAnimateCss' => true,
+    'registerButtonsCss' => true,
+    'registerFontAwesomeCss' => true,
+]); ?>
+        
+        <?= $this->render(
+            'header.php',
+            ['directoryAsset' => $directoryAsset]
+        ) ?>
+
+        <?= $this->render(
+            'left.php',
+            ['directoryAsset' => $directoryAsset]
+        )
+        ?>
+
+        <?= $this->render(
+            'content.php',
+            ['content' => $content, 'directoryAsset' => $directoryAsset]
+        ) ?>
+
     </div>
-</div>
 
-<footer class="footer">
-    <div class="container">
-        <p class="pull-left">&copy; <?= Html::encode(Yii::$app->name) ?> <?= date('Y') ?></p>
+    <?php $this->endBody() ?>
+    </body>
+    </html>
+    <?php $this->endPage() ?>
 
-        <p class="pull-right"><?= Yii::powered() ?></p>
-    </div>
-</footer>
-
-<?php $this->endBody() ?>
-</body>
-</html>
-<?php $this->endPage() ?>

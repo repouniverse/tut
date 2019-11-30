@@ -118,7 +118,7 @@ class SiteController extends Controller
  //Yii::info(" paracopmrobar   ", __METHOD__);  
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
-                 $this->redirect(['sta/default/']);      
+                 $this->redirect(['index']);      
 		// $this->redirect(['sta/default/view-profile','iduser'=>h::userId()]);           // return $this->goBack();
         } else {
           
@@ -386,7 +386,12 @@ public function actionRutas(){
    echo " Url::canonical()  :   ".Url::canonical()."<br>";
    echo " Url::current()  :   ".Url::current()."<br>";
    echo " Url::previous()  :   ".Url::previous()."<br>";
-
+   echo " UrlManager::getBaseUrl()  :   ".yii::$app->urlManager->getBaseUrl()."<br>";
+   echo " UrlManager::getHostInfo()  :   ".yii::$app->urlManager->getHostInfo()."<br>";
+   echo " UrlManager::getScriptUrl()  :   ".yii::$app->urlManager->getScriptUrl()."<br>";
+   //yii::$app->urlManager->setHostInfo('');
+   //echo " Url::base()  :   ".Url::base()."<br>";
+   //echo " UrlManager::setHostInfo()   :   ".yii::$app->urlManager->setHostInfo('http://case.itekron.com/frontend/web/sta/entregas/update?id=32')."<br>";
 }
 
 

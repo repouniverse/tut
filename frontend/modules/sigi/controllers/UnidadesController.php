@@ -5,6 +5,7 @@ namespace frontend\modules\sigi\controllers;
 use Yii;
 use frontend\modules\sigi\models\SigiUnidades;
 use frontend\modules\sigi\models\SigiUnidadesSearch;
+use frontend\modules\sigi\helpers\comboHelper;
 use frontend\controllers\base\baseController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -141,4 +142,117 @@ class UnidadesController extends baseController
 
         throw new NotFoundHttpException(Yii::t('sigi.labels', 'The requested page does not exist.'));
     }
+    
+     public function actionAgregaResidente($id){        
+         $this->layout = "install";
+         
+        $modelunidad = $this->findModel($id);        
+       $model=New \frontend\modules\sigi\models\SigiPropietarios();
+       $model->unidad_id=$id;
+       
+       $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                
+                $model->save();
+                //yii::error();
+                //$model->assignStudentsByRandom();
+                  return ['success'=>1,'id'=>$model->unidad_id];
+            }
+        }else{
+           return $this->renderAjax('_modal_residentes', [
+                        'model' => $model,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                        //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+    }
+    
+     public function actionAgregaMedidor($id){        
+         $this->layout = "install";
+         
+        $modelunidad = $this->findModel($id);        
+       $model=New \frontend\modules\sigi\models\SigiSuministros();
+       $model->unidad_id=$id;
+       
+       $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                
+                $model->save();
+                //yii::error();
+                //$model->assignStudentsByRandom();
+                  return ['success'=>1,'id'=>$model->unidad_id];
+            }
+        }else{
+           return $this->renderAjax('_modal_medidores', [
+                        'model' => $model,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                        //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+    }
+     public function actionAgregaHijo($id){        
+         $this->layout = "install";
+         
+        $modelunidad = $this->findModel($id);        
+       $model=New \frontend\modules\sigi\models\SigiUnidades();
+       $model->parent_id=$id;
+       $model->edificio_id=$modelunidad->edificio->id;
+       $model->codpro=$modelunidad->codpro;
+       $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                
+                $model->save();
+                //yii::error();
+                //$model->assignStudentsByRandom();
+                  return ['success'=>1,'id'=>$model->parent_id];
+            }
+        }else{
+           return $this->renderAjax('_modal_hijos', [
+                        'model' => $model,
+                        'modelunidad' => $modelunidad,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                        //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+    }
+    
+    
+  public function actionFillApoderados(){
+      
+      if(h::request()->isAjax){
+         // var_dump(h::request()->get('id'));die();
+          $model=$this->findModel(h::request()->get('id'));
+          
+         $items= comboHelper::getCboApoderados(h::request()->get('id'));
+         //var_dump($items);die();
+         echo \yii\helpers\Html::renderSelectOptions('', $items);
+      }
+  }  
 }

@@ -5,7 +5,7 @@ ECHO \common\widgets\spinnerWidget\spinnerWidget::widget();
 /* @var $this yii\web\View */
 /* @var $model frontend\modules\sta\models\Entregas */
 
-$this->title = Yii::t('sta.labels', 'Update Entregas: {name}', [
+$this->title = Yii::t('sta.labels', 'Editar entrega: {name}', [
     'name' => $model->id,
 ]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('sta.labels', 'Entregas'), 'url' => ['index']];

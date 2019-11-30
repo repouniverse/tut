@@ -233,4 +233,10 @@ public static function extDocs(){
     return array('ppt','pptx','doc','docx','xls','xlsx','pdf','jpg','jpeg'); 
 }
 
+public static function randomNameFile($ext){
+    if(!(substr($ext,0,1)=='.'))
+      $ext='.'.$ext;    
+    return uniqid().'_'.h::userId().'_'.str_replace('.','_',h::request()->getUserIP()).$ext;
+}
+
 }

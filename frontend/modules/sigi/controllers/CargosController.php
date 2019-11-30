@@ -155,4 +155,21 @@ class CargosController extends baseController
             'model' => $model,
         ]);
     }
+    
+    
+    public function actionCargosEdificioLista(){
+     return  $this->render('_arbol_cargos_edificio');
+    }
+    
+    public function actionTree(){
+        $key=h::request()->get('key');
+     h::response()->format = Response::FORMAT_JSON;
+     return[
+           ['key'=>$key.'_456', 'title'=>'Departamento 1'],
+            ['key'=>$key.'_457', 'title'=>'Departamento 2','lazy'=>true],
+         ];
+    }
+    
+    
+    
 }

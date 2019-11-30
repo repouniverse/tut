@@ -93,4 +93,23 @@ class SigiUnidadesSearch extends SigiUnidades
         
         return $dataProvider;
     }
+    
+     public function searchByUnidad($unidad_id)
+    {
+        $query = SigiUnidades::find();
+
+        // add conditions that should always apply here
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+
+        $query->where([
+            'parent_id' => $unidad_id,
+           // 'npisos' => $this->npisos,
+        ]);
+        // grid filtering conditions
+        
+        return $dataProvider;
+    }
 }

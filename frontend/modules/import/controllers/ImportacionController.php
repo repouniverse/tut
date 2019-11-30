@@ -21,6 +21,7 @@ use frontend\modules\import\models\ImportCargamasivaUserSearch;
 use common\controllers\base\baseController;
 use common\helpers\timeHelper;
 use common\helpers\h;
+use common\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 use yii\db\Exception;
 use yii\web\Response;
@@ -478,6 +479,32 @@ public function actionLoadCarga($idcarga){
          throw new NotFoundHttpException(Yii::t('sta.errors', 'No hay archivo adjunto'));
         }
  }
+ 
+ /*Gnerera un archivo csv ejemplo*/
+ public function actionExampleCsv($id){
+     $model=$this->findModel($id); 
+     //$model=new ImportCargamasiva();
+    // $model->attachBehavior($name, $behavior);
+     $route=$model->generateExampleCsv(
+             $model->modelAsocc()
+             );
+    
+      return Yii::$app->response->sendFile($route);   
+     }
+  public function actionExampleFileCsv($id){
+     
+     $clase='\\'.str_replace('_','\\',h::request()->get('calse'));
+     $campoforaneo=h::request()->get('campoforaneo');
+      $model=$this->findModel($id); 
+     $route=$model->generateExampleCsv(
+             new $clase,$campoforaneo
+             );
+    
+      return Yii::$app->response->sendFile($route);   
+     }   
+     
+ 
+ 
        
 }
       

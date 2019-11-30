@@ -1,5 +1,6 @@
 <?php
 namespace frontend\modules\sigi\models;
+use frontend\modules\sigi\Module as SigiModule;
 use common\models\masters\Clipro;
 use Yii;
 
@@ -24,6 +25,12 @@ use Yii;
  */
 class SigiUnidades extends \common\models\base\modelBase
 {
+    const TYP_PROPIETARIO='P';
+    const TYP_INQUILINO='I';
+    const SCENARIO_HIJO='hijo';
+    const SCENARIO_EDIFICIO='edificio';
+    const SCENARIO_BASICO='import_basica';
+    public $booleanFields=['esnuevo'];
     /**
      * {@inheritdoc}
      */
@@ -32,6 +39,8 @@ class SigiUnidades extends \common\models\base\modelBase
         return '{{%sigi_unidades}}';
     }
 
+    
+    
     /**
      * {@inheritdoc}
      */
@@ -43,7 +52,7 @@ class SigiUnidades extends \common\models\base\modelBase
            ['numero', 'unique', 'targetAttribute' => ['edificio_id','numero']],
             [['area', 'participacion'], 'number'],
             [['detalles'], 'string'],
-            [['codpro'], 'safe'],
+            [['codpro'.'esnuevo'], 'safe'],
             [['estreno'], 'safe'],
             [['codtipo'], 'string', 'max' => 4],
             [['numero'], 'string', 'max' => 12],
@@ -59,7 +68,8 @@ class SigiUnidades extends \common\models\base\modelBase
     {
         $scenarios = parent::scenarios(); 
         $scenarios['import_basica'] = ['edificio_id','codtipo','numero','area','codpro'];
-       // $scenarios[self::SCENARIO_REGISTER] = ['username', 'email', 'password'];
+        $scenarios[self::SCENARIO_HIJO] = ['destalles','estreno','codtipo','numero','area','numero','area','npiso','nombre','participacion'];
+// $scenarios[self::SCENARIO_REGISTER] = ['username', 'email', 'password'];
         return $scenarios;
     }
     /**
@@ -70,7 +80,7 @@ class SigiUnidades extends \common\models\base\modelBase
         return [
             'id' => Yii::t('sigi.labels', 'ID'),
             'codtipo' => Yii::t('sigi.labels', 'Tipo'),
-             'codpro' => Yii::t('sigi.labels', 'Apoderado'),
+             'codpro' => Yii::t('sigi.labels', 'Tenencia'),
             'npiso' => Yii::t('sigi.labels', 'Piso'),
             'edificio_id' => Yii::t('sigi.labels', 'Edificio'),
             'numero' => Yii::t('sigi.labels', 'Numero'),
@@ -119,6 +129,11 @@ class SigiUnidades extends \common\models\base\modelBase
         return $this->hasMany(SigiUnidades::className(), ['parent_id' => 'id']);
     }
     
+     public function getPadre()
+    {
+        return $this->hasOne(SigiUnidades::className(), ['id' => 'parent_id']);
+    }
+    
      public function getClipro()
     {
         return $this->hasOne(Clipro::className(), ['codpro' => 'codpro']);
@@ -142,7 +157,15 @@ class SigiUnidades extends \common\models\base\modelBase
         }
         return parent::beforeSave($insert);
     }
-    
+    public function afterSave($insert, $changedAttributes)  {
+         if($insert){
+            if($this->codpro <> SigiModule::getCodeNaturalPerson()){
+                //$this->estreno=null;
+               $this->insertPropietarioEmpresa() ;
+            } 
+         } 
+        return parent::afterSave($insert, $changedAttributes);
+    }
     public function hasChildunits(){
         return($this->getChildsUnits()->count()==0)?true:false;
     }
@@ -160,12 +183,14 @@ class SigiUnidades extends \common\models\base\modelBase
           return 0;
       }else{
          $areaTotal=$this->edificio->area();
-         if(!$porcentaje)
-           $areaTotal=$areaTotal*100;
+         /*if(!$porcentaje){
+              $areaTotal=$areaTotal*100;
          return $areaTotal;
+         }
+          */
          
         if($areaTotal>0){
-            return $this->area/$areaTotal;
+            return round(($this->area*(($porcentaje)?100:1))/$areaTotal,4);
         }else{
            return 0; 
         }  
@@ -173,4 +198,57 @@ class SigiUnidades extends \common\models\base\modelBase
        
         
     }
+    /*
+     * Se estrena este departamento
+     */
+    public function estrenar($fecha,$apoderado){
+        
+    }
+    
+    public function validateApoderado($attribute, $params)
+    {
+      /*verificar que el edificio a asignar tiene apoderadoso*/
+      if($this->isNewRecord)
+       $edificio=Edificios::find()->one(['id'=>$this->edificio_id]);
+       $edificio=$this->edificio;
+       if(!$edificio->hasApoderados())
+        $this->addError ('edificio_id',yii::t('sigi.errors','El edificio no tiene Apoderados'));
+      if(!in_array($this->codpro,$edificio->apoderados()))
+       $this->addError ('codpro',yii::t('sigi.errors','Este apoderado no esta registrado en el edificio'));
+      
+        
+    }
+   
+  private function insertPropietarioEmpresa(){
+      $atributos=[
+         'unidad_id'=>$this->id,
+          'tipo'=>self::TYP_PROPIETARIO,
+          'espropietario'=>true,
+          'nombre'=>Clipro::find()->where(['codpro'=>$this->codpro])->one()->despro,
+          'dni'=>Clipro::find()->where(['codpro'=>$this->codpro])->one()->rucpro,
+      ];
+      SigiPropietarios::firstOrCreateStatic($atributos, SigiPropietarios::SCENARIO_EMPRESA);
+  }  
+   
+  
+  public static function treeBase($edificio_id){
+       $datos=static::find()->where(['edificio_id'=>$edificio_id])->asArray()->all();
+       foreach($datos as $fila){
+         $keyTree='uni_'.$fila['id'];
+         $array_tree['items'][]=[             
+                       'icon'=>'fa fa-couch',
+                       'title' => $fila['nombre'],
+                       'lazy' => true ,
+                       // 'OTHER'=>'holis',
+                          'key'=>$keyTree,
+             'children' => [
+                        ['title' => yii::t('base.names','Unidades'),'tooltip'=>'fill-unidades_'.$fila['id'],'key'=>$keyTree.'_unidades'],
+                        ['title' => yii::t('base.names','Documentos'),'tooltip'=>'fill-documentos_'.$fila['id'],'key'=>$keyTree.'_documentos'],
+                        ['title' => yii::t('base.names','Colectores'),'tooltip'=>'fill-grupos_'.$fila['id'],'key'=>$keyTree.'_grupos'],                       
+                    ],
+                        ];
+       }
+     
+   }
+  
 }

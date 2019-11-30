@@ -3,12 +3,16 @@
 namespace frontend\modules\import\models;
 use frontend\modules\import\components\CSVReader as MyCSVReader;
 use common\helpers\h;
+use common\helpers\FileHelper;
 use yii\helpers\ArrayHelper;
 use common\behaviors\FileBehavior;
 use frontend\modules\import\models\ImportLogcargamasiva;
 use frontend\modules\import\models\ImportCargamasivaUser;
+use frontend\modules\import\behaviors\csvBehavior;
+use frontend\modules\import\ModuleImport;
 use Yii;
 use yii\web\NotFoundHttpException;
+use common\models\base\modelBase;
 /**
  * This is the model class for table "{{%import_cargamasiva}}".
  *
@@ -23,7 +27,7 @@ use yii\web\NotFoundHttpException;
  *
  * @property ImportCargamasivadet[] $importCargamasivadets
  */
-class ImportCargamasiva extends \common\models\base\modelBase
+class ImportCargamasiva extends modelBase
 {
   
      const EXTENSION_CSV='csv';
@@ -76,7 +80,10 @@ class ImportCargamasiva extends \common\models\base\modelBase
 		
 		'fileBehavior' => [
 			'class' => FileBehavior::className()
-		]
+		],
+            /*'csvBehavior' => [
+			'class' => csvBehavior::className()
+		]*/
 		
 	];
             }
@@ -362,4 +369,88 @@ public function ordenCampos(){
         }
        return parent::beforeSave($insert);
     }
+    /*NO USAR, YA SE REEMPLAZO ESTA FUNCION EN UN BEHAVIOR*/
+  public function generateExampleCsv($model,$campo=null){
+      yii::error('ingresando');
+       $childFields=$this->childsField($model,$campo);
+      //var_dump($campo);die();
+      $filas=$this->dataArrayToCsvExample($model,$campo);      
+       $pathComplete= ModuleImport::getPathCsv().DIRECTORY_SEPARATOR.FileHelper::randomNameFile('.csv');
+       if (!$file_handle = fopen($pathComplete, "w")) {  
+        echo "El archivo no se puede crear";
+        exit;  
+               }
+               $filac=array_keys($childFields);
+            $filac=array_map("utf8_decode", $filac);
+        if(fputcsv(                
+        $file_handle,$filac,
+        h::gsetting('import','delimiterCsv')
+                )===false){
+           echo "HUoi un error al escribir";fclose($file_handle);DIE(); 
+        }else{
+              }
+     foreach($filas as $fila){
+         fputcsv(
+                $file_handle, array_values($fila),
+               h::gsetting('import','delimiterCsv') 
+                ); 
+     }
+     rewind($file_handle);
+     fclose($file_handle);
+       return   $pathComplete;
+  }  
+   
+      
+  
+  /*
+   * DEVUELVE UN ARRAY CON LOS CAMPOS 
+   * DEl modelo asoiciado 
+   * peje: SI el modelo asociado es CLipro 
+   * retorna 
+   * ['Cod. Proveedor'=>'codpro','R.U.C.'=>'rucpro','Descripcion'=>'despro',...]
+   * Segun el escenario
+   */
+  
+  public function childsField($model,$campo=null ){
+      
+     if(('\\'.$model::className()==$this->modelo)){
+         $childs=$this->ChildsAsArray();
+          return array_combine(array_column($childs,'aliascampo'),
+              array_column($childs,'nombrecampo'));
+     }else{
+         //var_dump(in_array($campo,array_keys($model->attributes)),$campo,array_keys($model->attributes));
+         yii::error('El campo '.$campo);
+         if(!(in_array($campo,array_keys($model->attributes))))
+         throw new \yii\base\Exception(Yii::t('import.errors', 'No existe el campo \'{campo}\' para la tabla \'{tabla}\'',['campo'=>$campo,'tabla'=>$model->tableName()]));
+            $arr=[];
+         $safeFields=$model->getSafeFields();
+         if(!in_array($campo,$safeFields)){
+            $safeFields[]=$campo; 
+         }
+         /*Ordenando los campos para que aperaca primero el camppo foraneo*/
+        $index=array_search($campo,$safeFields);
+        unset($safeFields[$index]);
+        array_unshift($safeFields, $campo);
+         
+         
+         foreach($safeFields as $field){
+             $label=$model->getAttributeLabel($field);
+             if($label==''){
+                 $label=$field;
+             }
+            $arr[$label]= $field;
+         }
+        return $arr;
+     }
+      
+  }
+  
+  public function  dataArrayToCsvExample($model,$campo=null){
+      //var_dump($this->childsField($model));die();
+       return  $model->find()->
+       select(array_values($this->childsField($model,$campo)))->
+      limit(10)->asArray()->all();    
+    }
+  
+ 
 }

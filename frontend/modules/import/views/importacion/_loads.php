@@ -35,12 +35,12 @@ use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
                         
                         },
                         'try' => function ($url,$model) {
-			    $url = Url::toRoute([$this->context->id.'/import','id'=>$model->id,/*'verdadero'=>'1',*/'isJson'=>'si']);
+			    $url = Url::toRoute([$this->context->id.'/import','id'=>$model->id,/*'verdadero'=>'1',*/]);
                              return Html::a('<span class="btn btn-warning btn-sm glyphicon glyphicon-cog"></span>', '#', ['title'=>$url,/*'id'=>$model->codparam,*/'family'=>'holas','id'=> \yii\helpers\Json::encode(['id'=>$model->id,'modelito'=> str_replace('@','\\',get_class($model))]),/*'title' => 'Borrar'*/]);
                             },
                         
                         'upload' => function ($url,$model) {
-			    $url = Url::toRoute([$this->context->id.'/import','id'=>$model->id,'verdadero'=>'1','isJson'=>'si']);
+			    $url = Url::toRoute([$this->context->id.'/import','id'=>$model->id,'verdadero'=>'1']);
                              return Html::a('<span class="btn btn-info btn-sm glyphicon glyphicon-upload"></span>', '#', ['title'=>$url,/*'id'=>$model->codparam,*/'family'=>'holas','id'=> \yii\helpers\Json::encode(['id'=>$model->id,'modelito'=> str_replace('@','\\',get_class($model))]),/*'title' => 'Borrar'*/]);
                             }
                     ]
@@ -50,17 +50,25 @@ use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
                 'format' => 'raw',
                 'value' =>  function ($model, $key, $index, $column){
                         //$options=['width' => '40','height' => '42','class'=>"img-thumbnail"];
-                 $cad=($model->activo==$model::STATUS_CARGADO)?'<span class="glyphicon glyphicon-check"></span>':'';      
-        return ($model->hasAttachments())?Html::a('<span class="glyphicon glyphicon-paperclip"></span>',$model->urlFirstFile/*, $options*/).$cad:
+                 $cad=($model->activo==$model::STATUS_CARGADO)?'<span style="font-size:16px;" class="glyphicon glyphicon-check"></span>':'';      
+        return ($model->hasAttachments())?Html::a('<span class="glyphicon glyphicon-save"></span>',$model->urlFirstFile,['data-pjax'=>'0']).$cad:
             '<span class="glyphicon glyphicon-folder-open"></span>';
                        
               },
             ],
                'activo',   
             'descripcion',
-            'fechacarga',
-            'tienecabecera',
-            'duracion',
+           // 'fechacarga',
+           [
+    'attribute' => 'tienecabecera',
+    'format' => 'raw',
+    'value' => function ($model) {
+        return \yii\helpers\Html::checkbox('tienecabecera[]', $model->tienecabecera, [ 'disabled' => true]);
+
+             },
+
+          ],
+            //'duracion',
          
                                [
     'attribute' => 'estricto',

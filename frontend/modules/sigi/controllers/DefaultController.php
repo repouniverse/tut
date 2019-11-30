@@ -1,4 +1,5 @@
 <?php
+namespace frontend\modules\sigi\controllers;
 use yii\web\Controller;
 class DefaultController extends Controller
 {

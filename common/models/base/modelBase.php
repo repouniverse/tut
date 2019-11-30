@@ -506,6 +506,7 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
  * segun la relacion 
  */  
  public function obtenerForeignField($nombrecampo){
+    // echo $nombrecampo; die();
      $arreglo=$this->fillRelations();
      $nombrecampoforaneo=null;
      $claseforanea=$this->fieldsLink(false)[$nombrecampo];
@@ -1391,14 +1392,26 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
       /*Devuelve un array de campos coemnzando por los indices de
        * la tabla
        */
-        public function  getSafeFields(){
+        public function  getSafeFields($associative=false){
             //$safe= array_intersect($this->primaryKey();
             $safe=[];
-            foreach($this->attributes as $nombre=>$valor){
+            if($associative===false){
+               foreach($this->attributes as $nombre=>$valor){
                 if($this->isAttributeSafe($nombre)){
                    $safe[]=$nombre; 
-                }
+                      }
+                 } 
+                 
+            }else{
+                
+                foreach($this->attributes as $nombre=>$valor){
+                if($this->isAttributeSafe($nombre)){
+                   $safe[$nombre]=$valor; 
+                      }
+                 } 
+                
             }
+            
            
          return $safe;   
          

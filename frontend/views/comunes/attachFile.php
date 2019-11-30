@@ -30,6 +30,6 @@ use yii\helpers\Html;
 
 <div class="form-group">
         
-        <?= Html::submitButton(Yii::t('report.messages', 'Save'), ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('<span class="glyphicon glyphicon-paperclip"></span>'.'   '.Yii::t('report.messages', 'Adjuntar'), ['class' => 'btn btn-success']) ?>
     </div>
  <?php ActiveForm::end(); ?>

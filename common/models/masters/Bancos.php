@@ -1,7 +1,7 @@
 <?php
 
 namespace common\models\masters;
-
+use frontend\modules\sigi\models\SigiCuentas;
 use Yii;
 
 /**
@@ -53,6 +53,12 @@ class Bancos extends \common\models\base\modelBase
         ];
     }
 
+    public function getCuentas()
+    {
+        return $this->hasMany(SigiCuentas::className(), ['banco_id' => 'id']);
+    }
+    
+    
     /**
      * @return \yii\db\ActiveQuery
      */

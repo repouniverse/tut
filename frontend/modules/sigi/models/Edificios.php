@@ -28,6 +28,8 @@ use Yii;
  */
 class Edificios extends \common\models\base\modelBase
 {
+   
+    public $hardFields=['codigo','codcen'];
     /**
      * {@inheritdoc}
      */
@@ -42,9 +44,9 @@ class Edificios extends \common\models\base\modelBase
     public function rules()
     {
         return [
-            [['codtra', 'nombre', 'tipo', 'npisos', 'codcen', 'direccion', 'coddepa', 'codprov'], 'required'],
+            [['codtra', 'nombre','codigo', 'tipo', 'npisos', 'codcen', 'direccion', 'coddepa', 'codprov'], 'required'],
             [['npisos'], 'integer'],
-            [['coddist'], 'safe'],
+            [['coddist','codigo'], 'safe'],
             [['detalles'], 'string'],
             [['codtra', 'codprov'], 'string', 'max' => 6],
             [['nombre', 'proyectista'], 'string', 'max' => 60],
@@ -92,6 +94,10 @@ class Edificios extends \common\models\base\modelBase
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getCuentas()
+    {
+        return $this->hasMany(SigiCuentas::className(), ['edificio_id' => 'id']);
+    }
     public function getCentro()
     {
         return $this->hasOne(Centros::className(), ['codcen' => 'codcen']);
@@ -116,4 +122,45 @@ class Edificios extends \common\models\base\modelBase
         //var_dump($this->queryUnidades()->sum('[[area]]'));die();
         return $this->queryUnidades()->sum('[[area]]');
     }
+    
+    public function hasApoderados(){
+      
+      return(((SigiApoderados::find()->where(
+              [
+               'edificio_id'=>$this->id,
+                
+              ]
+              )->count())>0)+0)?true:false;  
+    }
+    
+    public function apoderados(){      
+      return
+        array_column(SigiApoderados::find()->where(
+              [
+               'edificio_id'=>$this->id,                
+              ]
+              )->asArray()->all(),'codpro');  
+      }
+      
+   public static function treeBase(){
+       $datos=static::find()->asArray()->all();
+        $array_tree=[];
+       foreach($datos as $fila){
+         $keyTree='edi_'.$fila['id'];
+         $array_tree[]=[             
+                       'icon'=>'fa fa-building',
+                       'title' => $fila['nombre'],
+                       'lazy' => true ,
+                       // 'OTHER'=>'holis',
+                          'key'=>$keyTree,
+             'children' => [
+                        ['title' => yii::t('base.names','Unidades'),'tooltip'=>'fill-unidades_'.$fila['id'],'key'=>$keyTree.'_unidades','lazy'=>true],
+                        ['title' => yii::t('base.names','Documentos'),'tooltip'=>'fill-documentos_'.$fila['id'],'key'=>$keyTree.'_documentos','lazy'=>true],
+                        ['title' => yii::t('base.names','Colectores'),'tooltip'=>'fill-grupos_'.$fila['id'],'key'=>$keyTree.'_grupos','lazy'=>true],                                    
+                    ],
+                        ];
+       }
+       return $array_tree;
+     
+   }
 }

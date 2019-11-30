@@ -88,13 +88,13 @@ class CSVReader  extends MyReader{
        $this->verifiyFile();
        //$inicial=$this->startFromLine;        
       // $linea=null;
-       $contador=0;
+       $contador=1;
        if (($fp = fopen($this->filename, 'r')) !== FALSE) {  
                   // yii::error('incinaod bucle');             
             while (($line =$this->ReadLineCsv($fp) ) !== FALSE) {  
                 //yii::error($line);  
-                 //yii::error('esta es contador -> '.$contador);  
-                // yii::error('esta es la start -> '.$this->startFromLine);  
+                 yii::error('esta es contador -> '.$contador);  
+                 yii::error('esta es la start -> '.$this->startFromLine);  
                   if($contador==$this->startFromLine){
                      // yii::error('coincidio');
                     break;  
@@ -103,7 +103,7 @@ class CSVReader  extends MyReader{
                 }
         }
          //yii::error('esto retorna');  
-   //yii::error($line);        
+   yii::error($line);        
       return $line;       
    } 
    

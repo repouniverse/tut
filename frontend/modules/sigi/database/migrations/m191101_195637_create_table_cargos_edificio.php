@@ -25,18 +25,21 @@ if(!$this->existsTable($table)) {
         'grupo_id'=>$this->integer(11)->notNull(),
         'tasamora'=>$this->decimal(6,3)->notNull(),
          'grupo_id'=>$this->integer(11)->notNull()->append($this->collateColumn()),  
-        'plazovencimiento'=>$this->integer(3),   
+        'plazovencimiento'=>$this->integer(3), 
+        /*Si es masivo o alicado individualmente a un departamento */
+         'individual'=>$this->char(1)->append($this->collateColumn()), 
         /*Si es para cobrar cada mes*/
         'regular'=>$this->char(1)->notNull()->append($this->collateColumn()), 
         /*Si se deduce de un contrato o prespuesto fijo o es un valor variable
          *ejemplo:  monto fijo contrato de ascensores 
          *          monto no fijo, consumo de agua  o luz
          **/        
+        
         'montofijo'=>$this->char(1)->notNull()->append($this->collateColumn()), 
         //en meses , mensual 1, bomestral 2 , semestral 6 
-        'frecuencia'=>$this->integer(3)->notNull(),
+        'frecuencia'=>$this->string(3)->notNull()->append($this->collateColumn()),
         /*depende de lectura de un medidos*/
-        'tipomedidor'=>$this->char(1)->notNull()->append($this->collateColumn()), 
+        'tipomedidor'=>$this->char(3)->append($this->collateColumn()), 
         ],$this->collateTable());
             $this->addForeignKey($this->generateNameFk($table), $table,
               'edificio_id', static::NAME_TABLE_EDIFICIOS,'id');

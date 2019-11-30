@@ -120,6 +120,7 @@ class Route extends \mdm\admin\BaseObject
         // var_dump(Configs::instance() );die();
         //var_dump($advanced);die();
         if ($advanced) {
+            //yii::error('app avanzado');
             // Use advanced route scheme.
             // Set advanced route prefix.
             $this->_routePrefix = self::PREFIX_ADVANCED;
@@ -155,6 +156,7 @@ class Route extends \mdm\admin\BaseObject
             Yii::$app = $yiiApp;
             unset($yiiApp);
         } else {
+             //yii::error('app basica');
             // Use basic route scheme.
             // Set basic route prefix
             $this->_routePrefix = self::PREFIX_BASIC;

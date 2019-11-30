@@ -5,7 +5,7 @@ use common\helpers\h;
 use frontend\modules\sta\components\Profile;
 use frontend\modules\sta\models\StaInterlocutor;
 use common\helpers\FileHelper;
-use frontend\modules\sta\filters\FilterComplete;
+use frontend\modules\sta\filters\FilterAccess;
 use frontend\modules\sta\models\Aluriesgo;
 use linslin\yii2\curl;
 use frontend\modules\sta\models\UserFacultades;
@@ -31,10 +31,10 @@ class staModule extends \yii\base\Module
      */
     public function behaviors(){
         return[
-           /* [
-            'class' => FilterComplete::className(), 
-              'except' => ['default/complete'],
-            ],*/
+            [
+            'class' => FilterAccess::className(), 
+             // 'except' => ['default/complete'],
+            ],
         ];
     }
     

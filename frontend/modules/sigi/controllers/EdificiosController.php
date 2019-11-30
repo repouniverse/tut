@@ -5,6 +5,9 @@ namespace frontend\modules\sigi\controllers;
 use Yii;
 use frontend\modules\sigi\models\Edificios;
 use frontend\modules\sigi\models\EdificiosSearch;
+use frontend\modules\sigi\models\SigiUnidades;
+use frontend\modules\sigi\models\SigiCargosgrupoedificio as Grupos;
+use frontend\modules\sigi\models\SigiCargosedificio as GrupoDetalle;
 use frontend\modules\sigi\models\SigiCargosedificioSearch;
 use frontend\controllers\base\baseController;
 use yii\web\NotFoundHttpException;
@@ -40,6 +43,10 @@ class EdificiosController extends baseController
      */
     public function actionIndex()
     {
+       /* $plantilla=\common\helpers\h::settings()->get('general','formatoDNI');
+        $plantilla='[0-9]{8}';
+        var_dump($plantilla,preg_match('10201403',$plantilla));die();*/
+        
         /*$MODELI=\frontend\modules\sigi\models\SigiCargosgrupoedificio::findOne(7);
         VAR_DUMP($MODELI->hasChilds());DIE();
         */
@@ -101,7 +108,7 @@ class EdificiosController extends baseController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
+         //var_dump($model->hasApoderados());die();
         if (h::request()->isAjax && $model->load(h::request()->post())) {
                 h::response()->format = Response::FORMAT_JSON;
                 return ActiveForm::validate($model);
@@ -357,5 +364,111 @@ public function actionAgregaConcepto($id){
             ]);  
         }
 }  
+   
+
+public function actionTree(){
+   //echo \yii\helpers\Json::encode(Edificios::treeBase());die();
+     return $this->render('_arbol',['arr_arbol'=>Edificios::treeBase()]);
     
+    
+}
+
+public function  actionFillGrupos(){
+    
+    $edificio_id=h::request()->get('identidad');
+    $datos=Grupos::find()->where(['edificio_id'=>$edificio_id])->asArray()->all();
+    $ramas=[];
+    /*return[
+           ['key'=>$key.'_456', 'title'=>'Departamento 1'],
+            ['key'=>$key.'_457', 'title'=>'Departamento 2','lazy'=>true],
+         ];*/
+    foreach($datos as $fila){
+        $ramas[]=[
+            'icon'=>'fa fa-money',
+            'key'=>'_'.$edificio_id.'_grupo', 
+            'title'=>$fila['descripcion'].
+                     \yii\helpers\Html::a(   '<i style="color:#d633b3;"><span class="fa fa-plus-circle"></span></i>', 
+                    \yii\helpers\Url::to(['/sigi/edificios/agrega-concepto-tree','id'=>$fila['id'],'gridName'=>'grilla-cuentas','idModal'=>'buscarvalor']),
+                        [
+                            'class'=>"botonAbre",
+                            'title' => yii::t('sta.labels','Agregar Colector'),
+                        ]
+                    ),
+            'lazy'=>true,
+            'tooltip'=>'fill-grupos-detalle_'.$fila['id'],
+        ];
+    }
+     h::response()->format = \yii\web\Response::FORMAT_JSON;
+    return $ramas;
+}
+
+
+public function  actionFillGruposDetalle(){
+    
+    $grupo_id=h::request()->get('identidad');
+    $datos=GrupoDetalle::find()->where(['grupo_id'=>$grupo_id])->all();
+    $ramas=[];
+    /*return[
+           ['key'=>$key.'_456', 'title'=>'Departamento 1'],
+            ['key'=>$key.'_457', 'title'=>'Departamento 2','lazy'=>true],
+         ];*/
+    foreach($datos as $fila){
+        $ramas[]=[
+            'icon'=>'fa fa-money',
+            'key'=>'_'.$grupo_id.'_grupodetalle', 
+            'title'=>$fila->cargo->descargo.
+                     \yii\helpers\Html::a(   '<i style="color:#6f9e30;"><span class="fa fa-plus-circle"></span></i>', 
+                    \yii\helpers\Url::to(['/sigi/edificios/agrega-partida-tree','id'=>$fila->id,'gridName'=>'grilla-cuentas','idModal'=>'buscarvalor']),
+                        [
+                            'class'=>"botonAbre",
+                            'title' => yii::t('sta.labels','Agregar Colector'),
+                        ]
+                    ),
+            //'lazy'=>true,
+           // 'tooltip'=>'fill-grupos-cargo_'.$fila['id'],
+        ];
+    }
+     h::response()->format = \yii\web\Response::FORMAT_JSON;
+    return $ramas;
+}
+
+/*
+ * Esta accion para agregar un concepto desde un arbol
+ * id: id deñl grupo coelctor del edificio, ojo NO DEL EDIFICIO 
+ */
+
+public function actionAgregaConceptoTree($id){
+    $this->layout = "install";
+        $modelGrupo = Grupos::findOne($id);  
+       if(is_null($modelGrupo)){
+           throw new NotFoundHttpException(Yii::t('sigi.labels', 'Esta dirección no existe'));
+       }
+       $model=New \frontend\modules\sigi\models\SigiCargosedificio();
+       $model->edificio_id=$modelGrupo->edificio->id;
+       $model->grupo_id=$modelGrupo->id;       
+       $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                $model->save();
+                //$model->assignStudentsByRandom();
+                  return ['success'=>1,'id'=>$model->edificio_id];
+            }
+        }else{
+           return $this->renderAjax('_modal_concepto_tree', [
+                        'model' => $model,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                        //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        } 
+}
+
+
 }

@@ -62,7 +62,7 @@ class AuditBehavior extends Behavior
               $model=New Activerecordlog();
                $model=$this->setLogValues($model, $attribute);
               if(!$model->save()){
-                  throw new ServerErrorHttpException(Yii::t('error', 'NO SE PUDO GRABAR  '.serialize($model->geterrors())));
+                  throw new ServerErrorHttpException(Yii::t('base.errors', 'NO SE PUDO GRABAR  '.serialize($model->geterrors())));
               }
               unset($model);
           }          
@@ -90,7 +90,7 @@ class AuditBehavior extends Behavior
             'creationdate'=>date('Y-m-d H:i:s'),
             //'ip'=>yii::$app->request->getUrl(),
             'controlador'=>Yii::$app->controller->id,
-            'description'=>Yii::$app->request->getUrl(),
+            'description'=>substr(Yii::$app->request->getUrl(),0,105),
             'nombrecampo'=>$attribute,
             'oldvalue'=>$this->owner->getOldAttribute($attribute),
             'newvalue'=>$this->owner->{$attribute}.'',

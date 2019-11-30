@@ -16,6 +16,8 @@ if(!$this->existsTable($table)) {
     $this->createTable($table,  [
          'id'=>$this->primaryKey(),
         'codtipo'=>$this->char(4)->notNull()->append($this->collateColumn()),
+         'esnuevo'=>$this->char(1)->notNull()->append($this->collateColumn()),
+        
         'npiso'=>$this->integer(3),
         'edificio_id'=>$this->integer(11)->notNull(),
         'numero'=>$this->string(12)->notNull()->append($this->collateColumn()),

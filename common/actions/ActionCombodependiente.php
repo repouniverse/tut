@@ -3,6 +3,7 @@ namespace common\actions;
 use common\helpers\h;
 use common\helpers\ComboHelper;
 USE yii\helpers\Html;
+use yii;
 /* 
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -32,7 +33,9 @@ class ActionCombodependiente extends \yii\base\Action
                      $source[$modelo]['campoclave'],
                       $source[$modelo]['camporef']);
              //print_r($datos);die();
-             
+            // array_unshift($datos,[''=>yii::t('base.verbs','--Seleccione un Valor--')]);
+             //$datos['']=yii::t('base.verbs','--Seleccione un Valor--');
+             $datos=array_merge([''=>yii::t('base.verbs','--Seleccione un Valor--')],$datos);
            }else{/*Se traa de datos directametne */
                $datos=$source;
              

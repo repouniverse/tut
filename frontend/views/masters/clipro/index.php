@@ -3,6 +3,7 @@ use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
+use kartik\export\ExportMenu;
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\masters\CliproSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -16,12 +17,30 @@ $this->title = Yii::t('base.names', 'Clipros');
     <h4><?= Html::encode($this->title) ?></h4>
     <?php Pjax::begin(['id'=>'clipropj']); ?>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-      <p>
+    <div class="btn-group">  
         <?= Html::a('<span class="fa fa-industry"></span>'.'  '.Yii::t('app', 'Crear Empresa'), ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
-    
-
-    <?= GridView::widget([
+   
+   
+    <?php
+ echo ExportMenu::widget([
+    'dataProvider' => $dataProvider,
+     'exportConfig'=>[
+         ExportMenu::FORMAT_EXCEL=>[
+             'filename'=>'Exportacion'
+               ],
+         ExportMenu::FORMAT_EXCEL_X=>[
+             'filename'=>'Exportacion'
+               ]
+         ],
+    'columns' => $gridColumns,
+    'dropdownOptions' => [
+        'label' => yii::t('sta.labels','Exportar'),
+        'class' => 'btn btn-success'
+    ]
+]) ?>
+    </div>
+ <hr>
+         <?=GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
          'summary' => '',
@@ -31,7 +50,7 @@ $this->title = Yii::t('base.names', 'Clipros');
                 'template'=>'{update}{view}{delete}',
                 'buttons'=>[
                     'update'=>function($url,$model){
-                        $url=\yii\helpers\Url::toRoute(['edit','id'=>$model->codpro]);
+                        $url=\yii\helpers\Url::toRoute(['update','id'=>$model->codpro]);
                         return \yii\helpers\Html::a(
                                 '<span class="btn btn-success glyphicon glyphicon-pencil"></span>',
                                 $url,

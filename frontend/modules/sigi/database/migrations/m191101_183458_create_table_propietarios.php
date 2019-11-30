@@ -17,6 +17,11 @@ if(!$this->existsTable($table)) {
         'unidad_id'=>$this->integer(11)->notNull(),
         'tipo'=>$this->char(1)->notNull()->append($this->collateColumn()),
         //'codmon'=>$this->string(5)->notNull()->append($this->collateColumn()),
+         'espropietario'=>$this->char(1)->append($this->collateColumn()),
+        'recibemail'=>$this->char(1)->append($this->collateColumn()),
+        
+        'user_id'=>$this->integer(4),
+         'nombre'=>$this->string(70)->append($this->collateColumn()),
         'correo'=>$this->string(70)->append($this->collateColumn()),
         'correo1'=>$this->string(70)->append($this->collateColumn()),
         'correo2'=>$this->string(70)->append($this->collateColumn()),

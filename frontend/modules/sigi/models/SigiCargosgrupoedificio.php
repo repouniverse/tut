@@ -59,7 +59,7 @@ class SigiCargosgrupoedificio extends \common\models\base\modelBase
      */
     public function getSigiCargosedificios()
     {
-        return $this->hasMany(SigiCargosedificio::className(), ['codgrupo' => 'codgrupo']);
+        return $this->hasMany(SigiCargosedificio::className(), ['grupo_id' => 'id']);
     }
 
     /**

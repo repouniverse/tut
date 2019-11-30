@@ -1,7 +1,9 @@
 <?php
 
 namespace frontend\modules\sigi\models;
-
+USE frontend\modules\sigi\models\SigiUnidades;
+USE common\helpers\h;
+USE common\models\masters\Clipro;
 use Yii;
 
 /**
@@ -26,6 +28,8 @@ use Yii;
  */
 class SigiPropietarios extends \common\models\base\modelBase
 {
+    CONST SCENARIO_EMPRESA='empresa';
+    public $booleanFields=['espropietario','recibemail'];
     /**
      * {@inheritdoc}
      */
@@ -33,18 +37,28 @@ class SigiPropietarios extends \common\models\base\modelBase
     {
         return '{{%sigi_propietarios}}';
     }
-
+ public function scenarios()
+    {
+        $scenarios = parent::scenarios(); 
+        $scenarios[self::SCENARIO_EMPRESA] = ['unidad_id','tipo','dni','nombre','espropietario'];
+       // $scenarios[self::SCENARIO_REGISTER] = ['username', 'email', 'password'];
+        return $scenarios;
+    }
+    
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['unidad_id', 'tipo'], 'required'],
+            [['unidad_id', 'tipo','nombre'], 'required'],
             [['unidad_id'], 'integer'],
             [['participacion'], 'number'],
+             [['recibemail','nombre','espropietario','user_id'], 'safe'],
             [['detalle'], 'string'],
+            [['dni'], 'valida_dni'],
             [['tipo', 'activo'], 'string', 'max' => 1],
+             [['correo', 'correo1', 'correo2'], 'email'],
             [['correo', 'correo1', 'correo2', 'celulares'], 'string', 'max' => 70],
             [['fijo', 'dni'], 'string', 'max' => 12],
             [['finicio', 'fcese'], 'string', 'max' => 10],
@@ -91,4 +105,37 @@ class SigiPropietarios extends \common\models\base\modelBase
     {
         return new SigiPropietariosQuery(get_called_class());
     }
+    
+    public function beforeSave($insert){
+        if($insert){
+            $this->activo=true;
+        }
+        return parent::beforeSave($insert);
+    }
+    
+    public function valida_dni($attribute, $params)
+    {
+        $error=false;
+     if(!((preg_match(h::settings()->get('general','formatoDNI'),$this->dni)==1) or 
+        (preg_match(h::settings()->get('general','formatoRUC'),$this->dni)==1)
+        )){
+        $this->addError('dni',yii::t('sigi.errors','El valor para este campo no es correcto, debe ser un DNI o un RUC'));
+    
+      } 
+            }
+            
+   public function valida_propietario($attribute, $params)
+    {
+       if($this->isNewRecord){
+           $esnuevo=Unidad::findOne()->esnuevo;
+       }ELSE{
+          $esnuevo=$this->unidad->esnuevo;
+       }
+       if($this->tipo=SigiUnidades::TYP_INQUILINO && 
+          $esnuevo){
+           $this->addError('nombre','No se permiten inquilinos en un departamento sin entregar');
+       }
+       
+       
+     } 
 }

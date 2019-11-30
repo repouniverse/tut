@@ -7,7 +7,7 @@ use yii\widgets\Pjax;
 /* @var $searchModel frontend\modules\sigi\models\SigiUnidadesSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('sigi.labels', 'Sigi Unidades');
+$this->title = Yii::t('sigi.labels', 'Unidades');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="sigi-unidades-index">
@@ -16,10 +16,11 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="box box-success">
      <div class="box-body">
     <?php Pjax::begin(); ?>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
+        
+    <?php echo $this->render('_search', ['model' => $searchModel]); ?>
+        
     <p>
-        <?= Html::a(Yii::t('sigi.labels', 'Create Sigi Unidades'), ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('<span class="fa fa-couch"></span>'.'    '.Yii::t('sigi.labels', 'Crear unidad'), ['create'], ['class' => 'btn btn-success']) ?>
     </p>
     <div style='overflow:auto;'>
     <?= GridView::widget([
@@ -32,42 +33,60 @@ $this->params['breadcrumbs'][] = $this->title;
          
          [
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{update}{delete}{view}',
-                'buttons' => [
-                    'update' => function($url, $model) {                        
-                        $options = [
-                            'title' => Yii::t('base.verbs', 'Update'),                            
-                        ];
-                        return Html::a('<span class="btn btn-info btn-sm glyphicon glyphicon-pencil"></span>', $url, $options/*$options*/);
-                         },
-                          'view' => function($url, $model) {                        
-                        $options = [
-                            'title' => Yii::t('base.verbs', 'View'),                            
-                        ];
-                        return Html::a('<span class="btn btn-warning btn-sm glyphicon glyphicon-search"></span>', $url, $options/*$options*/);
-                         },
-                         'delete' => function($url, $model) {                        
-                        $options = [
-                            'data-confirm' => Yii::t('rbac-admin', 'Are you sure you want to activate this user?'),
-                            'title' => Yii::t('base.verbs', 'Delete'),                            
-                        ];
-                        return Html::a('<span class="btn btn-danger btn-sm glyphicon glyphicon-remove"></span>', $url, $options/*$options*/);
-                         }
-                    ]
-                ],
+                'template' => '{update}',
+                
+          ],
          
-         
-         
+         [
+             'attribute'=>'numero',
+             'format'=>'raw',
+             'value'=>function($model){
+                   
+                      return   '<i style="color:#ff2211;font-size:14px">    '.$model->numero.'</i>' ;
+                
+             
+                       
+             }
+         ],
+         [
+             'attribute'=>'parent_id',
+             'format'=>'raw',
+             'value'=>function($model){
+                   if($model->parent_id>0){
+                      return   '<i style="color:#08882f;font-size:14px">    '.$model->padre->numero.'     <span class="fa fa-child"></span></i>' ;
+                    
+                   }
+                    return '';
+             
+                       
+             }
+         ],
          
          
 
-            'id',
-            'codtipo',
-            'npiso',
-            'edificio_id',
+           
+            [
+                'attribute'=>'edificio',
+                'value' => function($model) { 
+                        //var_dump($model);die();
+                        return $model->edificio->nombre ;
+                         },
+            ],
+           
+            [
+                'attribute'=>'participacion',
+                'value' => function($model) { 
+                        //var_dump($model);die();
+                         $participacion=$model->participacion(true);
+                        if(empty($participacion) or $participacion==0)
+                         return '--';
+                        return round($model->participacion(true),2).'  %';
+                         },
+            ],
             'numero',
-            //'nombre',
-            //'area',
+            'nombre',
+            'tipo.desunidad',
+            
             //'participacion',
             //'parent_id',
             //'detalles:ntext',

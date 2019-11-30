@@ -1,6 +1,7 @@
 <?php
 use common\helpers\ComboHelper;
 use frontend\modules\bigitems\models\Docbotellas;
+use common\widgets\spinnerWidget\spinnerWidget;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
@@ -14,7 +15,9 @@ use common\widgets\cbodepwidget\cboDepWidget as ComboDep;
 
 <div class="import-cargamasiva-form">
 <div class="box box-success">
-       <?php $form = ActiveForm::begin([
+       <?php
+       ECHO spinnerWidget::widget();
+       $form = ActiveForm::begin([
            'id'=>'form-cargamasiva',
     'fieldClass'=>'\common\components\MyActiveField'
     ]); ?>
@@ -22,8 +25,26 @@ use common\widgets\cbodepwidget\cboDepWidget as ComboDep;
   <div class="box-footer">
         <div class="col-md-12">
             <div class="form-group no-margin">
-        <?= Html::submitButton(Yii::t('import.labels', 'Grabar'), ['class' => 'btn btn-success']) ?>
-    </div>
+        <?= Html::submitButton('<span class="fa fa-save"></span>    '.Yii::t('import.labels', 'Grabar'), ['class' => 'btn btn-success']) ?>
+           
+            <?php 
+               
+                $url=Url::to(['example-csv','id'=>$model->id]);
+                echo Html::a(
+                        '<span class="fa fa-download"></span>    '.yii::t('import.labels','Descargar plantilla'),
+                        $url,
+                        [
+                          
+                            'class' => 'btn btn-success',
+                            
+                            ]
+                        );
+                ?> 
+            
+            
+            </div>
+              
+            
      </div>
     </div>
     <div class="box-body">
@@ -91,9 +112,13 @@ use common\widgets\cbodepwidget\cboDepWidget as ComboDep;
     
    
  <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">   
-  <?= $form->field($model, 'format')->textInput(['maxlength' => true]) ?>
-
- </div>
+   <?= $form->field($model, 'format')->
+            dropDownList(['csv'=>'csv'],
+                    ['prompt'=>'--'.yii::t('base.verbs','Seleccione un valor')."--",
+                     'disabled'=>(!$model->isNewRecord)?true:false
+                       ]
+                    ) ?>
+ </div> 
  
     
     

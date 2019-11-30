@@ -69,5 +69,11 @@ div.absolute {
     .d-inline {
     display: inline!important;
 }
+
+.modal-header {
+    color:white !important;
+    background-color: #81b36c;
+}
+
     
 }

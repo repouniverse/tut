@@ -33,6 +33,27 @@ use common\helpers\h;
            </div>
           <?php } ?>
             
+                <?php 
+                $id=$model->firstCitaByStudent();
+                $url=Url::to(['update','id'=>$id]);
+                echo ($id && $id <> $model->id)?Html::a('<span class="glyphicon glyphicon-step-backward"></span>',$url):'';
+                ?>
+                <?php 
+                $id=$model->previousCitaByStudent();
+                $url=Url::to(['update','id'=>$id]);
+                echo ($id)?Html::a('<span class="glyphicon glyphicon-arrow-left"></span>', $url):'';
+                ?> 
+                <?php 
+                $id=$model->nextCitaByStudent();
+                $url=Url::to(['update','id'=>$id]);
+                echo ($id)?Html::a('<span class="glyphicon glyphicon-arrow-right"></span>',$url):'';
+                ?>
+                 <?php 
+                $id=$model->lastCitaByStudent();
+                $url=Url::to(['update','id'=>$id]);
+                echo ($id && $id <> $model->id)?Html::a('<span class="glyphicon glyphicon-step-forward"></span>', $url):'';
+                ?>
+                
              </div>
             </div>
         </div>

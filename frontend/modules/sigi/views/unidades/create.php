@@ -5,8 +5,8 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model frontend\modules\sigi\models\SigiUnidades */
 
-$this->title = Yii::t('sigi.labels', 'Create Sigi Unidades');
-$this->params['breadcrumbs'][] = ['label' => Yii::t('sigi.labels', 'Sigi Unidades'), 'url' => ['index']];
+$this->title = Yii::t('sigi.labels', 'Crear Unidad');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('sigi.labels', 'Unidades'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="sigi-unidades-create">

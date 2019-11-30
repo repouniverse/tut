@@ -7,7 +7,7 @@ use yii\widgets\DetailView;
 /* @var $model frontend\modules\sigi\models\SigiUnidades */
 
 $this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('sigi.labels', 'Sigi Unidades'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('sigi.labels', 'Unidades'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
@@ -16,14 +16,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <h4><?= Html::encode($this->title) ?></h4>
 
     <p>
-        <?= Html::a(Yii::t('sigi.labels', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a(Yii::t('sigi.labels', 'Delete'), ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => Yii::t('sigi.labels', 'Are you sure you want to delete this item?'),
-                'method' => 'post',
-            ],
-        ]) ?>
+        <?= Html::a(Yii::t('sigi.labels', 'Editar'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+        
     </p>
 
     <?= DetailView::widget([

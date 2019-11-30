@@ -80,6 +80,7 @@ class comboHelper extends Combito
               }
              $pisos[$x]=$prefijo.' '.abs($x);
             }
+           $pisos[0]=yii::t('sigi.labels','AZOTEA');
         return $pisos;
     }
     
@@ -91,6 +92,13 @@ class comboHelper extends Combito
         return ArrayHelper::map($apode,
                 'codgrupo','descripcion');
         
+    }  
+    
+    public static function getCboTipoResidente(){
+        return [
+            \frontend\modules\sigi\models\SigiUnidades::TYP_PROPIETARIO=>yii::t('sigi.labels','PROPIETARIO') ,
+            \frontend\modules\sigi\models\SigiUnidades::TYP_INQUILINO=>yii::t('sigi.labels','INQULINO') ,
+            ];
     }  
 }
 

@@ -28,10 +28,29 @@ $colorPluginOptions =  [
     ]
 ];
 $gridColumns = [
-[
-    
+  [
                 'class' => 'yii\grid\ActionColumn',
-   ], 
+                //'template' => Helper::filterActionColumn(['view', 'activate', 'delete']),
+            'template' => '{update}',
+               'buttons' => [
+                    'update' => function($url, $model) {  
+                         $url = \yii\helpers\Url::to(['/sigi/unidades/update','id'=>$model->id]);
+                         $options = [
+                            //'title' => Yii::t('sta.labels', 'Editar'),
+                            //'aria-label' => Yii::t('rbac-admin', 'Activate'),
+                            //'data-confirm' => Yii::t('rbac-admin', 'Are you sure you want to activate this user?'),
+                            //'data-method' => 'get',
+                            'data-pjax' => '0',
+                        ];
+                        //return Html::button('<span class="glyphicon glyphicon-pencil"></span>', ['href' => $url, 'title' => 'Editar Adjunto', 'class' => ' btn btn-sm btn-success']);
+                        return Html::a('<span class="btn btn-success glyphicon glyphicon-pencil"></span>',$url,$options);
+                     
+                        
+                        },
+                      
+                        
+                    ]
+                ],
 [
     'class' => 'kartik\grid\ExpandRowColumn',
     'width' => '50px',

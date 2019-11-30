@@ -1,7 +1,8 @@
 <?php
 
 namespace frontend\modules\sigi\models;
-
+USE common\models\masters\Clipro;
+USE common\models\masters\Ums;
 use Yii;
 
 /**
@@ -72,7 +73,7 @@ class SigiSuministros extends \common\models\base\modelBase
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCodum0()
+    public function getUm()
     {
         return $this->hasOne(Ums::className(), ['codum' => 'codum']);
     }
@@ -88,11 +89,29 @@ class SigiSuministros extends \common\models\base\modelBase
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCodpro0()
+    public function getClipro()
     {
         return $this->hasOne(Clipro::className(), ['codpro' => 'codpro']);
     }
 
+    
+    public function getLecturas()
+    {
+        return $this->hasMany(SigiLecturas::className(), ['id' => 'suministro_id']);
+    }
+    
+    public function lastRead()
+    {
+        return $this->queryReads()->
+                andWhere(['<','id',$this->id])
+                ->orderBy('id desc')->limit(1)->one();
+    }
+    
+    
+    private function queryReads(){
+        return SigiLecturas::find()->where(['suministro_id' => $this->id]);
+    }
+    
     /**
      * {@inheritdoc}
      * @return SigiSuministrosQuery the active query used by this AR class.
@@ -100,5 +119,9 @@ class SigiSuministros extends \common\models\base\modelBase
     public static function find()
     {
         return new SigiSuministrosQuery(get_called_class());
+    }
+    
+    public function ultimaLectura(){
+      return 1;  
     }
 }

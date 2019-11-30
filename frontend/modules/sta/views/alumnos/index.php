@@ -8,6 +8,7 @@ use common\widgets\spinnerWidget\spinnerWidget;
 /* @var $searchModel frontend\modules\bigitems\models\DocbotellasSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 ECHO spinnerWidget::widget();
+
 //use kartik\datecontrol\DateControl;
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\modules\sta\models\AlumnosController */

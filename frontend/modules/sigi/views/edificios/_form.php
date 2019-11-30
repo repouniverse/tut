@@ -179,7 +179,11 @@ use common\widgets\selectwidget\selectWidget;
            
             <?=  Html::textInput('45545rret',  $model->area(),['disabled'=>true,'class' => 'form-control form-group']) ?>
           
- </div>    
+ </div>  
+  <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
+     <?= $form->field($model, 'codigo')->textInput() ?>
+
+ </div>
           
           
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">

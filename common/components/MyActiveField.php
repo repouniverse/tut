@@ -20,7 +20,13 @@ private function isBlockedField(){
     //Si es model base y ademas el campo tiene registros hijos relacionados 
     // ESUN CAMO QUE NO DEBE E EDITARSE 
     if($this->isBaseModel()){
-      if($this->model->isBlockedField($this->attribute)){
+      if(
+          $this->model->isBlockedField($this->attribute) or 
+          (
+            $this->model->hasChilds() && 
+            (in_array($this->attribute,$this->model->hardFields))
+           )
+        ){
         return true;    
       }        
     }      

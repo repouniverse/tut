@@ -31,7 +31,7 @@ class SigiCargosedificio extends \common\models\base\modelBase
     {
         return '{{%sigi_cargosedificio}}';
     }
-
+   
     /**
      * {@inheritdoc}
      */
@@ -41,10 +41,10 @@ class SigiCargosedificio extends \common\models\base\modelBase
             [['edificio_id', 'cargo_id', 'tasamora', 'grupo_id'], 'required'],
             [['edificio_id', 'cargo_id', 'plazovencimiento', 'frecuencia'], 'integer'],
             [['tasamora'], 'number'],
-            [['codgrupo'], 'string', 'max' => 3],
-            [['regular', 'montofijo', 'tipomedidor'], 'string', 'max' => 1],
+           // [['codgrupo'], 'string', 'max' => 3],
+            [['regular', 'montofijo'], 'string', 'max' => 1],
             [['edificio_id'], 'exist', 'skipOnError' => true, 'targetClass' => Edificios::className(), 'targetAttribute' => ['edificio_id' => 'id']],
-            [['codgrupo'], 'exist', 'skipOnError' => true, 'targetClass' => SigiCargosgrupoedificio::className(), 'targetAttribute' => ['grupo_id' => 'id']],
+            //[['codgrupo'], 'exist', 'skipOnError' => true, 'targetClass' => SigiCargosgrupoedificio::className(), 'targetAttribute' => ['grupo_id' => 'id']],
             [['cargo_id'], 'exist', 'skipOnError' => true, 'targetClass' => SigiCargos::className(), 'targetAttribute' => ['cargo_id' => 'id']],
         ];
     }
@@ -59,7 +59,7 @@ class SigiCargosedificio extends \common\models\base\modelBase
             'edificio_id' => Yii::t('app', 'Edificio ID'),
             'cargo_id' => Yii::t('app', 'Cargo ID'),
             'tasamora' => Yii::t('app', 'Tasamora'),
-            'codgrupo' => Yii::t('app', 'Codgrupo'),
+            //'codgrupo' => Yii::t('app', 'Codgrupo'),
             'plazovencimiento' => Yii::t('app', 'Plazovencimiento'),
             'regular' => Yii::t('app', 'Regular'),
             'montofijo' => Yii::t('app', 'Montofijo'),
@@ -99,5 +99,23 @@ class SigiCargosedificio extends \common\models\base\modelBase
     public static function find()
     {
         return new SigiCargosedificioQuery(get_called_class());
+    }
+    
+    public static function frecuencias(){
+        return [
+            '0.5'=>yii::t('base.names','QUINCENAL'),
+            '1'=>yii::t('base.names','MENSUAL'),
+            '2'=>yii::t('base.names','BIMESTRAL'),
+            '3'=>yii::t('base.names','TRIMESTRAL'),
+            '6'=>yii::t('base.names','SEMETRAL'),
+            '12'=>yii::t('base.names','ANUAL'),
+        ];
+    }
+    
+    public function beforeSave($insert) {
+        IF($insert){
+            $this->codigo=$this->correlativo('codigo',null,'edificio_id');
+        }
+        RETURN parent::beforeSave($insert);
     }
 }

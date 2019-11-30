@@ -132,6 +132,7 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
     
     public function getCsv(){
      //var_dump($this->firstLineTobegin());die();
+        yii::error('primera linea para importar:  '.$this->firstLineTobegin());
       if(is_null($this->_csv)){
          
           $this->_csv= New MyCSVReader( [
@@ -153,9 +154,9 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
     
     public function firstLineTobegin(){
         if($this->current_linea==0 && $this->tienecabecera)
-            return 1;
+            return 2;
          if($this->current_linea==0 && !$this->tienecabecera)
-            return 0;
+            return 1;
          return $this->current_linea + 1 ;
         
     }
@@ -201,6 +202,7 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
    */
  public function verifyFirstRow(){
      $row=$this->csv->getFirstRow();
+    // yii::error($row);
      if(is_null($row) or $row===false)
      {
          $this->addError('activo',Yii::t('import.errors', 'Error; la primera fila  del archivo de carga no se ha encontrado, esto porque pued eque el archivo no tenga filas  o la propiedad firstLineToBegin(): {primera} llego al final del archivo ',['primera'=>$this->firstLineTobegin()]));
@@ -221,7 +223,9 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
           $tipo=$filashijas[$index]['tipo'];
           $longitud=$filashijas[$index]['sizecampo'];
           $nombrecampo=$filashijas[$index]['nombrecampo'];
-         
+          //yii::error('verificando aqui');
+        // yii::error(var_dump($tipo,$valor));
+         //yii::error(var_dump($tipo,$valor));
           /*Detectando inconsistencias*/
           if(($carga->isTypeChar($tipo)&&($longitud <> strlen($valor))) or
            ($carga->isTypeVarChar($tipo) &&($longitud < strlen($valor))) or                
@@ -236,7 +240,7 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
           break;
       }
       if(!$validacion){
-          $this->addError('activo',Yii::t('import.errors', 'Error en el formato de la columna  "{columna}", los tipos no coinciden, revise el archivop de carga',['columna'=>$nombrecampo]));
+          $this->addError('activo',Yii::t('import.errors', 'Error en el formato de la columna  "{columna}", los tipos no coinciden, revise el archivo de carga',['columna'=>$nombrecampo]));
         // throw new \yii\base\Exception(Yii::t('import.errors', 'The csv file has not the same type columns "{columna}" than type fields in this load data',['columna'=>$nombrecampo]));
            return false; 
               }
@@ -377,6 +381,9 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
           $timeBegin=microtime(true);     
         $interrumpido=false;     
         // $this->flushLogCarga();
+        IF(!$verdadero)
+        $this->flushLogCarga();//Borra cualquier huella anterior en el log de carga
+                     
         $cargamasiva=$this->cargamasiva; 
         $cargamasiva->verifyChilds();//Verificando las filas hijas de metadatos
        $camino=$this->pathFileCsv();
@@ -390,8 +397,7 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
                 ){
             //yii::error('Ya paso ..., inciando el proceso',__METHOD__);  
             // VAR_DUMP($carga->pathFileCsv());die();
-                      $this->flushLogCarga();//Borra cualquier huella anterior en el log de carga
-                       yii::error('Ya paso ..., Leyendo datos ',__METHOD__);  
+                        yii::error('Ya paso ..., Leyendo datos ',__METHOD__);  
                       $datos=$this->dataToImport(); //todo el array de datos para procesar, siempre empezara desde current_linea para adelante 
                       
                       yii::error('Ya leyo  los datos estanb listos ',__METHOD__);  
@@ -538,10 +544,10 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
      */
    private function canLoadForStatus($verdadero){
        $estado=$this->activo;  
-        if(!$verdadero && ($estado==self::STATUS_PROBADO)){
+       /* if(!$verdadero && ($estado==self::STATUS_PROBADO)){
           $this->addError('activo',yii::t('import.errors','Este registro ya está probado, revise el log de prueba'));
           return false;  
-        }
+        }*/
          if(!$verdadero && ($estado==self::STATUS_CARGADO_INCOMPLETO)){
            $this->addError('activo',yii::t('import.errors','Este registro tiene carga incompleta'));
           return false;  
@@ -566,6 +572,7 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
          $estado=$this->activo;
          $isReady=(
             (!$verdadero && ($estado==self::STATUS_ABIERTO)) or 
+              !$verdadero && ($estado==self::STATUS_PROBADO) or   
             ($verdadero && ($estado==self::STATUS_PROBADO)) or 
             ($verdadero && ($estado==self::STATUS_CARGADO_INCOMPLETO))             
            )?true:false;
