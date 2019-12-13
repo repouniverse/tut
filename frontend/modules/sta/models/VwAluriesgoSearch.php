@@ -17,7 +17,7 @@ class VwAluriesgoSearch extends VwAluriesgo
     public function rules()
     {
         return [
-           [['codcar','codfac','codcur', 'ap', 'am', 'nombres',  'codalu', 'dni', 'correo', 'fijos', 'celulares', 'fijos','nomcur'], 'safe'],
+           [['codcar','codperiodo','codfac','codcur', 'ap', 'am', 'nombres',  'codalu', 'dni', 'correo', 'fijos', 'celulares', 'fijos','nomcur'], 'safe'],
      
         ];
     }

@@ -24,15 +24,16 @@ class m191013_162180_create_view_aluriesgo  extends viewMigration
 public function safeDown()
     {
      
-    $vista=static::NAME_VIEW;    
+    $vista=static::NAME_VIEW; 
+    if($this->existsTable($vista)) {
     $this->dropView($vista);
-    }
+    }}
     
  private function getFields(){
-     return [ /*Alu*/'a.ap','a.am','a.nombres','a.codfac','a.dni','a.correo','a.celulares','a.fijos',
+     return [ /*Alu*/'a.id as idalu','a.ap','a.am','a.nombres','a.codfac','a.dni','a.correo','a.celulares','a.fijos',
                   /*Aluriesgo*/'b.id','b.codcur','b.codalu','b.nveces','b.nveces15','b.codperiodo','b.codcar',
                   /*Materias*/ 'd.nomcur','c.creditos','c.electivo','c.ciclo',
-          /*Facultades*/ 'e.desfac',
+          /*Facultades*/ 'f.desfac',
                   
          ];
  }   

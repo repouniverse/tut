@@ -31,7 +31,7 @@ public function safeDown()
  private function getFields(){
      return [ 
           /*Aluriesgo*/'count(b.codcur) as cantidad',
-         /*Talleresdet*/'a.id','a.talleres_id','a.codalu','a.codtra','a.fingreso',
+         /*Talleresdet*/'a.id','a.talleres_id','a.codalu','a.codtra','a.fingreso','a.rank_psico','a.rank_tutor',
             /*Talleres*/'c.codperiodo','c.codfac',
          /*Alumnos*/'f.id as idalumno','f.fecna','f.ap','f.am','f.nombres','f.dni','f.correo','f.domicilio','f.celulares','f.fijos',
            // /*Trabajadores*/'h.ap as aptutor','h.am as amtutor','h.nombres as nombrestutor'

@@ -15,11 +15,13 @@ if(!$this->existsTable($table)) {
     $this->createTable($table,  [
          'id'=>$this->primaryKey(),
         'unidad_id'=>$this->integer(11)->notNull(),
+         'edificio_id'=>$this->integer(11)->notNull(),
         'tipo'=>$this->char(1)->notNull()->append($this->collateColumn()),
         //'codmon'=>$this->string(5)->notNull()->append($this->collateColumn()),
          'espropietario'=>$this->char(1)->append($this->collateColumn()),
         'recibemail'=>$this->char(1)->append($this->collateColumn()),
-        
+         'codepa'=>$this->string(12)->append($this->collateColumn()),
+      
         'user_id'=>$this->integer(4),
          'nombre'=>$this->string(70)->append($this->collateColumn()),
         'correo'=>$this->string(70)->append($this->collateColumn()),

@@ -6,7 +6,11 @@
   <?php 
 echo \yii\grid\GridView::widget([
         'id'=>'detallerepoGrid',
-        'dataProvider' => $dataProvider,        
+    'summary' => '',
+    'emptyCell'=>'',
+    
+          'tableOptions'=>['class'=>'table table-responsive no-margin'],
+               'dataProvider' => $dataProvider,        
         'columns' =>$columnas ,
      'pager' => ['options'=>['visible'=>false]],
         ]

@@ -15,7 +15,7 @@ use yii\widgets\ActiveForm;
         <div class="col-md-12">
             <div class="form-group no-margin">
                 
-        <?= Html::submitButton(Yii::t('sta.labels', 'Save'), ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton(Yii::t('sta.labels', 'Grabar'), ['class' => 'btn btn-success']) ?>
             
 
             </div>
@@ -50,6 +50,11 @@ use yii\widgets\ActiveForm;
  </div>
      
     <?php ActiveForm::end(); ?>
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">         
+    <?php
+    echo $this->render('_test_detalle',['model'=>$model]);
+    ?> 
+   </div>       
 
 </div>
     </div>

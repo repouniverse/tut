@@ -1,7 +1,7 @@
 <?php
 
 use yii\helpers\Html;
-use yii\grid\GridView;
+use kartik\grid\GridView;
 use yii\helpers\Url;
 use yii\widgets\Pjax;
 use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
@@ -13,7 +13,7 @@ use frontend\modules\sigi\models\SigiCargosgrupoedificioSearch;
          
 <?php
  $url= Url::to(['agrega-grupo','id'=>$model->id,'gridName'=>'grilla-grupocargos','idModal'=>'buscarvalor']);
-   echo  Html::button(yii::t('base.verbs','Insertar Agrupacion'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Agrupacion'),'id'=>'btn_grupos_edi', 'class' => 'botonAbre btn btn-success']); 
+   echo  Html::button(yii::t('base.verbs','Insertar'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Agrupacion'),'id'=>'btn_grupos_edi', 'class' => 'botonAbre btn btn-success']); 
 ?> 
          
     <?php Pjax::begin(['id'=>'grilla-grupocargos']); ?>
@@ -49,6 +49,18 @@ use frontend\modules\sigi\models\SigiCargosgrupoedificioSearch;
                             }
                         
                     ]
+                ],
+                [
+                'class' => 'kartik\grid\ExpandRowColumn',
+                'width' => '50px',
+                'value' => function ($model, $key, $index, $column) {
+                            return GridView::ROW_COLLAPSED;
+                                },
+                            'detail' => function ($model, $key, $index, $column) {
+                            return Yii::$app->controller->renderPartial('/edificios/colectores/_colectores', ['grupo_id' => $model->id]);
+                            },
+                    //'headerOptions' => ['class' => 'kartik-sheet-style'], 
+                    'expandOneOnly' => true
                 ],
             'codgrupo',
               'descripcion', [

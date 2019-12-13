@@ -61,6 +61,8 @@ class SigiCargosgrupoedificio extends \common\models\base\modelBase
     {
         return $this->hasMany(SigiCargosedificio::className(), ['grupo_id' => 'id']);
     }
+    
+    
 
     /**
      * @return \yii\db\ActiveQuery

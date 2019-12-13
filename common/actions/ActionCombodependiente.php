@@ -35,11 +35,13 @@ class ActionCombodependiente extends \yii\base\Action
              //print_r($datos);die();
             // array_unshift($datos,[''=>yii::t('base.verbs','--Seleccione un Valor--')]);
              //$datos['']=yii::t('base.verbs','--Seleccione un Valor--');
-             $datos=array_merge([''=>yii::t('base.verbs','--Seleccione un Valor--')],$datos);
+              yii::error( $datos);
+             $datos=[''=>yii::t('base.verbs','--Seleccione un Valor--')]+$datos;
            }else{/*Se traa de datos directametne */
                $datos=$source;
              
            }
+           yii::error( $datos);
           return $this->generateHtml($datos);   
         }
         

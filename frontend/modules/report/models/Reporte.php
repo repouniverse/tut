@@ -6,8 +6,8 @@ use common\models\masters\Documentos;
 use frontend\modules\report\behaviors\FileBehavior;
 use Yii;
 use common\helpers\h;
-
-class Reporte extends \common\models\base\modelBase
+use frontend\modules\report\models\baseReporte;
+class Reporte extends baseReporte
 {
     /**
      * {@inheritdoc}
@@ -146,8 +146,9 @@ class Reporte extends \common\models\base\modelBase
              $hijosCabecera=$this->getReportedetalle()->where(['and', "esdetalle='0'", ['or', "visiblelabel='1'", "visiblecampo='1'"]])->all();
 		//var_dump($hijosCabecera);die();
              $HTML_cabecera="";
-               //var_dump($hijosCabecera);die();
-             $modelin=$this->modelToRepor($idfiltro);
+               //var_dump($idfiltro,$campofiltro);die();
+             $modelin=$this->modelToRepor($idfiltro,$campofiltro);
+             //var_dump($modelin);die();
      foreach( $hijosCabecera as $record) {
           // var_dump($this->modelToRepor($idfiltro));die();
 		 $HTML_cabecera.=$record->putStyleField($record->nombre_campo,$modelin->{$record->nombre_campo}); 
@@ -166,13 +167,13 @@ class Reporte extends \common\models\base\modelBase
       }
       
     
-    public function modelToRepor($id,$campofiltro=null){
+    public function modelToRepor($idfiltro,$campofiltro=null){
       $clase=trim($this->modelo); 
       if(is_null($campofiltro)){
           
-          return $clase::find()->where(['id'=>$id])->one();  
+          return $clase::find()->where(['id'=>$idfiltro])->one();  
       }else{
-          return $clase::find()->where([$campofiltro=>$id])->one();  
+          return $clase::find()->where([$campofiltro=>$idfiltro])->one();  
       }
         
     }
@@ -223,6 +224,7 @@ class Reporte extends \common\models\base\modelBase
           
           
         }
+        //yii::error($columns);
         return $columns;
         
     }
@@ -240,16 +242,23 @@ class Reporte extends \common\models\base\modelBase
        return round(100*$ancho/$total);
        
     }
-    
+    /*
+     * Devuelve un active record filtrado por nombre del campo
+     */
     private function childByNameField($nameField){
        return $this->getReportedetalle()->where(['and', "esdetalle='1'", "visiblecampo='1'"])
              ->andWhere(['nombre_campo'=>$nameField])->one();
     }
-    
+    /*
+     * Devuelve el numero total de registros del
+     * reporte
+     */
     public function numeroregistros($idfiltro){
         $model= $this->modelo;
         return $model::find()->where([$this->campofiltro => $idfiltro])->count();
     }
+    
+    /*DEVUELVE EL NUMERO DE PAGIONAS */
     
     public function numeroPaginas($idfiltro){
         try{
@@ -268,8 +277,10 @@ class Reporte extends \common\models\base\modelBase
         $query = $model::find()->where([$this->campofiltro => $idfiltro]);
                 $provider = new \yii\data\ActiveDataProvider([
                         'query' => $query,
+                       'sort'=>false,
                             'pagination' => [
                                         'pageSize' => $this->registrosporpagina,
+                                      // 'linkOptions'=>['visible'=>false]
                                             ],
                                /* 'sort' => [
                                         'defaultOrder' => [
@@ -290,5 +301,9 @@ class Reporte extends \common\models\base\modelBase
         
         return parent::beforeSave($insert);
        
+    }
+    
+    public function reportFacultad(){
+        return 'hil';
     }
 }

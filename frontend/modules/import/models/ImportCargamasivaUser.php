@@ -275,7 +275,7 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
      $attributes=[
          'cargamasiva_id'=>$this->id,
          'nombrecampo'=> $campo,
-         'mensaje'=>$mensaje,
+         'mensaje'=>substr($mensaje,0,180),
          'level'=>$level,
          'fecha'=>date('Y-m-d H:i:s'),
          'user_id'=>h::userId(),

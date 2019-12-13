@@ -38,7 +38,7 @@ use common\helpers\h;
   
  
 
-  <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12"> 
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"> 
      <?php 
   // $necesi=new Parametros;
     echo selectWidget::widget([
@@ -53,7 +53,7 @@ use common\helpers\h;
 
  </div> 
  
-<div class="col-lg-3 col-md-6 col-sm-12 col-xs-12">
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <?=Html::label(yii::t('sigi.labels','Edificio'),'desedi23',['class'=>'control-label'])?>
      <?=Html::textInput( 'desedi23',Edificios::findOne($id)->nombre, ['id'=>'desedi23','disabled'=>true,'class'=>'form-group form-control'] )?>
 

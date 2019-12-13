@@ -18,7 +18,7 @@ class SigiPropietariosSearch extends SigiPropietarios
     {
         return [
             //[['id', 'edificio_id','cargo_id','grupo_id'], 'integer'],
-            [['unidad_id','nombre','correo','dni'], 'safe'],
+            [['edificio_id','codepa','nombre','correo','dni'], 'safe'],
         ];
     }
 
@@ -38,6 +38,35 @@ class SigiPropietariosSearch extends SigiPropietarios
      *
      * @return ActiveDataProvider
      */
+    public function search($params)
+    {
+        $query = SigiPropietarios::find();
+
+        // add conditions that should always apply here
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+
+        $this->load($params);
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to return any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+        // grid filtering conditions
+        $query->andFilterWhere([
+            'edificio_id' => $this->edificio_id,
+            'codepa' => $this->codepa,
+            'correo' => $this->correo,
+            'dni' => $this->dni,
+             'nombres' => $this->nombre,
+           ]);
+
+        return $dataProvider;
+    }
     public function searchByUnidad($idunidad)
     {
         $query = SigiPropietarios::find();
@@ -71,6 +100,5 @@ $query->andFilterWhere([
             'unidad_id' => $idunidad
                     ]);
         return $dataProvider;
-    }
-    
+    } 
 }

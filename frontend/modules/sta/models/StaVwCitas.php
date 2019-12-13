@@ -1,13 +1,25 @@
 <?php
 
 namespace frontend\modules\sta\models;
-
+use frontend\modules\sta\staModule;
+use common\models\masters\Documentos;
+use frontend\modules\sta\interfaces\editableViewInterface;
+use common\models\base\modelBase;
 use Yii;
-class StaVwCitas extends \common\models\base\modelBase
+class StaVwCitas extends 
+modelBase implements 
+editableViewInterface
 {
     /**
      * {@inheritdoc}
      */
+    public $extraMethodsToReport=[
+        'reportFacultad',
+        'reportCarrera',
+        'reportFotoAlu',
+        'reportDocument'
+    ];
+    
     public $dateorTimeFields=['fechaprog'=>self::_FDATETIME,
         'fechaprog1'=>self::_FDATETIME];
     public $fechaprog1;
@@ -73,5 +85,33 @@ class StaVwCitas extends \common\models\base\modelBase
     public static function find()
     {
         return new StaVwCitasQuery(get_called_class());
+    }
+    
+   public function getReportFacultad()
+    {
+        return Facultades::findOne($this->codfac)->desfac;
+    }
+     public function getReportCarrera()
+    {
+         return Carreras::findOne($this->codcar)->descar;
+    }
+   public function getReportFotoAlu()
+    {
+      return \yii\helpers\Html::img(staModule::getPathImage($this->codalu),['width'=>90, 'height'=>120]) ; 
+    } 
+    
+    public function getCita(){
+        return $this->hasOne(Citas::className(), ['id' => 'id']);
+    }
+    
+    public function getReportDocument()
+    {
+      return 'INFORME DE TUTORIA';
+    }
+    public static function findOne($id){
+        return static::find()->where(['id'=>$id])->one();
+    }
+    public function delete(){
+       return $this->cita->delete();
     }
 }

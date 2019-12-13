@@ -1,7 +1,7 @@
 <?php
-
+use kartik\export\ExportMenu;
+use kartik\grid\GridView;
 use yii\helpers\Html;
-use yii\grid\GridView;
 use yii\widgets\Pjax;
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\modules\sigi\models\SigiUnidadesSearch */
@@ -23,9 +23,16 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a('<span class="fa fa-couch"></span>'.'    '.Yii::t('sigi.labels', 'Crear unidad'), ['create'], ['class' => 'btn btn-success']) ?>
     </p>
     <div style='overflow:auto;'>
-    <?= GridView::widget([
+    <?php echo ExportMenu::widget([
+    'dataProvider' => $dataProvider,
+    'columns' => $gridColumns,
+    'dropdownOptions' => [
+        'label' => yii::t('sta.labels','Exportar'),
+        'class' => 'btn btn-success'
+    ]
+]) . "<hr>\n".GridView::widget([
         'dataProvider' => $dataProvider,
-         'summary' => '',
+        // 'summary' => '',
          'tableOptions'=>['class'=>'table table-condensed table-hover table-bordered table-striped'],
         'filterModel' => $searchModel,
         'columns' => [
@@ -36,7 +43,21 @@ $this->params['breadcrumbs'][] = $this->title;
                 'template' => '{update}',
                 
           ],
-         
+          [
+                'attribute'=>'edificio',
+                'filter'=>frontend\modules\sigi\helpers\comboHelper::getCboEdificios(),
+                'value' => function($model) { 
+                        //var_dump($model);die();
+                        return $model->edificio->nombre ;
+                         },
+                 'group'=>true,   
+            ],
+           ['attribute'=>'tipo',
+                                 'value'=>'tipo.desunidad',
+                                 //'filter'=>comboHelper::getCboEdificios(),
+             'group'=>true,
+                            
+              ],
          [
              'attribute'=>'numero',
              'format'=>'raw',
@@ -51,27 +72,22 @@ $this->params['breadcrumbs'][] = $this->title;
          [
              'attribute'=>'parent_id',
              'format'=>'raw',
+            
              'value'=>function($model){
                    if($model->parent_id>0){
                       return   '<i style="color:#08882f;font-size:14px">    '.$model->padre->numero.'     <span class="fa fa-child"></span></i>' ;
                     
                    }
                     return '';
-             
-                       
-             }
+                
+                 
+             },
+                
          ],
          
          
 
            
-            [
-                'attribute'=>'edificio',
-                'value' => function($model) { 
-                        //var_dump($model);die();
-                        return $model->edificio->nombre ;
-                         },
-            ],
            
             [
                 'attribute'=>'participacion',
@@ -83,17 +99,18 @@ $this->params['breadcrumbs'][] = $this->title;
                         return round($model->participacion(true),2).'  %';
                          },
             ],
-            'numero',
-            'nombre',
-            'tipo.desunidad',
             
+            'nombre',
+              
+             
+            ]
             //'participacion',
             //'parent_id',
             //'detalles:ntext',
             //'estreno',
 
           
-        ],
+        
     ]); ?>
     <?php Pjax::end(); ?>
 </div>

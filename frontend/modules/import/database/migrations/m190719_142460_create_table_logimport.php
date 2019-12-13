@@ -19,7 +19,7 @@ if(!$this->existsTable($table)) {
              'id'=>$this->primaryKey(),
             'cargamasiva_id' => $this->integer(11)->notNull(),//id padre
                'nombrecampo' => $this->string(60)->notNull()->append($this->collateColumn()),//codigo activo
-        'mensaje'=>$this->string(80)->notNull()->append($this->collateColumn()),
+        'mensaje'=>$this->string(180)->notNull()->append($this->collateColumn()),
         'level'=>$this->char(1)->append($this->collateColumn()),
         'fecha'=>$this->string(20)->append($this->collateColumn()),
          'user_id'=>$this->integer(4)->notNull(),

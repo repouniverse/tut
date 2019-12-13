@@ -32,28 +32,34 @@ $this->params['breadcrumbs'][] = $this->title;
          
          [
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{update}{delete}{view}',
+                'template' => '{update}{view}',
                 'buttons' => [
-                    'update' => function($url, $model) { 
-                        $url= \yii\helpers\Url::toRoute(['update','id'=>$model->id]);
+                    'update' => function($url, $model) {
+                     if(strtotime($model->swichtDate('fechaprog',false))==0){
+                         return '';   
+                     }else{
+                          $url= \yii\helpers\Url::toRoute(['update','id'=>$model->id]);
                         $options = [
-                            'title' => Yii::t('base.verbs', 'Update'),                            
+                            'title' => Yii::t('base.verbs', 'Editar'),                            
                         ];
-                        return Html::a('<span class="btn btn-info btn-sm glyphicon glyphicon-pencil"></span>', $url, $options/*$options*/);
-                         },
-                          'view' => function($url, $model) {                        
-                        $options = [
-                            'title' => Yii::t('base.verbs', 'View'),                            
+                        return Html::a('<span class="btn btn-danger btn-sm glyphicon glyphicon-pencil"></span>', $url, $options/*$options*/);
+                      
+                        
+                     }
+                        },
+                          'view' => function($url, $model) {  
+                            if(strtotime($model->swichtDate('fechaprog',false))==0){
+                                 return ''; 
+                        }else{
+                             $options = [
+                            'title' => Yii::t('base.verbs', 'Ver'),                            
                         ];
                         return Html::a('<span class="btn btn-warning btn-sm glyphicon glyphicon-search"></span>', $url, $options/*$options*/);
-                         },
-                         'delete' => function($url, $model) {                        
-                        $options = [
-                            'data-confirm' => Yii::t('rbac-admin', 'Are you sure you want to activate this user?'),
-                            'title' => Yii::t('base.verbs', 'Delete'),                            
-                        ];
-                        return Html::a('<span class="btn btn-danger btn-sm glyphicon glyphicon-remove"></span>', $url, $options/*$options*/);
+                        
+                              
                          }
+                        },
+                         
                     ]
                 ],
          
@@ -61,7 +67,7 @@ $this->params['breadcrumbs'][] = $this->title;
                'attribute' => 'fechaprog',
                  'format'=>'raw',
                  'value' => function ($model, $key, $index, $column) {
-                     if(strtotime($model->fechaprog)==0){
+                     if(strtotime($model->swichtDate('fechaprog',false))==0){
                          return '  <i style="color:#3ead05;font-size:12px"><span class="glyphicon glyphicon-calendar"></span></i>';
                      }
                             /*$formato=($model->isEntregado())?'  <i style="color:#3ead05;font-size:12px"><span class="glyphicon glyphicon-check"></span></i>':

@@ -63,7 +63,7 @@ use yii\helpers\Html;
                 'value' =>  function ($model, $key, $index, $column){
                         //$options=['width' => '40','height' => '42','class'=>"img-thumbnail"];
                         
-        return ($model->hasAttachments())?Html::a('<span class="glyphicon glyphicon-paperclip"></span>',$model->urlFirstFile/*, $options*/):
+        return ($model->hasAttachments())?Html::a('<span class="glyphicon glyphicon-paperclip"></span>',$model->urlFirstFile,['data-pjax'=>'0']/*, $options*/):
             '<span class="glyphicon glyphicon-folder-open"></span>';
                        
               },

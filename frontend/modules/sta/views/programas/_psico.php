@@ -27,10 +27,7 @@ use common\helpers\h;
                      'idGrilla'=>$gridName, 
                       ]
                   )?>
-         <?= Html::button(Yii::t('sta.labels', 'Grabar'),['onclick'=>"psico_saves()", 'class' => 'btn btn-success']) ?>       
-        
-                  <?= Html::submitButton(Yii::t('sta.labels', 'Grabar'), ['class' => 'btn btn-success']) ?>
-            
+       
 
             </div>
         </div>
@@ -41,7 +38,12 @@ use common\helpers\h;
 
   <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12"> 
      <?php 
-  // $necesi=new Parametros;
+  //Deshabilitar cambio de psicologo cuando aun 
+  //falta asinar alumnos, no puede haber cambios de pisologos 
+   //cuando todavia no se han aisgnado todos slos alumnos 
+   if(!$model->isNewRecord && $cantidadLibres>0){
+      echo $form->field($model, 'codtra')->textInput(['disabled'=>true,'value'=>$model->trabajador->fullName()]);
+   }else{
     echo selectWidget::widget([
            // 'id'=>'mipapa',
             'model'=>$model,
@@ -50,7 +52,9 @@ use common\helpers\h;
          'ordenCampo'=>2,
          'addCampos'=>[3,4,5],
         'inputOptions'=>[/*'enableAjaxValidation'=>true*/],
-        ]);  ?>
+        ]); 
+   }
+    ?>
 
  </div> 
  

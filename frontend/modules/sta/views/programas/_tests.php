@@ -76,7 +76,7 @@ use frontend\modules\sta\models\StaTestTalleres;
     'format' => 'raw',
     'value' => function ($model) {
        if($model->hasAttachments()){
-           return '<span class="label label-danger">'.$model->files[0]->type.'</span>'.Html::a($model->files[0]->name,$model->files[0]->url);
+           return '<span class="label label-danger">'.$model->files[0]->type.'</span>'.Html::a($model->files[0]->name,$model->files[0]->url,['data-pjax'=>'0']);
        }else{
          return '';  
        }

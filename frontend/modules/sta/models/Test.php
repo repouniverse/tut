@@ -72,4 +72,11 @@ class Test extends \common\models\base\modelBase
     {
         return new TestQuery(get_called_class());
     }
+    
+    
+    public function answerRangeNumeric(){
+        return [];
+    }
+    
+    
 }

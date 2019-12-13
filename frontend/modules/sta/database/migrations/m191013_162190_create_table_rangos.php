@@ -10,7 +10,8 @@ use common\helpers\FileHelper;
 use console\migrations\baseMigration;
 class m191013_162190_create_table_rangos  extends baseMigration
 {
- const NAME_TABLE='{{%sta_rangos}}';
+  const NAME_TABLE_FACULTAD='{{%sta_facultades}}';
+    const NAME_TABLE='{{%sta_rangos}}';
      const NAME_TABLE_TALLERES='{{%sta_talleres}}';
     // const NAME_TABLE_TRABAJADORES='{{%trabajadores}}';
    //const NAME_TABLE_ALUMNO='{{%sta_alu}}';
@@ -25,6 +26,7 @@ if(!$this->existsTable($table)) {
        // 'aluriesgo_id'=>$this->integer(11)->notNull(),
         'talleres_id'=>$this->integer(11)->notNull(),
         'dia'=>$this->integer(1)->notNull(),
+         'codfac'=>$this->string(8)->notNull()->append($this->collateColumn()),
         'hinicio'=>$this->char(5)->notNull()->append($this->collateColumn()),
         'hfin'=>$this->char(5)->notNull()->append($this->collateColumn()),
         'tolerancia'=>$this->decimal(4,1)->notNull(),
@@ -39,6 +41,8 @@ if(!$this->existsTable($table)) {
               'codtra', static::NAME_TABLE_TRABAJADORES,'codigotra');
                 /*  $this->addForeignKey($this->generateNameFk($table), $table,
               'codcar', static::NAME_TABLE_CARRERAS,'codcar');*/
+         $this->addForeignKey($this->generateNameFk($table), $table,
+              'codfac', static::NAME_TABLE_FACULTAD,'codfac');
             
             } 
  }

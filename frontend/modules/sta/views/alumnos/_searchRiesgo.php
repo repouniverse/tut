@@ -31,12 +31,25 @@ use common\widgets\selectwidget\selectWidget;
     <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">    
  <?= $form->field($model, 'codcar')->
             dropDownList(comboHelper::getCboCarreras(),
-                  ['prompt'=>'--'.yii::t('base.verbs','Choose a Value')."--",
+                  ['prompt'=>'--'.yii::t('base.verbs','Seleccione un Valor')."--",
                     // 'class'=>'probandoSelect2',
                       //'disabled'=>($model->isBlockedField('codpuesto'))?'disabled':null,
                         ]
                     ) ?>
- </div>   
+ </div>  
+        
+           <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">    
+ <?= $form->field($model, 'codperiodo')->
+            dropDownList(comboHelper::getCboPeriodos(),
+                  ['prompt'=>'--'.yii::t('base.verbs','Seleccione un Valor')."--",
+                    // 'class'=>'probandoSelect2',
+                      //'disabled'=>($model->isBlockedField('codpuesto'))?'disabled':null,
+                        ]
+                    ) ?>
+ </div>
+<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12"> 
+    <?= $form->field($model, 'nombres') ?>
+</div> 
  <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12"> 
     <?= $form->field($model, 'ap') ?>
 </div> 
@@ -46,7 +59,7 @@ use common\widgets\selectwidget\selectWidget;
  <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">    
  <?= $form->field($model, 'codfac')->
             dropDownList(comboHelper::getCboFacultades(),
-                  ['prompt'=>'--'.yii::t('base.verbs','Choose a Value')."--",
+                  ['prompt'=>'--'.yii::t('base.verbs','Seleccione un Valor')."--",
                     // 'class'=>'probandoSelect2',
                       //'disabled'=>($model->isBlockedField('codpuesto'))?'disabled':null,
                         ]

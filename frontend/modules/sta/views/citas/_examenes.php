@@ -66,7 +66,7 @@
                 'value' => function ($model) {
                     if($model->testTalleres->hasAttachments()){
                         //var_dump($model->testTalleres);
-                        return Html::a($model->test->descripcion, $model->testTalleres->files[0]->getUrl(), ['pjax'=>'0']);      
+                        return Html::a($model->test->descripcion, $model->testTalleres->files[0]->getUrl(), ['data-pjax'=>'0']);      
                      
                     }else{
                        return $model->test->descripcion ;
@@ -86,7 +86,7 @@
                 'value' => function ($model) {
                           $tieneFile= $model->countFiles();
                        IF($tieneFile>0){
-                           return Html::a('<span class="btn btn-success glyphicon glyphicon-download"></span>', $model->files[0]->getUrl(), ['pjax'=>'0']);
+                           return Html::a('<span class="btn btn-success glyphicon glyphicon-download"></span>', $model->files[0]->getUrl(), ['data-pjax'=>'0']);
                        }else{
                            return '';
                        }

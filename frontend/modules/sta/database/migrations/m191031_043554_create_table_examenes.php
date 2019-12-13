@@ -9,9 +9,11 @@ use console\migrations\baseMigration;
  */
 class m191031_043554_create_table_examenes extends baseMigration
 {
+      const NAME_TABLE_FACULTAD='{{%sta_facultades}}';
     const NAME_TABLE_CITAS='{{%sta_citas}}';
      const NAME_TABLE='{{%sta_examenes}}';
      const NAME_TABLE_TESTS='{{%sta_test}}';
+      //const NAME_TABLE_FACULTAD='{{%sta_test}}';
    //const NAME_TABLE_ALUMNO='{{%sta_alu}}';
     /*const NAME_TABLE_CURSOS='{{%sta_materias}}';
      const NAME_TABLE_PERIODOS='{{%sta_periodos}}';*/
@@ -24,6 +26,8 @@ if(!$this->existsTable($table)) {
        // 'aluriesgo_id'=>$this->integer(11)->notNull(),
         'citas_id'=>$this->integer(11)->notNull(),
         'codtest'=>$this->string(8)->notNull(),
+        'user_id'=>$this->integer(6),//campo propietarios 
+         'codfac'=>$this->string(8)->notNull()->append($this->collateColumn()),
          'detalles'=>$this->text()->append($this->collateColumn()),
         ],$this->collateTable());
   
@@ -35,7 +39,9 @@ if(!$this->existsTable($table)) {
               'codtest', static::NAME_TABLE_TESTS,'codtest');
                 /*  $this->addForeignKey($this->generateNameFk($table), $table,
               'codcar', static::NAME_TABLE_CARRERAS,'codcar');*/
-            
+     $this->addForeignKey($this->generateNameFk($table), $table,
+              'codfac', static::NAME_TABLE_FACULTAD,'codfac');
+                
             } 
  }
 

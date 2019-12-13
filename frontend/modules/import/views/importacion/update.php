@@ -5,7 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model frontend\modules\import\models\ImportCargamasiva */
 
-$this->title = Yii::t('import.labels', 'Editar registro : {name}', [
+$this->title = Yii::t('import.labels', 'Editar importación : {name}', [
     'name' => $model->descripcion,
 ]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('import.labels', 'Importaciones'), 'url' => ['index']];

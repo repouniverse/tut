@@ -282,6 +282,7 @@ class View extends \yii\base\View
      */
     public function registerAssetBundle($name, $position = null)
     {
+     
         if (!isset($this->assetBundles[$name])) {
             $am = $this->getAssetManager();
             $bundle = $am->getBundle($name);
@@ -297,6 +298,7 @@ class View extends \yii\base\View
         } else {
             $bundle = $this->assetBundles[$name];
         }
+        
 
         if ($position !== null) {
             $pos = isset($bundle->jsOptions['position']) ? $bundle->jsOptions['position'] : null;

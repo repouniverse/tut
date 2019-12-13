@@ -1,0 +1,143 @@
+<?php
+ use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
+ use frontend\modules\sta\models\StaDocuAluSearch;
+ use yii\widgets\Pjax;
+ use yii\grid\GridView;
+ use yii\helpers\Html;
+  use yii\helpers\Url;
+ //use frontend\modules\sta\models\ExamenesSearch;
+?>
+<div>
+     <div class="box-header">
+        <div class="col-md-12">
+            <div class="form-group no-margin">
+            <div class="row">     
+         <?php //$url= \yii\helpers\Url::to(['agrega-documento','id'=>$model->id,'gridName'=>'grilla-docus','idModal'=>'buscarvalor']);
+      ?>
+       <?= \yii\helpers\Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Agregar documento'), ['id'=>'btn-add-docus','class' => 'btn btn-warning'])?>
+          
+             </div>
+            </div>
+        </div>
+    </div> 
+    
+   <?php Pjax::begin(['id'=>'palogay_docu']); ?>
+    
+   <?php //var_dump((new SigiApoderadosSearch())->searchByEdificio($model->id)); die(); ?>
+    <?= GridView::widget([
+        'id'=>'grid-docusx',
+        'dataProvider' =>(new StaDocuAluSearch())->searchByTalleresdet($model->id),
+         'summary' => '',
+         'tableOptions'=>['class'=>'table table-condensed table-hover table-bordered table-striped'],
+        'columns' => [
+                 [
+                'class' => 'yii\grid\ActionColumn',
+                //'template' => Helper::filterActionColumn(['view', 'activate', 'delete']),
+            'template' => '{edit}{attach}{delete}',
+               'buttons' => [
+                   'delete' => function ($url,$model) {
+			   $url = \yii\helpers\Url::toRoute($this->context->id.'/deletemodel-for-ajax');
+                              return \yii\helpers\Html::a('<span class="btn btn-danger glyphicon glyphicon-trash"></span>', '#', ['title'=>$url,/*'id'=>$model->codparam,*/'family'=>'pinke','id'=>\yii\helpers\Json::encode(['id'=>$model->id,'modelito'=> str_replace('@','\\',get_class($model))]),/*'title' => 'Borrar'*/]);
+                            },
+                    'attach' => function($url, $model) {  
+                         $url=\yii\helpers\Url::toRoute(['/finder/selectimage','isImage'=>false,'idModal'=>'imagemodal','modelid'=>$model->id,'nombreclase'=> str_replace('\\','_',get_class($model))]);
+                        $options = [
+                            'title' => Yii::t('sta.labels', 'Subir Archivo'),
+                            //'aria-label' => Yii::t('rbac-admin', 'Activate'),
+                            //'data-confirm' => Yii::t('rbac-admin', 'Are you sure you want to activate this user?'),
+                            'data-method' => 'get',
+                            //'data-pjax' => '0',
+                        ];
+                        return Html::button('<span class="glyphicon glyphicon-paperclip"></span>', ['href' => $url, 'title' => 'Editar Adjunto', 'class' => 'botonAbre btn btn-success']);
+                        //return Html::a('<span class="btn btn-success glyphicon glyphicon-pencil"></span>', Url::toRoute(['view-profile','iduser'=>$model->id]), []/*$options*/);
+                     
+                        
+                        },
+                        
+                        'edit' => function ($url,$model) {
+			   $url = \yii\helpers\Url::toRoute([$this->context->id.'/edita-docu','id'=>$model->id,'gridName'=>'palogay_docu','idModal'=>'buscarvalor']);
+
+                              return \yii\helpers\Html::a('<span class="btn btn-danger glyphicon glyphicon-pencil"></span>', $url, ['class'=>'botonAbre']);
+                            } 
+                    ]
+                ],
+            'codocu',
+              [
+              'attribute' => '',
+               'format'=>'raw',
+                'value' => function ($model) {
+                    if($model->hasAttachments()){
+                        //var_dump($model->testTalleres);
+                        return Html::a($model->documento->desdocu, $model->files[0]->getUrl(), ['data-pjax'=>'0']);      
+                     
+                    }else{
+                       return $model->documento->desdocu ;
+                    }
+                   },
+                    ],
+                [
+              'attribute' => 'detalle',
+               //'format'=>'raw',
+                'value' => function ($model) {
+                    return substr($model->detalle,0,30).'...';
+                   },
+                    ],
+                [
+              'attribute' => '',
+               'format'=>'raw',
+                'value' => function ($model) {
+                          $tieneFile= $model->countFiles();
+                       IF($tieneFile>0){
+                           return Html::a('<span class="btn btn-success glyphicon glyphicon-download"></span>', $model->files[0]->getUrl(), ['data-pjax'=>'0']);
+                       }else{
+                           return '';
+                       }
+                    },
+                    ],
+        ],
+    ]); ?>
+        <?php 
+   echo linkAjaxGridWidget::widget([
+           'id'=>'widgetgruidBanuyucos',
+            'idGrilla'=>'palogay_docu',
+            'family'=>'pinke',
+          'type'=>'POST',
+           'evento'=>'click',
+            //'foreignskeys'=>[1,2,3],
+        ]); 
+   ?>
+    <?php Pjax::end(); ?> 
+    
+    
+<?php 
+  $this->registerJs("$('#btn-add-docus').on( 'click', function() { 
+     // alert(this.id);
+      $.ajax({
+              url: '".Url::to([$this->context->id.'/agrega-docs'])."', 
+              type: 'get',
+              data:{id:".$model->id."},
+              dataType: 'html', 
+              error:  function(xhr, textStatus, error){               
+                            var n = Noty('id');                      
+                              $.noty.setText(n.options.id, error);
+                              $.noty.setType(n.options.id, 'error');       
+                                }, 
+              success: function(data) {
+              $.pjax.reload('#palogay_docu');
+                   
+                        }
+                        });
+
+
+             })", \yii\web\View::POS_READY);
+?>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+</div>

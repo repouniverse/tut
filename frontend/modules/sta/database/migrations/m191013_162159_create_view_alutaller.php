@@ -28,8 +28,10 @@ class m191013_162159_create_view_alutaller extends viewMigration
 public function safeDown()
     {
      
-    $vista=static::NAME_VIEW;    
+    $vista=static::NAME_VIEW; 
+    if($this->existsTable($vista)) {
     $this->dropView($vista);
+    }
     }
     
  private function getFields(){

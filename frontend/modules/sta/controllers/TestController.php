@@ -8,6 +8,7 @@ use frontend\modules\sta\models\TestSearch;
 use frontend\controllers\base\baseController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+USE common\helpers\h;
 
 /**
  * TestController implements the CRUD actions for Test model.
@@ -124,4 +125,35 @@ class TestController extends baseController
 
         throw new NotFoundHttpException(Yii::t('sta.labels', 'The requested page does not exist.'));
     }
+    
+      public function actionAgregaPregunta($id){        
+         $this->layout = "install";
+        $modeltest = $this->findModel($id);
+       $model= new \frontend\modules\sta\models\StaTestdet();       
+       $model->codtest=$id;       
+       $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                $model->save();
+               // $model->assignStudentsByRandom();
+                  return ['success'=>1,'id'=>$model->codtest];
+            }
+        }else{
+           return $this->renderAjax('_modal_pregunta', [
+                        'model' => $model,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                        //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+ 
+    }
+    
 }

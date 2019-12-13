@@ -22,7 +22,7 @@ class m191123_160840_create_view_citas extends viewMigration
          'd.nombres as nombrestutor',
         's.codperiodo',
         'b.codalu',
-         'c.ap','c.am','c.nombres','c.codfac','c.codcar',
+         'c.ap','c.am','c.nombres','c.codcar',
          'a.*',
         ])
     ->from(['b'=>'{{%sta_talleresdet}}'])->

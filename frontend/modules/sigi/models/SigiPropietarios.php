@@ -29,6 +29,7 @@ use Yii;
 class SigiPropietarios extends \common\models\base\modelBase
 {
     CONST SCENARIO_EMPRESA='empresa';
+    CONST SCENARIO_TELEFONO='telefonos_correos';
     public $booleanFields=['espropietario','recibemail'];
     /**
      * {@inheritdoc}
@@ -40,8 +41,9 @@ class SigiPropietarios extends \common\models\base\modelBase
  public function scenarios()
     {
         $scenarios = parent::scenarios(); 
-        $scenarios[self::SCENARIO_EMPRESA] = ['unidad_id','tipo','dni','nombre','espropietario'];
-       // $scenarios[self::SCENARIO_REGISTER] = ['username', 'email', 'password'];
+        $scenarios[self::SCENARIO_EMPRESA] = ['edificio_id','codepa','tipo','dni','nombre','recibemail','correo','celulares','fijo'];
+         $scenarios[self::SCENARIO_TELEFONO] = ['id','correo','celulares','fijo'];
+        // $scenarios[self::SCENARIO_REGISTER] = ['username', 'email', 'password'];
         return $scenarios;
     }
     
@@ -51,17 +53,22 @@ class SigiPropietarios extends \common\models\base\modelBase
     public function rules()
     {
         return [
-            [['unidad_id', 'tipo','nombre'], 'required'],
+            [[ 'tipo','nombre'], 'required'],
             [['unidad_id'], 'integer'],
             [['participacion'], 'number'],
              [['recibemail','nombre','espropietario','user_id'], 'safe'],
             [['detalle'], 'string'],
+             [['codepa'], 'safe'],
             [['dni'], 'valida_dni'],
+            [['codepa'], 'valida_codepa'],
+            [['codepa'], 'required', 'on'=>self::SCENARIO_EMPRESA],
+            [['id'], 'required', 'on'=>self::SCENARIO_TELEFONO],
             [['tipo', 'activo'], 'string', 'max' => 1],
              [['correo', 'correo1', 'correo2'], 'email'],
             [['correo', 'correo1', 'correo2', 'celulares'], 'string', 'max' => 70],
             [['fijo', 'dni'], 'string', 'max' => 12],
             [['finicio', 'fcese'], 'string', 'max' => 10],
+            [['edificio_id'], 'exist', 'skipOnError' => true, 'targetClass' => Edificios::className(), 'targetAttribute' => ['edificio_id' => 'id']],
             [['unidad_id'], 'exist', 'skipOnError' => true, 'targetClass' => SigiUnidades::className(), 'targetAttribute' => ['unidad_id' => 'id']],
         ];
     }
@@ -86,6 +93,7 @@ class SigiPropietarios extends \common\models\base\modelBase
             'activo' => Yii::t('sigi.labels', 'Activo'),
             'finicio' => Yii::t('sigi.labels', 'Finicio'),
             'fcese' => Yii::t('sigi.labels', 'Fcese'),
+            'codepa' => Yii::t('sigi.labels', 'Numero Dep'),
         ];
     }
 
@@ -95,6 +103,11 @@ class SigiPropietarios extends \common\models\base\modelBase
     public function getUnidad()
     {
         return $this->hasOne(SigiUnidades::className(), ['id' => 'unidad_id']);
+    }
+    
+    public function getEdificio()
+    {
+        return $this->hasOne(Edificios::className(), ['id' => 'edificio_id']);
     }
 
     /**
@@ -109,11 +122,33 @@ class SigiPropietarios extends \common\models\base\modelBase
     public function beforeSave($insert){
         if($insert){
             $this->activo=true;
+            if(!empty($this->codepa))
+           $this->unidad_id=$this->departamento()->id;            
         }
         return parent::beforeSave($insert);
     }
     
-    public function valida_dni($attribute, $params)
+    public function departamento(){
+        
+      return SigiUnidades::find()->where(['numero'=>$this->codepa,'edificio_id'=>$this->edificio_id])->one();
+    }
+        
+    
+    
+    public function valida_codepa($attribute, $params)
+    {
+        if(!empty($this->codepa)){
+            $registro= $this->departamento();
+            if(is_null($registro)){
+               $this->addError ('codepa',yii::t('sigi.errors','El número de departamento {numero} indicado no se enuentra en el edificio ',['numero'=>$this->codepa]));  
+                  
+            }
+            
+        }
+            
+        
+      }
+  public function valida_dni($attribute, $params)
     {
         $error=false;
      if(!((preg_match(h::settings()->get('general','formatoDNI'),$this->dni)==1) or 
@@ -122,8 +157,7 @@ class SigiPropietarios extends \common\models\base\modelBase
         $this->addError('dni',yii::t('sigi.errors','El valor para este campo no es correcto, debe ser un DNI o un RUC'));
     
       } 
-            }
-            
+            }          
    public function valida_propietario($attribute, $params)
     {
        if($this->isNewRecord){

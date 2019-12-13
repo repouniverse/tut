@@ -4,7 +4,7 @@ use kartik\editable\Editable;
 use yii\helpers\Html;
   ?>
 <div style="overflow:auto;" >
-<?php Pjax::begin(); ?>
+<?php Pjax::begin(['id'=>'manita']); ?>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <?= kartik\grid\GridView::widget([
@@ -41,8 +41,16 @@ use yii\helpers\Html;
                 ],
             [
                         'class' => 'kartik\grid\EditableColumn',
-                
+                         
                         'editableOptions'=>[
+                            ///'model'=>NEW \frontend\modules\sta\models\Alumnos(),
+                            'ajaxSettings'=>[
+                                'url'=>'',
+                                'type'=>'post',
+                                //'data'=>['alo'=>'hola'],
+                               // 'data'=>['modelo'=>'Talleresdet'],
+                            ],
+                            'pjaxContainerId'=>'manita',
                             //'format' => Editable::FORMAT_BUTTON,
                             'inputType' => Editable::INPUT_DROPDOWN_LIST,
                              'data'=>['cour'=>'courier','xbriyaz'=>'xbriyaz','verdana'=>'verdana','arial'=>'arial'], 

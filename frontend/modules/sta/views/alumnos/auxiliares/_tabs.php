@@ -24,7 +24,7 @@
         ],
         [
             'label' =>'<i class="glyphicon glyphicon-file"></i> '. yii::t('base.names','Informes'), //$this->context->countDetail() obtiene el contador del detalle
-            'content'=> $this->render('_informe',[]),
+            'content'=> $this->render('/programas/_tab_documentos',['model'=>$modelTallerdet]),
 //'content' => $this->render('detalle',['form'=>$form,'orden'=>$this->context->countDetail(),'modelDetail'=>$modelDetail]),
             'active' => false,
              'options' => ['id' => 'myveaw3D4'],

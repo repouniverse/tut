@@ -113,14 +113,22 @@ class Edificios extends \common\models\base\modelBase
     }
     
     private function queryUnidades(){
-        return SigiUnidades::find()->where(['[[edificio_id]]'=>$this->id]);
+        return SigiUnidades::find()->where([
+            '[[edificio_id]]'=>$this->id,
+           // 'imputable'=>'1',
+                ]);
+    }
+    private function queryUnidadesImputables(){
+        return $this->queryUnidades()->andWhere([
+             'imputable'=>'1',
+                ]);
     }
     
     public function area(){
         if($this->isNewRecord)
         return 0;
         //var_dump($this->queryUnidades()->sum('[[area]]'));die();
-        return $this->queryUnidades()->sum('[[area]]');
+        return $this->queryUnidadesImputables()->sum('[[area]]');
     }
     
     public function hasApoderados(){
@@ -163,4 +171,61 @@ class Edificios extends \common\models\base\modelBase
        return $array_tree;
      
    }
+   
+   
+   
+   /***********
+    * funcione s para verificar que la facturacion ya esta corecta
+    * y que le deific esta listo 
+    * para facturacion
+    */
+   
+   /*Verifica que no falñta ningun departamentoi imputale 
+    * le falte propietario 
+    */
+   public function facUnitsWithoutOwner(){
+       /*Los departamentos que tienen por lo menis un propietario*/
+       $idsWithOwner=SigiPropietarios::find()->select('[[unidad_id]]')->
+               Where(['[[edificio_id]]'=>$this->id])->
+       andWhere(['[[tipo]]'=> SigiUnidades::TYP_PROPIETARIO])->asArray()->all();
+        $idsWithOwner= array_column($idsWithOwner, 'unidad_id');
+       /*Los departamentos totoales 
+        * 
+        */
+       return array_column(SigiUnidades::find()->select(['numero'])->
+               where(['not in','id',$idsWithOwner])->
+               all(),'numero');
+   }
+   
+   
+   /*Verifica que no falñta ningun medidor 
+    * En cad adepartamento
+    */
+   public function facUnitsWithoutPoint($type){
+       /*Los departamentos que tienen por lo menis un propietario*/
+       $faltan=[];
+      $idsTipo= array_column(SigiSuministros::find()->select('[[tipo]]')->distinct()->
+         Where(['[[edificio_id]]'=>$this->id])->asArray()->all(),'tipo'); 
+      if(count($idsTipo)==0){
+          return ['all'=>['all']];
+      }
+     foreach($idsTipo as $tipo){
+          $idsDepas= array_column(SigiSuministros::find()->select('[[unidad_id]]')->
+               where(['[[edificio_id]]'=>$this->id,
+                     ''=>$tipo,
+                   ])->
+               asArray()->all(),'unidad_id');
+        $Noestan=array_column(SigiUnidades::find()->select(['numero'])->
+               where(['not in','id',$idsDepas])->
+               all(),'numero');
+        if(count($Noestan)>0){
+            $faltan[$tipo]=$Noestan;
+        }
+         
+     }
+     return $falta;
+   }
+     
+       
+      
 }

@@ -1,5 +1,5 @@
 <?php
-
+use kartik\export\ExportMenu;
 use yii\helpers\Html;
 use kartik\grid\GridView;
 use yii\widgets\Pjax;
@@ -13,7 +13,7 @@ ECHO spinnerWidget::widget();
 /* @var $searchModel frontend\modules\sta\models\AlumnosController */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('sta.labels', 'Alumnos');
+$this->title = Yii::t('sta.labels', 'Alumnos en Riesgo Académico');
 //$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="alumnos-index">
@@ -32,16 +32,13 @@ $this->title = Yii::t('sta.labels', 'Alumnos');
 $gridColumns = [
                     [
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{update}{view}',
+                'template' => '{view}',
                 'buttons' => [
-                    'update' => function($url, $model) {                        
-                        $options = [
-                            'title' => Yii::t('base.verbs', 'Update'),                            
-                        ];
-                        return Html::a('<span class="btn btn-info btn-sm glyphicon glyphicon-pencil"></span>', $url, $options/*$options*/);
-                         },
                           'view' => function($url, $model) {    
-                             $url=\yii\helpers\Url::toRoute(['ver-detalles','id'=>$model->id]);
+                             $url=\yii\helpers\Url::toRoute([
+                                 'ver-detalles',
+                                 'id'=>$model->idalumno
+                                     ]);
                         $options = [
                             'data-pjax'=>'0',
                             'title' => Yii::t('base.verbs', 'Detalles'),                            
@@ -58,7 +55,7 @@ $gridColumns = [
                             return GridView::ROW_COLLAPSED;
                                 },
                                     'detail' => function ($model, $key, $index, $column) {
-                            return Yii::$app->controller->renderPartial('_form_view_riesgo', ['model' => $model]);
+                            return Yii::$app->controller->renderPartial('/alumnos/auxiliares/_form_view_alu_basico', ['model' => $model->alumno]);
                             },
                     //'headerOptions' => ['class' => 'kartik-sheet-style'], 
                     'expandOneOnly' => true
@@ -84,8 +81,15 @@ echo $this->render('_searchRiesgo', ['model' => $searchModel]);
   ?>
    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"> 
   <?php
- 
-  echo GridView::widget([
+ echo ExportMenu::widget([
+    'dataProvider' => $dataProvider,
+    'columns' => $gridColumns,
+     'filename'=>yii::t('sta.labels','datos_a_exportar'),
+    'dropdownOptions' => [
+        'label' => yii::t('sta.labels','Exportar'),
+        'class' => 'btn btn-success'
+    ]
+]) . "<hr>\n".GridView::widget([
     'id' => 'kv-grid-demo',
     'dataProvider' => $dataProvider,
    'columns' => $gridColumns, // check the configuration for grid columns by clicking button above
@@ -94,10 +98,7 @@ echo $this->render('_searchRiesgo', ['model' => $searchModel]);
     'filterRowOptions' => ['class' => 'kartik-sheet-style'],
     'pjax' => true, // pjax is set to always true for this demo
    'responsive' => TRUE,
-    'panel' => [
-        'type' => '',
-        //'heading' => $heading,
-    ],
+   
 ]);
   Pjax::end();
 ?>

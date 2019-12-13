@@ -16,7 +16,8 @@ class FilterAccess extends ActionFilter
     {
        // var_dump(yii::$app->controller->module);die();
      if(h::user()->isGuest)
-         yii::$app->controller->redirect(['/site/login']);    
+        
+        return  yii::$app->controller->redirect(['/site/login']);    
         return parent::beforeAction($action);
     }
 

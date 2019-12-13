@@ -31,9 +31,19 @@ use yii\widgets\Pjax;
 
           ],
    
-                     [
-    'attribute' => 'esforeign',
-    'format' => 'raw',
+                    
+   ['attribute' => 'esclave',
+        'format' => 'raw',
+        'value' => function ($model) {
+             if($model->esclave){
+                 return '<i style="color:red;font-size:16px;"><span class="fa fa-key"></i></span>';
+                 }else{
+                  return '';
+               }
+              }
+       ],
+     ['attribute'=>'esforeign',
+               'format' => 'raw',
     'value' => function ($model) {
              if($model->esforeign){
                 $cad=$model->cargamasiva->modelAsocc()->obtenerForeignClass($model->nombrecampo); 

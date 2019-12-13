@@ -11,7 +11,8 @@ use console\migrations\baseMigration;
  */
 class m191031_040801_create_table_citas extends baseMigration
 {
-   const NAME_TABLE='{{%sta_citas}}';
+       const NAME_TABLE_FACULTAD='{{%sta_facultades}}';
+    const NAME_TABLE='{{%sta_citas}}';
      const NAME_TABLE_TALLERESDET='{{%sta_talleresdet}}';
       const NAME_TABLE_TALLERES='{{%sta_talleres}}';
      const NAME_TABLE_TRABAJADORES='{{%trabajadores}}';
@@ -34,11 +35,15 @@ if(!$this->existsTable($table)) {
          'ftermino'=>$this->string(19)->append($this->collateColumn()),
         'fingreso'=>$this->char(10)->append($this->collateColumn()),
         'detalles'=>$this->text()->append($this->collateColumn()),
+        'detalles_secre'=>$this->text()->append($this->collateColumn()),
+         //'detalles_psico'=>$this->text()->append($this->collateColumn()),
          'codaula'=>$this->string(10)->append($this->collateColumn()),
           'duracion'=>$this->integer(3)->notNull(),
-         
+          'codfac'=>$this->string(8)->notNull()->append($this->collateColumn()),
         ],$this->collateTable());
-  
+  $this->addForeignKey($this->generateNameFk($table), $table,
+              'codfac', static::NAME_TABLE_FACULTAD,'codfac');
+            
   /*  $this->addForeignKey($this->generateNameFk($table), $table,
               'codalu', static::NAME_TABLE_ALUMNO,'codalu');*/
      $this->addForeignKey($this->generateNameFk($table), $table,

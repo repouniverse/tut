@@ -64,17 +64,18 @@ class VwAlutaller extends \common\models\base\modelBase
             'ap' => Yii::t('sta.labels', 'Ap'),
             'am' => Yii::t('sta.labels', 'Am'),
             'nombres' => Yii::t('sta.labels', 'Nombres'),
-            'codfac' => Yii::t('sta.labels', 'Codfac'),
-            'dni' => Yii::t('sta.labels', 'Dni'),
+            'codfac' => Yii::t('sta.labels', 'Fac'),
+            'dni' => Yii::t('sta.labels', 'DNI'),
             'correo' => Yii::t('sta.labels', 'Correo'),
             'celulares' => Yii::t('sta.labels', 'Celulares'),
             'fijos' => Yii::t('sta.labels', 'Fijos'),
             'id' => Yii::t('sta.labels', 'ID'),
-            'codalu' => Yii::t('sta.labels', 'Codalu'),
+            'codalu' => Yii::t('sta.labels', 'Código'),
             'talleres_id' => Yii::t('sta.labels', 'Talleres ID'),
             'fingreso' => Yii::t('sta.labels', 'Fingreso'),
-            'codtra' => Yii::t('sta.labels', 'Tutor'),
+            'codtra' => Yii::t('sta.labels', 'Psicólogo'),
              'nomcur' => Yii::t('sta.labels', 'Curso'),
+             'rank_tutor' => Yii::t('sta.labels', 'Calif'),
         ];
     }
 
@@ -95,7 +96,13 @@ class VwAlutaller extends \common\models\base\modelBase
        }
     }
     
+    public static function claseBase(){
+        return 'frontend\modules\sta\models\Talleresdet';
+    }
+    
     public function getPrimaryKey($asArray = false) {
-        return $this->id;
+        return 'id';
+        parent::getPrimaryKey($asArray);
+        
     }
 }

@@ -7,7 +7,13 @@ use yii\widgets\ActiveForm;
 /* @var $model frontend\modules\sigi\models\SigiCargos */
 /* @var $form yii\widgets\ActiveForm */
 ?>
+<?php 
+$this->title = Yii::t('sigi.labels', 'Diagrama Jerárquico');
+$this->params['breadcrumbs'][] = $this->title;
+?>
 
+
+    <h4><i class="fa fa-building"></i> <?= Html::encode($this->title) ?></h4>
 <div class="box box-success">
     <div class="box-body">
   <?php 

@@ -37,7 +37,10 @@ return [
     
     'components' => [
         
-        
+       'formatter' => [
+        'class' => 'yii\i18n\Formatter',
+        'nullDisplay' => '',
+          ], 
         
        'urlManager' => [
             'enablePrettyUrl' => true,

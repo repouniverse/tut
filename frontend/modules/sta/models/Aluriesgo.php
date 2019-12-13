@@ -160,7 +160,10 @@ class Aluriesgo extends \common\models\base\modelBase
      */
     public static function studentsInRiskQuery(){
        //return static::find()->select('codalu','codperiodo')->distinct(); 
-        $query = static::find()->select([Aluriesgo::tableName().'.codalu','codperiodo'])
+        $query = static::find()->select(
+                [                    Aluriesgo::tableName().'.codalu','codperiodo'
+                    ]
+                )
                 ->distinct()/*->innerJoin(Alumnos::tableName(), Aluriesgo::tableName().'.codalu='. Alumnos::tableName().'.codalu')*/;
                 
         return $query;

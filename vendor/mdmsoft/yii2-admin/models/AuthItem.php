@@ -155,6 +155,7 @@ class AuthItem extends Model
     {
         if ($this->validate()) {
             $manager = Configs::authManager();
+            //echo get_class($manager);die();
             if ($this->_item === null) {
                 if ($this->type == Item::TYPE_ROLE) {
                     $this->_item = $manager->createRole($this->name);

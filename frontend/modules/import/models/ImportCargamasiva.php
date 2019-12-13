@@ -154,9 +154,11 @@ class ImportCargamasiva extends modelBase
                 $i=1;
                // print_r($columnas);die();
               foreach($columnas as $nameField=>$oBCol){ 
-                	if($modeloatratar->isAttributeSafe($nameField) &&
+                	if(
+                         ( $modeloatratar->isAttributeSafe($nameField) &&
                           !$this->existsChildField($nameField) && 
-                          !($oBCol->dbType =='text')
+                          !($oBCol->dbType =='text') ) 
+                    /* o ES update y el campo es clave*/ or ( !$this->insercion && in_array($nameField,$modeloatratar->primaryKey(true)) )
                      ){
                           //yii::error($nameField,__METHOD__);   
                         yii::error($oBCol->dbType,__METHOD__);
@@ -355,7 +357,12 @@ public function ordenCampos(){
  
   public function findModelAsocc($fila,$scenario=null){
       //$model=$this->modelAsocc();
-      $clase=$this->model;
+       ///yii::error('findomodelAssoc Encontrando model');
+      $clase=$this->modelo;
+      //yii::error('findomodelAssoc Encontrando');
+      //yii::error($this->camposClave());
+      //dfdggd; fdsff;
+     // yii::error($this->AttributesPkForFindModel($fila,$this->camposClave()));
       $registro=$clase::find()->where(
               $this->AttributesPkForFindModel($fila,$this->camposClave())
               )->one();
@@ -373,9 +380,12 @@ public function ordenCampos(){
   public function generateExampleCsv($model,$campo=null){
       yii::error('ingresando');
        $childFields=$this->childsField($model,$campo);
-      //var_dump($campo);die();
-      $filas=$this->dataArrayToCsvExample($model,$campo);      
-       $pathComplete= ModuleImport::getPathCsv().DIRECTORY_SEPARATOR.FileHelper::randomNameFile('.csv');
+      //var_dump($modelo);die();
+      $filas=$this->dataArrayToCsvExample($model,$campo);  
+      $prefijo=(is_null($campo))?str_replace(' ','_',$this->descripcion).'_':
+              $campo.'_';
+      //$prefijo='';
+       $pathComplete= ModuleImport::getPathCsv().DIRECTORY_SEPARATOR.$prefijo.FileHelper::randomNameFile('.csv');
        if (!$file_handle = fopen($pathComplete, "w")) {  
         echo "El archivo no se puede crear";
         exit;  
@@ -449,7 +459,7 @@ public function ordenCampos(){
       //var_dump($this->childsField($model));die();
        return  $model->find()->
        select(array_values($this->childsField($model,$campo)))->
-      limit(10)->asArray()->all();    
+      limit(200)->asArray()->all();    
     }
   
  

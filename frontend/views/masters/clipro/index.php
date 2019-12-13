@@ -23,27 +23,19 @@ $this->title = Yii::t('base.names', 'Clipros');
    
     <?php
  echo ExportMenu::widget([
-    'dataProvider' => $dataProvider,
-     'exportConfig'=>[
-         ExportMenu::FORMAT_EXCEL=>[
-             'filename'=>'Exportacion'
-               ],
-         ExportMenu::FORMAT_EXCEL_X=>[
-             'filename'=>'Exportacion'
-               ]
-         ],
+    'dataProvider' => $dataProvider,    
     'columns' => $gridColumns,
     'dropdownOptions' => [
         'label' => yii::t('sta.labels','Exportar'),
         'class' => 'btn btn-success'
     ]
-]) ?>
+]).' 
     </div>
  <hr>
-         <?=GridView::widget([
+         '.GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
-         'summary' => '',
+        // 'summary' => '',
         //'tableOptions'=>['class'=>".thead-dark table table-condensed table-hover table-bordered table-striped"],
         'columns' => [
            ['class' => 'yii\grid\ActionColumn',

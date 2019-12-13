@@ -38,7 +38,8 @@ class AlumnosController extends baseController
      */
     public function actionIndex()
     {
-        
+         
+         
         //var_dump(\frontend\modules\sta\models\Facultades::find()->select('codfac')->asArray()->all());die();
         $searchModel = new AlumnosSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -149,11 +150,41 @@ class AlumnosController extends baseController
    public function actionVerDetalles($id){
        $model=$this->findModel($id);
        //var_dump(Aluriesgo::cursosByStudentPeriod());
-       $dataProviders=$this->generateProviders($model->codalu,$model->periodsInRisk());
-       return $this->render('/alumnos/auxiliares/_form_view_alu',
+       $codperiodo=staModule::getCurrentPeriod();
+       if(is_null(h::request()->get('codperiodo'))){
+          $codperiodo=staModule::getCurrentPeriod();  
+       }else{
+           $codperiodo=h::request()->get('codperiodo');
+       }
+       if(is_null(h::request()->get('codfac'))){
+          $codfac=$model->codfac;  
+       }else{
+           $codfac=h::request()->get('codfac');
+       }
+       $taller= \frontend\modules\sta\models\Talleres::find()->
+               where(['codfac'=>$codfac,'codperiodo'=>$codperiodo])->one();
+       if(is_null($taller) ){
+             return $this->render('_nohayprograma',['model'=>$model,'codperiodo'=>$codperiodo]);
+       }ELSE{
+         $modelTallerdet= \frontend\modules\sta\models\Talleresdet::find()->where(['codalu'=>$model->codalu,'talleres_id'=>$taller->id])->one();
+          if(is_null($modelTallerdet) ){
+                return $this->render('_nohayprograma',['model'=>$model,'codperiodo'=>$codperiodo]);
+       
+            }ELSE{
+               
+               $dataProviders=$this->generateProviders($model->codalu,$model->periodsInRisk());
+                
+               return $this->render('/alumnos/auxiliares/_form_view_alu',
                ['model'=>$model,
                 'dataProviders'=>$dataProviders,
-                'codperiodo'=>staModule::getCurrentPeriod()]);
+                'modelTallerdet'=>$modelTallerdet,
+                'codperiodo'=>$codperiodo]);    
+            }
+       }
+        
+       
+       
+       
    } 
    private function generateProviders($codalu,$periods){
        $arr=[];

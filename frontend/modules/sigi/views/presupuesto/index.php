@@ -1,13 +1,14 @@
 <?php
 
 use yii\helpers\Html;
-use yii\grid\GridView;
+use kartik\grid\GridView;
 use yii\widgets\Pjax;
+use frontend\modules\sigi\helpers\comboHelper;
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\modules\sigi\models\SigiBasePresupuestoSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('sigi.labels', 'Sigi Base Presupuestos');
+$this->title = Yii::t('sigi.labels', 'Partidas');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="sigi-base-presupuesto-index">
@@ -19,7 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a(Yii::t('sigi.labels', 'Create Sigi Base Presupuesto'), ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a(Yii::t('sigi.labels', 'Crear Partida'), ['create'], ['class' => 'btn btn-success']) ?>
     </p>
     <div style='overflow:auto;'>
     <?= GridView::widget([
@@ -32,7 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
          
          [
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{update}{delete}{view}',
+                'template' => '{update}',
                 'buttons' => [
                     'update' => function($url, $model) {                        
                         $options = [
@@ -55,20 +56,32 @@ $this->params['breadcrumbs'][] = $this->title;
                          }
                     ]
                 ],
-         
-         
-         
-         
-         
-
-            'id',
-            'edificio_id',
-            'codgrupo',
-            'codigo',
+                             // 'codigo',
             'descripcion',
+                            'mensual',
             //'activo',
-            //'ejercicio',
-            //'mensual',
+            'ejercicio',
+             ['attribute'=>'edificio_id',
+                                 'value'=>'edificio.codigo',
+                                 'filter'=>comboHelper::getCboEdificios(),
+             'group'=>true,
+                            
+                            ],
+              ['attribute'=>'cargosgrupoedificio_id',
+                    'value'=> 'cargosGrupoEdificioFirme.descripcion',
+                                // 'filter'=>comboHelper::getCboEdificios(),
+             'group'=>true,
+                            
+                            ],
+            ['attribute'=>'cargosedificio_id',
+                    'value'=> 'grupoConcepto.cargo.descargo', 
+                                 //'filter'=>comboHelper::getCboEdificios(),
+             'group'=>true,
+                            
+                            ],
+                          
+          
+            
             //'anual',
             //'restringir',
             //'acumulado',

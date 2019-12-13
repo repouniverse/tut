@@ -11,6 +11,7 @@ class m191031_043540_create_table_test_taller extends baseMigration
 {
    const NAME_TABLE_TALLERES='{{%sta_talleres}}';
      const NAME_TABLE='{{%sta_testtalleres}}';
+       const NAME_TABLE_FACULTAD='{{%sta_facultades}}';
      //const NAME_TABLE_TESTS='{{%sta_test}}';
    //const NAME_TABLE_ALUMNO='{{%sta_alu}}';
     /*const NAME_TABLE_CURSOS='{{%sta_materias}}';
@@ -25,9 +26,12 @@ if(!$this->existsTable($table)) {
         'taller_id'=>$this->integer(11)->notNull(),
         'codtest'=>$this->string(8)->notNull(),
         'peso'=>$this->integer(2),
+         'codfac'=>$this->string(8)->notNull()->append($this->collateColumn()),
          'obligatorio'=>$this->char(1)->append($this->collateColumn()),
         ],$this->collateTable());
-  
+   $this->addForeignKey($this->generateNameFk($table), $table,
+              'codfac', static::NAME_TABLE_FACULTAD,'codfac');
+        
   /*  $this->addForeignKey($this->generateNameFk($table), $table,
               'codalu', static::NAME_TABLE_ALUMNO,'codalu');*/
     $this->addForeignKey($this->generateNameFk($table), $table,

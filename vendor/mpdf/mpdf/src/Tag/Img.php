@@ -273,6 +273,7 @@ class Img extends Tag
 			}
 
 			// Image file
+                        //var_dump(get_class($this->imageProcessor));DIE();
 			$info = $this->imageProcessor->getImage($srcpath, true, true, $orig_srcpath, $interpolation); // mPDF 6
 			if (!$info) {
 				$info = $this->imageProcessor->getImage($this->mpdf->noImageFile);

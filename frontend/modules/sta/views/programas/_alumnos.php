@@ -1,9 +1,10 @@
 <?php
 
-use yii\helpers\Html;
-use yii\grid\GridView;
+use yii\helpers\Html,yii\helpers\Url;
+ //use yii\helpers\Url;
+use kartik\grid\GridView;
 use yii\widgets\Pjax;
-use kartik\editable\Editable;
+//use kartik\editable\Editable;
 //use kartik\grid\GridView ;
 use frontend\modules\sta\helpers\comboHelper;
 
@@ -22,9 +23,37 @@ use frontend\modules\sta\helpers\comboHelper;
     
     <div style='overflow:auto;'>
    <?php 
-   $dataTutores= comboHelper::getCboTutoresByProg($model->id);
+    Pjax::begin(['id'=>'sumilla']);
+   ////$dataTutores= comboHelper::getCboTutoresByProg($model->id);
    //print_r($dataTutores);die();
    $gridColumns = [
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{edit}',
+                'buttons' => [
+                   
+                         'edit' => function ($url,$model) {
+			    $url= Url::to(['convoca-alumno','id'=>$model->id,'gridName'=>'convocatorias_'.$model->id,'idModal'=>'buscarvalor']);
+                             //echo  Html::button(yii::t('base.verbs','Modificar Rangos'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Tutor'),'id'=>'btn_contacts', 'class' => 'botonAbre btn btn-success']); 
+                            return Html::a('<span class="btn btn-danger btn-sm fa fa-phone"></span>', $url, ['class'=>'botonAbre']);
+                            }
+                    ]
+                ],
+        [
+    'class' => 'kartik\grid\ExpandRowColumn',
+    'width' => '50px',
+    'value' => function ($model, $key, $index, $column) {
+        return GridView::ROW_COLLAPSED;
+    },
+    // uncomment below and comment detail if you need to render via ajax
+    // 'detailUrl'=>Url::to(['/site/book-details']),
+    'detail' => function ($model, $key, $index, $column) {
+        return Yii::$app->controller->renderPartial('/programas/convocatorias/_convocatorias',  ['grupo_id' => $model->id]);
+    },
+    'headerOptions' => ['class' => 'kartik-sheet-style'], 
+    'expandOneOnly' => true
+],                    
+                            
 [  'attribute' => 'cantidad',
     'format'=>'raw',
     'value' => function ($model, $key, $index, $column) {
@@ -40,13 +69,15 @@ use frontend\modules\sta\helpers\comboHelper;
 ],         
 [
                 'attribute'=>'codalu',
-                'format'=>'html',
+                'format'=>'raw',
                 'value' => function ($model, $key, $index, $column) {
                     $options=['id'=>$model->codalu,
-                              'class'=>'class_link_ajax'
+                              //'class'=>'class_link_ajax'
+                               'data-pjax'=>'0',
+                                'target'=>'_blank'
                                ];
-                    $url=\yii\helpers\Url::to();
-                    return Html::a($model->codalu, '#', $options);
+                    $url=\yii\helpers\Url::to(['programas/trata-alumno','id'=>$model->id,'idalumno'=>$model->idalumno,'codperiodo'=>$model->codperiodo,'codalu'=>$model->codalu]);
+                    return Html::a($model->codalu,$url, $options);
                         },
 ],
 [ 
@@ -55,6 +86,9 @@ use frontend\modules\sta\helpers\comboHelper;
        [ 
     'attribute' => 'celulares', 
 ],
+                                  [ 
+    'attribute' => 'correo', 
+],
 ];
    
    
@@ -62,7 +96,7 @@ use frontend\modules\sta\helpers\comboHelper;
    
    ?>
         <?php 
-        Pjax::begin(['id'=>'sumilla']);
+       
         echo GridView::widget([
              'id' => 'kv-grid-demo',
         'dataProvider' => $dataProviderAlumnos,
@@ -78,7 +112,7 @@ use frontend\modules\sta\helpers\comboHelper;
     ],*/
     
     ]);
-        Pjax::end();
+        //Pjax::end();
         ?>
         
     
@@ -123,5 +157,7 @@ $('#boton-refrescar').on( 'click', function(){
  
 );",\yii\web\View::POS_END);  
   ?>
-
+<?PHP
+ Pjax::end();
+?>
     </div>

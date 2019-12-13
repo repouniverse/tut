@@ -14,10 +14,20 @@ class FilterAccess extends ActionFilter
     
     public function beforeAction($action)
     {
-       // var_dump(yii::$app->controller->module);die();
-     if(h::user()->isGuest)
-         yii::$app->controller->redirect('site/login');    
-        return parent::beforeAction($action);
+       // header('location: http://www.neotegnia.com');
+       //var_dump(yii::$app->controller->module);die();
+     if(h::user()->isGuest){
+         //header('location: http://www.neotegnia.com');
+        //echo "hola"; die();
+        //header('location: http://case.itekron.com/frontend/web/site/login');
+         //var_dump(yii::$app->controller->redirect(['/sitryyr8686e/login']));die();
+          return yii::$app->controller->redirect(['/site/login']); 
+           //return parent::beforeAction($action);
+     }else{
+         
+     }
+       return parent::beforeAction($action); 
+       
     }
 
     public function afterAction($action, $result)

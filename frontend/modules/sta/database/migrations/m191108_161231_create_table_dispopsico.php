@@ -6,7 +6,7 @@ use console\migrations\baseMigration;
 class m191108_161231_create_table_dispopsico extends baseMigration
 {
    const NAME_TABLE='{{%sta_dispopsico}}';
-     const NAME_TABLE_TALLERPSICO='{{%sta_talleresdet}}';
+     const NAME_TABLE_TALLERPSICO='{{%sta_tallerpsico}}';
       
     public function safeUp()
     {

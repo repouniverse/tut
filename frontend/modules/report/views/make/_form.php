@@ -130,7 +130,7 @@ $papeles =['A3'=>'A3','A4'=>'A4','A5-L'=>'A5-L','A5'=>'A5','Letter'=>'Letter','A
     <?= $form->field($model, 'tienecabecera')->checkbox() ?>
  </div>
     
-     <?= Html::dropDownList('parentmodels', ' ', $model->parentModels(), []);?>
+     <?= ''/*Html::dropDownList('parentmodels', ' ', (new $model->modelo)->parentModels(), []);*/?>
      
     
     <div class="form-group">

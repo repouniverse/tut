@@ -72,7 +72,7 @@ $this->title = 'Profile';
               <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
                <?= $form->field($profile, 'tipo')->
             dropDownList(comboHelper::getCboValores($profile->RawTableName().'.tipo'),
-                    ['prompt'=>'--'.yii::t('base.verbs','Choose a Value')."--",
+                    ['prompt'=>'--'.yii::t('base.verbs','Seleccione un Valor')."--",
                      //'class'=>'probandoSelect2',
                         ]
                     ) ?>
@@ -83,7 +83,7 @@ $this->title = 'Profile';
 
  <?= $form->field($model, 'status')->
             dropDownList($model->dataComboStatus(),
-                    ['prompt'=>'--'.yii::t('base.verbs','Choose a Value')."--",
+                    ['prompt'=>'--'.yii::t('base.verbs','Seleccione un Valor')."--",
                      //'class'=>'probandoSelect2',
                         ]
                     ) ?>

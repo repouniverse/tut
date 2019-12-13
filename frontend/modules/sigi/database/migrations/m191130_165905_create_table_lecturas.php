@@ -23,6 +23,9 @@ if(!$this->existsTable($table)) {
         'hlectura'=>$this->char(5)->append($this->collateColumn()),
         'lectura'=>$this->decimal(12,4),
          'lecturaant'=>$this->decimal(12,4),
+         'anio'=>$this->char(4)->notNull()->append($this->collateColumn()),
+        'codeficio'=>$this->string(12)->append($this->collateColumn()),
+        'codtipo'=>$this->char(3)->append($this->collateColumn()),
         'delta'=>$this->decimal(12,4),       
         ],$this->collateTable());
   

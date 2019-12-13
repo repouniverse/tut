@@ -17,6 +17,9 @@ if(!$this->existsTable($table)) {
          'id'=>$this->primaryKey(),
         'codtipo'=>$this->char(4)->notNull()->append($this->collateColumn()),
          'esnuevo'=>$this->char(1)->notNull()->append($this->collateColumn()),
+         
+        'imputable'=>$this->char(1)->append($this->collateColumn())->
+            comment('PARA DETRERMINAR SI ESTA UNIDAD ES APORTANTE DE ALGUN PAGO O ES FACTURABLE'),
         
         'npiso'=>$this->integer(3),
         'edificio_id'=>$this->integer(11)->notNull(),
@@ -28,7 +31,7 @@ if(!$this->existsTable($table)) {
         'codpro'=>$this->char(6)->notNull(),
         'detalles'=>$this->text()->append($this->collateColumn()),
         'estreno'=>$this->char(10)->append($this->collateColumn()),//Es la fecha de entrega, si nos e ocnoce, colcoar 1970-01-01
-       
+       'imputable'=>$this->char(1)->append($this->collateColumn()),
         ],$this->collateTable());
   
     $this->addForeignKey($this->generateNameFk($table), $table,

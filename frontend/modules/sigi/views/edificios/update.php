@@ -1,13 +1,9 @@
 <?php
-
 use yii\helpers\Html;
-
 use kartik\tabs\TabsX;
-
-
 /* @var $this yii\web\View */
 /* @var $model frontend\modules\sta\models\Talleres */
-ECHO \common\widgets\spinnerWidget\spinnerWidget::widget();
+//ECHO \common\widgets\spinnerWidget\spinnerWidget::widget();
 /* @var $this yii\web\View */
 /* @var $model frontend\modules\sigi\models\Edificios */
 
@@ -42,7 +38,7 @@ $this->params['breadcrumbs'][] = Yii::t('sigi.labels', 'Update');
              'options' => ['id' => 'myveryownID4'],
         ],
         [
-          'label'=>'<i class="fa fa-users"></i> '.yii::t('sta.labels','Apoderados'), //$this->context->countDetail() obtiene el contador del detalle
+          'label'=>'<i class="fa fa-users"></i> '.yii::t('sta.labels','Grup Gestión'), //$this->context->countDetail() obtiene el contador del detalle
             'content'=> $this->render('_apoderados',[ 'model' => $model]),
             'active' => false,
              'options' => ['id' => 'dwnID4'],
@@ -60,7 +56,7 @@ $this->params['breadcrumbs'][] = Yii::t('sigi.labels', 'Update');
              'options' => ['id' => 'cnID6'],
         ],
        [
-          'label'=>'<i class="fa fa-users"></i> '.yii::t('sta.labels','Grupos'), //$this->context->countDetail() obtiene el contador del detalle
+          'label'=>'<i class="fa fa-users"></i> '.yii::t('sta.labels','Grup Conceptos'), //$this->context->countDetail() obtiene el contador del detalle
             'content'=> $this->render('_grupocargos',[ 'model' => $model]),
             'active' => false,
              'options' => ['id' => 'cnID7'],

@@ -10,8 +10,8 @@ ECHO \common\widgets\spinnerWidget\spinnerWidget::widget();
 /* @var $this yii\web\View */
 /* @var $model frontend\modules\sta\models\Citas */
 
-$this->title = Yii::t('sta.labels', 'Update Citas: {name}', [
-    'name' => $model->id,
+$this->title = Yii::t('sta.labels', 'Edita Cita: {name}', [
+    'name' => $model->fechaprog,
 ]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('sta.labels', 'Citas'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];

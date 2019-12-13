@@ -1,13 +1,12 @@
 <?php
-
 namespace frontend\modules\sta\models;
-
+use frontend\modules\sta\components\ActiveQueryScope;
 /**
  * This is the ActiveQuery class for [[Talleres]].
  *
  * @see Talleres
  */
-class TalleresQuery extends \yii\db\ActiveQuery
+class TalleresQuery extends ActiveQueryScope
 {
     /*public function active()
     {

@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
          
          [
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{update}{delete}{view}',
+                'template' => '{update}',
                 'buttons' => [
                     'update' => function($url, $model) {                        
                         $options = [
@@ -60,7 +60,7 @@ $this->params['breadcrumbs'][] = $this->title;
          
          
          
-
+               'id',
             'codigo',
            
             'nombre',

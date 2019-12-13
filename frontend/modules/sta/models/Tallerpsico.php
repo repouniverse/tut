@@ -90,7 +90,7 @@ class Tallerpsico extends \common\models\base\modelBase
      public function getCitasPendientes()
     {
         return $this->hasMany(Citas::className(), 
-                [  'talleres_id'=>'id',
+                [  /*'talleres_id'=>'id',*/
                     'codtra'=>$this->codtra,
                     'finicio'=> timeHelper::getDateTimeInitial(),
                     
@@ -103,7 +103,7 @@ class Tallerpsico extends \common\models\base\modelBase
     public function citasPendientesQuery()
     {
         return Citas::find()->where( 
-                [  'talleres_id'=>$this->talleres_id,
+                [ /* 'talleres_id'=>$this->talleres_id,*/
                     'codtra'=>$this->codtra,
                     'finicio'=> timeHelper::getDateTimeInitial(),
                     
@@ -258,6 +258,12 @@ class Tallerpsico extends \common\models\base\modelBase
             //$this->prefijo=$this->codfac;
            
             $this->calificacion=true;
+        }else{
+            if($this->hasChanged('codtra')){
+                $this->transfiereAlus($this->oldAttributes['codtra'],$this->codtra);
+                $this->calificacion=true;
+               //Tallerpsico::updateAll(['calificacion'=>true], $condition);
+            }
         }
         
         return parent::beforeSave($insert);
@@ -348,7 +354,7 @@ class Tallerpsico extends \common\models\base\modelBase
    * solo con le id de este modelo y el codigo de una alumno
    * 
    */   
-     public  function getTalleresdet($codalu){
+     public  function modelTalleresdet($codalu){
           return Talleresdet::find()->where([
               'talleres_id' => $this->talleres_id,
               'codalu'=>$codalu,
@@ -404,6 +410,38 @@ class Tallerpsico extends \common\models\base\modelBase
         
        // return $eventos;
     }
-     
-     
+    
+ public function putColorThisCodalu($events,$codalu,$color="#ff0000"){
+       // $codalu=$this->tallerdet->codalu;
+       foreach($events as $index=>$event) {
+           if(trim(strtoupper($codalu))==trim(strtoupper($event['title'])))
+            $events[$index]['color']=$color;
+       }
+       return $events;
+    }    
+    
+    
+   public function tallerDet(){
+       return  TallerDet::find()->where(
+                [
+                   // 'codtra'=>$this->codtra,
+                    'codtra'=>$this->codtra,
+                    'talleres_id'=>$this->talleres_id,
+                ]
+                )->one();
+    } 
+    /*
+     * Transfiere alumnos a un piscologo y otro 
+         Codtra : COdigo del trabajador destino
+     *      */
+    
+   public function transfiereAlus($oldCodtra,$newCodtra){
+     return  Tallerdet::updateAll(['codtra'=>$newCodtraodtra],
+               [
+                   'talleres_id'=>$this->talleres_id,
+                   'codtra'=>$oldCodtra
+                   //'codfac'=>$this->codfac,
+               ]);
+   } 
+    
 }

@@ -59,11 +59,9 @@ class ReportedetalleSearch extends Reportedetalle
         }
 
         // grid filtering conditions
-        $query->andFilterWhere([
-            'hidreporte'=>$filter,
-            'nombre_campo' => $this->nombre_campo,
-            'aliascampo' => $this->aliascampo,
-        ]);
+        $query->andFilterWhere(['like', 'nombre_campo', $this->nombre_campo])
+            ->andFilterWhere(['like', 'aliascampo', $this->aliascampo])
+            ->andFilterWhere(['hidreporte'=>$filter]);
 
        
         return $dataProvider;

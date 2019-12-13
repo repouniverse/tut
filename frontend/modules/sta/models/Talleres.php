@@ -14,6 +14,7 @@ use common\helpers\h;
 USE \yii2mod\settings\models\enumerables\SettingType;
    use \common\traits\timeTrait;
    USE common\helpers\RangeDates;
+use Carbon\Carbon;
 /**
  * This is the model class for table "{{%sta_talleres}}".
  *
@@ -164,12 +165,15 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
      */
     public function loadStudents(){
         $data=$this->studentsInRiskForThis();
+        
         $cantidad=count($data);
+       // ECHO $cantidad; die();
         $contador=0;
        foreach($data as $fila){
           IF(Talleresdet::firstOrCreateStatic([
                'talleres_id'=>$this->id,
                'codalu'=>$fila['codalu'],
+              'codfac'=>$this->codfac,
            ], Talleresdet::SCENARIO_BATCH ))
           $contador++;        
        }
@@ -178,10 +182,12 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
     
     pUBLIC function studentsInRiskForThis(){
          $query=Aluriesgo::studentsInRiskQuery();
+        
         $query->andWhere([
                'codfac'=>$this->codfac,
                'codperiodo'=>$this->codperiodo
                    ]);
+         /*echo $query->createCommand()->getRawSql();die();
          /*
         if(count(UserFacultades::filterFacultades())==1){
           $data=$query->asArray()->all();
@@ -205,7 +211,7 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
                'codperiodo'=>$this->codperiodo
                    ])->
                 andWhere(['not in',
-              'codalu', ArrayHelper::getColumn($this->studentsInRiskForThis(),'codalu')
+              'codalu',$this->codesStudents()
                ])->all();
       
     }
@@ -276,6 +282,8 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
         if($insert){
             //$this->prefijo=$this->codfac;
            $this->resolveCodocu();
+           IF(empty($this->tolerancia))
+               $this->tolerancia='0.1';
             $this->numero=$this->correlativo('numero');
         }
         
@@ -288,8 +296,9 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
         if($insert){
             //$this->prefijo=$this->codfac;
            $this->refresh();
-          $this->createRangos($this->id); //Llena la tabla rangos por unica vez 
-        }
+            $this->createRangos($this->id); //Llena la tabla rangos por unica vez 
+        
+         }
         
         return parent::afterSave($insert,$changedAttributes);
        
@@ -312,7 +321,7 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
                         'tolerancia'=> h::getIfNotPutSetting('sta','tolerancia',0.1, SettingType::FLOAT_TYPE),
                          'activo'=>(!in_array($key,[0,6]))?false:true,//SI ES SABADO O DOMINGO POR DEFAULT ES FALSE 
                 ];
-           // yii::error(Rangos::firstOrCreateStatic($attributes));
+         Rangos::firstOrCreateStatic($attributes);
             //yii::error($attributes);
         }
        return true;
@@ -391,17 +400,17 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
          if(is_null($fecha)){
             $carbon=toCarbon('finicitas');
          }else{             
-             $carbon= Carbon\Carbon::createFromFormat(                     
+             $carbon= Carbon::createFromFormat(                     
                      $this->formatToCarbon(self::_FDATE),
                      $fecha
                      );
          }
          $hinicio=substr($rangos[$carbon->dayOfWeek]['hinicio'],0,2)+0;
          $hfinal=substr($rangos[$carbon->dayOfWeek]['hfin'],0,2)+0;
-          $rang=new \common\helpers\RangeDates(
+          $rang=new \common\helpers\RangeDates([
                   $carbon->hour($hinicio)->copy(),
                  $carbon->hour($hfinal)->copy() 
-                  );unset($carbon);
+                  ]);unset($carbon);
             return $rang;
       }
       
@@ -409,10 +418,30 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
       
     
      
-     
+     private function codesStudents(){
+        return ArrayHelper::getColumn($this->studentsInRiskForThis(),'codalu');
+     }
       
      
+     /*
+      * Codes: Cualquier lista de codigos, que satisfagan un criterio 
+      * por ejemplo todos los codigos : funcion codesStudents()
+      */
+     public function listMailStudents($codes=null){
+         if(is_null($codes))
+           $codes=$this->codesStudents ();
+        return Alumnos::listMailFromField('correo',
+          ['in','codalu',$codes]);
+     }
       
+     
+     public function citasPendientesQuery(){
+        return  Citas::find()->where([
+            'talleres_id'=>$this->id,
+            '>','fechaprog',date('Y-d-m')
+            ]);
+     }
+     
           
     }
 

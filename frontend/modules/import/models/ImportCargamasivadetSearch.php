@@ -18,7 +18,7 @@ class ImportCargamasivadetSearch extends ImportCargamasivadet
     {
         return [
             [['id', 'user_id'], 'integer'],
-            [['insercion', 'escenario', 'lastimport', 'descripcion', 'format', 'modelo'], 'safe'],
+            [['insercion', 'escenario', 'lastimport', 'descripcion', 'format','esclave', 'modelo'], 'safe'],
         ];
     }
 
@@ -40,7 +40,7 @@ class ImportCargamasivadetSearch extends ImportCargamasivadet
      */
     public function search($params)
     {
-        $query = ImportCargamasiva::find();
+        $query = ImportCargamasivadet::find();
 
         // add conditions that should always apply here
 

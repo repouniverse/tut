@@ -77,11 +77,13 @@ class Combovalores extends \common\models\base\modelBase
     }
     
     /*Dvuel ve un valor dado una calve */
-    public static function getValue($key,$codcentro=null){
+    public static function getValue($key,$valor,$codcentro=null){
        if(!is_null($codcentro))
-      $value= static::find()->where(['nombretabla'=>$key,'codcen'=>$codcentro])->scalar();
-       $value= static::find()->where(['nombretabla'=>$key])->scalar();
-       return ($value===false)?null:$value;
+      $reg= static::find()->where(['nombretabla'=>$key,'codigo'=>$valor,'codcen'=>$codcentro])->one();
+       $reg= static::find()->where(['nombretabla'=>$key,'codigo'=>$valor])->one();
+      if(is_null($reg))
+          return '';
+       return $reg->valor;
        
         
     }

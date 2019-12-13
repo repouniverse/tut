@@ -33,7 +33,7 @@ $this->title = Yii::t('sta.labels', 'Alumnos');
 $gridColumns = [
                      [
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{update}{view}',
+                'template' => '{update}',
                 'buttons' => [
                     'update' => function($url, $model) {                        
                         $options = [
@@ -41,15 +41,7 @@ $gridColumns = [
                         ];
                         return Html::a('<span class="btn btn-info btn-sm glyphicon glyphicon-pencil"></span>', $url, $options/*$options*/);
                          },
-                          'view' => function($url, $model) {    
-                             $url=\yii\helpers\Url::toRoute(['ver-detalles','id'=>$model->id]);
-                        $options = [
-                            'data-pjax'=>'0',
-                            'title' => Yii::t('base.verbs', 'Detalles'),                            
-                        ];
-                        return Html::a('<span class="btn btn-warning btn-sm glyphicon glyphicon-search"></span>', $url, $options/*$options*/);
-                         },
-                         
+                          
                     ]
                 ],
                 [

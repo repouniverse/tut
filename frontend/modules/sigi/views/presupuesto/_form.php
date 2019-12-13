@@ -1,5 +1,6 @@
 <?php
-
+use common\widgets\cbodepwidget\cboDepWidget as ComboDep;
+use frontend\modules\sigi\models\VwSigiColectores;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\Pjax;
@@ -12,9 +13,10 @@ use common\helpers\timeHelper;
 ?>
 
 <div class="sigi-base-presupuesto-form">
-    <br>
+  
     <?php $form = ActiveForm::begin([
-    'fieldClass'=>'\common\components\MyActiveField'
+    'fieldClass'=>'\common\components\MyActiveField',
+        'enableAjaxValidation'=>true
     ]); ?>
       <div class="box-header">
         <div class="col-md-12">
@@ -32,39 +34,132 @@ use common\helpers\timeHelper;
 
  </div> 
 
- <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
-     <?= 
-            $form->field($model, 'edificio_id')->
-            dropDownList(comboHelper::getCboEdificios() ,
-                    ['prompt'=>'--'.yii::t('base.verbs','Escoja un valor')."--",
-                    // 'class'=>'probandoSelect2',
-                      //'disabled'=>($model->isBlockedField('codpuesto'))?'disabled':null,
-                        ]
-                    )  ?>
-</div>
- <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
-  <div class="input-group">
-<?php Pjax::begin(['id'=>'combito-grupo']); ?>
+    <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12"> 
+        <?php if($model->isNewRecord){ ?>
+    <?= ComboDep::widget([
+               'model'=>$model,               
+               'form'=>$form,
+               'data'=> comboHelper::getCboEdificios(),
+               'campo'=>'edificio_id',
+               'idcombodep'=>'sigibasepresupuesto-cargosgrupoedificio_id',
+               /* 'source'=>[ //fuente de donde se sacarn lso datos 
+                    /*Si quiere colocar los datos directamente 
+                     * para llenar el combo aqui , hagalo coloque la matriz de los datos
+                     * aqui:  'id1'=>'valor1', 
+                     *        'id2'=>'valor2,
+                     *         'id3'=>'valor3,
+                     *        ...
+                     * En otro caso 
+                     * de la BD mediante un modelo  
+                     */
+                        /*Docbotellas::className()=>[ //NOmbre del modelo fuente de datos
+                                        'campoclave'=>'id' , //columna clave del modelo ; se almacena en el value del option del select 
+                                        'camporef'=>'descripcion',//columna a mostrar 
+                                        'campofiltro'=>'codenvio'/* //cpolumna 
+                                         * columna que sirve como criterio para filtrar los datos 
+                                         * si no quiere filtrar nada colocwue : false | '' | null
+                                         *
+                        
+                         ]*/
+                   'source'=>[\frontend\modules\sigi\models\VwSigiColectores::className()=>
+                                [
+                                  'campoclave'=>'idgrupo' , //columna clave del modelo ; se almacena en el value del option del select 
+                                        'camporef'=>'descripciongrupo',//columna a mostrar 
+                                        'campofiltro'=>'idedificio'  
+                                ]
+                                ],
+                            ]
+               
+               
+        )  ?>
+         <?php } else{ ?> 
+<?php echo $form->field($model, 'edificio_id')->
+        textInput([
+            'value' => $model->edificio->nombre,
+            'disabled'=>true
+            ]) ?>
+
+     <?php 
+    }
+      ?> 
+        
+ </div>  
+          
+          <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12"> 
+    <?php if($model->isNewRecord){ ?>
+    <?= ComboDep::widget([
+               'model'=>$model,               
+               'form'=>$form,
+               'data'=>[],
+               'campo'=>'cargosgrupoedificio_id',
+               'idcombodep'=>'sigibasepresupuesto-cargosedificio_id',
+               /* 'source'=>[ //fuente de donde se sacarn lso datos 
+                    /*Si quiere colocar los datos directamente 
+                     * para llenar el combo aqui , hagalo coloque la matriz de los datos
+                     * aqui:  'id1'=>'valor1', 
+                     *        'id2'=>'valor2,
+                     *         'id3'=>'valor3,
+                     *        ...
+                     * En otro caso 
+                     * de la BD mediante un modelo  
+                     */
+                        /*Docbotellas::className()=>[ //NOmbre del modelo fuente de datos
+                                        'campoclave'=>'id' , //columna clave del modelo ; se almacena en el value del option del select 
+                                        'camporef'=>'descripcion',//columna a mostrar 
+                                        'campofiltro'=>'codenvio'/* //cpolumna 
+                                         * columna que sirve como criterio para filtrar los datos 
+                                         * si no quiere filtrar nada colocwue : false | '' | null
+                                         *
+                        
+                         ]*/
+                   'source'=>[\frontend\modules\sigi\models\VwSigiColectores::className()=>
+                                [
+                                  'campoclave'=>'idcolector' , //columna clave del modelo ; se almacena en el value del option del select 
+                                        'camporef'=>'descargo',//columna a mostrar 
+                                        'campofiltro'=>'idgrupo'  
+                                ]
+                                ],
+                            ]
+               
+               
+        )  ?>
+    <?php } else{ ?> 
+<?php echo $form->field($model, 'cargosgrupoedificio_id')->
+        textInput([
+            'value' => $model->cargosGrupoEdificioFirme->descripcion,
+            'disabled'=>true
+            ]) ?>
+
+     <?php 
+    }
+      ?>        
+              
+          </div>      
+    <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
+
+ <?php if($model->isNewRecord){ ?>
           <?= 
-            $form->field($model, 'codgrupo')->
-            dropDownList(comboHelper::getCboGrPresup() ,
+            $form->field($model, 'cargosedificio_id')->
+            dropDownList([] ,
                     ['prompt'=>'--'.yii::t('base.verbs','Escoja un valor')."--",
                     // 'class'=>'input-group',
                       //'disabled'=>($model->isBlockedField('codpuesto'))?'disabled':null,
                         ]
                     )  ?>
- <?php Pjax::end(); ?>
-        
-  <div class="input-group-btn">
-         <?php 
-    $url= Url::to(['gpresupuesto/create','id'=>$model->id,'gridName'=>'combito-grupo','idModal'=>'buscarvalor']);
-    echo  Html::button(yii::t('sigi.labels','+'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Grupo'),'id'=>'btn_contacts', 'class' => 'botonAbre btn btn-success']); 
+ <?php } else{ ?> 
+<?php echo $form->field($model, 'cargosgrupoedificio_id')->
+        textInput([
+            'value' => $model->grupoConcepto->cargo->descargo,
+            'disabled'=>true
+            ]) ?>
 
-    ?>
-    
-   </div> 
+     <?php 
+    }
+      ?> 
+        
+   
       </div>  
-</DIV>
+
  
   
   
@@ -87,10 +182,7 @@ use common\helpers\timeHelper;
      <?= $form->field($model, 'mensual')->textInput(['maxlength' => true]) ?>
 
  </div>
-  <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
-     <?= $form->field($model, 'anual')->textInput(['maxlength' => true]) ?>
-
- </div>
+  
   <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
      <?= $form->field($model, 'restringir')->checkbox([]) ?>
 
@@ -99,10 +191,7 @@ use common\helpers\timeHelper;
      <?= $form->field($model, 'activo')->checkbox([]) ?>
 
  </div>
-  <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
-     <?= $form->field($model, 'acumulado')->textInput(['maxlength' => true]) ?>
-
- </div>
+ 
      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
      <?= $form->field($model, 'detalles')->textarea(['rows' => 6]) ?>
 

@@ -25,6 +25,7 @@ if(!$this->existsTable($table)) {
         'numerocliente'=>$this->string(25)->append($this->collateColumn()),
         'codum'=>$this->string(4)->notNull(),
         'unidad_id'=>$this->integer(11)->notNull(),
+        'edificio_id'=>$this->integer(11)->notNull(),
         'detalles'=>$this->text()->append($this->collateColumn()),
         'frecuencia'=>$this->integer(5),
        // 'indicaciones2'=>$this->text()->append($this->collateColumn()),

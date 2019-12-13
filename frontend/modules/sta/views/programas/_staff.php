@@ -93,7 +93,7 @@ use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
     </div>
     <?php
  $url= Url::to(['agrega-psico','id'=>$model->id,'gridName'=>'grilla-staff','idModal'=>'buscarvalor']);
-   echo  Html::button(yii::t('base.verbs','Insertar Tutor'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Tutor'),'id'=>'btn_contacts', 'class' => 'botonAbre btn btn-success']); 
+   echo  Html::button(yii::t('base.verbs','Agregar Psicólogo'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Tutor'),'id'=>'btn_contacts', 'class' => 'botonAbre btn btn-success']); 
 ?> 
 </div>
   

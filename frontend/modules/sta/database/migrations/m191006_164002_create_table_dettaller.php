@@ -6,7 +6,7 @@ use console\migrations\baseMigration;
 
 class m191006_164002_create_table_dettaller extends baseMigration
 {
-   
+    const NAME_TABLE_FACULTAD='{{%sta_facultades}}';
      const NAME_TABLE='{{%sta_talleresdet}}';
      const NAME_TABLE_TALLERES='{{%sta_talleres}}';
    const NAME_TABLE_ALUMNO='{{%sta_alu}}';
@@ -24,11 +24,13 @@ if(!$this->existsTable($table)) {
         'fingreso'=>$this->char(10)->append($this->collateColumn()),
         'detalles'=>$this->text()->append($this->collateColumn()),
          'codtra'=>$this->string(6)->append($this->collateColumn()),
-        
+          'codfac'=>$this->string(8)->append($this->collateColumn()),
          
          
         ],$this->collateTable());
-  
+  $this->addForeignKey($this->generateNameFk($table), $table,
+              'codfac', static::NAME_TABLE_FACULTAD,'codfac');
+            
     $this->addForeignKey($this->generateNameFk($table), $table,
               'codalu', static::NAME_TABLE_ALUMNO,'codalu');
     $this->addForeignKey($this->generateNameFk($table), $table,

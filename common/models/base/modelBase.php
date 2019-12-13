@@ -236,6 +236,7 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
      //      'campo2'=>'datetime'.
       //      'campo3'=>'time' )
    
+    public static $mailFields=[];///arrayde nombres de campos tipo mail
     public $booleanFields=[]; // array para almacenar los campos que se consideran booleanos 
     
     
@@ -431,6 +432,7 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
        $calse=new \ReflectionClass(static::class); //LA CLASE HIJA ACTUAL NO LA PADRE 
        $metods=$calse->getMethods();
        //print_r($metods);die();
+       //yii::error($metods);
        UNSET($calse);
        foreach($metods as $key=>$object){
            /*echo trim(static::class)."<br>";
@@ -506,7 +508,6 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
  * segun la relacion 
  */  
  public function obtenerForeignField($nombrecampo){
-    // echo $nombrecampo; die();
      $arreglo=$this->fillRelations();
      $nombrecampoforaneo=null;
      $claseforanea=$this->fieldsLink(false)[$nombrecampo];
@@ -1246,6 +1247,7 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
   
   private function modelsByRelations($parents=true){
      $arre=$this->fillRelations();
+    // yii::error($arre);
       $modelos=[];
       foreach($arre as $clases=>$valores){
           if($valores[1]){//si son hijos 
@@ -1379,39 +1381,30 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
            
         }
         
+        
+        
+        
     /*
    * Devuelve 
      * el valor denominacion del camo relacionado conl a tala combos 
    */
-        public static function comboValueField($attribute,$codcentro=null){
-            
-           return \common\models\masters\Combovalores::getValue(static::RawTableName().'.'.$attribute,$codcentro=null);
+        public  function comboValueField($attribute,$codcentro=null){
+            $valor=$this->{$attribute};
+           return \common\models\masters\Combovalores::getValue(static::RawTableName().'.'.$attribute,$valor,$codcentro);
            
         }
         
       /*Devuelve un array de campos coemnzando por los indices de
        * la tabla
        */
-        public function  getSafeFields($associative=false){
+        public function  getSafeFields(){
             //$safe= array_intersect($this->primaryKey();
             $safe=[];
-            if($associative===false){
-               foreach($this->attributes as $nombre=>$valor){
+            foreach($this->attributes as $nombre=>$valor){
                 if($this->isAttributeSafe($nombre)){
                    $safe[]=$nombre; 
-                      }
-                 } 
-                 
-            }else{
-                
-                foreach($this->attributes as $nombre=>$valor){
-                if($this->isAttributeSafe($nombre)){
-                   $safe[$nombre]=$valor; 
-                      }
-                 } 
-                
+                }
             }
-            
            
          return $safe;   
          
@@ -1508,7 +1501,22 @@ public function firstMessage($category=null){
          
    }
     
-  }   
+  }  
+  
+  
+  public static function listMailFromField($attribute,$condition=[1=>1]){
+      if(in_array($attribute,static::$mailFields)){
+         return array_column(static::find()->select($attribute)->
+            where($condition)->
+            // andWhere(['<>',$attribute,null])->
+              andWhere(['<>',$attribute,''])->asArray()->all(),$attribute);
+          
+      }else{
+         throw new ServerErrorHttpException(Yii::t('base.errors', 'El campo {campo} no pertenece a la lista de campos mail ',['campo'=>$attribute]));  
+      }
+  }
+  
+  
     
 }   
 

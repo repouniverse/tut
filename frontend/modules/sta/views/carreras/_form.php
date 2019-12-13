@@ -34,7 +34,7 @@ use frontend\modules\sta\helpers\comboHelper;
  <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">   
    <?= $form->field($model, 'codfac')->
             dropDownList(comboHelper::getCboFacultades(),
-                    ['prompt'=>'--'.yii::t('base.verbs','Choose a Value')."--",
+                    ['prompt'=>'--'.yii::t('base.verbs','Seleccione un Valor')."--",
                      //'class'=>'probandoSelect2',
                         ]
                     ) ?>

@@ -400,6 +400,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
     public function evento(){
         $formatDB=h::gsetting(self::_FORMATBD, self::_FDATETIME); // = "Y-m-d H:i:s"
         return [
+            'id'=>$this->id,
             'title'=>$this->tallerdet->codalu,
             'start'=>$this->swichtDate('fechaprog', false),
             'end'=>date($formatDB, strtotime($this->swichtDate('fechaprog', false))+60*$this->duracion),
@@ -499,4 +500,10 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
             yii::t('sta.labels','Ultima cita')=>$this->lastCitaByStudent(),
         ];
     }
+    
+    public function providerByAlumno(){
+        
+    }
+    
+    
 }

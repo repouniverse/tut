@@ -12,7 +12,7 @@ use frontend\modules\sigi\models\SigiApoderadosSearch;
          
 <?php
  $url= Url::to(['agrega-apoderado','id'=>$model->id,'gridName'=>'grilla-apoderados','idModal'=>'buscarvalor']);
-   echo  Html::button(yii::t('base.verbs','Insertar Apoderado'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Apoderado'),'id'=>'btn_apoderado', 'class' => 'botonAbre btn btn-success']); 
+   echo  Html::button(yii::t('base.verbs','Insertar '), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Apoderado'),'id'=>'btn_apoderado', 'class' => 'botonAbre btn btn-success']); 
 ?> 
          
     <?php Pjax::begin(['id'=>'grilla-apoderados']); ?>

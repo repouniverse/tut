@@ -76,7 +76,7 @@ use common\widgets\cbodepwidget\cboDepWidget as ComboDep;
        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">   
    <?= $form->field($model, 'escenario')->
             dropDownList(($model->isNewRecord)?[]:[$model->escenario=>$model->escenario],
-                    ['prompt'=>'--'.yii::t('base.verbs','Choose a Value')."--",
+                    ['prompt'=>'--'.yii::t('base.verbs','Seleccione un Valor')."--",
                      'disabled'=>(($model->cargamasiva_id)>0)?'disabled':false,
                        ]
                     ) ?>

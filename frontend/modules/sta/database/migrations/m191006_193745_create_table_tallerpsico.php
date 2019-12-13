@@ -6,7 +6,7 @@ use console\migrations\baseMigration;
 
 class m191006_193745_create_table_tallerpsico extends baseMigration
 {
-   
+    const NAME_TABLE_FACULTAD='{{%sta_facultades}}';
      const NAME_TABLE='{{%sta_tallerpsico}}';
      const NAME_TABLE_TALLERES='{{%sta_talleres}}';
      const NAME_TABLE_TRABAJADORES='{{%trabajadores}}';
@@ -25,6 +25,7 @@ if(!$this->existsTable($table)) {
         'fingreso'=>$this->char(10)->append($this->collateColumn()),
         'detalles'=>$this->text()->append($this->collateColumn()),
         */
+         'codfac'=>$this->string(8)->notNull()->append($this->collateColumn()),
           'nalumnos'=>$this->integer(3),
          'fregistro'=>$this->char(10)->notNull()->append($this->collateColumn()),
         'codtra'=>$this->string(6)->notNull()->append($this->collateColumn()),
@@ -40,7 +41,9 @@ if(!$this->existsTable($table)) {
               'codtra', static::NAME_TABLE_TRABAJADORES,'codigotra');
                 /*  $this->addForeignKey($this->generateNameFk($table), $table,
               'codcar', static::NAME_TABLE_CARRERAS,'codcar');*/
-            
+      $this->addForeignKey($this->generateNameFk($table), $table,
+              'codfac', static::NAME_TABLE_FACULTAD,'codfac');
+                   
             } 
  }
 

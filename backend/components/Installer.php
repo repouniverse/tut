@@ -554,8 +554,8 @@ public static function createSettings(){
      h::settings()->set('bigitems','WithPlaces', '0');
      
      ///formatos de tiempo
-      h::settings()->set('timeUser','date', 'dd/MM/yyyy');
-      h::settings()->set('timeUser','datetime', 'dd/MM/yyyy hh:ii:ss');
+      h::settings()->set('timeUser','date', 'dd/mm/yyyy');
+      h::settings()->set('timeUser','datetime', 'dd/mm/yyyy hh:ii:ss');
       h::settings()->set('timeUser','time', 'hh:ii:ss');
       h::settings()->set('timeUser','hour', 'hh:ii');
       h::settings()->set('timeBD','date', 'Y-m-d');

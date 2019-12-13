@@ -470,5 +470,15 @@ public function actionAgregaConceptoTree($id){
         } 
 }
 
+public function actionPropietarios(){
+    //$model= \frontend\modules\import\models\ImportCargamasivadet::findOne(72);
+    //var_dump($model->esclave);die();
+    $searchModel = new \frontend\modules\sigi\models\SigiPropietariosSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
+        return $this->render('propietarios', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+}
 }

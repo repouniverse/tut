@@ -130,12 +130,11 @@ class staModule extends \yii\base\Module
     
    
    public function getCurrentPeriod(){
-    //if(is_null($this->_currentPeriod)){
-      $modelo=Periodos::findOne(['activa'=>'1']);
+    $modelo=Periodos::findOne(['activa'=>'1']);
      if(is_null($modelo))
           throw new ServerErrorHttpException(Yii::t('sta.errors', 'No se encontró ningun periodo Activo, debe activar un Periodo'));
-         return $modelo->codperiodo;  
-    
+         return $modelo->codperiodo; 
+
      
    }
    /*
@@ -153,6 +152,8 @@ class staModule extends \yii\base\Module
       
   }
 
-      
+ public static function docCodes(){
+     return ['104','105','106'];
+ } 
   
 }

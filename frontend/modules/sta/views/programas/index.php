@@ -19,7 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php //echo $this->render('_searchriesgo', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a(Yii::t('sta.labels', 'Create Talleres'), ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a(Yii::t('sta.labels', 'Crear Programa'), ['create'], ['class' => 'btn btn-success']) ?>
     </p>
     <div style='overflow:auto;'>
     <?= GridView::widget([
@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
          
          [
                 'class' => 'yii\grid\ActionColumn',
-               'template' => '{update}{delete}{view}',
+               'template' => '{update}',
                 'buttons' => [
                     'update' => function($url, $model) {                        
                         $options = [
@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'data-pjax'=>0,
                             
                         ];
-                        return Html::a('<span class="btn btn-info btn-sm glyphicon glyphicon-pencil"></span>', $url, $options/*$options*/);
+                        return Html::a('<span class="btn btn-success btn-sm glyphicon glyphicon-pencil"></span>', $url, $options/*$options*/);
                          },
                           'view' => function($url, $model) {                        
                         $options = [

@@ -22,9 +22,9 @@ class SigiBasePresupuesto extends \common\models\base\modelBase
     public function rules()
     {
         return [
-            [['edificio_id','anual'], 'required'],
+            [['edificio_id','ejercicio','mensual','cargosedificio_id','cargosgrupoedificio_id'], 'required'],
             [['edificio_id'], 'integer'],
-            [['cargosedificio_id','detalles'], 'safe'],
+            [['cargosedificio_id','detalles','activo'], 'safe'],
             [['mensual', 'anual', 'acumulado'], 'number'],
             [['codgrupo', 'ejercicio'], 'string', 'max' => 4],
             [['codigo'], 'string', 'max' => 10],
@@ -111,6 +111,15 @@ class SigiBasePresupuesto extends \common\models\base\modelBase
     {
         return $this->hasOne(SigiCargos::className(), ['id' => 'cargo_id']);
     }
+    
+    public function getCargosGrupoEdificioFirme()
+    {
+        return $this->hasOne(SigiCargosgrupoedificio::className(), [
+           'id'=> 'cargosgrupoedificio_id',
+            
+            ]);
+    }
+    
     
    /*Dsolo para cumplir con la importacion*/ 
     public function getCargosGrupoEdificio()

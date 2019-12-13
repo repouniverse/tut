@@ -41,6 +41,7 @@ class Mailer extends Correo
     const MAIL_USER_SERVER_DEFAULT='25';
     public function init(){
        // yii::$app->settings->set('section', 'key', 1258.5);
+        yii::error(static::arrayConfig());
         $this->_transport=static::arrayConfig();
         
         return parent::init();
@@ -227,7 +228,7 @@ class Mailer extends Correo
                'port' =>h::getIfNotPutSetting(
                        'mail','portservermail',
                        Yii::$app->params['portservermail']),
-                  'encryption' => 'tls',
+                  'encryption' => 'ssl',
               /*Esta line ase agergo apra que funcione en localhost */
                   'streamOptions'=>['ssl' =>['allow_self_signed' => true,'verify_peer_name' => false, 'verify_peer' => false]],
         ];

@@ -20,15 +20,19 @@ class M230929152929AlterTableMenu extends baseMigration
          */
         $table=static::NAME_TABLE;
         //var_dump($table);die();
-        if(!$this->existsColumn($table,'icon')){         
+      if($this->existsTable($table)) {
+          if(!$this->existsColumn($table,'icon')){         
             $this->addColumn($table,
                  'icon', 
                  $this->string(35)->append($this->collateColumn())
                  );
         }
-       (new \yii\db\Query)
+        (new \yii\db\Query)
     ->createCommand()->update($table, ['icon' => 'circle'],'id >0')->execute();
+   
+      }
         
+            
     }
 
     /**

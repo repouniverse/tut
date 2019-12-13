@@ -383,8 +383,8 @@ class Controller extends Component implements ViewContextInterface
      */
     public function render($view, $params = [])
     {
-        $content = $this->getView()->render($view, $params, $this);
-        return $this->renderContent($content);
+        $content = $this->getView()->render($view, $params, $this); 
+       return $this->renderContent($content);
     }
 
     /**
@@ -396,11 +396,11 @@ class Controller extends Component implements ViewContextInterface
      */
     public function renderContent($content)
     {
-        $layoutFile = $this->findLayoutFile($this->getView());
+       $layoutFile = $this->findLayoutFile($this->getView());
         if ($layoutFile !== false) {
-            return $this->getView()->renderFile($layoutFile, ['content' => $content], $this);
+              return $this->getView()->renderFile($layoutFile, ['content' => $content], $this);
         }
-
+   
         return $content;
     }
 

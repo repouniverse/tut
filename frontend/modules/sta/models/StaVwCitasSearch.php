@@ -103,4 +103,27 @@ class StaVwCitasSearch extends StaVwCitas
     {
         return $this->hasOne(Trabajadores::className(), ['codigotra' => 'codtra']);
     }
+    
+     public function searchByAlumnoByPeriodo($codalu,$codperiodo)
+    {
+        $query = StaVwCitas::find();
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+
+         $query->Where(['codalu'=> $codalu])
+                 ->andWhere(['codperiodo'=>$codperiodo]);
+        return $dataProvider;
+    }
+    public function searchByTallerId($tallerId)
+    {
+        $query = StaVwCitas::find();
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+
+         $query->Where(['talleresdet_id'=> $tallerId]);
+        return $dataProvider;
+    }
+    
 }

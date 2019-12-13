@@ -75,7 +75,7 @@ use frontend\modules\sigi\helpers\comboHelper;
  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
      <?= $form->field($model, 'numero')->textInput(['maxlength' => true]) ?>
   </DIV>
-      <?= $form->field($model, 'edificio_id')->hiddenInput(['value'=>$id]) ?>    
+        
         
    <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12">    
  <?= $form->field($model, 'parent_id')->
@@ -91,23 +91,11 @@ use frontend\modules\sigi\helpers\comboHelper;
      <?= $form->field($model, 'area')->textInput(['maxlength' => true]) ?>
 
  </div>
-  <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
-    <?php  //h::settings()->invalidateCache();  ?>
-                       <?= $form->field($model, 'estreno')->widget(DatePicker::class, [
-                             'language' => h::app()->language,
-                           // 'readonly'=>true,
-                          // 'inline'=>true,
-                           'pluginOptions'=>[
-                                     'format' => h::gsetting('timeUser', 'date')  , 
-                                  'changeMonth'=>true,
-                                  'changeYear'=>true,
-                                 'yearRange'=>"-99:+0",
-                               ],
-                           
-                            //'dateFormat' => h::getFormatShowDate(),
-                            'options'=>['class'=>'form-control']
-                            ]) ?>
-</div>
+  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+     <?= $form->field($model, 'imputable')->checkbox([]) ?>
+
+ </div>
+  
   
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
      <?= $form->field($model, 'detalles')->textarea(['rows' => 6]) ?>

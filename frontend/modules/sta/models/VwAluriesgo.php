@@ -3,7 +3,7 @@
 namespace frontend\modules\sta\models;
 use frontend\modules\sta\models\Alumnos;
 use Yii;
-
+use kartik\export\ExportMenu;
 /**
  * This is the model class for table "{{%vw_aluriesgo}}".
  *
@@ -27,6 +27,9 @@ use Yii;
  */
 class VwAluriesgo extends \common\models\base\modelBase
 {
+    
+    
+  
     /**
      * {@inheritdoc}
      */
@@ -64,17 +67,17 @@ class VwAluriesgo extends \common\models\base\modelBase
             'ap' => Yii::t('sta.labels', 'Ap'),
             'am' => Yii::t('sta.labels', 'Am'),
             'nombres' => Yii::t('sta.labels', 'Nombres'),
-            'codfac' => Yii::t('sta.labels', 'Codfac'),
+            'codfac' => Yii::t('sta.labels', 'Fac.'),
             'dni' => Yii::t('sta.labels', 'Dni'),
             'celulares' => Yii::t('sta.labels', 'Celulares'),
             'fijos' => Yii::t('sta.labels', 'Fijos'),
             'id' => Yii::t('sta.labels', 'ID'),
-            'codcur' => Yii::t('sta.labels', 'Codcur'),
-            'codalu' => Yii::t('sta.labels', 'Codalu'),
-            'nveces' => Yii::t('sta.labels', 'Nveces'),
-            'codperiodo' => Yii::t('sta.labels', 'Codperiodo'),
-            'codcar' => Yii::t('sta.labels', 'Codcar'),
-            'nomcur' => Yii::t('sta.labels', 'Nomcur'),
+            'codcur' => Yii::t('sta.labels', 'Curso'),
+            'codalu' => Yii::t('sta.labels', 'Código'),
+            'nveces' => Yii::t('sta.labels', 'Repet'),
+            'codperiodo' => Yii::t('sta.labels', 'Periodo'),
+            'codcar' => Yii::t('sta.labels', 'Espec'),
+            'nomcur' => Yii::t('sta.labels', 'Curso'),
             
         ];
     }

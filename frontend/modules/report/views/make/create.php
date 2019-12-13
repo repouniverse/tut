@@ -4,7 +4,7 @@ use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model frontend\modules\report\models\Reporte */
-
+//echo "hol"; die();
 $this->title = Yii::t('report.messages', 'Create Reporte');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('report.messages', 'Reportes'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;

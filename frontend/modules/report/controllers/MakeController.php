@@ -117,6 +117,7 @@ class MakeController extends baseController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+       //var_dump($model->methodsReport());die();
        
         
 //var_dump($model->existsChildField('deslarga'));die();
@@ -212,6 +213,23 @@ class MakeController extends baseController
                           // echo "ya  existe np pasa nad  ".$nameField."<br>"; 
                         }
 		}
+              
+              IF(property_exists($modeloareportar,'extraMethodsToReport')){
+                  foreach($modeloareportar->extraMethodsToReport as $metodo){
+                      if(!$modeloreporte->existsChildField($metodo)){
+                          Reportedetalle::firstOrCreateStatic(
+                 Reportedetalle::prepareValues(
+                                   $id,
+                                   $modeloreporte->codocu, 
+                                    $metodo,
+                                    $metodo, 
+                                    40, 
+                                    'varchar(40)'
+                         ));
+                      }
+                     
+                  }
+              }
                 //print_r(array_keys($columnas));die();
         /* foreach( array_diff(
                array_keys(get_object_vars ($modeloareportar)),
@@ -227,6 +245,9 @@ class MakeController extends baseController
                $contador+=1;
            }
        }*/
+        
+                
+                
         if($contador > 0 ){
                 yii::$app->session->setFlash('success',yii::t('report.messages','Se agregaron '.$contador.' registros hijos '));
 		}else {
@@ -262,15 +283,14 @@ class MakeController extends baseController
   
   public function actionCreareporte($id, $idfiltro,$campofiltro=null){
      // echo $this->putLogo($id, $idfiltro);die();
-       //$model=$this->findModel($id); 
+       $model=$this->findModel($id); 
        $this->layout='blank';
-      // return $this->render('reporte_1');
-     // var_dump($id, $idfiltro);die();
-      $model=$this->findModel($id);      
+      
+      //$model=$this->findModel($id);      
       $logo=($model->tienelogo)?$this->putLogo($id, $idfiltro):'';      
          $header=$model->putHeaderReport($id, $idfiltro); 
-         
-          $cabecera=$model->putCabecera($id,$idfiltro,$campofiltro=null);
+        // var_dump($idfiltro,$campofiltro);die();
+          $cabecera=$model->putCabecera($id,$idfiltro,$model->campofiltro);
          
       /*$pdf->methods=[ 
            'SetHeader'=>[($model->tienecabecera)?$header:''], 
@@ -287,19 +307,20 @@ class MakeController extends baseController
      // var_dump($dataProvider);die();
       $pageContents=[]; //aray con las paginas cotneido un elemento potr pagina
       for($i = 1; $i <= $npaginas; $i++){
+         // yii::error('pagina :'.$npaginas);
           $dataProvider->pagination->page = $i-1; //Set page 1
           $dataProvider->refresh(); //Refresh models
-          
-         $pageContents[]=$contenidoSinGrilla.$this->render('reporte',[
-             'modelo'=>$model,
-             
+    
+         $pageContents[]=trim($this->render('reporte',[
+             'modelo'=>$model,             
              'dataProvider'=>$dataProvider,
              'contenidoSinGrilla'=>$contenidoSinGrilla,
              'columnas'=>$model->makeColumns(),             
-                 ]).$this->pageBreak();
-         
+                 ]).$this->pageBreak());
+        
          
               }
+      //echo $pageContents[0];die();
       return $this->prepareFormat($pageContents, $model);
      
      }
@@ -366,7 +387,8 @@ $mpdf = new \Mpdf\Mpdf([
         ];*/
            $mpdf->simpleTables = true;
                  $mpdf->packTableData = true;
-           
+           $mpdf->showImageErrors = true;
+           $mpdf->curlAllowUnsafeSslRequests = true;
           $paginas=count($contenido);
           //echo $contenido[0];die();
          foreach($contenido as $index=>$pagina){
@@ -476,5 +498,21 @@ jQuery("#detallerepoGrid").yiiGridView({"filterUrl":"\/frontend\/web\/report\/ma
     return $mpdf->Output();   
   }      
         
-        
+    public function actionPruebaPdf(){
+      $mpdf=new \Mpdf\Mpdf();
+     // $mpdf->AddPage();
+      $mpdf->SetXY(10,300);
+   
+     // $mpdf->WriteCell( 10,30, 'member_code');
+      //$mpdf->writeCell(200,200,'<span style="color:red;">HOLA AMIGUITO</span>');
+      //$mpdf->text_input_as_HTML = true; //(default = false)
+     /* $mpdf->writeText(10,25,'texto 1');
+      $mpdf->writeText(20,35,'texto 4');
+      $mpdf->writeText(10,45,'texto 5');
+      $mpdf->writeText(10,55,'texto 6');*/
+      $mpdf->SetXY(100,20);
+      $mpdf->writeCell(50,15,'HOLA');
+     
+      return $mpdf->Output();   
+  }         
 }

@@ -4,10 +4,14 @@ namespace frontend\modules\sta\controllers;
 
 use Yii;
 use frontend\modules\sta\models\Talleres;
+use frontend\modules\sta\staModule;
 use frontend\modules\sta\models\Tallerpsico;
 use frontend\modules\sta\models\RangosSearch;
 use frontend\modules\sta\models\TalleresSearch;
 use frontend\modules\sta\models\VwAlutaller;
+use frontend\modules\sta\models\StaVwCitasSearch;
+use frontend\modules\sta\models\VwStaTutores;
+use frontend\modules\sta\models\Alumnos;
 use frontend\modules\sta\models\VwAlutallerSearch;
 use frontend\modules\sta\models\VwAluriesgoSearch;
 use frontend\modules\sta\models\TallerpsicoSearch;
@@ -139,15 +143,10 @@ on a.talleresdet_id=b.id)  left join
      */
     public function actionUpdate($id)
     {
-        
-        
         $model = $this->findModel($id);
         
-        
-  
-        
-        
-      
+        //$range=$model->range('12/12/2019');
+        //var_dump($range->getInitialDate(),$range->getFinalDate());die();
         //yii::error('eNCONTOR MODELO');
 //print_r($model->studentsInRiskForThis()); die();
          $searchStaff = new TallerpsicoSearch();
@@ -157,8 +156,8 @@ on a.talleresdet_id=b.id)  left join
         $dataProviderRangos = $searchRangos->SearchByTaller($id);
 
          $searchAlumnos = new VwAlutallerSearch();
-        $dataProviderAlumnos = $searchAlumnos->searchByFacultad(
-                h::request()->queryParams,$model->codfac);
+        $dataProviderAlumnos = $searchAlumnos->searchByTaller(
+                h::request()->queryParams,$model->id);
 //yii::error('que pasa');
         
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -251,6 +250,7 @@ on a.talleresdet_id=b.id)  left join
          yii::error('estudiantes libres en '.$cantidadLibres,__METHOD__);
        $model=New Tallerpsico();
        $model->talleres_id=$id;
+       $model->codfac=$modelprograma->codfac;
        
        $datos=[];
         if(h::request()->isPost){
@@ -338,7 +338,46 @@ on a.talleresdet_id=b.id)  left join
       */
     }
     
+       public function actionEditaPsico($id){        
+         $this->layout = "install";
+        $model = Tallerpsico::findOne($id);
+        $varios=$modelprograma->freeStudents();
+        $cantidadLibres=count($varios);unset($varios);
+        
+               $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                $model->save();                
+                  return ['success'=>1,'id'=>$model->talleres_id];
+            }
+        }else{
+           return $this->renderAjax('_psico', [
+                        'model' => $model,
+                        'id' => $id,
+                        'cantidadLibres'=>$cantidadLibres,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                        'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        
+        }
+        
+        
+        /* yii::error('estudiantes libres en '.$cantidadLibres,__METHOD__);
+       $model=New Tallerpsico();
+       $model->talleres_id=$id;
+       $model->codfac=$modelprograma->codfac;*/
+       
     
+    
+    }
+     
    public function actionEditTutor(){
        if ($this->is_editable())
             return $this->editField();
@@ -498,9 +537,11 @@ public function actionMakeCitaByStudent(){
         if($validator->validate($codalu, $error) && !is_null($model)) {
             $attributes=[
                 'talleres_id'=>$model->talleres_id,
-                'talleresdet_id'=>$model->getTalleresdet($codalu)->id,
+                'talleresdet_id'=>$model->modelTalleresdet($codalu)->id,
                 'fechaprog'=>$model::SwichtFormatDate($fecha,$model::_FDATETIME,true),
                 'codtra'=>$model->codtra,
+                 'codfac'=>$model->codfac,
+                
             ];
            // var_dump($fecha,$model::_FDATETIME,$model::SwichtFormatDate($fecha,$model::_FDATETIME,true));die();
            
@@ -522,5 +563,207 @@ public function actionMakeCitaByStudent(){
     }
 }
 
+public function actionTrataAlumno($id){   
+    //ENOCNTRADNO EL TALLER DET
+    $modelTallerdet = \frontend\modules\sta\models\Talleresdet::findOne($id);
+    //print_r($modelTallerdet->listMailFromField($attribute, $condition));
+    //ENCONTRANDO TALLER_PSICO
+    $modelPsico=$modelTallerdet->tallerPsico();
+     //ENCONTRANDO EL ALUMNO    
+    $model=Alumnos::findOne(['codalu'=>$modelTallerdet->codalu]);
+    
+    //ECHO $modelTallerdet->talleres->descripcion; die();
+    /*Provider de Citas por alumno*/
+    $dataProvider=(new StaVwCitasSearch())->searchByTallerId($modelTallerdet->id);
+    /*****************/
+    $color='#d351e2';
+    /*Provider de citas pendientes*/    
+    $citasPendientes=$modelPsico->
+            putColorThisCodalu(
+                    $modelPsico->eventosPendientes(),$model->codalu,$color);
+    
+    
+    
+    /************************/
+    //print_r($citasPendientes);die();
+    
+    
+       return $this->render('_tabsCitas',
+               [
+                   'model'=>$model, 
+                   'modelPsico'=>$modelPsico,
+                   'color'=>$color,
+                   'modelTallerdet'=>$modelTallerdet,
+                'dataProvider'=>$dataProvider,
+                   'codalu'=>$modelTallerdet->codalu,
+                   'citasPendientes'=>$citasPendientes,
+                'codperiodo'=>$modelTallerdet->talleres->codperiodo,
+                   ]);
+    
+}
+
+
+public function actionNotificaCita(){
+    if(h::request()->isAjax){
+        $mensajes=[];
+         h::response()->format = \yii\web\Response::FORMAT_JSON;
+        $alumno= Alumnos::findOne(h::request()->get('idalu'));
+        $nombre=$alumno->nombres;
+       if(empty($alumno->correo)){
+           return ['error'=>yii::t('sta.labels','Error : El alumno no tiene dirección de correo')];
+       
+           
+       }
+           
+        $cita=Citas::findOne(h::request()->get('idcita'));
+        
+        
+        $mailer = new \common\components\Mailer();
+        $message =new  \yii\swiftmailer\Message();
+            $message->setSubject('Notificacion de Cita')
+            ->setFrom(['neotegnia@gmail.com'=>'Tutoría UNI'])
+            ->setTo($alumno->correo)
+            ->SetHtmlBody("Buenas Tardes  $nombre <br>"
+                    . "La presente es para notificarle que tienes "
+                    . "una cita programada<br>Cuando: $cita->fechaprog <br>"
+                    . "Duracion de la cita: $cita->duracion <br>  ");
+           
+    try {
+        
+           $result = $mailer->send($message);
+           $mensajes['success']='Se envió el correo';
+    } catch (\Swift_TransportException $Ste) {      
+         $mensajes['error']=$Ste->getMessage();
+    }
+    return $mensajes;
+    }
+}
+        
+public function actionAgregaDocs(){
+    if(h::request()->isAjax){
+       $tallerdet= \frontend\modules\sta\models\Talleresdet::findOne(h::request()->get('id')); 
+      if(!is_null($tallerdet)){
+          $tallerdet->generaDocumentos();
+          unset($tallerdet);
+      }
+       
+    }
+}
+
+public function actionProgramaVista($id){
+    if ($this->is_editable())
+            return $this->editField();
+    
+        $model = $this->findModel($id);
+         $searchAlumnos = new VwAlutallerSearch();
+        $dataProviderAlumnos = $searchAlumnos->searchByTaller(
+                h::request()->queryParams,$model->id);
+        return $this->render('/programas/visualizacion/view', [
+            'model' => $model,
+           //'dataProviderStaff'=>$dataProviderStaff,
+             //'dataProviderRangos'=> $dataProviderRangos,
+           // 'searchStaff' =>$searchStaff,
+            'dataProviderAlumnos'=>$dataProviderAlumnos,
+            'searchAlumnos' => $searchAlumnos,
+        ]); 
+}
+
+public function actionCalificaAlumno($id){
+        
+        $this->layout = "install";
+        $model = \frontend\modules\sta\models\Talleresdet::findOne($id);
+       // var_dump($modeltallerdet);die();
+        $model->setScenario($model::SCENARIO_TUTOR);        
+       $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                $model->save();
+                //$model->assignStudentsByRandom();
+                  return ['success'=>1,'id'=>$model->talleres_id];
+            }
+        }else{
+           return $this->renderAjax('/programas/visualizacion/_modal_califica_tutor', [
+                        'model' => $model,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                        //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+}
+
+
+public function actionConvocaAlumno($id){
+        
+        $this->layout = "install";
+        $model =NEW  \frontend\modules\sta\models\StaConvocatoria;
+         $modelDet = \frontend\modules\sta\models\Talleresdet::findOne($id);
+         $model->codfac=$modelDet->talleres->codfac;
+          $model->talleresdet_id=$modelDet->id;
+       // var_dump($modeltallerdet);die();
+        //$model->setScenario($model::SCENARIO_TUTOR);        
+       $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+            // var_dump(h::request()->post(), $model->attributes);die();
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+               yii::error('grabando');
+                $model->save();
+                //$model->assignStudentsByRandom();
+                  return ['success'=>1,'id'=>$model->id];
+            }
+        }else{
+           return $this->renderAjax('_modal_convocatoria', [
+                        'model' => $model,
+               'modeldet'=>$modelDet,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                        //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+}
+
+
+public function actionEditaDocu($id){        
+         $this->layout = "install";
+         $model= \frontend\modules\sta\models\StaDocuAlu::findOne($id);
+         
+        $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                $model->save();
+                //$model->assignStudentsByRandom();
+                  return ['success'=>1,'id'=>$model->id];
+            }
+        }else{
+           return $this->renderAjax('_modal_docu_alu', [
+                        'model' => $model,
+                         'modeldet' => $model->talleresdet,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                       // 'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+
+    }
 
 }

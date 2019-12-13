@@ -28,8 +28,8 @@ use common\widgets\cbodepwidget\cboDepWidget as ComboDep;
         <?= Html::submitButton('<span class="fa fa-save"></span>    '.Yii::t('import.labels', 'Grabar'), ['class' => 'btn btn-success']) ?>
            
             <?php 
-               
-                $url=Url::to(['example-csv','id'=>$model->id]);
+               if(!$model->isNewRecord){
+                  $url=Url::to(['example-csv','id'=>$model->id]);
                 echo Html::a(
                         '<span class="fa fa-download"></span>    '.yii::t('import.labels','Descargar plantilla'),
                         $url,
@@ -38,7 +38,9 @@ use common\widgets\cbodepwidget\cboDepWidget as ComboDep;
                             'class' => 'btn btn-success',
                             
                             ]
-                        );
+                        );  
+               }
+               
                 ?> 
             
             
@@ -95,7 +97,7 @@ use common\widgets\cbodepwidget\cboDepWidget as ComboDep;
  <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">   
    <?= $form->field($model, 'escenario')->
             dropDownList(($model->isNewRecord)?[]:[$model->escenario=>$model->escenario],
-                    ['prompt'=>'--'.yii::t('base.verbs','Choose a Value')."--",
+                    ['prompt'=>'--'.yii::t('base.verbs','--Seleccione un valor')."--",
                      'disabled'=>(!$model->isNewRecord)?true:false
                        ]
                     ) ?>

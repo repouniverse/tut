@@ -38,33 +38,62 @@ class baseController extends Controller
         $className=$this->getNamespace($this->findKeyArrayInPost());
          //var_dump($this->findKeyArrayInPost(),$className);die();
        // var_dump(static::EDIT_EDITABLE_KEY);die();
-      $model=$className::findOne( h::request()->post(static::EDIT_EDITABLE_KEY));
-        var_dump(static::EDIT_EDITABLE_KEY);die();
+       //$model= new $className();
+      // var_dump($className);die();
+       if(method_exists($className,'claseBase')){
+          $className=$className::claseBase(); 
+          $model=$className::findOne(h::request()-> post('id'));
+          /*$model=$className::findOne(h::request()-> post($this->findKeyArrayInPost())[h::request()->
+                post( static::EDIT_EDITABLE_INDEX  )][h::request()->post(static::EDIT_EDITABLE_ATTRIBUTE)] );
+      var_dump(h::request()-> post($this->findKeyArrayInPost())[h::request()->
+                post( static::EDIT_EDITABLE_INDEX  )][h::request()->post(static::EDIT_EDITABLE_ATTRIBUTE)]);
+          die();*/
+      
+       }ELSE{
+         $model=$className::findOne( h::request()->post(static::EDIT_EDITABLE_KEY));  
+       }
+      
+      //$model=$className::findOne( h::request()->post(static::EDIT_EDITABLE_KEY));
+       
+var_dump(h::request()-> post());die();
+
+
+//var_dump(static::EDIT_EDITABLE_KEY);die();
       // use Yii's response format to encode output as JSON
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        /*var_dump(h::request()->post(static::EDIT_EDITABLE_ATTRIBUTE),
+                
+                h::request()-> post($this->findKeyArrayInPost())[h::request()->
+                post( static::EDIT_EDITABLE_INDEX  )][h::request()->post(static::EDIT_EDITABLE_ATTRIBUTE)]);
+        die();*/
+        //var_dump(h::request()->post(static::EDIT_EDITABLE_KEY),$model);die();
         $model->{h::request()->post(static::EDIT_EDITABLE_ATTRIBUTE)}=h::request()->
                 post($this->findKeyArrayInPost())[h::request()->
                 post( static::EDIT_EDITABLE_INDEX  )][h::request()->post(static::EDIT_EDITABLE_ATTRIBUTE)];
-     
-         if ($model->load($_POST)) {        
+     //print_r($_POST);die();
+        // if ($model->load($_POST)) { 
+             print_r($model->attributes);
         if ($model->save()) {
+            
              return  \yii\helpers\Json::encode(['output'=>'OK', 'message'=>'SE EDITO SIN PROBLEMAS']);
              }
        else {
+           var_dump($model->getFisrtError());
            RETURN  ['output'=>'Error', 'message'=>$model->getFirstError()];
-        }}else {
-             return ['output'=>'', 'message'=>''];
-        }
+       // }}else {
+            // return ['output'=>'', 'message'=>''];
+        //}
    
-  }
-     
+            }
+ }
   /*
    * Verifica que el controlador esta recibiendo 
    * un POST AJAX de un widget edit-xxxx
    */
  public function is_editable(){
-     return (!(h::request()->post(static::EDIT_HAS_EDITABLE,
-            static::EDIT_EDITABLE_ATTRIBUTE)
+     return (!(
+    h::request()->post(static::EDIT_HAS_EDITABLE,static::EDIT_EDITABLE_ATTRIBUTE
+            )
             ===static::EDIT_EDITABLE_ATTRIBUTE)); 
  }
   
@@ -172,9 +201,12 @@ private static function findKeyArrayInPost(){
 	//$modelClass=unserialize(h::request()->get(static::NOMBRE_CLASE_PARAMETER));
        // $id=h::request()->get(static::ID_CLASE_PARAMETER);
         $model=$modelClass::findOne($id);
+        //var_dump($modelClass,$model);die();
         if($model instanceof modeloBase){           
                 if($model->hasChilds()){
                     $datos['error']=yii::t('base.errors','El registro tiene otros registros hijos ');  
+                }elseif($model->hasAttachments()){
+                     $datos['error']=yii::t('base.errors','El registro tiene archivos adjuntos y no puede ser borrado, elimine primero los archivos adjuntos ');  
                 }else{
                       try{ 
                              if($model->delete()<> false){

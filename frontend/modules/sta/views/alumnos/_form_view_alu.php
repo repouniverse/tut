@@ -10,7 +10,16 @@ use common\helpers\h;
 ?>
 
 <div class="alumnos-form">
-    <br>
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="btn-group">
+            <?php  foreach($model->periodsInRisk() as $period){   ?>
+            <a href="<?=\yii\helpers\Url::toRoute(['/sta/alumnos/ver-detalles','id'=>$model->id, 'codperiodo'=>$period])?>" data-pjax="0" target="_blank" class="btn btn-warning btn-lg ">
+            <i class="glyphicon glyphicon-calendar" aria-hidden="true"></i> <?=$period?>
+            </a>
+            <?php  }   ?>
+        </div>
+        
+    </div>
     <?php $form = ActiveForm::begin(); ?>
       
       <div class="box-body">

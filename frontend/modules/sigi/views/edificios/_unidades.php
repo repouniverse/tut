@@ -1,13 +1,10 @@
 <?php
-
 use yii\helpers\Html;
 use yii\helpers\Url;
 use kartik\grid\GridView;
 use yii\widgets\Pjax;
 use frontend\modules\sigi\models\SigiUnidadesSearch;
-    
-    
-
+    use kartik\export\ExportMenu;
 $colorPluginOptions =  [
     'showPalette' => true,
     'showPaletteOnly' => true,
@@ -41,6 +38,7 @@ $gridColumns = [
                             //'data-confirm' => Yii::t('rbac-admin', 'Are you sure you want to activate this user?'),
                             //'data-method' => 'get',
                             'data-pjax' => '0',
+                             'target'=>'_blank'
                         ];
                         //return Html::button('<span class="glyphicon glyphicon-pencil"></span>', ['href' => $url, 'title' => 'Editar Adjunto', 'class' => ' btn btn-sm btn-success']);
                         return Html::a('<span class="btn btn-success glyphicon glyphicon-pencil"></span>',$url,$options);
@@ -78,6 +76,19 @@ $gridColumns = [
     },
    
 ],
+            [
+             'attribute'=>'parent_id',
+             'format'=>'raw',
+             'value'=>function($model){
+                   if($model->parent_id>0){
+                      return   '<i style="color:#08882f;font-size:14px">    '.$model->padre->numero.'     <span class="fa fa-child"></span></i>' ;
+                    
+                   }
+                    return '';
+             
+                       
+             }
+         ],
 [
     
     'attribute' => 'nombre',    
@@ -86,7 +97,19 @@ $gridColumns = [
 [    
     'attribute' => 'area',
 ],
-            'tipo.desunidad',
+         [    
+    'attribute' => 'tipo',
+             'value'=>'tipo.desunidad',
+             'group'=>true,
+          ],
+ [
+             'attribute'=>'participacion',
+             'format'=>'raw',
+             'value'=>function($model){
+                   return $model->participacion();
+             }
+         ],                
+                 
 [
     'class' => 'kartik\grid\CheckboxColumn',
     'headerOptions' => ['class' => 'kartik-sheet-style'],
@@ -94,14 +117,33 @@ $gridColumns = [
     'pageSummaryOptions' => ['colspan' => 3, 'data-colspan-dir' => 'rtl']
 ],
 ];
-
-
  $url= Url::to(['agrega-unidad','id'=>$model->id,'gridName'=>'grilla-unidades','idModal'=>'buscarvalor']);
    echo  Html::button(yii::t('base.verbs','Agregar Unidad'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Unidad'),'id'=>'btn_contacts', 'class' => 'botonAbre btn btn-success']); 
-Pjax::begin(['id'=>'grilla-unidades']);
+$dataProvider=(New SigiUnidadesSearch())->searchByEdificio($model->id);
+ echo ExportMenu::widget([
+    'dataProvider' => $dataProvider,
+     'filename'=>'unidades',
+     'exportConfig'=>[
+         ExportMenu::FORMAT_EXCEL=>[
+             'filename'=>'Exportacion'
+               ],
+         ExportMenu::FORMAT_EXCEL_X=>[
+             'filename'=>'Exportacion'
+               ]
+         ],
+    'columns' => $gridColumns,
+    'dropdownOptions' => [
+        'label' => yii::t('sta.labels','Exportar'),
+        'class' => 'btn btn-success'
+    ]
+]) ?>
+ 
+ <hr>
+   <?php
+   Pjax::begin(['id'=>'grilla-unidades']);
   echo GridView::widget([
     'id' => 'kv-grid-demo',
-    'dataProvider' => (New SigiUnidadesSearch())->searchByEdificio($model->id),
+    'dataProvider' => $dataProvider,
     //'filterModel' => $searchModel,
     'columns' => $gridColumns, // check the configuration for grid columns by clicking button above
     'containerOptions' => ['style' => 'overflow: auto'], // only set when $responsive = false

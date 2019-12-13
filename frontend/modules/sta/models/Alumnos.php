@@ -40,7 +40,7 @@ class Alumnos extends \common\models\base\modelBase implements PersonInterface ,
         'fecna'=>self::_FDATE,
        
         ];
-    
+    public static $mailFields=['correo'];
     /**
      * {@inheritdoc}
      */
@@ -255,4 +255,30 @@ class Alumnos extends \common\models\base\modelBase implements PersonInterface ,
        
    }
    
+   
+   public function tallerDet($codperiodo=null){
+       $codperiodo=(is_null($codperiodo))? 
+       staModule::getCurrentPeriod():$codperiodo;
+      // var_dump($codperiodo,$this->codfac);die();
+       try{
+         $taller=  Talleres::find()->where([
+           'codperiodo'=>$codperiodo,
+           'codfac'=>$this->codfac,
+           ])->one();
+     if($taller===NUll){
+         return null;
+     }
+   return Talleresdet::find()->where([
+              'codalu'=>$this->codalu, 
+       'talleres_id'=>$taller->id, 
+           ])->one();
+       } catch (Exception $ex) {
+            $this->addError('codalu','No se encontro ningun registro para {codalu} {codfac} {codperiodo}',['codperiodo'=>$codperiodo,'codalu'=>$codalu,'codfac'=>$codfac]);
+         return null;
+            
+       }
+       
+      
+       
+   }
 }
