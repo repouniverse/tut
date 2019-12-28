@@ -55,7 +55,7 @@ class SigiLecturas extends \common\models\base\modelBase
              //[['codepa'], 'exist', 'skipOnError' => true, 'targetClass' => Edificios::className(), 'targetAttribute' => ['codedificio' => 'codigo']],
      
             /*Fin de escebnario imortacion*/
-            [['mes'], 'string', 'max' => 2],
+            [['mes'], 'integer'],
             [['flectura'], 'string', 'max' => 10],
             [['hlectura'], 'string', 'max' => 5],
             [['suministro_id'], 'exist', 'skipOnError' => true, 'targetClass' => SigiSuministros::className(), 'targetAttribute' => ['suministro_id' => 'id']],
@@ -64,10 +64,8 @@ class SigiLecturas extends \common\models\base\modelBase
  public function scenarios()
     {
         $scenarios = parent::scenarios(); 
-        //$scenarios['import_basica'] = ['edificio_id','parent_id','codtipo','imputable','numero','area','codpro'];
-        $scenarios[self::SCENARIO_IMPORTACION] = ['codepa','codedificio','codtipo','mes','anio','lectura','flectura'];
-        //$scenarios[self::SCENARIO_COMPLETO] = ['edificio_id','parent_id','codtipo','imputable','numero','area','codpro','npiso','nombre','detalles','estreno'];
-        return $scenarios;
+        $scenarios[self::SCENARIO_IMPORTACION] = ['codepa','codedificio','codtipo','codum','codpro'];
+       return $scenarios;
     }
     
     /**
@@ -107,10 +105,13 @@ class SigiLecturas extends \common\models\base\modelBase
     }
     
     public function beforeSave($insert) {
-      if($insert)
-        $this->lecturaant=$this->lastReadNumeric(); 
-      if($this->hasChanged('lectura'))
-           $this->delta=$this->lectura-$this->lastReadNumeric();        
+      if($insert){
+          $this->resolveIds();
+        $this->lecturaant=$this->lastReadNumeric();   
+      }else{
+         if($this->hasChanged('lectura'))
+           $this->delta=$this->lectura-$this->lastReadNumeric();    
+      }  
         RETURN parent::beforeSave($insert);
     }
     
@@ -135,29 +136,43 @@ class SigiLecturas extends \common\models\base\modelBase
      
     private function resolveIds(){
         
-        $id_edificio= Edificios::find()->where(['codigo'=>$this->codedificio])->id;
-        
-        $id_unidad= SigiUnidades::find()->where([
-            'codigo'=>$this->codepa,
-        'edificio_id'=>$edificio->id,
-            ])->one();
+        $this->edificio_id= $this->edificio()->id;        
+        $this->unidad_id= $this->depa()->id;
+        $this->suministro_id=$this->medidor()->id;
         
     }
     public function valida_depa($attribute, $params)
     {
-        $edificio=Edificios::find()->where(['codigo'=>$this->codedificio]);
+        $edificio=$this->edificio();
       if(is_null($edificio)){
           $this->addError('codedificio',yii::t('sigi.labels','El codigo de edificio no existe'));
           return;
       }       
-   $depa= SigiUnidades::find()->where([
-       'codigo'=>$this->codedpa,
-        'edificio_id'=>$edificio->id,
-       ])->one();
+   $depa= $this->depa(); 
    if(is_null($depa)){
           $this->addError('codepa',yii::t('sigi.labels','El codigo de departamento para este edificio no existe'));
           return;
       } 
+  //VERIFICANDO QUE EL DEPA TENGA MDEIDOR DE ESTE TIPO
+     if(is_null($this->medidor())){
+        $this->addError('codepa',yii::t('sigi.labels','Este departamento no tiene ningun medidor del tipo {medidor}',['medidor'=> SigiSuministros::comboValueFieldStatic('tipo',SigiSuministros::COD_TYPE_SUMINISTRO_DEFAULT)]));
+          return;  
+     }
+     
+      
         
-    }       
+    }     
+    
+    private function edificio(){
+        return Edificios::find()->where(['codigo'=>$this->codedificio])->one();
+    }
+    private function depa(){
+       return  SigiUnidades::find()->where([
+            'numero'=>$this->codepa,
+        'edificio_id'=>$this->edificio()->id,
+            ])->one();
+    }
+    private function medidor(){
+       return  $this->depa()->firstMedidor(SigiSuministros::COD_TYPE_SUMINISTRO_DEFAULT);
+    }
 }

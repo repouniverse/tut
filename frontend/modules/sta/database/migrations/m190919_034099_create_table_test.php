@@ -19,7 +19,7 @@ if(!$this->existsTable($table)) {
           //'codfac'=>$this->string(8)->append($this->collateColumn()),
           'opcional'=>$this->char(1)->append($this->collateColumn())->notNull(),
           //'activa'=>$this->char(1)->append($this->collateColumn()),
-        // 'codperiodo'=>$this->string(6)->append($this->collateColumn()),
+         'codocu'=>$this->string(3)->append($this->collateColumn()),
          'version'=>$this->string(5)->append($this->collateColumn())->notNull(),
         'nveces'=>$this->integer(2),
          //'electivo'=>$this->char(1)->append($this->collateColumn()),

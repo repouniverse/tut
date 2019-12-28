@@ -56,7 +56,9 @@
         "kriss/yii2-calendar-schedule": "^1.0" ,
         "myclabs/deep-copy": "=1.9.3",
         "yii2mod/yii2-tree": "*",
-        "miloschuman/yii2-highcharts-widget": "*"
+        "miloschuman/yii2-highcharts-widget": "*",
+        "buttflattery/yii2-formwizard": "@dev",
+        "drsdre/yii2-wizardwidget": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

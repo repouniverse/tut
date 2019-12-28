@@ -1,6 +1,7 @@
 <?php
 namespace frontend\modules\sigi\models;
 use frontend\modules\sigi\Module as SigiModule;
+use frontend\modules\sigi\interfaces\colectoresInterface;
 use common\models\masters\Clipro;
 use Yii;
 
@@ -27,12 +28,15 @@ class SigiUnidades extends \common\models\base\modelBase
 {
     const TYP_PROPIETARIO='P';
     const TYP_INQUILINO='I';
+     //const TYP_EX_PROPIETARIO='E';
+    //const TYP_EX_INQUILINO='X';
     const SCENARIO_HIJO='import_hijos';
     const SCENARIO_EDIFICIO='edificio';
     const SCENARIO_COMPLETO='import_completo';
     const SCENARIO_BASICO='basica';
     const SCENARIO_UPDATE_BASICO='update_basico';
     public $booleanFields=['esnuevo','imputable'];
+    public $hardFields=['edificio_id','numero'];
     /**
      * {@inheritdoc}
      */
@@ -344,4 +348,19 @@ class SigiUnidades extends \common\models\base\modelBase
      
    }
   
+   public function CalculoColector(colectoresInterface $colector){
+      return $colector->factorProRateo()->montoTotal()->insertCosto();
+   }
+   
+   public function firstMedidor($type){
+       return $this->getSigiSuministros()->andWhere(['tipo'=>$type])->one();
+   }   
+   
+   public function currentResidente(){
+      return SigiPropietarios::find()->where(
+               ['unidad_id'=>$this->id]
+               )->andWhere(
+               ['activo'=>'1']
+               )->one();
+   }
 }

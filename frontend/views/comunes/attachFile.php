@@ -14,8 +14,8 @@ use yii\helpers\Html;
 	'pluginOptions' => [ // Plugin options of the Kartik's FileInput widget 
             
     'allowedFileExtensions'=>$allowedExtensions,
-    'maxImageWidth'=>3800,
-    'maxImageHeight'=>3800,
+    'maxImageWidth'=>500,
+    'maxImageHeight'=>500,
     'resizePreference'=>'height',
     'maxFileCount'=>1,
     'resizeImage'=>true,

@@ -24,7 +24,7 @@ class SigiApoderados extends \common\models\base\modelBase
     /**
      * {@inheritdoc}
      */
-   
+   public $booleanFields=['tienejunta','emisordefault','facturaigv','permiteventa' ];
     public static function tableName()
     {
         return '{{%sigi_apoderados}}';
@@ -41,9 +41,9 @@ class SigiApoderados extends \common\models\base\modelBase
             [['edificio_id', 'codpro'], 'required'],
             [['edificio_id'], 'integer'],
             [['detalles'], 'string'],
-            
+             [['tienejunta','emisordefault','facturaigv','permiteventa'], 'safe'],
             [['codpro'], 'string', 'max' => 6],
-            [['facturaigv', 'permite1', 'permite2', 'permiteventa', 'permitealquiler'], 'string', 'max' => 1],
+            //[['facturaigv', 'permite1', 'permite2', 'permiteventa', 'permitealquiler'], 'string', 'max' => 1],
             [['codpro'], 'exist', 'skipOnError' => true, 'targetClass' => Clipro::className(), 'targetAttribute' => ['codpro' => 'codpro']],
         ];
     }
@@ -63,6 +63,9 @@ class SigiApoderados extends \common\models\base\modelBase
             'detalles' => Yii::t('sigi.labels', 'Detalles'),
             'permiteventa' => Yii::t('sigi.labels', 'Permiteventa'),
             'permitealquiler' => Yii::t('sigi.labels', 'Permitealquiler'),
+            'tienejunta' => Yii::t('sigi.labels', 'Junta Directiva'),
+            'facturaigv' => Yii::t('sigi.labels', 'Deduce Igv'),
+            'emisordefault' => Yii::t('sigi.labels', 'Emisor por defecto'),
         ];
     }
 

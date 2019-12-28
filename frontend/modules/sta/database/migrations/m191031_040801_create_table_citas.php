@@ -38,6 +38,7 @@ if(!$this->existsTable($table)) {
         'detalles_secre'=>$this->text()->append($this->collateColumn()),
          //'detalles_psico'=>$this->text()->append($this->collateColumn()),
          'codaula'=>$this->string(10)->append($this->collateColumn()),
+        'activo'=>$this->char(1)->notNull()->append($this->collateColumn()),
           'duracion'=>$this->integer(3)->notNull(),
           'codfac'=>$this->string(8)->notNull()->append($this->collateColumn()),
         ],$this->collateTable());

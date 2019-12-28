@@ -186,7 +186,39 @@ class EdificiosController extends baseController
        
     }
     
-    
+    public function actionEditaApoderado($id){        
+         $this->layout = "install";
+         
+            
+       $model=\frontend\modules\sigi\models\SigiApoderados::findOne($id);
+       if(is_null($model))
+          throw new NotFoundHttpException(Yii::t('sigi.labels', 'The requested page does not exist.'));  
+       
+       $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                $model->save();
+                //$model->assignStudentsByRandom();
+                  return ['success'=>1,'id'=>$model->id];
+            }
+        }else{
+           return $this->renderAjax('_apoderado', [
+                        'model' => $model,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                        //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+       
+       
+    }
      public function actionAgregaUnidad($id){        
          $this->layout = "install";
          
@@ -315,7 +347,36 @@ class EdificiosController extends baseController
             ]);  
         }
     }
-    
+   
+    public function actionEditaGrupo($id){        
+         $this->layout = "install";
+         
+        //$modeledificio = $this->findModel($id);        
+       $model=\frontend\modules\sigi\models\SigiCargosgrupoedificio::findOne($id);
+       
+       $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                $model->save();
+                //$model->assignStudentsByRandom();
+                  return ['success'=>1,'id'=>$model->id];
+            }
+        }else{
+           return $this->renderAjax('_modal_grupocargo', [
+                        'model' => $model,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                        //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+    }
     
     /*CARGA LOS CONCEPTOS PAR AUN EDIFICIO DETERMINADO*/
     
@@ -364,7 +425,38 @@ public function actionAgregaConcepto($id){
             ]);  
         }
 }  
-   
+
+public function actionEditaConceptoTree($id){
+    $this->layout = "install";
+        $model=\frontend\modules\sigi\models\SigiCargosedificio::findOne($id);
+       if(is_null($model)){
+           throw new NotFoundHttpException(Yii::t('sigi.labels', 'Esta dirección no existe'));
+       }
+      
+          
+       $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                $model->save();
+                //$model->assignStudentsByRandom();
+                  return ['success'=>1,'id'=>$model->edificio_id];
+            }
+        }else{
+           return $this->renderAjax('_modal_concepto_tree', [
+                        'model' => $model,
+                        'id' => $model->grupo_id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                        //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        } 
+}
 
 public function actionTree(){
    //echo \yii\helpers\Json::encode(Edificios::treeBase());die();

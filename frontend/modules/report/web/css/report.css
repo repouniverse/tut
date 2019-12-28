@@ -20,3 +20,10 @@ td {
     font-weight: normal;
     
 }
+.pagination {    
+    display: none !important;
+}
+
+ul {    
+    display: none !important;
+}

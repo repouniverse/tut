@@ -176,6 +176,37 @@ class UnidadesController extends baseController
         }
     }
     
+    public function actionEditaResidente($id){        
+         $this->layout = "install";
+        $model=\frontend\modules\sigi\models\SigiPropietarios::findOne($id);
+        if(is_null($model))
+        throw new NotFoundHttpException(Yii::t('sigi.labels', 'The requested page does not exist.'));
+       $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                
+                $model->save();
+                //yii::error();
+                //$model->assignStudentsByRandom();
+                  return ['success'=>1,'id'=>$model->id];
+            }
+        }else{
+           return $this->renderAjax('_modal_residentes', [
+                        'model' => $model,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                        //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+    }
+    
      public function actionAgregaMedidor($id){        
          $this->layout = "install";
          
@@ -208,6 +239,42 @@ class UnidadesController extends baseController
             ]);  
         }
     }
+    
+     public function actionEditaMedidor($id){        
+         $this->layout = "install";
+         
+        //$modelunidad = $this->findModel($id);        
+       $model=\frontend\modules\sigi\models\SigiSuministros::findOne($id);
+        if(is_null($model))
+        throw new NotFoundHttpException(Yii::t('sigi.labels', 'The requested page does not exist.'));
+      
+       
+       $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                
+                $model->save();
+                //yii::error();
+                //$model->assignStudentsByRandom();
+                  return ['success'=>1,'id'=>$model-id];
+            }
+        }else{
+           return $this->renderAjax('_modal_medidores', [
+                        'model' => $model,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                        //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+    }
+    
      public function actionAgregaHijo($id){        
          $this->layout = "install";
          

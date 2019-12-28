@@ -1,5 +1,5 @@
 <?php
-
+use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
 use yii\helpers\Html,yii\helpers\Url;
  //use yii\helpers\Url;
 use kartik\grid\GridView;
@@ -24,13 +24,16 @@ use frontend\modules\sta\helpers\comboHelper;
    $gridColumns = [
             [
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{edit}',
+                'template' => '{edit}{delete}',
                 'buttons' => [
-                   
+                    'delete' => function ($url,$model) {
+			    $url = Url::toRoute($this->context->id.'/deletemodel-for-ajax',['id'=>$model->id]);
+                             return Html::a('<span class="btn btn-danger btn-sm glyphicon glyphicon-trash"></span>', '#', ['title'=>$url,/*'id'=>$model->codparam,*/'family'=>'pink','id'=> \yii\helpers\Json::encode(['id'=>$model->id,'modelito'=> str_replace('@','\\',get_class($model))]),/*'title' => 'Borrar'*/]);
+                            },
                          'edit' => function ($url,$model) {
-			    $url= Url::to(['convoca-alumno','id'=>$model->codtest,'gridName'=>'convocatorias_'.$model->codtest,'idModal'=>'buscarvalor']);
+			    $url= Url::to(['edita-pregunta','id'=>$model->id,'gridName'=>'sumilla','idModal'=>'buscarvalor']);
                              //echo  Html::button(yii::t('base.verbs','Modificar Rangos'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Tutor'),'id'=>'btn_contacts', 'class' => 'botonAbre btn btn-success']); 
-                            return Html::a('<span class="btn btn-danger btn-sm fa fa-phone"></span>', $url, ['class'=>'botonAbre']);
+                            return Html::a('<span class="btn btn-danger btn-sm btn-sm glyphicon glyphicon-pencil"></span>', $url, ['class'=>'botonAbre']);
                             }
                     ]
                 ],
@@ -56,6 +59,9 @@ use frontend\modules\sta\helpers\comboHelper;
 ], 
 [ 
     'attribute' => 'pregunta', 
+    'value'=>function($model){
+        return substr($model->pregunta,0,50).'...';
+    }
 ],
       
 ];
@@ -88,7 +94,18 @@ use frontend\modules\sta\helpers\comboHelper;
     </div>
     
 
+
 <?PHP
+echo linkAjaxGridWidget::widget([
+           'id'=>'mifpapi',
+            'idGrilla'=>'sumilla',
+            'family'=>'pink',
+          'type'=>'POST',
+           'evento'=>'click',
+            //'foreignskeys'=>[1,2,3],
+        ]); 
+
+
  Pjax::end();
 ?>
     </div>

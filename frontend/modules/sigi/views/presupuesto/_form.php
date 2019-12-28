@@ -22,7 +22,7 @@ use common\helpers\timeHelper;
         <div class="col-md-12">
             <div class="form-group no-margin">
                 
-        <?= Html::submitButton(Yii::t('sigi.labels', 'Save'), ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton(Yii::t('sigi.labels', 'Grabar'), ['class' => 'btn btn-success']) ?>
             
 
             </div>

@@ -68,6 +68,7 @@ class CuentasporController extends baseController
     public function actionCreate()
     {
         $model = new SigiCuentaspor();
+        $model->valoresDefault();
         
         
         if (h::request()->isAjax && $model->load(h::request()->post())) {
@@ -83,9 +84,38 @@ class CuentasporController extends baseController
 
         return $this->render('create', [
             'model' => $model,
+            
         ]);
     }
 
+    
+         
+    public function actionCrearBoletaInterna()
+    {
+        $model = new SigiCuentaspor();
+        $model->setScenario(SigiCuentaspor::SCENARIO_RECIBO_INTERNO);
+        $model->valoresDefault();
+        
+        
+        if (h::request()->isAjax && $model->load(h::request()->post())) {
+                h::response()->format = Response::FORMAT_JSON;
+                return ActiveForm::validate($model);
+        }
+        
+        
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        }else{
+            //print_r($model->getErrors());die();
+        }
+
+        return $this->render('crear_recibo', [
+            'model' => $model,
+            
+        ]);
+    }
+    
     /**
      * Updates an existing SigiCuentaspor model.
      * If update is successful, the browser will be redirected to the 'view' page.
@@ -105,7 +135,7 @@ class CuentasporController extends baseController
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
-
+            yii::error($model->getErrors());
         return $this->render('update', [
             'model' => $model,
         ]);

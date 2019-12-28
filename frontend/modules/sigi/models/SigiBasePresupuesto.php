@@ -22,7 +22,7 @@ class SigiBasePresupuesto extends \common\models\base\modelBase
     public function rules()
     {
         return [
-            [['edificio_id','ejercicio','mensual','cargosedificio_id','cargosgrupoedificio_id'], 'required'],
+            [['edificio_id','ejercicio','mensual','cargosedificio_id','cargosgrupoedificio_id'], 'required','except'=>self::SCENARIO_IMPORTACION],
             [['edificio_id'], 'integer'],
             [['cargosedificio_id','detalles','activo'], 'safe'],
             [['mensual', 'anual', 'acumulado'], 'number'],
@@ -52,11 +52,15 @@ class SigiBasePresupuesto extends \common\models\base\modelBase
                 'on'=>'importacion',
                 'message'=>yii::t('sigi.errors','El valor del campo \'cargo_id\' NO se encontro en la tabla {{sigi_cargos}}')
              ],
+            
+            /*Campos obligatorios*/
+            [['edificio_id','ejercicio','mensual','cargosedificio_id','cargosgrupoedificio_id'], 'required'],
+            
             /*fiN DEL escenario imortacion*/
             
+             [['edificio_id','codgrupo','codcargo','descripcion','ejercicio','anual'], 'required','on'=>self::SCENARIO_IMPORTACION],
             
             
-            [['edificio_id'], 'exist', 'skipOnError' => true, 'targetClass' => Edificios::className(), 'targetAttribute' => ['edificio_id' => 'id']],
         ];
     }
 
@@ -88,6 +92,8 @@ class SigiBasePresupuesto extends \common\models\base\modelBase
             'anual' => Yii::t('sigi.labels', 'Anual'),
             'restringir' => Yii::t('sigi.labels', 'Restringir'),
             'acumulado' => Yii::t('sigi.labels', 'Acumulado'),
+            'cargosgrupoedificio_id'=>Yii::t('sigi.labels', 'Grupo'),
+            'cargosedificio_id'=>Yii::t('sigi.labels', 'Colector'),
         ];
     }
 

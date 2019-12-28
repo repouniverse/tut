@@ -67,10 +67,15 @@ return [
                    'dmstr\web\AdminLteAsset'=>['skin'=>'skin-green'],
                              ],
                         ],
-        
-        'request' => [
+         'request' => [
+
+        	// !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
+
+        	'cookieValidationKey' => 'HOLIS',
             'csrfParam' => '_csrf-frontend',
-        ],
+        	//'enableCsrfValidation' => false,
+
+           ],
         /*'user' => [
             'identityClass' => 'common\models\User',
             'enableAutoLogin' => true,

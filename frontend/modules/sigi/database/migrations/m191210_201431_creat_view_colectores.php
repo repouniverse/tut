@@ -32,7 +32,7 @@ public function safeDown()
  private function getFields(){
      return [ /*Cargos*/'a.id as idcargo','a.descargo','a.codcargo',
                   /*Grupos*/'b.id as idgrupo','b.edificio_id','b.codgrupo','b.descripcion as descripciongrupo',
-                  /*Colectores*/ 'c.id as idcolector','c.tasamora','c.frecuencia','c.regular','montofijo','tipomedidor',
+                  /*Colectores*/'c.emisorexterno','c.individual', 'c.id as idcolector','c.tasamora','c.frecuencia','c.regular','montofijo','tipomedidor',
           /*Edicicios*/ 'd.id as idedificio','d.codigo','d.nombre',
                   
          ];

@@ -35,7 +35,7 @@ $this->params['breadcrumbs'][] = Yii::t('sigi.labels', 'Update');
              'options' => ['id' => 'myveryownID3'],
         ],
         [
-          'label'=>'<i class="fa fa-users"></i> '.yii::t('sta.labels','Tutores'), //$this->context->countDetail() obtiene el contador del detalle
+          'label'=>'<i class="fa fa-users"></i> '.yii::t('sta.labels','Detalles'), //$this->context->countDetail() obtiene el contador del detalle
             'content'=> $this->render('_segunda',[ 'model' => $model]),
             'active' => false,
              'options' => ['id' => 'myveryownID4'],

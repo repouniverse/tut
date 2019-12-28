@@ -187,7 +187,7 @@ private static function findKeyArrayInPost(){
         if(h::request()->isAjax){
            $id= h::request()->post('id');
            $clase=str_replace('@','\\',h::request()->post('modelito'));
-           //var_dump($clase);die();
+          // var_dump(h::request()->post(),$id,$clase);die();
            $datos=$this->deleteModel($id, $clase);
            h::response()->format = \yii\web\Response::FORMAT_JSON;
            return $datos;
@@ -228,7 +228,23 @@ private static function findKeyArrayInPost(){
     return $datos;
  }
  
- 
+ /*
+ * Genera un array de objetos hijos y 
+ * losprepara en el escenario indicado
+ */
+    public function generateItems(string $clase,$n,$escenario=null){
+        $itemsp=[];
+        for($i = 1; $i <= $n; $i++) {
+             $itemsp[]=new $clase;         
+           }
+        if(!is_null($escenario)){
+            foreach($itemsp as $item){
+                $item->setScenario($escenario);
+            }
+        }
+        return $itemsp;
+    }
+  
 
  
 }

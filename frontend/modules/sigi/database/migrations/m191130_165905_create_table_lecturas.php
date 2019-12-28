@@ -6,7 +6,7 @@ class m191130_165905_create_table_lecturas extends  baseMigration
 {
     const NAME_TABLE='{{%sigi_lecturas}}';
    const NAME_TABLE_SUMINISTROS='{{%sigi_suministros}}';
-   //const NAME_TABLE_CONCEPTO_EDIFICIO='{{%sigi_cargosedificio}}';
+   const NAME_TABLE_EDIFICIO='{{%sigi_edificios}}';
    
      
     public function safeUp()
@@ -16,6 +16,7 @@ if(!$this->existsTable($table)) {
     $this->createTable($table,  [
          'id'=>$this->primaryKey(),
         'suministro_id'=>$this->integer(11)->notNull(),
+        'edificio_id'=>$this->integer(11)->notNull(),
         'unidad_id'=>$this->integer(11)->notNull(),
         'codepa'=>$this->string(12),
         'mes'=>$this->string(2)->notNull()->append($this->collateColumn()),
@@ -24,7 +25,7 @@ if(!$this->existsTable($table)) {
         'lectura'=>$this->decimal(12,4),
          'lecturaant'=>$this->decimal(12,4),
          'anio'=>$this->char(4)->notNull()->append($this->collateColumn()),
-        'codeficio'=>$this->string(12)->append($this->collateColumn()),
+        'codedificio'=>$this->string(12)->append($this->collateColumn()),
         'codtipo'=>$this->char(3)->append($this->collateColumn()),
         'delta'=>$this->decimal(12,4),       
         ],$this->collateTable());
@@ -33,6 +34,10 @@ if(!$this->existsTable($table)) {
               'unidad_id', static::NAME_TABLE_UNIDADES,'id');*/
     $this->addForeignKey($this->generateNameFk($table), $table,
               'suministro_id', static::NAME_TABLE_SUMINISTROS,'id');
+     
+             
+     $this->addForeignKey($this->generateNameFk($table), $table,
+              'edificio_id', static::NAME_TABLE_EDIFICIO,'id');
      
             } 
  }

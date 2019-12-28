@@ -7,7 +7,7 @@ namespace frontend\modules\sta\models;
  *
  * @see StaVwCitas
  */
-class StaVwCitasQuery extends \frontend\modules\sta\components\ActiveQueryScope
+class StaVwCitasQuery extends \frontend\modules\sta\components\ActiveQueryCitas
 {
     /*public function active()
     {

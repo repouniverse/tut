@@ -17,7 +17,7 @@ class cboDepWidget extends \yii\base\Widget
     public $campo;//el nombre del campo modelo
     public $idcombodep; //El id del comboa  aactuaklizar
     public $data=[];// data del combo box a renderizar
-    
+    public $idComboSource=null;
     /*
      * Esta 3 prpeidades definen de donde se sacaran los datos
      * tabla: 
@@ -118,7 +118,12 @@ success: function (data) {// success callback function
    
 
    private function getIdControl(){
-       return strtolower($this->getShortNameModel().'-'.$this->campo);
+       if($this->idComboSource===null){
+           return strtolower($this->getShortNameModel().'-'.$this->campo);
+       }else{
+           return $this->idComboSource;
+       }
+       
    }
       
   private function getShortNameModel(){

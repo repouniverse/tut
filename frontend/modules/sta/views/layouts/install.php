@@ -34,7 +34,23 @@ use yii\helpers\Html;
    <body class="<?= \dmstr\helpers\AdminLteHelper::skinClass() ?>" style="overflow-y: scroll;">
        
  <?php $this->beginBody() ?>
-    
+    <?php \shifrin\noty\NotyWidget::widget([
+    'options' => [ // you can add js options here, see noty plugin page for available options
+        'dismissQueue' => true,
+        'layout' => 'center',
+        'theme' => 'relax',
+        'animation' => [
+            'open' => 'animated flipInX',
+            'close' => 'animated flipOutX',
+        ],
+        'timeout' => false,
+    ],
+    'enableSessionFlash' => true,
+    'enableIcon' => true,
+    'registerAnimateCss' => true,
+    'registerButtonsCss' => true,
+    'registerFontAwesomeCss' => true,
+]); ?>
        
 
         <?= $content ?>

@@ -59,7 +59,7 @@ use frontend\modules\sigi\models\SigiEdificiodocusSearch;
                 'value' => function ($model) {
                           $tieneFile= $model->countFiles();
                        IF($tieneFile>0){
-                           return Html::a('<span class="btn btn-success glyphicon glyphicon-download"></span>', $model->files[0]->getUrl(), ['pjax'=>'0']);
+                           return Html::a('<span class="btn btn-success glyphicon glyphicon-download"></span>', $model->files[0]->getUrl(), ['data-pjax'=>'0']);
                        }else{
                            return '';
                        }

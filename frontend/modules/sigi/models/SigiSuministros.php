@@ -27,6 +27,8 @@ class SigiSuministros extends \common\models\base\modelBase
     /**
      * {@inheritdoc}
      */
+    CONST COD_TYPE_SUMINISTRO_DEFAULT='101'; //medidor tipo agua 
+    const SCENARIO_IMPORTACION='importacion_simple';
     public static function tableName()
     {
         return '{{%sigi_suministros}}';
@@ -42,6 +44,18 @@ class SigiSuministros extends \common\models\base\modelBase
             [['unidad_id', 'frecuencia'], 'integer'],
             [['detalles'], 'string'],
             [['tipo'], 'string', 'max' => 3],
+            
+            
+            /*Escenario imortacion*/
+             [['codepa'], 'valida_depa','on'=>self::SCENARIO_IMPORTACION],
+             [['codepa','codedificio','tipo','codum','codpro'], 'required','on'=>self::SCENARIO_IMPORTACION],
+              [['codepa','codedificio','tipo','codum','codpro'], 'safe','on'=>self::SCENARIO_IMPORTACION],
+            
+            [['codedificio'], 'exist', 'skipOnError' => true, 'targetClass' => Edificios::className(), 'targetAttribute' => ['codedificio' => 'codigo'],'on'=>self::SCENARIO_IMPORTACION],
+             //[['codepa'], 'exist', 'skipOnError' => true, 'targetClass' => Edificios::className(), 'targetAttribute' => ['codedificio' => 'codigo']],
+     
+            
+            
             [['codpro'], 'string', 'max' => 6],
             [['codsuministro'], 'string', 'max' => 12],
             [['numerocliente'], 'string', 'max' => 25],
@@ -51,7 +65,13 @@ class SigiSuministros extends \common\models\base\modelBase
             [['codpro'], 'exist', 'skipOnError' => true, 'targetClass' => Clipro::className(), 'targetAttribute' => ['codpro' => 'codpro']],
         ];
     }
-
+public function scenarios()
+    {
+        $scenarios = parent::scenarios(); 
+       $scenarios[self::SCENARIO_IMPORTACION] = ['codepa','codedificio','tipo','codum','codpro'];
+        return $scenarios;
+    }
+    
     /**
      * {@inheritdoc}
      */
@@ -124,4 +144,51 @@ class SigiSuministros extends \common\models\base\modelBase
     public function ultimaLectura(){
       return 1;  
     }
+    
+    private function edificio(){
+        return Edificios::find()->where(['codigo'=>$this->codedificio])->one();
+    }
+    private function depa(){
+       return  SigiUnidades::find()->where([
+            'numero'=>$this->codepa,
+        'edificio_id'=>$this->edificio()->id,
+            ])->one();
+    }
+    /*private function medidor(){
+       return  $this->depa()->firstMedidor(SigiSuministros::COD_TYPE_SUMINISTRO_DEFAULT);
+    }*/
+    public function valida_depa($attribute, $params)
+    {
+        $edificio=$this->edificio();
+      if(is_null($edificio)){
+          $this->addError('codedificio',yii::t('sigi.labels','El codigo de edificio no existe'));
+          return;
+      }       
+   $depa= $this->depa(); 
+   if(is_null($depa)){
+          $this->addError('codepa',yii::t('sigi.labels','El codigo de departamento para este edificio no existe'));
+          return;
+      } 
+    }
+    
+  private function resolveIds(){ 
+      if($this->getScenario()==self::SCENARIO_IMPORTACION){
+         $this->edificio_id= $this->edificio()->id;        
+        $this->unidad_id= $this->depa()->id;
+        $this->numerocliente=substr($this->depa()->numero.'_'.$this->comboValueField('tipo'),0,25);
+      }
+        
+       // $this->suministro_id=$this->medidor()->id;        
+    }
+    
+ public function beforeSave($insert) {
+      if($insert){
+          $this->resolveIds();
+        //$this->lecturaant=$this->lastReadNumeric();   
+      }else{
+          
+      }  
+        RETURN parent::beforeSave($insert);
+    }   
+    
 }

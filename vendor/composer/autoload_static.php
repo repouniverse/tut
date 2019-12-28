@@ -191,12 +191,17 @@ class ComposerStaticInitdb0b409cd7b5708c1b63db5a098648e5
         ),
         'd' => 
         array (
+            'drsdre\\wizardwidget\\' => 20,
             'dosamigos\\chartjs\\' => 18,
             'dmstr\\' => 6,
         ),
         'c' => 
         array (
             'cebe\\markdown\\' => 14,
+        ),
+        'b' => 
+        array (
+            'buttflattery\\formwizard\\' => 24,
         ),
         'W' => 
         array (
@@ -568,6 +573,10 @@ class ComposerStaticInitdb0b409cd7b5708c1b63db5a098648e5
         array (
             0 => __DIR__ . '/..' . '/himiklab/yii2-colorbox-widget',
         ),
+        'drsdre\\wizardwidget\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/drsdre/yii2-wizardwidget',
+        ),
         'dosamigos\\chartjs\\' => 
         array (
             0 => __DIR__ . '/..' . '/2amigos/yii2-chartjs-widget/src',
@@ -579,6 +588,10 @@ class ComposerStaticInitdb0b409cd7b5708c1b63db5a098648e5
         'cebe\\markdown\\' => 
         array (
             0 => __DIR__ . '/..' . '/cebe/markdown',
+        ),
+        'buttflattery\\formwizard\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/buttflattery/yii2-formwizard/src',
         ),
         'Webmozart\\Assert\\' => 
         array (

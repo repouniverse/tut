@@ -27,22 +27,17 @@ use frontend\modules\sigi\models\SigiCargosgrupoedificioSearch;
                  [
                 'class' => 'yii\grid\ActionColumn',
                 //'template' => Helper::filterActionColumn(['view', 'activate', 'delete']),
-            'template' => '{edit}{delete}',
+            'template' => '{update}{delete}',
                'buttons' => [
-                    'attach' => function($url, $model) {  
-                         $url=\yii\helpers\Url::toRoute(['/finder/selectimage','isImage'=>false,'idModal'=>'imagemodal','modelid'=>$model->id,'nombreclase'=> str_replace('\\','_',get_class($model))]);
+                  'update' => function($url, $model) use ($idPjax){   
+                        $url= \yii\helpers\Url::to(['edita-grupo','id'=>$model->id,'gridName'=>'grilla-grupocargos','idModal'=>'buscarvalor']);
                         $options = [
-                            'title' => Yii::t('sta.labels', 'Subir Archivo'),
-                            //'aria-label' => Yii::t('rbac-admin', 'Activate'),
-                            //'data-confirm' => Yii::t('rbac-admin', 'Are you sure you want to activate this user?'),
-                            'data-method' => 'get',
-                            //'data-pjax' => '0',
+                            'title' => Yii::t('base.verbs', 'Editar'), 
+                            'class'=>'botonAbre',
+                            'data-pjax'=>'0'
                         ];
-                        return Html::button('<span class="glyphicon glyphicon-paperclip"></span>', ['href' => $url, 'title' => 'Editar Adjunto', 'class' => 'botonAbre btn btn-success']);
-                        //return Html::a('<span class="btn btn-success glyphicon glyphicon-pencil"></span>', Url::toRoute(['view-profile','iduser'=>$model->id]), []/*$options*/);
-                     
-                        
-                        },
+                        return Html::a('<span class="btn btn-info btn-sm glyphicon glyphicon-pencil"></span>', $url, $options/*$options*/);
+                         },
                         'delete' => function ($url,$model) {
 			   $url = \yii\helpers\Url::toRoute($this->context->id.'/deletemodel-for-ajax');
                               return \yii\helpers\Html::a('<span class="btn btn-danger glyphicon glyphicon-trash"></span>', '#', ['title'=>$url,/*'id'=>$model->codparam,*/'family'=>'holas','id'=>\yii\helpers\Json::encode(['id'=>$model->id,'modelito'=> str_replace('@','\\',get_class($model))]),/*'title' => 'Borrar'*/]);

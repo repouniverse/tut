@@ -108,21 +108,21 @@ echo CalendarScheduleWidget::widget([
       }
                              
                                     }'),
-        'eventDrop' => new JsExpression('function(event, delta,minuteDelta, revertFunc) {
-       if (confirm("Are you sure about this change?")) {
+        'eventDrop' => new JsExpression('function(event, delta,revertFunc) {
+       if (confirm("'.yii::t('sta.labels','¿Confirmar que desea hacer esta operación ?').'")) {
                   var fechainicio=event.start.format("YYYY-MM-DD HH:mm:ss");
         $.ajax({ 
                     method:"get",    
-                    url: "'.\yii\helpers\Url::toRoute('/sta/programas/make-cita-by-student').'",
+                    url: "'.\yii\helpers\Url::toRoute(['/sta/citas/reprograma-cita']).'",
                     delay: 250,
-                        data: {id:'.$model->id.', fecha:fechainicio,codalu:event.title  },
+                        data: {idcita:event.id, finicio:fechainicio },
              error:  function(xhr, textStatus, error){               
-                            revertFunc();
+                           revertFunc();
                                 }, 
               success: function(json) {  
                         var n = Noty("id");
                        if ( !(typeof json["error"]==="undefined") ) {
-                       revertFunc();
+                      revertFunc();
                    $.noty.setText(n.options.id,"<span class=\'glyphicon glyphicon-remove-sign\'></span>      "+ json["error"]);
                               $.noty.setType(n.options.id, "error"); 
                               }
@@ -144,12 +144,50 @@ echo CalendarScheduleWidget::widget([
       }
                              
                                     }'),
+        
+        /*evento resize*/
         'eventResize' => new JsExpression('function(event, delta, revertFunc) {
-                    alert(event.title + " SE MOVIO A     INICIO->" + event.start.format("YYYY-MM-DD H:m:s")+ "   FIN  -> "+event.end.format("YYYY-MM-DD HH:mm:ss") );
-                    if (!confirm("Are you sure about this change?")) {
-                    
+                   // alert(event.title + " SE MOVIO A     INICIO->" + event.start.format("YYYY-MM-DD H:m:s")+ "   FIN  -> "+event.end.format("YYYY-MM-DD HH:mm:ss") );
+                    if (confirm("'.yii::t('sta.labels','¿Confirmar que desea cambiar la duración de esta cita ?').'")) {
+                               var fechainicio=event.start.format("YYYY-MM-DD HH:mm:ss");
+                               var fechatermino=event.end.format("YYYY-MM-DD HH:mm:ss");
+        $.ajax({ 
+                    method:"get",    
+                    url: "'.\yii\helpers\Url::toRoute(['/sta/citas/reprograma-cita']).'",
+                    delay: 250,
+                        data: {idcita:event.id, finicio:fechainicio ,ftermino:fechatermino},
+             error:  function(xhr, textStatus, error){               
+                           revertFunc();
+                                }, 
+              success: function(json) {  
+                        var n = Noty("id");
+                       if ( !(typeof json["error"]==="undefined") ) {
+                      revertFunc();
+                   $.noty.setText(n.options.id,"<span class=\'glyphicon glyphicon-remove-sign\'></span>      "+ json["error"]);
+                              $.noty.setType(n.options.id, "error"); 
+                              }
+                         if ( !(typeof json["success"]==="undefined") ) {
+                                        $.noty.setText(n.options.id,"<span class=\'glyphicon glyphicon-ok-sign\'></span>" + json["success"]);
+                             $.noty.setType(n.options.id, "success");
+                              } 
+                               if ( !(typeof json["warning"]==="undefined") ) {
+                                        $.noty.setText(n.options.id,"<span class=\'glyphicon glyphicon-info-sign\'></span>" +json["warning"]);
+                             $.noty.setType(n.options.id, "warning");
+                              } 
+                              
+                      
+                        },
+   cache: true
+  })
+        }else{
+      revertFunc();
 
-                             revertFunc(); }}'),
+                            }
+                  }'),
+        /*fin del veno resize*/
+        
+        
+        /*evento Click*/
         'eventClick' => new JsExpression('function(event) {'
                 . 'if (confirm("'.yii::t('sta.labels','¿Confirmar que desea notificar ?').'")) {
                  $.ajax({ 

@@ -26,12 +26,61 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
          'summary' => '',
+        'pjax' => true,
+    'striped' => true,
+    'hover' => true,
+       'showPageSummary' => true,
          'tableOptions'=>['class'=>'table table-condensed table-hover table-bordered table-striped'],
         'filterModel' => $searchModel,
         'columns' => [
-            
+           ['class' => 'kartik\grid\SerialColumn'], 
          
-         [
+       
+                             // 'codigo',
+            ['attribute'=>'descripcion',
+                            //'format' => ['decimal', 2],
+                            'pageSummary' => yii::t('sigi.labels','Subtotal'),
+                 
+                            ]    ,
+                        ['attribute'=>'mensual',
+                            'format' => ['decimal', 2],
+                            'pageSummary' => true,
+                            ]    ,
+            //'activo',
+            ['attribute'=>'ejercicio',
+                            
+                            ]    ,
+             ['attribute'=>'edificio_id',
+                                 'value'=>'edificio.codigo',
+                                 'filter'=>comboHelper::getCboEdificios(),
+             'group'=>true,
+                            
+                            ],
+              ['attribute'=>'cargosgrupoedificio_id',
+                    'value'=> 'cargosGrupoEdificioFirme.descripcion',
+                                // 'filter'=>comboHelper::getCboEdificios(),
+             'group'=>true,
+                      
+                            ],
+            ['attribute'=>'cargosedificio_id',
+                    'value'=>function($model){
+                        return $model->grupoConcepto->cargo->descargo;
+                    },
+               
+                                 //'filter'=>comboHelper::getCboEdificios(),
+             'group'=>true,
+            // 'subGroupOf'=>6
+              //'group'=>true,
+                //'groupedRow' => true,                
+              // 'pageSummary' => true,            
+                            ],
+                          
+          
+            
+            //'anual',
+            //'restringir',
+            //'acumulado',
+  [
                 'class' => 'yii\grid\ActionColumn',
                 'template' => '{update}',
                 'buttons' => [
@@ -56,36 +105,6 @@ $this->params['breadcrumbs'][] = $this->title;
                          }
                     ]
                 ],
-                             // 'codigo',
-            'descripcion',
-                            'mensual',
-            //'activo',
-            'ejercicio',
-             ['attribute'=>'edificio_id',
-                                 'value'=>'edificio.codigo',
-                                 'filter'=>comboHelper::getCboEdificios(),
-             'group'=>true,
-                            
-                            ],
-              ['attribute'=>'cargosgrupoedificio_id',
-                    'value'=> 'cargosGrupoEdificioFirme.descripcion',
-                                // 'filter'=>comboHelper::getCboEdificios(),
-             'group'=>true,
-                            
-                            ],
-            ['attribute'=>'cargosedificio_id',
-                    'value'=> 'grupoConcepto.cargo.descargo', 
-                                 //'filter'=>comboHelper::getCboEdificios(),
-             'group'=>true,
-                            
-                            ],
-                          
-          
-            
-            //'anual',
-            //'restringir',
-            //'acumulado',
-
           
         ],
     ]); ?>

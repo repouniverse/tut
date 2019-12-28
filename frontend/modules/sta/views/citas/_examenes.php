@@ -13,8 +13,9 @@
             <div class="row">     
          <?php $url= \yii\helpers\Url::to(['agrega-examen','id'=>$model->id,'gridName'=>'grilla-examenes','idModal'=>'buscarvalor']);
       ?>
-       <?= \yii\helpers\Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Agregar evaluacion'), ['href' => $url,'id'=>'btn-add-test','class' => 'botonAbre btn btn-warning'])?>
-          
+       <?=($model->asistio)?\yii\helpers\Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Agregar evaluacion'), ['href' => $url,'id'=>'btn-add-test','class' => 'botonAbre btn btn-warning']):''?>
+         <?=($model->asistio)?\yii\helpers\Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Refrescar Preguntas'), ['id'=>'boton_bateria','class' => 'btn btn-warning']):''?> 
+                <?=($model->asistio)?\yii\helpers\Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Notificar'), ['id'=>'boton_notifica','class' => 'btn btn-warning']):''?>  
              </div>
             </div>
         </div>
@@ -94,8 +95,83 @@
                     ],
         ],
     ]); ?>
-        
-    <?php Pjax::end(); ?> 
+       <?php Pjax::end(); ?>   
+    <?php 
+  $string="$('#boton_bateria').on( 'click', function(){ 
+     
+       $.ajax({
+              url: '".Url::to(['/sta/citas/banco-preguntas','id'=>$model->id])."', 
+              type: 'get',
+              data:{id:".$model->id.",pruebas:". \yii\helpers\Json::encode($model->codExamenes())." },
+              dataType: 'json', 
+              error:  function(xhr, textStatus, error){               
+                            var n = Noty('id');                      
+                              $.noty.setText(n.options.id, error);
+                              $.noty.setType(n.options.id, 'error');       
+                                }, 
+              success: function(json) {
+              var n = Noty('id');
+                      
+                       if ( !(typeof json['error']==='undefined') ) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['error']);
+                              $.noty.setType(n.options.id, 'error');  
+                          }    
+
+                             if ( !(typeof json['warning']==='undefined' )) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['warning']);
+                              $.noty.setType(n.options.id, 'warning');  
+                             } 
+                          if ( !(typeof json['success']==='undefined' )) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['success']);
+                              $.noty.setType(n.options.id, 'success');  
+                             }      
+                   
+                        }
+                        });
+
+
+             })";
+  //echo $string;
+$string2="$('#boton_notifica').on( 'click', function(){ 
+     
+       $.ajax({
+              url: '".Url::to(['/sta/citas/notifica-banco-digital','id'=>$model->id])."', 
+              type: 'get',
+              data:{idalu:".$model->tallerdet->alumno->id." },
+              dataType: 'json', 
+              error:  function(xhr, textStatus, error){               
+                            var n = Noty('id');                      
+                              $.noty.setText(n.options.id, error);
+                              $.noty.setType(n.options.id, 'error');       
+                                }, 
+              success: function(json) {
+              var n = Noty('id');
+                      
+                       if ( !(typeof json['error']==='undefined') ) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['error']);
+                              $.noty.setType(n.options.id, 'error');  
+                          }    
+
+                             if ( !(typeof json['warning']==='undefined' )) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['warning']);
+                              $.noty.setType(n.options.id, 'warning');  
+                             } 
+                          if ( !(typeof json['success']==='undefined' )) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['success']);
+                              $.noty.setType(n.options.id, 'success');  
+                             }      
+                   
+                        }
+                        });
+
+
+             })";
+  $this->registerJs($string, \yii\web\View::POS_END);
+  $this->registerJs($string2, \yii\web\View::POS_END);
+?>
+    
+    
+   
     
     
     <br>

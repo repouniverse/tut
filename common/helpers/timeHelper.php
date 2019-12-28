@@ -66,7 +66,29 @@ class timeHelper {
        return '1970-01-01';
    }
    
+   public static function formatMysql(){
+    return h::gsetting('timeBD', 'datetime');
    } 
-   
+   public static function regexMysqlDate(){
+      return '/[0-9]{4}-[0-9]{1}[0-2]{1}-[0-3]{1}[0-9]{1}/';
+  }
+  public static function regexMysqlDateTime(){
+      return '/[0-9]{4}-[0-9]{1}[0-2]{1}-[0-3]{1}[0-9]{1} [0-2]{1}[0-9]{1}:[0-5]{1}[0-9]{1}:[0-5]{1}[0-9]{1}/';
+  }
+  public static function IsFormatMysqlDate($fecha){
+     if(preg_match(static::regexMysqlDateTime(),$fecha)){
+         return true;
+     }else{
+         return false;
+     }
+  }
+  public static function IsFormatMysqlDateTime($fecha){
+     if(preg_match(static::regexMysqlDateTime(),$fecha)){
+         return true;
+     }else{
+         return false;
+     }
+  }
+}  
   
    

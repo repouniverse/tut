@@ -7,6 +7,7 @@ use frontend\modules\report\behaviors\FileBehavior;
 use Yii;
 use common\helpers\h;
 use frontend\modules\report\models\baseReporte;
+use  yii\web\ServerErrorHttpException;
 class Reporte extends baseReporte
 {
     /**
@@ -169,13 +170,21 @@ class Reporte extends baseReporte
     
     public function modelToRepor($idfiltro,$campofiltro=null){
       $clase=trim($this->modelo); 
+     // echo $campofiltro; die();
       if(is_null($campofiltro)){
-          
-          return $clase::find()->where(['id'=>$idfiltro])->one();  
+          //echo $clase::find()->where([$model->getTableSchema()->primaryKey()=>$idfiltro])->createCommand()->getRawSql();die();
+          $modelo= $clase::find()->where([$model->getTableSchema()->primaryKey()=>$idfiltro])->one();  
       }else{
-          return $clase::find()->where([$campofiltro=>$idfiltro])->one();  
+        // echo $clase::find()->where([$campofiltro=>$idfiltro])->createCommand()->getRawSql();die(); 
+          $modelo= $clase::find()->where([$campofiltro=>$idfiltro])->one();  
       }
         
+      if(is_null($modelo)){
+           throw new \yii\base\Exception(Yii::t('report.messages', 'No se encontró ningun registro para este filtro'));
+      }else{
+          return $modelo;
+      }
+      
     }
     /*
      * Devuel una ruta competa para
@@ -209,9 +218,13 @@ class Reporte extends baseReporte
     public function makeColumns(){
         $hijosDetalle=$this->
                 getReportedetalle()->
-                where(['and', "esdetalle='1'", "visiblecampo='1'"])->
+                //where(['and', "esdetalle='1'", "visiblecampo='1'"])->
+                where(["esdetalle"=>'1'])->andWhere(["visiblecampo"=>'1'])->
                 orderBy('orden')->all();
-        //echo count( $hijosDetalle);die();
+       /* echo  $hijosDetalle=$this->
+                getReportedetalle()->
+                //where(['and', "esdetalle='1'", "visiblecampo='1'"])->
+                where(["esdetalle"=>'1'])->andWhere(["visiblecampo"=>'1'])->createCommand()->getRawSql();die();*/
         $columns=[];
         foreach($hijosDetalle as $fila){
              $columns[]=[

@@ -23,13 +23,14 @@ use yii\helpers\Html;
                         ],
             ],
            
-            
+            'nombre_campo',
              'aliascampo',
             //'tipodato',
             [
                         'class' => 'kartik\grid\EditableColumn',
                 
                         'editableOptions'=>[
+                            'pjaxContainerId'=>'manita',
                             //'format' => Editable::FORMAT_BUTTON,
                             'inputType' => Editable::INPUT_DROPDOWN_LIST,
                           'data'=>['1'=>'Yes','0'=>'No'],  
@@ -43,6 +44,7 @@ use yii\helpers\Html;
                         'class' => 'kartik\grid\EditableColumn',
                          
                         'editableOptions'=>[
+                             'pjaxContainerId'=>'manita',
                             ///'model'=>NEW \frontend\modules\sta\models\Alumnos(),
                             'ajaxSettings'=>[
                                 'url'=>'',
@@ -64,6 +66,7 @@ use yii\helpers\Html;
                         'class' => 'kartik\grid\EditableColumn',
                 
                         'editableOptions'=>[
+                             'pjaxContainerId'=>'manita',
                           //  'format' => Editable::FORMAT_BUTTON,
                             'inputType' => Editable::INPUT_DROPDOWN_LIST,
                              'data'=>['1'=>'Yes','0'=>'No'], 
@@ -76,6 +79,7 @@ use yii\helpers\Html;
 	    [
                         'class' => 'kartik\grid\EditableColumn',
                         'editableOptions'=>[
+                             'pjaxContainerId'=>'manita',
                                             ],
                         'attribute' => 'left',
                             //'pageSummary' => 'Total',
@@ -85,6 +89,7 @@ use yii\helpers\Html;
             [
                         'class' => 'kartik\grid\EditableColumn',
                         'editableOptions'=>[
+                             'pjaxContainerId'=>'manita',
                                             ],
                         'attribute' => 'top',
                             //'pageSummary' => 'Total',

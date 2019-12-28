@@ -76,6 +76,7 @@ return [
                              * al momento de ejecutar la migracion 
                              */
                          'console\migrations',
+                             'frontend\modules\message\database\migrations',
                          // 'nemmo\attachments\migrations', 
                           //'yii\rbac\migrations', 
                           // 'yii2mod\settings\migrations',  
@@ -87,6 +88,8 @@ return [
                             'frontend\modules\import\database\migrations',
                             'frontend\modules\sta\database\migrations',
                             'frontend\modules\sigi\database\migrations',
+                             'frontend\modules\access\database\migrations',
+                            
                             ],
                         ],
         'fixture' => [
@@ -95,7 +98,9 @@ return [
           ],
     ],
     'components' => [
-        
+        'request' => [
+   //'enableCookieValidation' => 'eret'
+                ],
         
         
         'cache' => [

@@ -52,7 +52,7 @@ class StaVwCitasSearch extends StaVwCitas
     public function search($params)
     {
         $query = StaVwCitas::find();
-
+        
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
@@ -118,11 +118,13 @@ class StaVwCitasSearch extends StaVwCitas
     public function searchByTallerId($tallerId)
     {
         $query = StaVwCitas::find();
+        
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
 
-         $query->Where(['talleresdet_id'=> $tallerId]);
+         $query->andWhere(['talleresdet_id'=> $tallerId]);
+        // echo $query->createCommand()->getRawSql();die();
         return $dataProvider;
     }
     

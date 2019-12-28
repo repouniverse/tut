@@ -3,6 +3,9 @@
 namespace frontend\modules\sta\models;
 use common\behaviors\FileBehavior;
 use Yii;
+use frontend\modules\sta\traits\testTrait;
+use frontend\modules\report\models\Reporte;
+
 
 /**
  * This is the model class for table "{{%sta_test}}".
@@ -12,19 +15,24 @@ use Yii;
  * @property string $opcional
  * @property string $version
  * @property int $nveces
+ * @property int $id
+ * @property string $codocu
+ * @property int $reporte_id
+ *
+ * @property StaExamenes[] $staExamenes
+ * @property StaTestcali[] $staTestcalis
+ * @property StaTestdet[] $staTestdets
  */
 class Test extends \common\models\base\modelBase
 {
-    /**
-     * {@inheritdoc}
-     */
+  use testTrait;
     public static function tableName()
     {
         return '{{%sta_test}}';
     }
 
     
-    public function behaviors()
+     public function behaviors()
 {
 	return [
 		
@@ -41,11 +49,12 @@ class Test extends \common\models\base\modelBase
     {
         return [
             [['codtest', 'descripcion', 'opcional', 'version'], 'required'],
-            [['nveces'], 'integer'],
+            [['nveces', 'id', 'reporte_id'], 'integer'],
             [['codtest'], 'string', 'max' => 8],
             [['descripcion'], 'string', 'max' => 40],
             [['opcional'], 'string', 'max' => 1],
             [['version'], 'string', 'max' => 5],
+            [['codocu'], 'string', 'max' => 3],
             [['codtest'], 'unique'],
         ];
     }
@@ -56,12 +65,39 @@ class Test extends \common\models\base\modelBase
     public function attributeLabels()
     {
         return [
-            'codtest' => Yii::t('sta.labels', 'Codtest'),
-            'descripcion' => Yii::t('sta.labels', 'Descripcion'),
-            'opcional' => Yii::t('sta.labels', 'Opcional'),
-            'version' => Yii::t('sta.labels', 'Version'),
-            'nveces' => Yii::t('sta.labels', 'Nveces'),
+            'codtest' => Yii::t('app', 'Codtest'),
+            'descripcion' => Yii::t('app', 'Descripcion'),
+            'opcional' => Yii::t('app', 'Opcional'),
+            'version' => Yii::t('app', 'Version'),
+            'nveces' => Yii::t('app', 'Nveces'),
+            'id' => Yii::t('app', 'ID'),
+            'codocu' => Yii::t('app', 'Codocu'),
+            'reporte_id' => Yii::t('app', 'Reporte ID'),
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStaExamenes()
+    {
+        return $this->hasMany(Examenes::className(), ['codtest' => 'codtest']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStaTestcalis()
+    {
+        return $this->hasMany(StaTestcali::className(), ['codtest' => 'codtest']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTestdets()
+    {
+        return $this->hasMany(StaTestdet::className(), ['codtest' => 'codtest']);
     }
 
     /**
@@ -72,11 +108,17 @@ class Test extends \common\models\base\modelBase
     {
         return new TestQuery(get_called_class());
     }
-    
-    
-    public function answerRangeNumeric(){
-        return [];
+    public function getCalificiones(){
+       return $this->hasMany(StaTestcali::className(), ['codtest' => 'codtest']);
+   
     }
     
+    public function getReporte(){
+       return $this->hasOne(Reporte::className(), ['id' => 'reporte_id']);
+   
+    }
     
+    public function arrayCalificaciones(){
+       return array_column( $this->getCalificiones()->select(['valor','descripcion'])->asArray()->all(),'descripcion','valor');
+    }
 }

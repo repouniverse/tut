@@ -85,7 +85,13 @@ class comboHelper extends Combito
                 'codtest','descripcion');
     
     }    
-        
+  
+    public static function geCboRankTutor(){
+        return ['A'=>'Buena asistencia y Rendimiento',
+                 'B'=>'Buen Rendimiento e Inasistencias',
+                 'C'=>'Con inasistencias'];
+    }
+    
 }
 
 

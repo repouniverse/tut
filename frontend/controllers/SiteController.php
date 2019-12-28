@@ -381,6 +381,7 @@ public function actionRutas(){
    echo " Url::home()  :   ".Url::home()."<br>";
    echo " Url::home('https')  :   ".Url::home('https')."<br>";
    echo " Url::base()  :   ".Url::base()."<br>";
+   echo " Url::to(['controlador/accion','param2'=>'uno','param2'=>'dos'],true)  :   ".Url::to(['controlador/accion','param1'=>'uno','param2'=>'dos'],true)."<br>";
    echo " Url::base(true)  :   ".Url::base(true)."<br>";
    echo " Url::base('https')  :   ".Url::base('https')."<br>";
    echo " Url::canonical()  :   ".Url::canonical()."<br>";
@@ -393,6 +394,20 @@ public function actionRutas(){
    //echo " Url::base()  :   ".Url::base()."<br>";
    //echo " UrlManager::setHostInfo()   :   ".yii::$app->urlManager->setHostInfo('http://case.itekron.com/frontend/web/sta/entregas/update?id=32')."<br>";
 }
-
+public function actionCookies(){
+    $cookiesRead = Yii::$app->request->cookies;
+    $cookiesSend = Yii::$app->response->cookies;
+    if($cookiesRead->has('token')){
+         echo "Existe la cookie token y el valor es ".$cookiesRead->get('token')->value;
+    }else{
+         $cookiesSend->add(new \yii\web\Cookie([
+    'name' => 'token',
+    'value' => 'myvalor de cookie',
+             ]));
+         echo "no existia la cooike toke,perio ya se agrego";
+    }
+    // var_dump($cookies );
+  
+   }
 
 }

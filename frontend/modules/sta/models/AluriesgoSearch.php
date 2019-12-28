@@ -15,7 +15,7 @@ class AluriesgoSearch extends Aluriesgo
     public function rules()
     {
         return [
-            [['entrega_id', 'programa_id','nveces','neveces15'], 'integer'],
+            [['entrega_id', 'programa_id','nveces','nveces15'], 'integer'],
             [['codcar', 'codcur', 'codalu','codperiodo', 'status', 'codfac'], 'safe'],
         ];
     }
@@ -49,6 +49,7 @@ class AluriesgoSearch extends Aluriesgo
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination'=>['pageSize '=>10]
         ]);
 
         $this->load($params);

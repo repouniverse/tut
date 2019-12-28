@@ -23,8 +23,30 @@ use frontend\modules\sigi\models\SigiApoderadosSearch;
          'summary' => '',
          'tableOptions'=>['class'=>'table table-condensed table-hover table-bordered table-striped'],
         'columns' => [
-                 [
+                  [
                 'class' => 'yii\grid\ActionColumn',
+                //'template' => Helper::filterActionColumn(['view', 'activate', 'delete']),
+            'template' => '{update}',
+               'buttons' => [
+                    'update' => function($url, $model) {  
+                       $url= Url::to(['edita-apoderado','id'=>$model->id,'gridName'=>'grilla-apoderados','idModal'=>'buscarvalor']);
+                         $options = [
+                           'class'=>'botonAbre',
+                            //'title' => Yii::t('sta.labels', 'Editar'),
+                            //'aria-label' => Yii::t('rbac-admin', 'Activate'),
+                            //'data-confirm' => Yii::t('rbac-admin', 'Are you sure you want to activate this user?'),
+                            //'data-method' => 'get',
+                            'data-pjax' => '0',
+                             //'target'=>'_blank'
+                        ];
+                        //return Html::button('<span class="glyphicon glyphicon-pencil"></span>', ['href' => $url, 'title' => 'Editar Adjunto', 'class' => ' btn btn-sm btn-success']);
+                        return Html::a('<span class="btn btn-success glyphicon glyphicon-pencil"></span>',$url,$options);
+                     
+                        
+                        },
+                      
+                        
+                    ]
                 ],
             'codpro',
             'clipro.despro',

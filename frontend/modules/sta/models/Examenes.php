@@ -2,6 +2,7 @@
 
 namespace frontend\modules\sta\models;
 use common\behaviors\FileBehavior;
+use frontend\modules\access\models\modelSensibleAccess;
 use Yii;
 
 /**
@@ -15,11 +16,13 @@ use Yii;
  * @property StaTest $codtest0
  * @property StaCitas $citas
  */
-class Examenes extends \common\models\base\modelBase
+class Examenes extends modelSensibleAccess
 {
     /**
      * {@inheritdoc}
      */
+    public $dateorTimeFields=['fnotificacion'=>self::_FDATETIME];
+    public $booleanFields=['virtual'];
     public static function tableName()
     {
         return '{{%sta_examenes}}';
@@ -44,6 +47,7 @@ class Examenes extends \common\models\base\modelBase
         return [
             [['citas_id', 'codtest'], 'required'],
             [['citas_id'], 'integer'],
+             [['fnotificacion','virtual','codfac'],'safe'],
             [['detalles'], 'string'],
             [['codtest'], 'string', 'max' => 8],
             [['codtest'], 'exist', 'skipOnError' => true, 'targetClass' => Test::className(), 'targetAttribute' => ['codtest' => 'codtest']],
@@ -88,6 +92,11 @@ class Examenes extends \common\models\base\modelBase
     {
         return $this->hasOne(Citas::className(), ['id' => 'citas_id']);
     }
+    
+    public function getExamenesDet()
+    {
+        return $this->hasMany(StaExamenesdet::className(), ['examenes_id' => 'id']);
+    }
 
     /**
      * {@inheritdoc}
@@ -97,4 +106,48 @@ class Examenes extends \common\models\base\modelBase
     {
         return new ExamenesQuery(get_called_class());
     }
+    
+      //yii:error('creando token');
+  public function notificaMail(){
+      $token=  \common\components\token\Token::create('citas', 'token_examen', null, time()+60*2);
+      
+   
+  }
+   
+  /*
+   * Esta funcion crea los registros detalles del
+   * Examen psicologico, creando registros del 
+   * la tabl 'examenesdet', copiando de la tabla 'testdet'
+   */
+  public function creaExamen(){
+      $detalles=$this->test->testdets;
+     //var_dump($detalles);die();
+      foreach($detalles as $detalle){
+          //yii::error('recorreindo');
+           $attributos=[
+          'examenes_id'=>$this->id,
+           'codfac'=>$this->codfac,
+          'test_id'=>$detalle->id
+                   ];
+      $valor=StaExamenesdet::firstOrCreateStatic($attributos, StaExamenesdet::SCENARIO_MIN );
+       //yii::error($valor);
+      }
+  }  
+  
+  
+  public function npreguntas(){
+     return count($this->getExamenesDet()->asArray()->all());
+  }
+  
+ public function porcentajeAvance(){
+     $respondidas=$this->getExamenesDet()
+             ->andWhere(['not',['valor'=>null]])->count();
+     $totales=$this->npreguntas();
+     //return random_int(20, 99);
+     if($totales>0){
+        return round((100*$respondidas/$totales),3); 
+     }
+     return 0;
+ }
+  
 }

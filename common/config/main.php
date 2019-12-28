@@ -37,6 +37,15 @@ return [
     
     
     'modules' => [
+        'message' => [
+        'class' => 'frontend\modules\message\Module',
+        'userModelClass' => '\common\models\User', // your User model. Needs to be ActiveRecord.
+    ],
+        
+        'access' => [
+            'class' => 'frontend\modules\access\accessModule',
+        ],
+        
         'sigi' => [
             'class' => 'frontend\modules\sigi\Module',
         ],
@@ -116,15 +125,7 @@ return [
     
     'components' => [
            
-         'request' => [
-
-        	// !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
-
-        	//'cookieValidationKey' => 'HOLIS',
-
-        	//'enableCsrfValidation' => false,
-
-    ],
+        
 
         'paramsGen'=>[
             'class'=>'common\components\ParametersGeneral',
@@ -169,6 +170,11 @@ return [
                 'report.messages' => [
                                             'class' => 'yii\i18n\PhpMessageSource',
                                             'basePath' => '@frontend/modules/report/messages',
+                                            ], 
+                
+                'report.labels' => [
+                                            'class' => 'yii\i18n\PhpMessageSource',
+                                            'basePath' => '@frontend/modules/report/messages',
                                             ],  
                  'bigitems.labels' => [
                                             'class' => 'yii\i18n\PhpMessageSource',
@@ -186,6 +192,10 @@ return [
                 'import.messages' => [
                                             'class' => 'yii\i18n\PhpMessageSource',
                                             'basePath' => '@frontend/modules/import/messages',
+                                            ], 
+                'message' => [
+                                            'class' => 'yii\i18n\PhpMessageSource',
+                                            'basePath' => '@frontend/modules/message/messages',
                                             ], 
                 'bigitems.errors' => [
                                             'class' => 'yii\i18n\PhpMessageSource',

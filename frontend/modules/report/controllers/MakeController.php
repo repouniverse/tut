@@ -249,9 +249,9 @@ class MakeController extends baseController
                 
                 
         if($contador > 0 ){
-                yii::$app->session->setFlash('success',yii::t('report.messages','Se agregaron '.$contador.' registros hijos '));
+                //yii::$app->session->setFlash('success',yii::t('report.messages','Se agregaron '.$contador.' registros hijos '));
 		}else {
-			yii::$app->session->setFlash('information',yii::t('report.messages', 'No se agregaron registros hijos ya existen todos'));
+			//yii::$app->session->setFlash('information',yii::t('report.messages', 'No se agregaron registros hijos ya existen todos'));
 		}
                 if(!$refresh)
 		return $this->redirect(array('update','id'=>$modeloreporte->id));
@@ -264,7 +264,7 @@ class MakeController extends baseController
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             //var_dump(Yii::$app->request->post());die();
             //echo \yii\helpers\Html::script("$('#createCompany').modal('hide'); window.parent.$.pjax({container: '#grilla-contactos'})");
-            $this->closeModal('buscarvalor','detallerepoGrid');
+            $this->closeModal('buscarvalor','manita');
         } elseif (Yii::$app->request->isAjax) {
             return $this->renderAjax('_detalle', [
                         'model' => $model,

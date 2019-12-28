@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use frontend\modules\sta\helpers\comboHelper;
-use common\widgets\selectwidget\selectWidget;
+//use common\widgets\selectwidget\selectWidget;
 /* @var $this yii\web\View */
 /* @var $model frontend\modules\sta\models\AlumnosController */
 /* @var $form yii\widgets\ActiveForm */
@@ -28,16 +28,9 @@ use common\widgets\selectwidget\selectWidget;
      </div>
     <div id="buscador">
         <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12"> 
-    <?PHP echo selectWidget::widget([
-           // 'id'=>'mipapa',
-            'model'=>$model,
-            'form'=>$form,
-            'campo'=>'codalu',
-           'multiple'=>'multiple',
-        'ordenCampo'=>3,
-         'addCampos'=>[4,5],
-            //'foreignskeys'=>[1,2,3],
-        ]);  ?>
+     
+    <?= $form->field($model, 'codalu') ?>
+
         </DIV>
     <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">    
  <?= $form->field($model, 'codcar')->

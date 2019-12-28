@@ -9,7 +9,7 @@ class m191101_164027_create_table_sumnisitros extends baseMigration
      const NAME_TABLE_UMS='{{%ums}}';
      const NAME_TABLE_CLIPRO='{{%clipro}}';
      const NAME_TABLE_UNIDADES='{{%sigi_unidades}}';
-   //const NAME_TABLE_ALUMNO='{{%sta_alu}}';
+   const NAME_TABLE_EDIFICIOS='{{%sigi_edificios}}';
     /*const NAME_TABLE_CURSOS='{{%sta_materias}}';
      const NAME_TABLE_PERIODOS='{{%sta_periodos}}';*/
     public function safeUp()
@@ -38,6 +38,8 @@ if(!$this->existsTable($table)) {
               'codum', static::NAME_TABLE_UMS,'codum');
     $this->addForeignKey($this->generateNameFk($table), $table,
               'unidad_id', static::NAME_TABLE_UNIDADES,'id');
+      $this->addForeignKey($this->generateNameFk($table), $table,
+              'edificio_id', static::NAME_TABLE_EDIFICIOS,'id');
   
         $this->putCombo($table,'tipo', [
             'ENERGIA ELECTRICA',

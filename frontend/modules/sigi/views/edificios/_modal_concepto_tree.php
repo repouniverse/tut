@@ -28,7 +28,7 @@ use common\widgets\selectwidget\selectWidget;
                   ['idModal'=>$idModal,
                     'idForm'=>'myformulario',
                     'title'=>'<span class="fa fa-save"></span>'.'    '.yii::t('base.verbs','Guardar'),
-                      'url'=> \yii\helpers\Url::to(['/sigi/'.$this->context->id.'/agrega-concepto-tree','id'=>$id]),
+                      'url'=> \yii\helpers\Url::to(['/sigi/'.$this->context->id.'/'.(($model->isNewRecord)?'agrega':'edita').'-concepto-tree','id'=>(($model->isNewRecord)?$id:$model->id)]),
                      'idGrilla'=>$gridName, 
                       ]
                   )?>

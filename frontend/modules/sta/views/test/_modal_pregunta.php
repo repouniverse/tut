@@ -16,7 +16,7 @@ use kartik\widgets\TimePicker;
             <?= \common\widgets\buttonsubmitwidget\buttonSubmitWidget::widget(
                   ['idModal'=>$idModal,
                     'idForm'=>'form-convojgjgcatoria',
-                      'url'=> \yii\helpers\Url::to(['/sta/test/agrega-pregunta','id'=>$id]),
+                      'url'=> \yii\helpers\Url::to([($model->isNewRecord)?'/sta/test/agrega-pregunta':'/sta/test/edita-pregunta','id'=>$id]),
                      'idGrilla'=>$gridName, 
                       ]
                   )?>

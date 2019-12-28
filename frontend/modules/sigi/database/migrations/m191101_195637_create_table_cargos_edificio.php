@@ -34,7 +34,7 @@ if(!$this->existsTable($table)) {
          *ejemplo:  monto fijo contrato de ascensores 
          *          monto no fijo, consumo de agua  o luz
          **/        
-        
+        'emisorexterno'=>$this->char(1)->notNull()->append($this->collateColumn()), 
         'montofijo'=>$this->char(1)->notNull()->append($this->collateColumn()), 
         //en meses , mensual 1, bomestral 2 , semestral 6 
         'frecuencia'=>$this->string(3)->notNull()->append($this->collateColumn()),

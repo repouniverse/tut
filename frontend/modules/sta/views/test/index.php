@@ -66,7 +66,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'opcional',
             'version',
             'nveces',
-
+                 ['class' => 'frontend\modules\report\components\columnGridReport',
+                   'attribute'=>'report_id']
           
         ],
     ]); ?>

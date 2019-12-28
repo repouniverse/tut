@@ -36,6 +36,13 @@
             'active' => false,
              'options' => ['id' => 'myoyvf577dID4'],
         ],
+        [
+            'label' =>'<i class="glyphicon glyphicon-pencil"></i> '. yii::t('base.names','Tutor Académico'), //$this->context->countDetail() obtiene el contador del detalle
+            'content'=> $this->render('_academica',['modelTallerdet'=>$modelTallerdet]),
+//'content' => $this->render('detalle',['form'=>$form,'orden'=>$this->context->countDetail(),'modelDetail'=>$modelDetail]),
+            'active' => false,
+             'options' => ['id' => 'academi8946'],
+        ],
     ],
 ]); 
     ?> 

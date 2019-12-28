@@ -24,7 +24,7 @@ use frontend\modules\sigi\helpers\comboHelper;
           <?= \common\widgets\buttonsubmitwidget\buttonSubmitWidget::widget(
                   ['idModal'=>$idModal,
                     'idForm'=>'myformulario',
-                      'url'=> \yii\helpers\Url::to(['/sigi/'.$this->context->id.'/agrega-medidor','id'=>$id]),
+                      'url'=> \yii\helpers\Url::to(['/sigi/'.$this->context->id.'/'.(($model->isNewRecord)?'agrega':'edita').'-medidor','id'=>$id]),
                      'idGrilla'=>$gridName, 
                       ]
                   )?>

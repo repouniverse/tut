@@ -609,4 +609,22 @@ return array (
       '@kartik/select2' => $vendorDir . '/kartik-v/yii2-widget-select2/src',
     ),
   ),
+  'buttflattery/yii2-formwizard' => 
+  array (
+    'name' => 'buttflattery/yii2-formwizard',
+    'version' => '9999999-dev',
+    'alias' => 
+    array (
+      '@buttflattery/formwizard' => '/src',
+    ),
+  ),
+  'drsdre/yii2-wizardwidget' => 
+  array (
+    'name' => 'drsdre/yii2-wizardwidget',
+    'version' => '1.2.3.0',
+    'alias' => 
+    array (
+      '@drsdre/wizardwidget' => $vendorDir . '/drsdre/yii2-wizardwidget',
+    ),
+  ),
 );

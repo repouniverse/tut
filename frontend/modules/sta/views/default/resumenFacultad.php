@@ -1,7 +1,7 @@
 <?php  
 use dosamigos\chartjs\ChartJs;
 use yii\grid\GridView;
-
+use frontend\modules\sta\models\Talleresdet;
 ?>
 <div class="box box-success">
         
@@ -148,40 +148,32 @@ use yii\grid\GridView;
                   </p>
 
                   <div class="progress-group">
-                      <span class="text-info"><span class="fa fa-users"></span><?='  '.yii::t('sta.labels','Alumnos ubicados')?></span>
-                    <span class="progress-number"><b>160</b>/200</span>
+                      <span class="text-info"><span class="fa fa-users"></span><?='  '.yii::t('sta.labels','Alumnos sin ubicar')?></span>
+                    <span class="progress-number"><b><?=round($kpiContacto[Talleresdet::CONTACTO_SIN_RESPUESTA]*$nalumnos/100,0)?></b>/<?=$nalumnos?></span>
 
                     <div class="progress sm">
-                      <div class="progress-bar progress-bar-aqua" style="width: 80%"></div>
+                      <div class="progress-bar progress-bar-red" style="width: <?=$kpiContacto[Talleresdet::CONTACTO_SIN_RESPUESTA]?>%"></div>
                     </div>
                   </div>
                   <!-- /.progress-group -->
                   <div class="progress-group">
-                    <span class="text-info"><span class="fa fa-users"></span><?='  '.yii::t('sta.labels','Alumnos citados')?></span>
-                    <span class="progress-number"><b>310</b>/400</span>
+                    <span class="text-info"><span class="fa fa-users"></span><?='  '.yii::t('sta.labels','Alumnos Contactados')?></span>
+                    <span class="progress-number"><b><?=round($kpiContacto[Talleresdet::CONTACTO_CON_RESPUESTA]*$nalumnos/100,0)?></b>/<?=$nalumnos?></span>
 
                     <div class="progress sm">
-                      <div class="progress-bar progress-bar-red" style="width: 80%"></div>
+                      <div class="progress-bar progress-bar-warning" style="width: <?=$kpiContacto[Talleresdet::CONTACTO_CON_RESPUESTA]?>%"></div>
                     </div>
                   </div>
                   <!-- /.progress-group -->
                   <div class="progress-group">
-                    <span class="text-info"><span class="fa fa-users"></span><?='  '.yii::t('sta.labels','Alumnos con informe')?></span>
-                    <span class="progress-number"><b>480</b>/800</span>
+                    <span class="text-info"><span class="fa fa-users"></span><?='  '.yii::t('sta.labels','Alumnos con Asistencia')?></span>
+                    <span class="progress-number"><b><?=round($kpiContacto[Talleresdet::CONTACTO_CON_CITA]*$nalumnos/100,0)?></b>/<?=$nalumnos?></span>
 
                     <div class="progress sm">
-                      <div class="progress-bar progress-bar-green" style="width: 80%"></div>
+                        <div class="progress-bar progress-bar-green" style="width: <?=$kpiContacto[Talleresdet::CONTACTO_CON_CITA]?>%"></div>
                     </div>
                   </div>
-                  <!-- /.progress-group -->
-                  <div class="progress-group">
-                    <span class="text-info"><span class="fa fa-users"></span><?='  '.yii::t('sta.labels','Alumnos con citas finalizadas')?></span>
-                    <span class="progress-number"><b>250</b>/500</span>
-
-                    <div class="progress sm">
-                      <div class="progress-bar progress-bar-yellow" style="width: 80%"></div>
-                    </div>
-                  </div>
+           
                   <!-- /.progress-group -->
                 </div>
                 <!-- /.col -->

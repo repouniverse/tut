@@ -1,6 +1,7 @@
 <?php
 namespace common\actions;
 use common\helpers\h;
+use yii;
 /* 
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -45,6 +46,7 @@ class ActionSearchSelect extends \yii\base\Action
               }else{
                   $query=$query->select([$firstField." as id",$secondField.' as text'])->where(['like',$secondField,$filter]);
               }
+              yii::error($query->createCommand()->getRawSql());
              $resultados= $query->asArray()->all();            
          }         
            return  \yii\helpers\Json::encode($resultados);

@@ -5,6 +5,7 @@ namespace frontend\modules\sta\controllers;
 use Yii;
 use frontend\modules\sta\models\Alumnos;
 use frontend\modules\sta\models\Aluriesgo;
+use frontend\modules\sta\models\AluriesgoSearch;
 use frontend\modules\sta\models\AlumnosSearch;
 use frontend\modules\sta\models\VwAluriesgoSearch;
 use frontend\controllers\base\baseController;
@@ -59,6 +60,7 @@ class AlumnosController extends baseController
         $searchModel = new VwAluriesgoSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
+       
         return $this->render('alumnosRiesgo', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,

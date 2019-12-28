@@ -4,7 +4,7 @@ namespace common\models\masters;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\models\masters\Parametros;
+use common\models\config\Parametros;
 
 /**
  * ParametrosSearch represents the model behind the search form of `common\models\masters\Parametros`.

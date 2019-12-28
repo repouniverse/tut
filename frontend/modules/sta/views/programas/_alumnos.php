@@ -33,10 +33,17 @@ use frontend\modules\sta\helpers\comboHelper;
                 'buttons' => [
                    
                          'edit' => function ($url,$model) {
-			    $url= Url::to(['convoca-alumno','id'=>$model->id,'gridName'=>'convocatorias_'.$model->id,'idModal'=>'buscarvalor']);
-                             //echo  Html::button(yii::t('base.verbs','Modificar Rangos'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Tutor'),'id'=>'btn_contacts', 'class' => 'botonAbre btn btn-success']); 
-                            return Html::a('<span class="btn btn-danger btn-sm fa fa-phone"></span>', $url, ['class'=>'botonAbre']);
-                            }
+                            $status=$model->statusContact();
+                            if($status== frontend\modules\sta\models\Talleresdet::CONTACTO_CON_CITA) {
+                              //$url= Url::to(['convoca-alumno','id'=>$model->id,'gridName'=>'convocatorias_'.$model->id,'idModal'=>'buscarvalor']);
+                              //return Html::a('<span class="btn btn-danger btn-sm fa fa-phone"></span>', $url, ['class'=>'botonAbre']);
+                             return '<span class="btn btn-'.$status.' btn-sm fa fa-phone"></span>';
+                                
+                            }else{
+                               $url= Url::to(['convoca-alumno','id'=>$model->id,'gridName'=>'convocatorias_'.$model->id,'idModal'=>'buscarvalor']);
+                              return Html::a('<span class="btn btn-'.$status.' btn-sm fa fa-phone"></span>', $url, ['class'=>'botonAbre']);  
+                             }
+			    }
                     ]
                 ],
         [
@@ -61,6 +68,12 @@ use frontend\modules\sta\helpers\comboHelper;
                               'class'=>'class_link_ajax'
                                ];
                     return Html::a('<span class="badge badge-danger">'.$model->cantidad.'</span>', '#', $options);
+                        }
+],
+ [  'attribute' => '%Asis',
+    'format'=>'raw',
+    'value' => function ($model, $key, $index, $column) {
+                    return $model->porcentajeAsistencias().'%';
                         }
 ],
 [  'attribute' => 'ap',

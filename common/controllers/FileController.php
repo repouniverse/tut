@@ -24,6 +24,7 @@ namespace common\controllers;
 use nemmo\attachments\models\File;
 use nemmo\attachments\models\UploadForm;
 use nemmo\attachments\ModuleTrait;
+use frontend\modules\access\models\AccessModelPermiso;
 use Yii;
 use yii\helpers\FileHelper;
 use yii\web\Controller;
@@ -68,7 +69,9 @@ class FileController extends nemmo\attachments\controllers\FileController
 
     public function actionDownload($id)
     {
+        
         $file = File::findOne(['id' => $id]);
+        
         $filePath = $this->getModule()->getFilesDirPath($file->hash) . DIRECTORY_SEPARATOR . $file->hash . '.' . $file->type;
         return Yii::$app->response->sendFile($filePath, "$file->name.$file->type");
         return Yii::$app->response->xSendFile($filePath, "$file->name.$file->type");

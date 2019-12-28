@@ -167,13 +167,20 @@ class TrabajadoresController extends baseController
 //echo h::user()->identity->tableName();die();
         /*$limon=new \common\models\Profile;
         echo $limon->persona::className();die();*/
- /*$reg=\frontend\modules\sta\models\Citas::findOne(1);
+    /*$reg=\frontend\modules\sta\models\Citas::findOne(76);
+    $fp=$reg->toCarbon('fechaprog');
+   $fi=$reg->toCarbon('finicio');
+ $ft=$reg->toCarbon('ftermino');  
+ var_dump($fp->format($reg->formatToCarbon($reg::_FDATETIME)));die();*/
+        
+/*        
+ $reg=\frontend\modules\sta\models\Citas::findOne(76);
  $reg2=\frontend\modules\sta\models\Citas::findOne(2);
  $foc=$reg->toCarbon('finicio');
  $ftc=$reg->toCarbon('ftermino');
  $fo=$reg2->toCarbon('finicio');
   $ft=$reg2->toCarbon('ftermino');
-  
+ /* 
  $rangeCompare=new \common\helpers\RangeDates([$reg->toCarbon('finicio'),
      $reg->toCarbon('ftermino')]);
  $rangeSearch=new \common\helpers\RangeDates([$reg2->toCarbon('finicio'),

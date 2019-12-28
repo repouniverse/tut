@@ -37,30 +37,11 @@ use yii\helpers\Html;
         
         
     </head>
-  
-
-    
-    
-    
     <body class="<?= \dmstr\helpers\AdminLteHelper::skinClass() ?>">
     <?php $this->beginBody(); ?>
     <div class="wrapper">
-
-      
- 
-        
-        
-        
-        
-        
-        
-        
-        
              <?php
-
-
 use lo\widgets\modal\ModalAjax;
-
 echo ModalAjax::widget([
     'id' => 'buscarvalor',
     'header' => 'Buscar Valor',

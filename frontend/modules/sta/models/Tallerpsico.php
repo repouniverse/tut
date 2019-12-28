@@ -105,7 +105,7 @@ class Tallerpsico extends \common\models\base\modelBase
         return Citas::find()->where( 
                 [ /* 'talleres_id'=>$this->talleres_id,*/
                     'codtra'=>$this->codtra,
-                    'finicio'=> timeHelper::getDateTimeInitial(),
+                    'asistio'=> '0',
                     
                     ]);
     }

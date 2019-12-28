@@ -30,7 +30,7 @@ $this->params['breadcrumbs'][] = Yii::t('sigi.labels', 'Editar');
     'items' => [
         [
           'label'=>'<i class="fa fa-home"></i> '.yii::t('sta.labels','Principal'), //$this->context->countDetail() obtiene el contador del detalle
-            'content'=> $this->render('_form',['model' => $model]),
+            'content'=> $this->render('_form',['model' => $model,'dataProviderCuentasPor' =>$dataProviderCuentasPor,]),
             'active' => true,
              'options' => ['id' => 'myvynID3'],
         ],

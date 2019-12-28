@@ -24,7 +24,7 @@ use common\helpers\h;
           <?= \common\widgets\buttonsubmitwidget\buttonSubmitWidget::widget(
                   ['idModal'=>$idModal,
                     'idForm'=>'myformulario',
-                      'url'=> \yii\helpers\Url::to(['/sigi/'.$this->context->id.'/agrega-apoderado','id'=>$id]),
+                      'url'=> \yii\helpers\Url::to(['/sigi/'.$this->context->id.'/'.(($model->isNewRecord)?'agrega':'edita').'-apoderado','id'=>$id]),
                      'idGrilla'=>$gridName, 
                       ]
                   )?>
@@ -58,7 +58,18 @@ use common\helpers\h;
      <?=Html::textInput( 'desedi23',Edificios::findOne($id)->nombre, ['id'=>'desedi23','disabled'=>true,'class'=>'form-group form-control'] )?>
 
   </div>
-   
+  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+     <?= $form->field($model, 'tienejunta')->checkbox() ?>
+
+ </div>
+  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+     <?= $form->field($model, 'facturaigv')->checkbox() ?>
+
+ </div>
+      <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+     <?= $form->field($model, 'emisordefault')->checkbox() ?>
+
+ </div>
 
     <?php ActiveForm::end(); ?>
 

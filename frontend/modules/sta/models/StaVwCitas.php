@@ -27,7 +27,7 @@ editableViewInterface
       public $ftermino1;
     public static function tableName()
     {
-        return '{{%sta_vw_citas}}';
+        return '{{%vw_sta_citas}}';
     }
 
     /**

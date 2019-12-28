@@ -18,7 +18,7 @@ class ActionSelectImage extends \yii\base\Action
         $isImage=h::request()->get('isImage');
         $id=h::request()->get('modelid');
         $ext=h::request()->get('extension');
-       
+       //$idGrilla=h::request()->get('idGrilla');
         if(!is_numeric($id))
           throw new \yii\base\Exception(Yii::t('base.errors', 'Id is invalid'));
         $this->controller->layout = "install";

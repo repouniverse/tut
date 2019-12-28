@@ -52,4 +52,8 @@ class Module extends \yii\base\Module
     public static function  getPdf(){
         return new Pdf(static::configureDefaultPdf());
     }
+    
+    public static function urlReport($idReporte,$idFiltro,$campoFiltro=null){
+        return \yii\helpers\Url::to(['/report/make/creareporte','id'=>$idReporte,'idfiltro'=>$idFiltro]);
+    }
 }

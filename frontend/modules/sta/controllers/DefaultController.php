@@ -112,12 +112,15 @@ class DefaultController extends Controller
         $provAlumnos= Aluriesgo::worstStudentsByFacProvider($codfac);
         $provCursos= Aluriesgo::worstCursosByFacProvider($codfac);
         $nalumnos=Aluriesgo::studentsInRiskByFacQuery($codfac)->count();
-        //var_dump($provCursos);die();
+       $taller=\frontend\modules\sta\models\Talleres::findOne(['codfac'=>$codfac,'codperiodo'=> \frontend\modules\sta\staModule::getCurrentPeriod()]);
+        
+//var_dump($taller->kp_contactados());die();
         return $this->render('resumenFacultad',[
                    'model'=>$model,
             'nalumnos'=>$nalumnos,
                    'provAlumnos'=>$provAlumnos,
                    'provCursos'=>$provCursos,
+                    'kpiContacto'=>(!is_null($taller))?$taller->kp_contactados():\frontend\modules\sta\models\Talleres::kp_contactadosEmpty(),
                     ]);
     } 
     

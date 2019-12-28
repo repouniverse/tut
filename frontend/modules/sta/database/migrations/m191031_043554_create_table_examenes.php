@@ -28,6 +28,7 @@ if(!$this->existsTable($table)) {
         'codtest'=>$this->string(8)->notNull(),
         'user_id'=>$this->integer(6),//campo propietarios 
          'codfac'=>$this->string(8)->notNull()->append($this->collateColumn()),
+         'fnotificacion'=>$this->string(20)->notNull()->append($this->collateColumn()),
          'detalles'=>$this->text()->append($this->collateColumn()),
         ],$this->collateTable());
   

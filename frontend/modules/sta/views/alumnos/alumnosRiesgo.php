@@ -37,10 +37,12 @@ $gridColumns = [
                           'view' => function($url, $model) {    
                              $url=\yii\helpers\Url::toRoute([
                                  'ver-detalles',
-                                 'id'=>$model->idalumno
+                                 'id'=>$model->idalumno,
+                                 'codperiodo'=>$model->codperiodo
                                      ]);
                         $options = [
                             'data-pjax'=>'0',
+                            'target'=>'_blank',
                             'title' => Yii::t('base.verbs', 'Detalles'),                            
                         ];
                         return Html::a('<span class="btn btn-warning btn-sm glyphicon glyphicon-search"></span>', $url, $options/*$options*/);

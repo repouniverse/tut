@@ -16,7 +16,8 @@ use kartik\widgets\TimePicker;
             <?= \common\widgets\buttonsubmitwidget\buttonSubmitWidget::widget(
                   ['idModal'=>$idModal,
                     'idForm'=>'form-convojgjgcatoria',
-                      'url'=> \yii\helpers\Url::to(['/sta/test/agrega-pregunta','id'=>$id]),
+                     // $url= Url::to(['convoca-alumno','id'=>$model->id,'gridName'=>'convocatorias_'.$model->id,'idModal'=>'buscarvalor']);
+                      'url'=> \yii\helpers\Url::to(['convoca-alumno','id'=>$id,'gridName'=>'convocatorias_'.$model->id,'idModal'=>'buscarvalor']),
                      'idGrilla'=>$gridName, 
                       ]
                   )?>

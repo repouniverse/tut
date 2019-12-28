@@ -14,7 +14,7 @@ class ActionCombodependiente extends \yii\base\Action
 {	
 	public function run(){
 	//Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-           
+          // yii::error('inicinaod');
             /*$modelo= h::request()->post('clase');*/
             $valorfiltro=h::request()->post('filtro');
             /*$campoclave=h::request()->post('campoclave');
@@ -22,21 +22,23 @@ class ActionCombodependiente extends \yii\base\Action
            $isremote=h::request()->post('isremotesource');
            $source=h::request()->post('source');
            if($isremote=='yes'){
-               
              $modelo=array_keys($source)[0];
-            //var_dump($source);die();
-             //$valorfiltro='20';
-             $datos=ComboHelper::getCboGeneral(
+             $clase= new $modelo;
+            // var_dump($clase instanceof ComboHelper);die();
+             if($clase instanceof ComboHelper){
+                 $funcion=$source[$modelo]['campofiltro'];
+                $datos=$modelo::{$funcion}($valorfiltro);
+             }else{
+                  $datos=ComboHelper::getCboGeneral(
                      $valorfiltro,
                      $modelo,
                      $source[$modelo]['campofiltro'],
                      $source[$modelo]['campoclave'],
                       $source[$modelo]['camporef']);
-             //print_r($datos);die();
-            // array_unshift($datos,[''=>yii::t('base.verbs','--Seleccione un Valor--')]);
-             //$datos['']=yii::t('base.verbs','--Seleccione un Valor--');
-              yii::error( $datos);
-             $datos=[''=>yii::t('base.verbs','--Seleccione un Valor--')]+$datos;
+             }
+           
+            
+            $datos=[''=>yii::t('base.verbs','--Seleccione un Valor--')]+$datos;
            }else{/*Se traa de datos directametne */
                $datos=$source;
              

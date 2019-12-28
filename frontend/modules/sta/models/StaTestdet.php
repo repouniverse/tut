@@ -21,6 +21,7 @@ class StaTestdet extends \common\models\base\modelBase
     /**
      * {@inheritdoc}
      */
+    
     public static function tableName()
     {
         return '{{%sta_testdet}}';
@@ -73,4 +74,6 @@ class StaTestdet extends \common\models\base\modelBase
     {
         return new StaTestdetQuery(get_called_class());
     }
+    
+    
 }

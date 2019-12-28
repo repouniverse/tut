@@ -37,9 +37,7 @@ use kartik\widgets\TimePicker;
       <?PHP
      echo $form->field($model, 'rank_tutor')->dropDownList(
              [
-                 'A'=>'Buena asistencia y Rendimiento',
-                 'B'=>'Buen Rendimiento e Inasistencias',
-                 'C'=>'Con inasistencias',
+             \frontend\modules\sta\helpers\comboHelper::geCboRankTutor(),
                  
                  ], 
              ['prompt'=>'--Seleccione un Valor--']);

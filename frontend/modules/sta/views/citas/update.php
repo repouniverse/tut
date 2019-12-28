@@ -17,11 +17,11 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('sta.labels', 'Citas'), 'url
 $this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = Yii::t('sta.labels', 'Update');
 ?>
-<div class="citas-update">
-<h4><i class="fa fa-edit"></i><?= Html::encode($this->title) ?></h4>
-   
-    <div class="box box-success">
-    
+
+
+<h4></h4>
+    <div class="box box-body">
+        <div class="alert alert-info"> <i class="fa fa-edit"></i><?= Html::encode($this->title) ?>-<?=$model->tallerdet->alumno->fullName().Html::a(Html::img($model->tallerdet->alumno->getUrlImage(),['width'=>60,'height'=>65, 'class'=>"img-thumbnail cuaizquierdo"])) ?></div>
     <?php echo TabsX::widget([
     'position' => TabsX::POS_ABOVE,
      'bordered'=>true,
@@ -50,4 +50,5 @@ $this->params['breadcrumbs'][] = Yii::t('sta.labels', 'Update');
        
     ],
 ]);  
-
+?>
+</div>

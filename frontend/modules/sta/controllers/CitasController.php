@@ -16,6 +16,7 @@ use yii\helpers\Url;
 use frontend\controllers\base\baseController;
 use yii\web\Response;
 use yii\widgets\ActiveForm;
+use common\helpers\timeHelper;
 /**
  * CitasController implements the CRUD actions for Citas model.
  */
@@ -100,6 +101,7 @@ class CitasController extends baseController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        //print_r($model->codExamenes());die();
 
         if (h::request()->isAjax && $model->load(h::request()->post())) {
                 h::response()->format = Response::FORMAT_JSON;
@@ -140,6 +142,7 @@ class CitasController extends baseController
      */
     protected function findModel($id)
     {
+       
         if (($model = Citas::findOne($id)) !== null) {
             return $model;
         }
@@ -153,7 +156,8 @@ class CitasController extends baseController
             $model->setScenario($model::SCENARIO_ASISTIO);
             $model->asistio=true;
              h::response()->format = Response::FORMAT_JSON;
-            if($model->save()){
+            
+            if($model->canChangeAsistio() && $model->save()){
                 return ['success'=>yii::t('sta.messages','Se confirmó asistencia')];
             }else{
                return ['error'=>yii::t('sta.messages','Hubo error al confirmar asistencia: '.$model->getFirstError())];  
@@ -161,12 +165,30 @@ class CitasController extends baseController
         }
     }
     
+    
+    public function actionAjaxAnulaCita(){
+        if(h::request()->isAjax){
+            $model=$this->findModel(h::request()->get('id'));
+            $model->setScenario($model::SCENARIO_ACTIVO);
+            $model->activo=false;
+             h::response()->format = Response::FORMAT_JSON;
+            
+            if($model->canInactivate() && $model->save()){
+                return ['success'=>yii::t('sta.messages','Se Anuló la cita sin problemas')];
+            }else{
+               return ['error'=>yii::t('sta.messages','Hubo error al intentar anular: '.$model->getFirstError())];  
+            }
+        }
+    }
+    
    public function actionAgregaExamen($id){
     $this->layout = "install";
          
-        $modelCita = $this->findModel($id);        
+        $modelCita = $this->findModel($id);  
+       
        $model=New \frontend\modules\sta\models\Examenes();
        $model->citas_id=$id;
+       $model->codfac=$modelCita->codfac;
        
        $datos=[];
         if(h::request()->isPost){
@@ -177,7 +199,7 @@ class CitasController extends baseController
                return ['success'=>2,'msg'=>$datos];  
             }else{
                 $model->save();
-                //$model->assignStudentsByRandom();
+                //$model->creaExamen();
                   return ['success'=>1,'id'=>$model->id];
             }
         }else{
@@ -230,6 +252,328 @@ class CitasController extends baseController
             ]);  
         }
 }   
+
+public function  actionNotificaExamenDigital(){
+
+    if(h::request()->isAjax){
+       //echo  h::request()->get('id')
+        $mensajes=[];
+         h::response()->format = \yii\web\Response::FORMAT_JSON;
+        $alumno= \frontend\modules\sta\models\Alumnos::findOne(h::request()->get('idalu'));
+           $examen= Examenes::findOne(h::request()->get('id'));
+       
+        
+        if(is_null($alumno))
+            return ['error'=>yii::t('sta.errors','Error : NO se encontró el registro alumno')];
+         if(is_null($examen))
+            return ['error'=>yii::t('sta.errors','Error : NO se encontró el registro examen')];
+       if(!$examen->cita->asistio)
+           return ['error'=>yii::t('sta.errors','NO puede completar esta operación mientras la cita no tenga asistencia')];
+       $nombre=$alumno->nombres;
+        
+       if(empty($alumno->correo)){
+           return ['error'=>yii::t('sta.labels','Error : El alumno no tiene dirección de correo')];
+       
+           
+       }
+        $token=  \common\components\token\Token::create('citas', 'token_'.$alumno->id, null, time());
+       
+       // $cita=$examen->cita;
+        
+        $link= Url::to(['/sta/citas/examen-virtual','id'=>$examen->id,'token'=>$token->token],true);
+        $mailer = new \common\components\Mailer();
+        $message =new  \yii\swiftmailer\Message();
+            $message->setSubject('Notificacion de Examen')
+            ->setFrom(['neotegnia@gmail.com'=>'Tutoría UNI'])
+            ->setTo($alumno->correo)
+            ->SetHtmlBody("Buenas Tardes  $nombre <br>"
+                    . "La presente es para notificarle que tienes "
+                    . "una examen  programado. <br> Presiona el siguiente link "
+                    . "para acceder a la prueba: <br>"
+                    . "    <a  href=\"".$link."\" >Presiona aquí </a>");
+           
+    try {
+        
+           $result = $mailer->send($message);
+           $mensajes['success']='Se envió el correo, invitando al examen, el Alumno tiene que responder ';
+    } catch (\Swift_TransportException $Ste) {      
+         $mensajes['error']=$Ste->getMessage();
+    }
+    return $mensajes;
+    }
+
+}
+ public function  actionNotificaBancoDigital($id){
+
+    if(h::request()->isAjax){
+       //echo  h::request()->get('id')
+        $mensajes=[];
+         h::response()->format = \yii\web\Response::FORMAT_JSON;
+        $alumno= \frontend\modules\sta\models\Alumnos::findOne(h::request()->get('idalu'));
+           $cita= $this->findModel($id);
+        if(is_null($alumno))
+            return ['error'=>yii::t('sta.errors','Error : NO se encontró el registro alumno')];
+         if(is_null($cita))
+            return ['error'=>yii::t('sta.errors','Error : NO se encontró el registro cita')];
+       if(!$cita->asistio)
+            return ['error'=>yii::t('sta.errors','NO puede completar esta operación mientras la cita no tenga asistencia')];
+       if(!$cita->hasCompletePreguntas())
+            return ['error'=>yii::t('sta.errors','El banco de preguntas aun no esta completo, refresque preguntas')];
+       
+        $nombre=$alumno->nombres;
+       if(empty($alumno->correo)){
+           return ['error'=>yii::t('sta.labels','Error : El alumno no tiene dirección de correo')];
+       
+           
+       }
+        $token=  \common\components\token\Token::create('citas', 'token_'.$cita->id, null, time());
+       
+       // $cita=$examen->cita;
+        
+        $link= Url::to(['/sta/citas/examen-banco','id'=>$cita->id,'token'=>$token->token],true);
+        $mailer = new \common\components\Mailer();
+        $message =new  \yii\swiftmailer\Message();
+            $message->setSubject('Notificacion de Examen')
+            ->setFrom(['neotegnia@gmail.com'=>'Tutoría UNI'])
+            ->setTo($alumno->correo)
+            ->SetHtmlBody("Buenas Tardes  $nombre <br>"
+                    . "La presente es para notificarle que tienes "
+                    . "una examen  programado. <br> Presiona el siguiente link "
+                    . "para acceder a la prueba: <br>"
+                    . "    <a  href=\"".$link."\" >Presiona aquí </a>");
+           
+    try {
+        
+           $result = $mailer->send($message);
+           $mensajes['success']='Se envió el correo, invitando al examen, el Alumno tiene que responder ';
+    } catch (\Swift_TransportException $Ste) {      
+         $mensajes['error']=$Ste->getMessage();
+    }
+    return $mensajes;
+    }
+
+} 
+
+public function actionExamenVirtual($id){
+     $session = Yii::$app->session;
+      $examen=Examenes::findOne($id); 
+      //var_dump($session->get('token'));die();
+    if(($session->get('token')===null)){
+             yii::error('no hya sesion token');  
+                $cadenatoken=h::request()->get('token');
+                $token=\common\components\token\Token::compare('citas', 'token_'.$examen->cita->tallerdet->alumno->id, $cadenatoken);
+                     if(is_null($token)){
+                              
+                                     echo "no pasa nada con tu roken";die();
+                            }else{
+                                yii::error('comparo el token es ok,a har creando la sesion');
+                                    $session->set('token', $cadenatoken);
+                                    yii::error('borrando el token');
+                                    $token->delete();
+                                     yii::error('Crenado el detalle ');
+                                     $examen->creaExamen();
+                                    return  $this->render('_examen_virtual',['model'=>$examen]);
+       
+                                 }
+        
+    }else{
+         yii::error('Si hay sesion token');  
+       $modelos=$examen->examenesDet;
+       //var_dump($examen->id);die();
+       yii::error(h::request()->post('StaExamenesdet'));
+       return  $this->render('_examen_virtual',['model'=>$examen,'modelos'=>$modelos]); 
+    }
     
     
+}
+
+public function actionExamenBanco($id){
+    $cookiesRead = Yii::$app->request->cookies;
+    $cookiesSend = Yii::$app->response->cookies;
+    $nombrecookie='calamaro_'.$id;
+     $this->layout="install";
+    $cita=$this->findModel($id);
+     
+    if($cookiesRead->has($nombrecookie)){
+        $steps=$this->prepareDataToRenderExamen($cita);
+       return  $this->render('_examen_virtual',['model'=>$cita,'steps'=>$steps]); 
+        
+    }else{
+         $cadenatoken=h::request()->get('token');
+         yii::error('cadena token :'.$cadenatoken);
+         $token=\common\components\token\Token::compare('citas', 'token_'.$cita->id, $cadenatoken);
+                     if(is_null($token)){
+                                    $respuesta="no pasa nada con tu roken";
+                                      return $respuesta;
+                            }else{
+                                  $token->delete();
+                                     yii::error('Crenado el detalle ');
+                                     $cita->generaExamenes();
+                                     yii::error('creando la cookie');
+                                     //echo "hay  ".$cookiesRead->count()." cookies <br> ";
+                                     $cookiesSend->add(new \yii\web\Cookie([
+                                        'name' => $nombrecookie,
+                                        'value' => 'este es el valor de la cookie paloma',
+                                                    ]));
+                                     $steps=$this->prepareDataToRenderExamen($cita);
+                                    return  $this->render('_examen_virtual',['model'=>$cita,'steps'=>$steps]); 
+                                     //Yii::$app->session->setFlash('success',yii::t('sta.messages','Bienvenido al Examen Virtual'));
+                                     //$this->redirect($this->action->id);
+                                 }
+         
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    $this->layout="install";
+     $session = Yii::$app->session;
+      $cita=$this->findModel($id); 
+      //var_dump($session->get('token'));die();
+    if(($session->get('tokenBanco')===null)){
+             yii::error('no hya sesion token');  
+                $cadenatoken=h::request()->get('token');
+                yii::error('le token get es:  '.$cadenatoken); 
+                $token=\common\components\token\Token::compare('citas', 'token_'.$cita->id, $cadenatoken);
+                     if(is_null($token)){
+                              
+                                     echo "no pasa nada con tu roken";die();
+                            }else{
+                                yii::error('comparo el token es ok,a har creando la sesion');
+                                    $session->set('tokenBanco', $cadenatoken);
+                                    yii::error('borrando el token');
+                                    $token->delete();
+                                     yii::error('Crenado el detalle ');
+                                     $cita->generaExamenes();
+                                     echo "hola tod fue un exito"; die();
+                                    //return  $this->render('_examen_virtual',['model'=>$examen]);
+       
+                                 }
+        
+    }else{
+      $proveedores=$cita->providersExamenes(); 
+      
+      $steps=[];
+      $i=1;
+      foreach($proveedores as $code=>$proveedor){
+          $modeloMuestra=$proveedor->models[0];
+          $calificaciones=$modeloMuestra->test->arrayCalificaciones();
+          $steps[$i]=[
+              'title' => $modeloMuestra->descripcion,
+               'icon' => 'glyphicon glyphicon-cloud-upload',
+              'content' => $this->renderPartial('_examen_step',
+                                ['model'=>$cita,'calificaciones'=>$calificaciones,'proveedor'=>$proveedor,'codexamen'=>$code]
+                      ),
+          ];
+          $i++;
+      }
+      
+      
+       
+       return  $this->render('_examen_virtual',['model'=>$cita,'steps'=>$steps]); 
+    }
+    
+    
+}
+
+function actionBancoPreguntas($id){
+  if(h::request()->isAjax){
+       $mensajes=[];
+               h::response()->format = \yii\web\Response::FORMAT_JSON;
+      $model=$this->findModel($id);
+      $model->generaExamenes();
+      $mensajes['success']=yii::t('sta.labels','El banco de preguntas está completo');
+      return $mensajes;
+  }
+    
+}
+
+
+ public function actionRespuestaExamen(){
+     if(h::request()->isAjax){
+         $mensajes=[];
+      // h::response()->format = \yii\web\Response::FORMAT_JSON;
+         $identidad=h::request()->get('identidad');
+         $valor=h::request()->get('valor');
+         $examendet=\frontend\modules\sta\models\StaExamenesdet::findOne($identidad);
+         $porcentaje=$examendet->examen->porcentajeAvance();unset($examendet);         
+         $exito=\frontend\modules\sta\models\StaExamenesdet::respuesta($identidad, $valor);
+         if($exito){
+            return $this->renderPartial('_progress',['porcentaje'=>$porcentaje]);
+         }else{
+            
+         }
+         
+     }
+ }
+
+ public function actionCookies(){
+     $cookiesRead = Yii::$app->request->cookies;
+     $cookiesSend = Yii::$app->response->cookies;
+     //var_dump($cookiesRead);die();
+     echo "hay ".$cookiesRead->count()."  cookies<br>";
+     
+     $cookiesSend->add(new \yii\web\Cookie([
+                                        'name' => 'camaron_59',
+                                        'value' =>  'biblia',
+                                                    ]));
+     echo "AHORA hay ".$cookiesRead->count()."  cookies<br>";
+     var_dump($cookiesRead);
+ }
+ 
+ 
+ private function prepareDataToRenderExamen($cita){
+     $proveedores=$cita->providersExamenes(); 
+      $steps=[];
+      $i=1;
+      foreach($proveedores as $code=>$proveedor){
+          $modeloMuestra=$proveedor->models[0];
+          $calificaciones=$modeloMuestra->test->arrayCalificaciones();
+          $steps[$i]=[
+              'title' => $modeloMuestra->descripcion,
+               'icon' => 'glyphicon glyphicon-cloud-upload',
+              'content' => $this->renderPartial('_examen_step',
+                                ['modeloMuestra'=>$modeloMuestra,'model'=>$cita,'calificaciones'=>$calificaciones,'proveedor'=>$proveedor,'codexamen'=>$code]
+                      ),
+          ];
+          $i++;
+      }
+    return $steps;
+ }
+ public function actionReprogramaCita(){
+    if(h::request()->isAjax){
+         h::response()->format = \yii\web\Response::FORMAT_JSON;
+     $id=h::request()->get('idcita');
+     $model= $this->findModel($id);
+     $fechaInicio=h::request()->get('finicio');
+     $fechaTermino=h::request()->get('ftermino');
+     if(is_null($fechaTermino)){
+         $verifiFtem=true;
+     }else{
+         $verifiFtem=timeHelper::IsFormatMysqlDateTime($fechaTermino);
+     }
+     if (timeHelper::IsFormatMysqlDateTime($fechaInicio) && 
+         $verifiFtem) {
+    if($model->reprograma($fechaInicio, $fechaTermino)){
+         return ['success'=>yii::t('sta.labels','Se reprogramó la cita')];
+     }else{
+         return ['error'=>yii::t('sta.errors','Hubo problemas: ').$model->getFirstError()]; 
+     }
+} else {
+   return ['error'=>yii::t('sta.errors','Problema en el formato de fechas ')]; 
+}
+     
+     //$mensajes=[];
+    }   
+     
+ }
 }

@@ -3,6 +3,7 @@
 namespace frontend\modules\sta\models;
 use common\models\masters\Documentos;
 use common\behaviors\FileBehavior;
+use frontend\modules\access\models\modelSensibleAccess;
 use Yii;
 
 /**
@@ -16,7 +17,7 @@ use Yii;
  *
  * @property StaTalleresdet $talleresdet
  */
-class StaDocuAlu extends \common\models\base\modelBase
+class StaDocuAlu extends modelSensibleAccess
 {
     /**
      * {@inheritdoc}

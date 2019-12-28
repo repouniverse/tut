@@ -28,8 +28,9 @@
         ) ?>
     </section>
     
-    
-    
+     
+         <?php 
+   ?> 
     <?php echo \yii\helpers\Html::script("$(function(){
       // bind change event to select
       $('#cboFavorites').on('change', function () {

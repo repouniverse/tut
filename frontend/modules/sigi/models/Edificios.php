@@ -3,7 +3,9 @@
 namespace frontend\modules\sigi\models;
 use common\models\masters\Trabajadores;
 use frontend\modules\sigi\models\SigiUnidades;
+use frontend\modules\sigi\models\SigiCuentaspor;
 use common\models\masters\Centros;
+use yii\web\NotFoundHttpException;
 use Yii;
 
 /**
@@ -98,10 +100,28 @@ class Edificios extends \common\models\base\modelBase
     {
         return $this->hasMany(SigiCuentas::className(), ['edificio_id' => 'id']);
     }
+    
+     public function getApoderados()
+    {
+        return $this->hasMany(SigiApoderados::className(), ['edificio_id' => 'id']);
+    }
+    
+    public function getColectores()
+    {
+        return $this->hasMany(SigiCargosedificio::className(), ['edificio_id' => 'id']);
+    }
+    
+    public function getCargos()
+    {
+        return $this->hasMany(SigiCargosgrupoedificio::className(), ['edificio_id' => 'id']);
+    }
+    
     public function getCentro()
     {
         return $this->hasOne(Centros::className(), ['codcen' => 'codcen']);
     }
+    
+    
 
     /**
      * {@inheritdoc}
@@ -149,6 +169,9 @@ class Edificios extends \common\models\base\modelBase
               ]
               )->asArray()->all(),'codpro');  
       }
+      
+  
+      
       
    public static function treeBase(){
        $datos=static::find()->asArray()->all();
@@ -226,6 +249,31 @@ class Edificios extends \common\models\base\modelBase
      return $falta;
    }
      
-       
+  /*
+   * Genera los dcoumentos mensuales de facturacion
+   *  de manera autoamtica : POr ejemplo
+   * lo que sle de partidas de presupsuesto , aquellas 
+   * que son fijas y regulares 
+   */
+   
+  public function generateDocsPorCobrar($mes){
+      foreach($this->colectores as $colector){
+          if($colector->isFijoRegular()){
+              //SigiCuentaspor::
+          }
+      }
+  } 
+  
+  /*Obtiene el emisor por dafulr en el edificio*/
+  public function emisorDefault(){
+     $apoderado= $this->getApoderados()->andWhere(['emisordefault'=>'1'])->one();
+     if(is_null($apoderado)){
+       throw new NotFoundHttpException(Yii::t('sigi.labels', 'El edificio no tiene apoderados emisores, por favor agregue uno por default'));  
+     }else{
+         return $apoderado;
+     }
+     
+  }
+      
       
 }

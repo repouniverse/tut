@@ -4,7 +4,7 @@ namespace frontend\modules\sta\models;
 use frontend\modules\sta\staModule;
 use frontend\modules\sta\models\StaDocuAlu;
 use Yii;
-
+ use common\helpers\timeHelper;
 /**
  * This is the model class for table "{{%sta_talleresdet}}".
  *
@@ -24,6 +24,13 @@ class Talleresdet extends \common\models\base\modelBase
     const SCENARIO_BATCH='batch';
     const SCENARIO_PSICO='psico';
     const SCENARIO_TUTOR='tutor';
+    
+    const CONTACTO_SIN_RESPUESTA='danger';
+    const CONTACTO_CON_RESPUESTA='warning';
+    const CONTACTO_CON_CITA='success';
+    
+    
+    
     /**
      * {@inheritdoc}
      */
@@ -91,6 +98,16 @@ class Talleresdet extends \common\models\base\modelBase
     {
         return $this->hasMany(StaDocuAlu::className(), ['talleresdet_id' => 'id']);
     }
+    
+     public function getCitas()
+    {
+        return $this->hasMany(Citas::className(), ['talleresdet_id' => 'id']);
+    }
+    
+     public function getConvocatorias()
+    {
+        return $this->hasMany(StaConvocatoria::className(), ['talleresdet_id' => 'id']);
+    }
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -139,4 +156,61 @@ class Talleresdet extends \common\models\base\modelBase
         
         
     }
+    
+    /*
+     * fUNCIONQ UE DEVUELVE EL ESTADO DEL ALUMNO 
+     * EN FUNCION DE COMO HA RESPONDIDO A LA CONVOCARTORIA 
+     * SUCCESS= ALUMNO YA ASISTIO POR LO MENOS A SU ROIEMRA CITA 
+     */
+    public function statusContact(){
+        if($this->hasFirstCita()){
+           return self::CONTACTO_CON_CITA; 
+        }else{
+          if($this->hasFirstAnswer()){
+            return self::CONTACTO_CON_RESPUESTA;   
+          }else{
+            return self::CONTACTO_SIN_RESPUESTA;     
+          }   
+        }
+    }
+    
+  public function hasFirstCita(){
+     return ($this->getCitas()->andWhere(['asistio'=>'1'])->count() > 0)?true:false; 
+  }
+  
+  public function hasFirstAnswer(){
+    return($this->getConvocatorias()->andWhere(['resultado'=>'1'])->count()>0)?true:false; 
+  }
+  
+  public function isNotContacted(){
+    return(!$this->hasFirstCita() && !$this->hasFirstAnswer())?true:false;
+  }
+  
+  public function inasistencias(){
+      
+      return $this->citasPasadasQuery()->
+              andWhere(['asistio'=>'0'])->
+              count();
+  }
+  
+  public function asistencias(){
+      
+      return $this->citasPasadasQuery()->
+              andWhere(['asistio'=>'1'])->
+              count();
+  }
+  
+  public function porcentajeAsistencias(){
+      $nasistencias=$this->asistencias();
+      $totales=$this->citasPasadasQuery()->count();
+      if($totales>0)
+      return round((100*($nasistencias/$totales)),0);
+      return 0;
+  }
+  
+  private function citasPasadasQuery(){
+       $ahora=date(timeHelper::formatMysql());
+      return $this->getCitas()->
+              andWhere(['<','fechaprog',$ahora]);
+  }
 }

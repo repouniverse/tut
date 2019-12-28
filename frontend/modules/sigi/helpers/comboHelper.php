@@ -98,8 +98,85 @@ class comboHelper extends Combito
         return [
             \frontend\modules\sigi\models\SigiUnidades::TYP_PROPIETARIO=>yii::t('sigi.labels','PROPIETARIO') ,
             \frontend\modules\sigi\models\SigiUnidades::TYP_INQUILINO=>yii::t('sigi.labels','INQULINO') ,
+            // \frontend\modules\sigi\models\SigiUnidades::TYP_EX_PROPIETARIO=>yii::t('sigi.labels','ANTERIOR-PROPIETARIO') ,
+            // \frontend\modules\sigi\models\SigiUnidades::TYP_EX_INQUILINO=>yii::t('sigi.labels','ANTERIOR-INQUILINO') ,
             ];
-    }  
+    } 
+    
+    /*
+     * Devueklve las juntas de ropietarios del un edificio, solo
+     * las juntas directivas 
+     */
+      public static function getCboJuntas($idedificio){
+         $apode= \frontend\modules\sigi\models\SigiApoderados::find()
+                 ->select(['codpro'])
+                 ->where(['edificio_id'=>$idedificio,'tienejunta'=>'1'])->asArray()->all();
+         
+ $codigos=ArrayHelper::getColumn($apode, 'codpro');
+         //VAR_DUMP($apode,$idedificio,$codigos);DIE();
+        return ArrayHelper::map(
+                \common\models\masters\Clipro::find()->
+                where(['in',
+              'codpro', $codigos
+               ])->all(),
+                'codpro','despro');
+    }
+    
+    /*
+     * Saca los colectores de emision individual
+     * solo los indinviduales
+     * POR EJEMPLO MULTAS, LAVANDERIA, RESERVAS 
+     */
+    public function getCboColectorNoMasivo($idedificio){
+         $colec= \frontend\modules\sigi\models\VwSigiColectores::find()
+                 ->select(['idcolector','descargo'])
+                 ->where(['edificio_id'=>$idedificio,'individual'=>'1'])->asArray()->all();
+         return ArrayHelper::map($colec,'idcolector','descargo'); 
+    }
+    
+    /*
+     * Saca los colectores de emision masiva
+     * solo los imasivas Y ADEMAS  NO presuspuestos 
+     * 
+     * YA NO MULTAS SOLO RECOBOS DE AGUA, CUOTAS EXTRAPORDINARIAS ETC 
+     * 
+     */
+    public function getCboColectorMasivo($idedificio){
+         $colec= \frontend\modules\sigi\models\VwSigiColectores::find()
+                 ->select(['idcolector','descargo'])
+                 ->where(['edificio_id'=>$idedificio])
+                 ->andWhere(['<>','montofijo','1'])
+                // ->andWhere(['<>','regular','1'])
+                  ->andWhere(['<>','individual','1'])
+                 ->asArray()->all();
+         /*echo  \frontend\modules\sigi\models\VwSigiColectores::find()
+                 ->select(['idcolector','descargo'])
+                 ->where(['edificio_id'=>$idedificio])
+                 ->andWhere(['<>','montofijo','1'])
+                 ->andWhere(['<>','regular','1'])
+                  ->andWhere(['<>','individual','1'])->createCommand()->getRawSql();DIE();*/
+         return ArrayHelper::map($colec,'idcolector','descargo'); 
+    }
+    
+    
+    
+     public function getCboColectores($idedificio){
+         $colec= \frontend\modules\sigi\models\VwSigiColectores::find()
+                 ->select(['idcolector','descargo'])
+                 ->where(['edificio_id'=>$idedificio,/*'individual'=>'1'*/])->asArray()->all();
+         return ArrayHelper::map($colec,'idcolector','descargo'); 
+    }
+    
+      public static function getCboUnitsByEdificio($id_edificio){
+     
+          return ArrayHelper::map(
+                          \frontend\modules\sigi\models\SigiUnidades::find()
+                  ->where(['edificio_id'=>$id_edificio])
+                   ->andWhere(['imputable'=>'1'])->
+                  all(),
+                'id','numero'); 
+     
+    }
 }
 
 

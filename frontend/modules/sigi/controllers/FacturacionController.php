@@ -5,6 +5,7 @@ namespace frontend\modules\sigi\controllers;
 use Yii;
 use frontend\modules\sigi\models\SigiFacturacion;
 use frontend\modules\sigi\models\SigiFacturacionSearch;
+use frontend\modules\sigi\models\SigiCuentasporSearch;
 use frontend\controllers\base\baseController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -96,7 +97,11 @@ class FacturacionController extends baseController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+          $searchModel = new SigiCuentasporSearch();
+         $dataProviderCuentasPor = $searchModel->searchByFactu($model->id);
 
+        
+        
         if (h::request()->isAjax && $model->load(h::request()->post())) {
                 h::response()->format = Response::FORMAT_JSON;
                 return ActiveForm::validate($model);
@@ -108,6 +113,7 @@ class FacturacionController extends baseController
 
         return $this->render('update', [
             'model' => $model,
+            'dataProviderCuentasPor' =>$dataProviderCuentasPor,
         ]);
     }
 

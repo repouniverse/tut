@@ -54,7 +54,24 @@ class ProgramasController extends baseController
      */
     public function actionIndex()
     {
+        $class = new  \ReflectionClass('\frontend\modules\sta\models\Alumnos');
+       $clase='\frontend\modules\sta\models\Entregas';
        
+       //var_dump(is_subclass_of($clase, \common\models\base\modelBase::className()));
+        //var_dump($class->getParentClass());die();
+       /* $expre='/[0-9]{4}-[0-9]{1}[0-2]{1}-[0-3]{1}[0-9]{1} [0-2]{1}[0-9]{1}:[0-5]{1}[0-9]{1}:[0-5]{1}[0-9]{1}/';
+        $fecha='2019-12-24 09:00:00';
+       var_dump(preg_match($expre,$fecha));die();*/
+        /*$model= \frontend\modules\sta\models\Examenes::findOne(29);
+        var_dump($model->getExamenesDet()->count());die();
+        */
+        
+       /* $model= Citas::findOne(84);
+        $model->fechaprog='24/12/2019 13:10:00';
+       // var_dump($model->tallerProg()->range($model->toCarbon('fechaprog')));
+        var_dump($model->esFeriado(),$model->isInJourney(),$model->isFreeForPsico(),$model->getFirstError());
+       die();*/
+        
         /*select 
         d.ap as aptutor,d.am as amtutor,d.nombres as nombretutor,
                 s.codperiodo,
@@ -532,7 +549,7 @@ public function actionMakeCitaByStudent(){
         $fecha=h::request()->get('fecha');
         $model= Tallerpsico::findOne($id);
        // print_r($model->getTalleresdet($codalu)->attributes);
-        //var_dump($model->talleres_id);die();
+        //var_dump($model->attributes);die();
         $validator = new \yii\validators\RegularExpressionValidator(['pattern'=> h::gsetting('sta', 'regexcodalu')]);
         if($validator->validate($codalu, $error) && !is_null($model)) {
             $attributes=[
@@ -544,20 +561,26 @@ public function actionMakeCitaByStudent(){
                 
             ];
            // var_dump($fecha,$model::_FDATETIME,$model::SwichtFormatDate($fecha,$model::_FDATETIME,true));die();
-           
+       
              h::response()->format = \yii\web\Response::FORMAT_JSON;
             if(Citas::firstOrCreateStatic($attributes,Citas::SCE_CREACION_BASICA)){
               $datos['success']=yii::t('sta.errors','Se ha creado la cita satisfactoriamente');
                 
             }else{
-              $datos['error']=yii::t('sta.errors','Hubo un problema interno al grabar el registro de las citas ');
-              
+                $mod=new Citas(Citas::SCE_CREACION_BASICA);
+                $mod->setAttributes($attributes);
+                $mod->validate();
+              $datos['error']=yii::t('sta.errors','Hubo un problema interno al grabar el registro de las citas : '.$mod->getFirstErrors());
+                UNSET($mod);
             }
                 
            return $datos; 
             
             
-                } 
+                } else{
+                  $datos['error']=yii::t('sta.errors','El código de alumno no es el adecuado');
+                
+                }
  
        
     }

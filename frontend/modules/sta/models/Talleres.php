@@ -393,24 +393,32 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
        * dada una fecha  un carbnon con la fecha-hora de inicio
        * y tro Carbsn la fecha hora termino d edia 
        * Dando solo una fecha 
-       * var : $fecha   cadena en formato  ''
+       * var : $fecha   Carbon
+       * Ojo: solo busca dentro de los dias marcados como activos 
        */
-      public function  range($fecha){
+      public function  range($fecha=null){
+           ///Solo los dias o jornadas  activos , ooj verifique bien 
+          //la programacion
            $rangos=$this->rangesArray();
-         if(is_null($fecha)){
-            $carbon=toCarbon('finicitas');
-         }else{             
-             $carbon= Carbon::createFromFormat(                     
-                     $this->formatToCarbon(self::_FDATE),
-                     $fecha
-                     );
-         }
-         $hinicio=substr($rangos[$carbon->dayOfWeek]['hinicio'],0,2)+0;
-         $hfinal=substr($rangos[$carbon->dayOfWeek]['hfin'],0,2)+0;
-          $rang=new \common\helpers\RangeDates([
-                  $carbon->hour($hinicio)->copy(),
-                 $carbon->hour($hfinal)->copy() 
-                  ]);unset($carbon);
+           //Si el dia cae dentro del rango
+           if(array_key_exists($fecha->dayOfWeek, $rangos)){
+               $hinicio=substr($rangos[$fecha->dayOfWeek]['hinicio'],0,2)+0;
+                $hfinal=substr($rangos[$fecha->dayOfWeek]['hfin'],0,2)+0;
+                $minicio=substr($rangos[$fecha->dayOfWeek]['hinicio'],3,2)+0;
+                $mfinal=substr($rangos[$fecha->dayOfWeek]['hfin'],3,2)+0;
+                /*yii::error('hora inicio '.$hinicio);
+                 yii::error('hora final '.$hfinal);
+                  yii::error($fecha->hour($hinicio)->copy());
+                  yii::error($fecha->hour($hfinal)->copy());*/
+               //$carbonInicio=$fecha->hour()->
+                $rang=new \common\helpers\RangeDates([
+                  $fecha->hour($hinicio)->minute($minicio)->copy(),
+                 $fecha->hour($hfinal)->minute($mfinal)->copy() 
+                  ]);
+           }else{
+              $rang=null;
+           }
+         unset($carbon);
             return $rang;
       }
       
@@ -441,7 +449,79 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
             '>','fechaprog',date('Y-d-m')
             ]);
      }
+   
+ public function nAlumnos(){
+   return Aluriesgo::studentsInRiskByFacQuery($this->codfac)->count();  
+ } 
+ 
+/*
+ * Funciones para KPI
+ * Estas funciones deben de ser cacheadas
+ */
+ 
+ 
+ /*Alunos que por lo menos tienen una aistencia */
+private function kp_nAlusConAsistencia(){
+    $citasAsistidas=array_column(Citas::find()->
+            select('talleresdet_id')->distinct()
+            ->where(['talleres_id'=>$this->id])
+            ->andWhere(['asistio'=>'1'])
+            ->asArray()->all(),'talleresdet_id');
+  return Talleresdet::find()->where([
+      'in','id',$citasAsistidas
+  ])->count();
+    
+}
+
+/*Alunos que han  contestado a alguan llamada o aviso  */
+private function kp_nAlusRespondieron(){
+    $idtes=array_column($this->getAlumnos()->
+            select('id')->distinct()           
+           ->asArray()->all(),'id');
+    /*var_dump($idtes);*/
+    $convocatorias=array_column(StaConvocatoria::find()->
+            select('talleresdet_id')->distinct()
+            ->where(['in','talleresdet_id',$idtes])
+            ->andWhere(['resultado'=>'1']) //contestaron la llamada o aviso 
+            ->asArray()->all(),'talleresdet_id');
+    /*var_dump(StaConvocatoria::find()->
+            select('talleresdet_id')->distinct()
+            ->where(['in','talleresdet_id',$idtes])
+            ->andWhere(['resultado'=>'1'])->createCommand()->getRawSql());die();*/
+  return Talleresdet::find()->where([
+      'in','id',$convocatorias
+  ])->andWhere([
+      'not in','id',
+      array_column(Citas::find()->
+            select('talleresdet_id')->distinct()
+            ->where(['talleres_id'=>$this->id])
+            ->andWhere(['asistio'=>'1'])
+            ->asArray()->all(),'talleresdet_id')
+            ])->count();
+    
+}
+
+public function kp_contactados(){
+   $nalumnos=$this->nAlumnos();
+   $conAsistencia=$this->kp_nAlusConAsistencia();
+    $respondieron=$this->kp_nAlusRespondieron();
+    $sincontacto=$nalumnos-$conAsistencia-$respondieron;
+    return [
+        Talleresdet::CONTACTO_CON_CITA=>($nalumnos >0)?round(100*$conAsistencia/$nalumnos,1):0,
+         Talleresdet::CONTACTO_CON_RESPUESTA=>($nalumnos >0)?round(100*$respondieron/$nalumnos,1):0,
+         Talleresdet::CONTACTO_SIN_RESPUESTA=>($nalumnos >0)?round(100*$sincontacto/$nalumnos,1):0,
+            ];
+}
+public static function kp_contactadosEmpty(){
+   return [
+        Talleresdet::CONTACTO_CON_CITA=>0,
+         Talleresdet::CONTACTO_CON_RESPUESTA=>0,
+         Talleresdet::CONTACTO_SIN_RESPUESTA=>0,
+            ];
+}
+
+
+
      
-          
     }
 

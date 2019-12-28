@@ -9,10 +9,10 @@ echo \yii\grid\GridView::widget([
     'summary' => '',
     'emptyCell'=>'',
     
-          'tableOptions'=>['class'=>'table table-responsive no-margin'],
+          'tableOptions'=>[/*'class'=>'table table-responsive no-margin'*/],
                'dataProvider' => $dataProvider,        
         'columns' =>$columnas ,
-     'pager' => ['options'=>['visible'=>false]],
+    // 'pager' => ['options'=>['visible'=>false]],
         ]
     ); ?>
 

@@ -15,6 +15,8 @@ class linkAjaxGridWidget extends Widget
    public $question="Está seguro de efectuar esta acción?";
    public $mode='json'; //puede ser json, html
      public $divReplace=null; //puede ser json, html
+    public $posicion=View::POS_HEAD;
+     //
    // private $_varsJs=[];
     
     public function init()
@@ -73,8 +75,10 @@ class linkAjaxGridWidget extends Widget
       $confirm=($this->confirm)?$cad:'';
      // $mesage=yii::t('base.verbs','Are you Sure to Delete this Record ?');
    $cadenaJs="$('div[id=\"".$this->idGrilla."\"] [family=\"".$this->family."\"]').on( '".$this->evento."', function() { 
-            $.ajax({
+           
+$.ajax({
               url: this.title,
+              
               type: '".$this->type."',
               data:JSON.parse(this.id) ,
               dataType: 'json',".$confirm." 
@@ -114,7 +118,7 @@ class linkAjaxGridWidget extends Widget
             . "})";
        
   // echo  \yii\helpers\Html::script($stringJs);
-   $this->getView()->registerJs($cadenaJs);
+   $this->getView()->registerJs($cadenaJs,$this->posicion);
    // $this->getView()->registerJs($stringJs2);
                         }     
         

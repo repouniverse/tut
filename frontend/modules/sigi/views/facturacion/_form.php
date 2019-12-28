@@ -5,6 +5,9 @@ use yii\widgets\ActiveForm;
 use frontend\modules\sigi\helpers\comboHelper;
 use common\helpers\timeHelper;
 use common\helpers\h;
+
+use yii\grid\GridView;
+use yii\widgets\Pjax;
 /* @var $this yii\web\View */
 /* @var $model frontend\modules\sigi\models\SigiFacturacion */
 /* @var $form yii\widgets\ActiveForm */
@@ -80,6 +83,72 @@ use common\helpers\h;
  </div>
      
     <?php ActiveForm::end(); ?>
+ <div style='overflow:auto;'>
+      <?php Pjax::begin(); ?>
+    <?= GridView::widget([
+        'dataProvider' =>$dataProviderCuentasPor,
+         'summary' => '',
+         'tableOptions'=>['class'=>'table table-condensed table-hover table-bordered table-striped'],
+        //'filterModel' => $searchModel,
+        'columns' => [
+         [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{update}',
+                'buttons' => [
+                    'update' => function($url, $model) {                        
+                        $options = [
+                            'title' => Yii::t('base.verbs', 'Update'),                            
+                        ];
+                        return Html::a('<span class="btn btn-info btn-sm glyphicon glyphicon-pencil"></span>', $url, $options/*$options*/);
+                         },
+                          'view' => function($url, $model) {                        
+                        $options = [
+                            'title' => Yii::t('base.verbs', 'View'),                            
+                        ];
+                        return Html::a('<span class="btn btn-warning btn-sm glyphicon glyphicon-search"></span>', $url, $options/*$options*/);
+                         },
+                         'delete' => function($url, $model) {                        
+                        $options = [
+                            'data-confirm' => Yii::t('rbac-admin', 'Are you sure you want to activate this user?'),
+                            'title' => Yii::t('base.verbs', 'Delete'),                            
+                        ];
+                        return Html::a('<span class="btn btn-danger btn-sm glyphicon glyphicon-remove"></span>', $url, $options/*$options*/);
+                         }
+                    ]
+                ],
+           ['class' => 'frontend\modules\report\components\columnGridReport',
+                   'attribute'=>'report_id'],
+           // 'id',
+              ['attribute'=>'edificio_id',
+                  'filter'=> frontend\modules\sigi\helpers\comboHelper::getCboEdificios(),
+                  'value'=>'edificio.codigo'
+                  ],
+           /* ['attribute'=>'codocu',
+                  'filter'=> frontend\modules\sigi\helpers\comboHelper::getCboDocuments(),
+                  'value'=>'documento.desdocu'
+                  ],*/
+                            
+             ['attribute'=>'colector_id',
+                  //'filter'=> frontend\modules\sigi\helpers\comboHelper::getCboColectores($model->edificio_id),
+                  'value'=>'colector.cargo.descargo'
+                  ],               
+           // 'codocu',
+            'descripcion',
+            'fedoc',
+                            
+            'mes',
+            'anio',
+            //'detalle:ntext',
+            //'fevenc',
+            'monto',
+            //'igv',
+            //'codestado',
 
+          
+        ],
+    ]); ?>
+    <?php Pjax::end(); ?>
+</div>       
+          
 </div>
     </div>

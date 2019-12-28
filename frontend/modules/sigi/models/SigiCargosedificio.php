@@ -4,6 +4,7 @@ namespace frontend\modules\sigi\models;
 
 use Yii;
 
+
 /**
  * This is the model class for table "{{%sigi_cargosedificio}}".
  *
@@ -22,8 +23,16 @@ use Yii;
  * @property SigiCargosgrupoedificio $codgrupo0
  * @property SigiCargos $cargo
  */
-class SigiCargosedificio extends \common\models\base\modelBase
+class SigiCargosedificio extends \common\models\base\modelBase /*implements
+frontend\modules\sigi\interfaces\colectoresInterface*/
 {
+   private $_monto;
+    public $booleanFields= [
+        'regular',
+        'individual',
+        'montofijo',
+        'emisorexterno'
+        ];
     /**
      * {@inheritdoc}
      */
@@ -41,7 +50,7 @@ class SigiCargosedificio extends \common\models\base\modelBase
             [['edificio_id', 'cargo_id', 'tasamora', 'grupo_id'], 'required'],
             [['edificio_id', 'cargo_id', 'plazovencimiento', 'frecuencia'], 'integer'],
             [['tasamora'], 'number'],
-           // [['codgrupo'], 'string', 'max' => 3],
+            [['individual'],'safe'],
             [['regular', 'montofijo'], 'string', 'max' => 1],
             [['edificio_id'], 'exist', 'skipOnError' => true, 'targetClass' => Edificios::className(), 'targetAttribute' => ['edificio_id' => 'id']],
             //[['codgrupo'], 'exist', 'skipOnError' => true, 'targetClass' => SigiCargosgrupoedificio::className(), 'targetAttribute' => ['grupo_id' => 'id']],
@@ -91,7 +100,16 @@ class SigiCargosedificio extends \common\models\base\modelBase
     {
         return $this->hasOne(SigiCargos::className(), ['id' => 'cargo_id']);
     }
-
+ public function getCuentaspor()
+    {
+        return $this->hasMany(SigiCuentaspor::className(), ['colector_id'=>'id']);
+    }
+    
+  public function getBasePresupuesto()
+    {
+        return $this->hasMany(SigiBasePresupuesto::className(), ['cargosedificio_id'=>'id']);
+    }  
+    
     /**
      * {@inheritdoc}
      * @return SigiCargosedificioQuery the active query used by this AR class.
@@ -114,8 +132,88 @@ class SigiCargosedificio extends \common\models\base\modelBase
     
     public function beforeSave($insert) {
         IF($insert){
+           $this->resolveDefaults();
             $this->codigo=$this->correlativo('codigo',null,'edificio_id');
         }
         RETURN parent::beforeSave($insert);
     }
-}
+    
+  public function isMedidor(){
+      return !empty($this->tipomedidor);
+  }
+   
+  public function isFijoRegular(){
+      return ($this->regular && $this->montofijo);
+  }
+  
+  public function isBudget(){
+      return ($this->isFijoRegular() && !$this->emisorexterno);
+  }
+  
+  public function isMassive(){
+      return (!$this->individual);
+  }
+    
+   public function factorProRateo(){
+       
+   }
+    
+    public function montoTotal($mes,$anio){
+     if($this->isBudget()){
+          /* yii::error(SigiBasePresupuesto::find()->
+                 select('sum(mensual) as monto')->where(
+                    ['cargosedificio_id'=>$this->id,'ejercicio'=>$anio]
+            )->createCommand()->getRawSql());*/
+         $valor=SigiBasePresupuesto::find()->
+                 select('sum(mensual) as monto')->where(
+                    ['cargosedificio_id'=>$this->id,'ejercicio'=>$anio]
+            )->scalar();
+         return is_null($valor)?0:$valor;
+     }else{
+        /* yii::error(SigiCuentaspor::find()->
+                 select('sum(monto)as monto')->where(
+                    ['colector_id'=>$this->id,'mes'=>$mes,'anio'=>$anio]
+            )->createCommand()->getRawSql());*/
+         $valor=SigiCuentaspor::find()->
+                 select('sum(monto)as monto')->where(
+                    ['colector_id'=>$this->id,'mes'=>$mes,'anio'=>$anio]
+            )->scalar();
+         return is_null($valor)?0:$valor;
+     }
+    }
+    
+    
+     
+     public function dataProvider($mes){
+     if($this->isBudget()){
+         return SigiBasePresupuesto::find()->
+                 select('sum(mensual)as monto')->where(
+                    ['cargosedificio_id'=>$this->id,'mes'=>$mes]
+            )->scalar();
+     }else{
+         return SigiCuentaspor::find()->
+                 select('sum(monto)as monto')->where(
+                    ['colector_id'=>$this->id,'mes'=>$mes]
+            )->scalar();
+     }
+     
+     
+    }
+    /*
+     * Ubica las fuentes de cobranza
+     */
+    public function sourceProvider($mes){
+       
+    }
+    
+    public function resolveDefaults(){
+        foreach($this->booleanFields as $campo){
+            if(is_null($this->{$campo})){
+                $this->{$campo}='0';
+            }
+        }
+        return true;
+    }
+  
+}  
+

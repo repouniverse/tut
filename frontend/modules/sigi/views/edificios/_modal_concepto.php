@@ -24,7 +24,7 @@ use common\widgets\selectwidget\selectWidget;
           <?= \common\widgets\buttonsubmitwidget\buttonSubmitWidget::widget(
                   ['idModal'=>$idModal,
                     'idForm'=>'myformulario',
-                      'url'=> \yii\helpers\Url::to(['/sigi/'.$this->context->id.'/agrega-concepto','id'=>$id]),
+                      'url'=> \yii\helpers\Url::to(['/sigi/'.$this->context->id.'/'.(($model->isNewRecord)?'agrega':'edita').'-concepto','id'=>$id]),
                      'idGrilla'=>$gridName, 
                       ]
                   )?>

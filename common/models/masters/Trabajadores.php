@@ -90,20 +90,20 @@ class Trabajadores extends modelBase implements \common\interfaces\PersonInterfa
     public function attributeLabels()
     {
         return [
-            'codigotra' => Yii::t('base.names', 'Code'),
-            'ap' => Yii::t('base.names', 'Last Name'),
-            'am' => Yii::t('base.names', "Mother's last name"),
-            'nombres' => Yii::t('base.names', 'Names'),
-            'dni' => Yii::t('base.names', 'Identity Document'),
-            'ppt' => Yii::t('base.names', 'Safe passage'),
-            'pasaporte' => Yii::t('base.names', 'Passport'),
-            'codpuesto' => Yii::t('base.names', 'Position'),
-            'cumple' => Yii::t('base.names', 'Date of Birth'),
-            'fecingreso' => Yii::t('base.names', 'Admission date'),
-            'domicilio' => Yii::t('base.names', 'Address'),
-            'telfijo' => Yii::t('base.names', 'Phone Number'),
-            'telmoviles' => Yii::t('base.names', 'Moviles Phone Numbers'),
-            'referencia' => Yii::t('base.names', 'References'),
+            'codigotra' => Yii::t('base.names', 'Código'),
+            'ap' => Yii::t('base.names', 'A Pat'),
+            'am' => Yii::t('base.names', "A Mat"),
+            'nombres' => Yii::t('base.names', 'Nombres'),
+            'dni' => Yii::t('base.names', 'Doc. Id.'),
+            'ppt' => Yii::t('base.names', 'PPT'),
+            'pasaporte' => Yii::t('base.names', 'Pasaporte'),
+            'codpuesto' => Yii::t('base.names', 'Cargo'),
+            'cumple' => Yii::t('base.names', 'F Nac.'),
+            'fecingreso' => Yii::t('base.names', 'F. ingreso'),
+            'domicilio' => Yii::t('base.names', 'Dirección'),
+            'telfijo' => Yii::t('base.names', 'Tel Fijo'),
+            'telmoviles' => Yii::t('base.names', 'Movil'),
+            'referencia' => Yii::t('base.names', 'Referencias'),
         ];
     }
 

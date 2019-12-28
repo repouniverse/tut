@@ -23,7 +23,7 @@ use common\widgets\selectwidget\selectWidget;
           <?= \common\widgets\buttonsubmitwidget\buttonSubmitWidget::widget(
                   ['idModal'=>$idModal,
                     'idForm'=>'myformulario',
-                      'url'=> \yii\helpers\Url::to(['/sigi/'.$this->context->id.'/agrega-grupo','id'=>$id]),
+                      'url'=> \yii\helpers\Url::to(['/sigi/'.$this->context->id.'/'.(($model->isNewRecord)?'agrega':'edita').'-grupo','id'=>$id]),
                      'idGrilla'=>$gridName, 
                       ]
                   )?>

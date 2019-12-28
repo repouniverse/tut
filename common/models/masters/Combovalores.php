@@ -81,6 +81,7 @@ class Combovalores extends \common\models\base\modelBase
        if(!is_null($codcentro))
       $reg= static::find()->where(['nombretabla'=>$key,'codigo'=>$valor,'codcen'=>$codcentro])->one();
        $reg= static::find()->where(['nombretabla'=>$key,'codigo'=>$valor])->one();
+      // yii::error($reg->attributes);
       if(is_null($reg))
           return '';
        return $reg->valor;

@@ -7,7 +7,7 @@ use yii\widgets\Pjax;
 /* @var $searchModel frontend\modules\sigi\models\SigiCuentasporSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('sigi.labels', 'Sigi Cuentaspors');
+$this->title = Yii::t('sigi.labels', 'Recibos');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="sigi-cuentaspor-index">
@@ -19,7 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a(Yii::t('sigi.labels', 'Create Sigi Cuentaspor'), ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a(Yii::t('sigi.labels', 'Crear Recibos'), ['create'], ['class' => 'btn btn-success']) ?>
     </p>
     <div style='overflow:auto;'>
     <?= GridView::widget([
@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
          
          [
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{update}{delete}{view}',
+                'template' => '{update}',
                 'buttons' => [
                     'update' => function($url, $model) {                        
                         $options = [
@@ -55,22 +55,36 @@ $this->params['breadcrumbs'][] = $this->title;
                          }
                     ]
                 ],
-         
+           ['class' => 'frontend\modules\report\components\columnGridReport',
+                   'attribute'=>'report_id'],
          
          
          
          
 
-            'id',
-            'edificio_id',
-            'codocu',
+           // 'id',
+              ['attribute'=>'edificio_id',
+                  'filter'=> frontend\modules\sigi\helpers\comboHelper::getCboEdificios(),
+                  'value'=>'edificio.codigo'
+                  ],
+           /* ['attribute'=>'codocu',
+                  'filter'=> frontend\modules\sigi\helpers\comboHelper::getCboDocuments(),
+                  'value'=>'documento.desdocu'
+                  ],*/
+                            
+             ['attribute'=>'colector_id',
+                  //'filter'=> frontend\modules\sigi\helpers\comboHelper::getCboColectores($model->edificio_id),
+                  'value'=>'colector.cargo.descargo'
+                  ],               
+           // 'codocu',
             'descripcion',
             'fedoc',
-            //'mes',
-            //'anio',
+                            
+            'mes',
+            'anio',
             //'detalle:ntext',
             //'fevenc',
-            //'monto',
+            'monto',
             //'igv',
             //'codestado',
 

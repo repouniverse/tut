@@ -67,10 +67,10 @@ trait timeTrait
     public function isRangeIntoOtherRange(RangeDates $rangeCompare, //rango a buscar
             RangeDates $rangeSearch, //rANGO A COMPARAR 
             $withBorder=true){
-        yii::error($this->intofisrtCondition($rangeCompare, $rangeSearch, $withBorder));
-      yii::error($this->intoSecondCondition($rangeCompare, $rangeSearch));
-       yii::error( $this->intoThirdCondition($rangeCompare, $rangeSearch));
-          yii::error($this->intoFourthCondition($rangeCompare, $rangeSearch) );
+        if(is_null($rangeCompare) or is_null($rangeSearch))return false;
+        /*yii::error('****inicinac********');
+         yii::error($rangeSearch->initialDate->format('Y-m-d H:i'));
+        yii::error($rangeSearch->finalDate->format('Y-m-d H:i'));*/
         return (
                  $this->intofisrtCondition($rangeCompare, $rangeSearch, $withBorder) &&
                  (
@@ -89,35 +89,77 @@ trait timeTrait
      */
   private function intofisrtCondition(RangeDates $rangeCompare, 
           RangeDates $rangeSearch,$withBorder=true){
+      /*yii::error('***primera condicion**');
+       yii::error($rangeSearch->initialDate->format('H:i'));
+        yii::error($rangeSearch->finalDate->format('H:i'));*/
       if($withBorder){
+          /*yii::error(!($rangeCompare->finalDate->lessThanOrEqualTo($rangeSearch->initialDate) or
+             $rangeCompare->initialDate->greaterThanOrEqualTo($rangeSearch->finalDate)));
+          */
            return !($rangeCompare->finalDate->lessThanOrEqualTo($rangeSearch->initialDate) or
              $rangeCompare->initialDate->greaterThanOrEqualTo($rangeSearch->finalDate)); 
              
          }else{
+             /*yii::error(($rangeCompare->finalDate->lessThan($rangeSearch->initialDate) or
+             $rangeCompare->initialDate->greaterThan($rangeSearch->finalDate)));*/
+             
             return !($rangeCompare->finalDate->lessThan($rangeSearch->initialDate) or
              $rangeCompare->initialDate->greaterThan($rangeSearch->finalDate));        
          }
   }
 
 private function intoSecondCondition(RangeDates $rangeCompare, 
-          RangeDates $rangeSearch){      
-         return (($rangeCompare->getDiff($rangeCompare->finalDate,$rangeSearch->initialDate) >= (1-$rangeCompare->tolerance)*$rangeCompare->duration) &&
+          RangeDates $rangeSearch){   
+    /* yii::error('**Segunda condicion**');
+         yii::error('Diferencia de tfc-to : '.$rangeCompare->getDiff($rangeCompare->finalDate,$rangeSearch->initialDate));
+         yii::error('Duracion del rango pequeni : '.$rangeCompare->duration);
+          yii::error('Porcentaje de tolerancia : '.(1-$rangeCompare->tolerance));
+           yii::error('Comparando si tfc-to > ()%duracion: '.($rangeCompare->getDiff($rangeCompare->finalDate,$rangeSearch->initialDate) >= (1-$rangeCompare->tolerance)*$rangeCompare->duration)?'ok':'no cumple');
+            yii::error('Comparando toc < to : '.($rangeCompare->initialDate->lessThanOrEqualTo($rangeSearch->initialDate))?'ok':'falso');
+         yii::error($rangeSearch->initialDate->format('H:i'));
+        yii::error($rangeSearch->finalDate->format('H:i'));*/
+            /* yii::error((($rangeCompare->getDiff($rangeCompare->finalDate,$rangeSearch->initialDate) >= (1-$rangeCompare->tolerance)*$rangeCompare->duration) &&
+           ($rangeCompare->initialDate->lessThanOrEqualTo($rangeSearch->initialDate))
+           ));*/
+             
+            return (($rangeCompare->getDiff($rangeCompare->finalDate,$rangeSearch->initialDate) >= (1-$rangeCompare->tolerance)*$rangeCompare->duration) &&
            ($rangeCompare->initialDate->lessThanOrEqualTo($rangeSearch->initialDate))
            );
            
   }
  
   private function intoThirdCondition(RangeDates $rangeCompare, 
-          RangeDates $rangeSearch){      
-         return (($rangeCompare->initialDate->greaterThanOrEqualTo($rangeSearch->initialDate)) &&
+          RangeDates $rangeSearch){  
+           /* yii::error('**Tercera condicion**');
+       yii::error('Comparando toc >=to : '.($rangeCompare->initialDate->greaterThanOrEqualTo($rangeSearch->initialDate))?'yes':'falso');
+        yii::error($rangeCompare->initialDate->format('H:i'));
+       yii::error($rangeCompare->finalDate->format('H:i'));
+        yii::error($rangeSearch->initialDate->format('H:i'));
+        yii::error($rangeSearch->finalDate->format('H:i'));
+       yii::error('Comparando tfc <= tf : '.($rangeCompare->finalDate->lessThanOrEqualTo($rangeSearch->finalDate))?'yes':'falso');
+        yii::error('Porcentaje de tolerancia : '.(1-$rangeCompare->tolerance));
+          */
+          
+          $valida=(($rangeCompare->initialDate->greaterThanOrEqualTo($rangeSearch->initialDate)) &&
            ($rangeCompare->finalDate->lessThanOrEqualTo($rangeSearch->finalDate))
            );
+         // yii::error($valida);
+         return $valida;
            
   }
 
   
   private function intoFourthCondition(RangeDates $rangeCompare, 
-          RangeDates $rangeSearch){      
+          RangeDates $rangeSearch){  
+  /*yii::error('**Cuarta  condicion**');
+       yii::error('Diferencia de tfc-tf : '.($rangeCompare->getDiff($rangeCompare->finalDate,$rangeSearch->finalDate))?'yes':'no');
+         yii::error('Duracion del rango pequeni : '.$rangeCompare->duration);
+          yii::error('Tolerancia del rango grande : '.($rangeCompare->tolerance));
+           yii::error('Comparando si tfc-tf < tolerancia*duracion: '.($rangeCompare->getDiff($rangeCompare->finalDate,$rangeSearch->finalDate) < ($rangeCompare->tolerance)*$rangeCompare->duration)?'ok':'no cumple');
+            yii::error('Comparando toc <= tf : '.($rangeCompare->initialDate->lessThanOrEqualTo($rangeSearch->finalDate))?'ok':'falso');
+        yii::error((($rangeCompare->getDiff($rangeCompare->finalDate,$rangeSearch->finalDate) < ($rangeCompare->tolerance)*$rangeCompare->duration) &&
+           ($rangeCompare->initialDate->lessThanOrEqualTo($rangeSearch->finalDate))
+           ));*/
          return (($rangeCompare->getDiff($rangeCompare->finalDate,$rangeSearch->finalDate) < ($rangeCompare->tolerance)*$rangeCompare->duration) &&
            ($rangeCompare->initialDate->lessThanOrEqualTo($rangeSearch->finalDate))
            );
@@ -133,6 +175,18 @@ private function intoSecondCondition(RangeDates $rangeCompare,
           RangeDates $rangeSearch){
       return !($rangeSearch->initialDate->greaterThan($rangeCompare->finalDate) or
        $rangeCompare->initialDate->greaterThan($rangeSearch->finalDate));
+  }
+  
+  
+  public function isRangeInOtherGroupRanges(RangeDates $rangeCompare,$groupRanges,$withBorders=true){
+      $retorno=false;
+      foreach($groupRanges as $rangeSearch){
+          if($this->isRangeIntoOtherRange($rangeCompare, $rangeSearch, $withBorders)){
+              $retorno=true;
+              break;
+          }
+      }
+      return $retorno;
   }
   
 }
