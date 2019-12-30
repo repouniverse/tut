@@ -154,9 +154,7 @@ frontend\modules\sigi\interfaces\colectoresInterface*/
       return (!$this->individual);
   }
     
-   public function factorProRateo(){
-       
-   }
+   
     
     public function montoTotal($mes,$anio){
      if($this->isBudget()){

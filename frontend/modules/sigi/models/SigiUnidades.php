@@ -348,9 +348,16 @@ class SigiUnidades extends \common\models\base\modelBase
      
    }
   
+   
+   
    public function CalculoColector(colectoresInterface $colector){
       return $colector->factorProRateo()->montoTotal()->insertCosto();
+      
    }
+   
+   
+  
+   
    
    public function firstMedidor($type){
        return $this->getSigiSuministros()->andWhere(['tipo'=>$type])->one();

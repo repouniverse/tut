@@ -2,6 +2,7 @@
  use kartik\date\DatePicker;
  use common\widgets\cbodepwidget\cboDepWidget as ComboDep;
 use yii\helpers\Html;
+
 use yii\grid\GridView;
 use yii\widgets\Pjax;
 use common\helpers\h;
@@ -15,15 +16,21 @@ use common\widgets\selectwidget\selectWidget;
 
 <div class="sigi-cuentaspor-form">
    
-    <?php $form = ActiveForm::begin([
+    <?php $form = ActiveForm::begin(['id'=>'myformulario',
     'fieldClass'=>'\common\components\MyActiveField'
     ]); ?>
       <div class="box-header">
         <div class="col-md-12">
             <div class="form-group no-margin">
-                
-        <?= Html::submitButton('<span class="fa fa-save"></span>   '.Yii::t('sigi.labels', 'Guardar'), ['class' => 'btn btn-success']) ?>
-            
+          <?= \common\widgets\buttonsubmitwidget\buttonSubmitWidget::widget(
+                  ['idModal'=>$idModal,
+                    'idForm'=>'myformulario',
+                      'url'=> \yii\helpers\Url::to(['/sigi/'.$this->context->id.'/create-as-child','id'=>$modelFacturacion->id]),
+                     'idGrilla'=>$gridName, 
+                      ]
+                  )?>
+         
+                  
 
             </div>
         </div>
@@ -32,58 +39,17 @@ use common\widgets\selectwidget\selectWidget;
     
  
     <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12"> 
-     
-    <?= ComboDep::widget([
-               'model'=>$model,               
-               'form'=>$form,
-               'data'=> comboHelper::getCboEdificios(),
-               'campo'=>'edificio_id',
-               'idcombodep'=>'sigicuentaspor-colector_id',
-               /* 'source'=>[ //fuente de donde se sacarn lso datos 
-                    /*Si quiere colocar los datos directamente 
-                     * para llenar el combo aqui , hagalo coloque la matriz de los datos
-                     * aqui:  'id1'=>'valor1', 
-                     *        'id2'=>'valor2,
-                     *         'id3'=>'valor3,
-                     *        ...
-                     * En otro caso 
-                     * de la BD mediante un modelo  
-                     */
-                        /*Docbotellas::className()=>[ //NOmbre del modelo fuente de datos
-                                        'campoclave'=>'id' , //columna clave del modelo ; se almacena en el value del option del select 
-                                        'camporef'=>'descripcion',//columna a mostrar 
-                                        'campofiltro'=>'codenvio'/* //cpolumna 
-                                         * columna que sirve como criterio para filtrar los datos 
-                                         * si no quiere filtrar nada colocwue : false | '' | null
-                                         *
-                        
-                         ]*/
-                    'source'=>[\frontend\modules\sigi\helpers\comboHelper::class=>
-                                [
-                                 // 'campoclave'=>'idcolector' , //columna clave del modelo ; se almacena en el value del option del select 
-                                       // 'camporef'=>'descargo',//columna a mostrar 
-                                        'campofiltro'=>'getCboColectorMasivo'  
-                                ]
-                                ],
-                            ]
-               
-               
-        )  ?>
-     
-
-
+      <?= $form->field($model, 'edificio_id')->dropDownList(
+             comboHelper::getCboEdificios(),
+             ['disabled'=>'disabled']
+             ) ?>
+    
  </div> 
           
   <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
-     <?php
-     if($model->isNewRecord){
-         $dati=[];
-     }else{
-         $dati= comboHelper::getCboColectores($model->edificio_id);
-     }
-     ?>
+    
      <?= $form->field($model, 'colector_id')->dropDownList(
-             $dati,
+             comboHelper::getCboColectorMasivo($modelFacturacion->edificio_id),
              ['prompt'=>yii::t('sigi.labels','--Escoja un valor--')]
              ) ?>
  </div>
@@ -97,6 +63,11 @@ use common\widgets\selectwidget\selectWidget;
      <?= $form->field($model, 'descripcion')->textInput(['maxlength' => true]) ?>
 
  </div>
+  <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+     <?= $form->field($model, 'numerodoc')->textInput(['maxlength' => true]) ?>
+
+ </div>        
+          
           <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
       <?= $form->field($model, 'codmon')->dropDownList(
  comboHelper::getCboMonedas(),
@@ -125,14 +96,14 @@ use common\widgets\selectwidget\selectWidget;
   <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
       <?= $form->field($model, 'mes')->dropDownList(
  common\helpers\timeHelper::cboMeses(),
-             ['prompt'=>yii::t('sigi.labels','--Escoja un valor--')]
+           ['disabled'=>'disabled']
              ) ?>
 
  </div>
   <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
       <?= $form->field($model, 'anio')->dropDownList(
  common\helpers\timeHelper::cboAnnos(),
-             ['prompt'=>yii::t('sigi.labels','--Escoja un valor--')]
+            ['disabled'=>'disabled']
              ) ?>
 
  </div>
@@ -159,29 +130,8 @@ use common\widgets\selectwidget\selectWidget;
      <?= $form->field($model, 'detalle')->textarea(['rows' => 6]) ?>
 
  </div>
-  <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
-    <?php  //h::settings()->invalidateCache();  ?>
-                       <?= $form->field($model, 'fevenc')->widget(DatePicker::class, [
-                             'language' => h::app()->language,
-                           // 'readonly'=>true,
-                          // 'inline'=>true,
-                           'pluginOptions'=>[
-                                     'format' => h::gsetting('timeUser', 'date')  , 
-                                  'changeMonth'=>true,
-                                  'changeYear'=>true,
-                                 'yearRange'=>"-99:+0",
-                               ],
-                           
-                            //'dateFormat' => h::getFormatShowDate(),
-                            'options'=>['class'=>'form-control']
-                            ]) ?>
 
- </div>
  
-  <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
-     <?= $form->field($model, 'igv')->textInput(['maxlength' => true]) ?>
-
- </div>
   <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
      <?= $form->field($model, 'codestado')->textInput(['disabled'=>true,'maxlength' => true]) ?>
 

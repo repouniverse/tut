@@ -139,11 +139,14 @@ class FacturacionController extends baseController
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
+            
     {
         if (($model = SigiFacturacion::findOne($id)) !== null) {
             return $model;
         }
+        
 
         throw new NotFoundHttpException(Yii::t('sigi.labels', 'The requested page does not exist.'));
     }
+    
 }

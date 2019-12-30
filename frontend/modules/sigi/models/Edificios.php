@@ -274,6 +274,11 @@ class Edificios extends \common\models\base\modelBase
      }
      
   }
-      
+  /* devuevle solo las unidades imputabels como
+   * array de activerecords
+   */
+  public function unidadesImputables(){
+      return $this->queryUnidadesImputables()->all();
+  }
       
 }
