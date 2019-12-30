@@ -83,8 +83,8 @@ use yii\widgets\Pjax;
  </div>
      
     <?php ActiveForm::end(); ?>
- <div style='overflow:auto;'>
-      <?php Pjax::begin(); ?>
+
+      <?php Pjax::begin(['id'=>'gridcuentaspor']); ?>
     <?= GridView::widget([
         'dataProvider' =>$dataProviderCuentasPor,
          'summary' => '',
@@ -119,10 +119,10 @@ use yii\widgets\Pjax;
            ['class' => 'frontend\modules\report\components\columnGridReport',
                    'attribute'=>'report_id'],
            // 'id',
-              ['attribute'=>'edificio_id',
+             /* ['attribute'=>'edificio_id',
                   'filter'=> frontend\modules\sigi\helpers\comboHelper::getCboEdificios(),
                   'value'=>'edificio.codigo'
-                  ],
+                  ],*/
            /* ['attribute'=>'codocu',
                   'filter'=> frontend\modules\sigi\helpers\comboHelper::getCboDocuments(),
                   'value'=>'documento.desdocu'
@@ -133,11 +133,11 @@ use yii\widgets\Pjax;
                   'value'=>'colector.cargo.descargo'
                   ],               
            // 'codocu',
-            'descripcion',
-            'fedoc',
+            //'descripcion',
+            //'fedoc',
                             
-            'mes',
-            'anio',
+            //'mes',
+           // 'anio',
             //'detalle:ntext',
             //'fevenc',
             'monto',
@@ -148,7 +148,11 @@ use yii\widgets\Pjax;
         ],
     ]); ?>
     <?php Pjax::end(); ?>
+     <?php
+        $url= Url::to(['agrega-cuenta','id'=>$model->id,'gridName'=>'grilla-cuentas','idModal'=>'buscarvalor']);
+        echo  Html::button(yii::t('base.verbs','Insertar Cuenta'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Cuenta'),'id'=>'btn_cuentas_edi', 'class' => 'botonAbre btn btn-success']); 
+        ?> 
 </div>       
           
 </div>
-    </div>
+    

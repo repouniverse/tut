@@ -20,6 +20,8 @@ use Yii;
  */
 class SigiFacturacion extends \common\models\base\modelBase
 {
+   
+    public $hardFields=['edificio_id','mes','ejercicio'];
     /**
      * {@inheritdoc}
      */
@@ -68,7 +70,10 @@ class SigiFacturacion extends \common\models\base\modelBase
     {
         return $this->hasMany(SigiDetfacturacion::className(), ['facturacion_id' => 'id']);
     }
-
+    public function getSigiCuentaspor()
+    {
+        return $this->hasMany(SigiCuentaspor::className(), ['facturacion_id' => 'id']);
+    }
     /**
      * @return \yii\db\ActiveQuery
      */
