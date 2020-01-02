@@ -42,9 +42,9 @@ return [
         'userModelClass' => '\common\models\User', // your User model. Needs to be ActiveRecord.
     ],
         
-        'access' => [
+        /*'access' => [
             'class' => 'frontend\modules\access\accessModule',
-        ],
+        ],*/
         
         'sigi' => [
             'class' => 'frontend\modules\sigi\Module',

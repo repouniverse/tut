@@ -9,6 +9,7 @@ use frontend\modules\sigi\models\SigiUnidades;
 use frontend\modules\sigi\models\SigiCargosgrupoedificio as Grupos;
 use frontend\modules\sigi\models\SigiCargosedificio as GrupoDetalle;
 use frontend\modules\sigi\models\SigiCargosedificioSearch;
+use frontend\modules\sigi\models\SigiSuministrosSearch;
 use frontend\controllers\base\baseController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -159,7 +160,7 @@ class EdificiosController extends baseController
         $modeledificio = $this->findModel($id);        
        $model=New \frontend\modules\sigi\models\SigiApoderados();
        $model->edificio_id=$id;
-       
+       $model->facturindividual=true;
        $datos=[];
         if(h::request()->isPost){
             $model->load(h::request()->post());
@@ -573,4 +574,18 @@ public function actionPropietarios(){
             'dataProvider' => $dataProvider,
         ]);
 }
+
+
+public function actionSuministros(){
+   $searchModel = new SigiSuministrosSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('suministros', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]); 
+}
+
+
+
 }

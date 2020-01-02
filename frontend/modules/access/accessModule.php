@@ -1,24 +1,23 @@
 <?php
 
-namespace frontend\modules\access;
+namespace frontend\modules\bigitems;
 
+use yii;
 /**
- * access module definition class
+ * bigitems module definition class
  */
 class accessModule extends \yii\base\Module
 {
-    /**
-     * {@inheritdoc}
-     */
+   
     public $controllerNamespace = 'frontend\modules\access\controllers';
-
-    /**
-     * {@inheritdoc}
-     */
+    
     public function init()
     {
+        
         parent::init();
-
-        // custom initialization code goes here
-    }
+       
+       }
+       
+  
+    
 }

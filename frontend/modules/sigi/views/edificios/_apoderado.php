@@ -70,7 +70,10 @@ use common\helpers\h;
      <?= $form->field($model, 'emisordefault')->checkbox() ?>
 
  </div>
+ <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+     <?= $form->field($model, 'facturindividual')->checkbox() ?>
 
+ </div>
     <?php ActiveForm::end(); ?>
 
 </div>

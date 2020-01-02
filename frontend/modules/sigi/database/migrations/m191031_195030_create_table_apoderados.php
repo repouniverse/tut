@@ -30,6 +30,7 @@ if(!$this->existsTable($table)) {
         'permiteventa'=>$this->char(1)->append($this->collateColumn()),
          'permitealquiler'=>$this->char(1)->append($this->collateColumn()),
          'emisordefault'=>$this->char(1)->append($this->collateColumn()),
+         'facturindividual'=>$this->char(1)->append($this->collateColumn()),
         ],$this->collateTable());
   
   /*  $this->addForeignKey($this->generateNameFk($table), $table,

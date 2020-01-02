@@ -24,7 +24,7 @@ class SigiApoderados extends \common\models\base\modelBase
     /**
      * {@inheritdoc}
      */
-   public $booleanFields=['tienejunta','emisordefault','facturaigv','permiteventa' ];
+   public $booleanFields=['tienejunta','emisordefault','facturaigv','permiteventa','facturindividual' ];
     public static function tableName()
     {
         return '{{%sigi_apoderados}}';
@@ -41,7 +41,7 @@ class SigiApoderados extends \common\models\base\modelBase
             [['edificio_id', 'codpro'], 'required'],
             [['edificio_id'], 'integer'],
             [['detalles'], 'string'],
-             [['tienejunta','emisordefault','facturaigv','permiteventa'], 'safe'],
+             [['tienejunta','emisordefault','facturaigv','permiteventa','facturindividual'], 'safe'],
             [['codpro'], 'string', 'max' => 6],
             //[['facturaigv', 'permite1', 'permite2', 'permiteventa', 'permitealquiler'], 'string', 'max' => 1],
             [['codpro'], 'exist', 'skipOnError' => true, 'targetClass' => Clipro::className(), 'targetAttribute' => ['codpro' => 'codpro']],

@@ -113,7 +113,10 @@ public function scenarios()
     {
         return $this->hasOne(Clipro::className(), ['codpro' => 'codpro']);
     }
-
+public function getEdificio()
+    {
+        return $this->hasOne(Edificios::className(), ['id' => 'edificio_id']);
+    }
     
     public function getLecturas()
     {
@@ -131,6 +134,18 @@ public function scenarios()
     private function queryReads(){
         return SigiLecturas::find()->where(['suministro_id' => $this->id]);
     }
+    
+    private function queryReadsForThisMonth($mes,$anio){
+        return $this->queryReads()->
+                andWhere(['mes' => $mes,'anio'=>$anio]);
+    }
+    
+    
+    public function consumoTotal($mes,$anio){
+        $this->queryReadsForThisMonth($mes,$anio)->select('sum(lectura)')->scalar();
+    }
+    
+    
     
     /**
      * {@inheritdoc}

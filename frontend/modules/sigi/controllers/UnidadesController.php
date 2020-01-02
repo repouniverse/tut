@@ -70,7 +70,8 @@ class UnidadesController extends baseController
     public function actionCreate()
     {
         $model = new SigiUnidades();
-        
+        $model->edificio_id=5;
+        var_dump($model->edificio);die();
         
         if (h::request()->isAjax && $model->load(h::request()->post())) {
                 h::response()->format = Response::FORMAT_JSON;

@@ -192,6 +192,13 @@ class SigiUnidades extends \common\models\base\modelBase
         return($this->getChildsUnits()->count()==0)?true:false;
     }
     
+    public function  isChild(){
+        if(!empty($this->parent_id && $this->parent_id >0 )){
+            return(is_null(SigiUnidades::findOne($this->parent_id)))?false:true;  
+        }
+       return false;     
+    }
+    
     public function isEntregado(){
         return (empty($this->estreno))?false:true;
     }
@@ -221,7 +228,7 @@ class SigiUnidades extends \common\models\base\modelBase
     
     /*CALCULA LA PARTICIPACION */
     
-    public function participacion($porcentaje=false){
+    public function participacionArea($porcentaje=false){
       if($this->isNewRecord){
           return 0;
       }else{
@@ -348,19 +355,33 @@ class SigiUnidades extends \common\models\base\modelBase
      
    }
   
-   public function CalculoColector(colectoresInterface $colector){
-      return $colector->factorProRateo()->montoTotal()->insertCosto();
+   public function porcParticipacion(colectoresInterface $colector,$mes,$anio){
+       if($colector->isMedidor()){
+          $medidor=$this->firstMedidor($colector->tipomedidor);
+          $lecturatotal=$medidor->consumoTotal($mes,$anio);
+          return ($lecturatotal>0)?round($medidor->lectura/$lecturatotal):0;
+       }elseif($colector->individual){
+           return 1;
+       }else{
+           return $this->participacionArea(); 
+       }
    }
    
    public function firstMedidor($type){
-       return $this->getSigiSuministros()->andWhere(['tipo'=>$type])->one();
+       return $this->sigiSuministros()->andWhere(['tipo'=>$type])->one();
    }   
    
    public function currentResidente(){
       return SigiPropietarios::find()->where(
                ['unidad_id'=>$this->id]
                )->andWhere(
+               ['tipo'=>self::TYP_PROPIETARIO]
+               )->andWhere(
                ['activo'=>'1']
                )->one();
    }
+   
+ public function miApoderado(){
+     return SigiApoderados::find()->where(['codpro'=>$this->codpro,'edificio_id'=>$this->edificio_id])->one();
+ }
 }

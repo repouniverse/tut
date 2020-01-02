@@ -50,7 +50,7 @@ frontend\modules\sigi\interfaces\colectoresInterface*/
             [['edificio_id', 'cargo_id', 'tasamora', 'grupo_id'], 'required'],
             [['edificio_id', 'cargo_id', 'plazovencimiento', 'frecuencia'], 'integer'],
             [['tasamora'], 'number'],
-            [['individual'],'safe'],
+            [['individual','tipomedidor'],'safe'],
             [['regular', 'montofijo'], 'string', 'max' => 1],
             [['edificio_id'], 'exist', 'skipOnError' => true, 'targetClass' => Edificios::className(), 'targetAttribute' => ['edificio_id' => 'id']],
             //[['codgrupo'], 'exist', 'skipOnError' => true, 'targetClass' => SigiCargosgrupoedificio::className(), 'targetAttribute' => ['grupo_id' => 'id']],
@@ -154,31 +154,27 @@ frontend\modules\sigi\interfaces\colectoresInterface*/
       return (!$this->individual);
   }
     
-   public function factorProRateo(){
-       
-   }
+   
     
     public function montoTotal($mes,$anio){
      if($this->isBudget()){
-          /* yii::error(SigiBasePresupuesto::find()->
+           yii::error(SigiBasePresupuesto::find()->
                  select('sum(mensual) as monto')->where(
                     ['cargosedificio_id'=>$this->id,'ejercicio'=>$anio]
-            )->createCommand()->getRawSql());*/
-         $valor=SigiBasePresupuesto::find()->
+            )->createCommand()->getRawSql());
+         return SigiBasePresupuesto::find()->
                  select('sum(mensual) as monto')->where(
                     ['cargosedificio_id'=>$this->id,'ejercicio'=>$anio]
             )->scalar();
-         return is_null($valor)?0:$valor;
      }else{
-        /* yii::error(SigiCuentaspor::find()->
+         yii::error(SigiCuentaspor::find()->
                  select('sum(monto)as monto')->where(
                     ['colector_id'=>$this->id,'mes'=>$mes,'anio'=>$anio]
-            )->createCommand()->getRawSql());*/
-         $valor=SigiCuentaspor::find()->
+            )->createCommand()->getRawSql());
+         return SigiCuentaspor::find()->
                  select('sum(monto)as monto')->where(
                     ['colector_id'=>$this->id,'mes'=>$mes,'anio'=>$anio]
             )->scalar();
-         return is_null($valor)?0:$valor;
      }
     }
     

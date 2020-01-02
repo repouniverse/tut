@@ -65,27 +65,49 @@ class CuentasporController extends baseController
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
+    public function actionCreateAsChild($id)
     {
-        $model = new SigiCuentaspor();
-        $model->valoresDefault();
+        $this->layout = "install";
+        $modelFacturacion = \frontend\modules\sigi\models\SigiFacturacion::findOne($id);
+        if(is_null($modelFacturacion))
+           // echo "hol";die();
+         throw new NotFoundHttpException(Yii::t('sigi.labels', 'The requested page does not exist.'));
+       // $model->valoresDefault();
         
+        $model=new SigiCuentaspor();
+        $model->setScenario($model::SCENARIO_RECIBO_EXTERNO_MASIVO);
+        $attributesChild=[
+            'edificio_id'=>$modelFacturacion->edificio_id,
+            'facturacion_id'=>$modelFacturacion->id,
+             'mes'=>$modelFacturacion->mes,
+            'anio'=>$modelFacturacion->ejercicio,
+        ];
+        $model->setAttributes($attributesChild);
         
-        if (h::request()->isAjax && $model->load(h::request()->post())) {
-                h::response()->format = Response::FORMAT_JSON;
-                return ActiveForm::validate($model);
+        $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                $model->save();
+                //$model->assignStudentsByRandom();
+                  return ['success'=>1,'id'=>$model->id];
+            }
+        }else{
+           return $this->renderAjax('create_as_child', [
+                        'model' => $model,
+               'modelFacturacion' =>$modelFacturacion,
+                       // 'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                       'idModal'=>h::request()->get('idModal'),
+                       //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
         }
         
-        
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        return $this->render('create', [
-            'model' => $model,
-            
-        ]);
     }
 
     

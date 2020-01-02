@@ -274,6 +274,73 @@ class Edificios extends \common\models\base\modelBase
      }
      
   }
-      
+  /* devuevle solo las unidades imputabels como
+   * array de activerecords
+   */
+  public function unidadesImputables(){
+      return $this->queryUnidadesImputables()->all();
+  }
+  
+  
+  
+  
+  public function verifyIsFacturable(){
+      /*
+       * Primero porlo enos debe de teer un apoderado con falñg junta directiva y con flag emisor por defecto
+       */
+      $mensajes=[];
+      $score=0;
+      $listo=true;
+     if($this->hasApoderados()){
+         $score=3;
+     }else{
+         return false;
+     }
+     
+     if($this->apoderados()->andWhere(['tienejunta'=>'1',''])->count()>0){
+         $score+=2;
+     }else{
+         return false;
+     }
+     if($this->apoderados()->andWhere(['emisordefault'=>'1'])->count()>0){
+         $score+=3;
+     }else{
+         return false;
+     }
+     if($this->cuentas()->count()>0){
+         $score+=3;
+     }else{
+         return false;
+     }
+     if($this->cargos()->count()>0){
+         $score+=3;
+         foreach($this->cargos() as $cargo){
+             if($cargo->colectores()->count()> 0){
+                 $score+=3;
+             }else{
+                 return false;
+             }
+         }
+         
+     }else{
+         return false;
+     }
+   
+     /*Si los departamentos tienen propietarios asignado*/
+     if(count($this->unidadesImputables()) >0 ){
+         foreach($this->unidadesImputables() as $unidad){
+             if(!is_null($unidad->currentResidente())){
+                  $score+=3;
+             }else{
+                 return false;
+             }
+             
+         }
+     }else{
+         return false;
+     }
+     
+  }
+  
       
 }
