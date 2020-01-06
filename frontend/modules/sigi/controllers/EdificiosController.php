@@ -44,7 +44,17 @@ class EdificiosController extends baseController
      */
     public function actionIndex()
     {
-       /* $plantilla=\common\helpers\h::settings()->get('general','formatoDNI');
+       /*$registro=\frontend\modules\sigi\models\SigiFacturacion::findOne(50);
+       VAR_DUMP($registro->grupos());DIE();*/
+      /*$existe= \frontend\modules\sigi\models\SigiDetfacturacion::find()->
+                where([
+                    'cuentaspor_id'=>25,
+                    'colector_id'=>45
+                        ])
+                ->exists();
+        var_dump($existe);die();*/
+        
+        /* $plantilla=\common\helpers\h::settings()->get('general','formatoDNI');
         $plantilla='[0-9]{8}';
         var_dump($plantilla,preg_match('10201403',$plantilla));die();*/
         
@@ -586,6 +596,16 @@ public function actionSuministros(){
         ]); 
 }
 
-
+public function actionVerificarDatos($id){
+    $this->layout = "install";
+        
+       $model=$this->findModel($id);   
+      $model->verifyIsFacturable();
+           return $this->renderAjax('_modal_verificar_datos', [
+                        'model' => $model,
+                        
+            ]);  
+         
+}
 
 }

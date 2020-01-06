@@ -181,19 +181,32 @@ class SigiUnidades extends \common\models\base\modelBase
     }
     public function afterSave($insert, $changedAttributes)  {
          if($insert){
-            /*if($this->codpro <> SigiModule::getCodeNaturalPerson()){
+           /*  $this->refresh();
+            if($this->esnuevo){
                 //$this->estreno=null;
                $this->insertPropietarioEmpresa() ;
             } */
-         } 
-        return parent::afterSave($insert, $changedAttributes);
-    }
+          if($this->isChild()){
+              $this->refresh();
+              
+              yii::error('la nueva identidad es ');
+               yii::error($this->id);
+              $this->copyPropietarios();
+                 } 
+        
+        }
+    return parent::afterSave($insert, $changedAttributes);
+          }
+          
+          
+          
+          
     public function hasChildunits(){
         return($this->getChildsUnits()->count()==0)?true:false;
     }
     
     public function  isChild(){
-        if(!empty($this->parent_id && $this->parent_id >0 )){
+        if(($this->parent_id >0 )){
             return(is_null(SigiUnidades::findOne($this->parent_id)))?false:true;  
         }
        return false;     
@@ -326,8 +339,9 @@ class SigiUnidades extends \common\models\base\modelBase
   private function insertPropietarioEmpresa(){
       $atributos=[
          'unidad_id'=>$this->id,
+           'edificio_id'=>$this->edificio_id,
           'tipo'=>self::TYP_PROPIETARIO,
-          'espropietario'=>true,
+          'activo'=>true,
           'nombre'=>Clipro::find()->where(['codpro'=>$this->codpro])->one()->despro,
           'dni'=>Clipro::find()->where(['codpro'=>$this->codpro])->one()->rucpro,
       ];
@@ -355,23 +369,47 @@ class SigiUnidades extends \common\models\base\modelBase
      
    }
   
+
+   
+   
+   public function CalculoColector(colectoresInterface $colector){
+      return $colector->factorProRateo()->montoTotal()->insertCosto();
+   }
+
    public function porcParticipacion(colectoresInterface $colector,$mes,$anio){
        if($colector->isMedidor()){
           $medidor=$this->firstMedidor($colector->tipomedidor);
-          $lecturatotal=$medidor->consumoTotal($mes,$anio);
-          return ($lecturatotal>0)?round($medidor->lectura/$lecturatotal):0;
+          
+          /*Si no encuentra un medidor en el departamento
+           * Simpelnenre devuleve e porcentaje de participacion 
+           * del area 
+           */
+          if(!is_null($medidor)){
+             $lecturatotal=$medidor->consumoTotal($mes,$anio);
+             return ($lecturatotal>0)?round($medidor->lectura/$lecturatotal):$this->participacionArea(); 
+          }else{
+            return $this->participacionArea();   
+          }
+          
+          
+          
        }elseif($colector->individual){
            return 1;
        }else{
            return $this->participacionArea(); 
        }
+
    }
    
+   
+  
+   
+   
    public function firstMedidor($type){
-       return $this->sigiSuministros()->andWhere(['tipo'=>$type])->one();
+       return $this->getSigiSuministros()->andWhere(['tipo'=>$type])->one();
    }   
    
-   public function currentResidente(){
+   public function currentPropietario(){
       return SigiPropietarios::find()->where(
                ['unidad_id'=>$this->id]
                )->andWhere(
@@ -384,4 +422,38 @@ class SigiUnidades extends \common\models\base\modelBase
  public function miApoderado(){
      return SigiApoderados::find()->where(['codpro'=>$this->codpro,'edificio_id'=>$this->edificio_id])->one();
  }
+ 
+ public function parentNumero(){
+     if($this->isChild()){
+        return $this->padre->numero;
+     }else{
+         return '';
+     }
+ }
+ 
+ public function copyPropietarios(){
+   if($this->isChild()){
+     foreach($this->padre->sigiPropietarios as $propietario){
+         yii::error('copyporpeitarios');
+          yii::error($this->id);
+       $this->insertPropietario($propietario); 
+    }   
+   }
+    
+ }
+ 
+ public function insertPropietario($propietario){
+     yii::error('inserpropietariuos');
+          yii::error($this->id);
+     $model=new SigiPropietarios();
+     $model->attributes=$propietario->attributes;
+     $model->unidad_id=$this->id;
+     if($model->save()){
+        yii::error('GRABO '.$this->id);    
+     }ELSE{
+      yii::error($model->getFirstError());   
+     }
+         
+ }
+ 
 }

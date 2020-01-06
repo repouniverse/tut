@@ -23,8 +23,8 @@ use Yii;
  * @property SigiCargosgrupoedificio $codgrupo0
  * @property SigiCargos $cargo
  */
-class SigiCargosedificio extends \common\models\base\modelBase /*implements
-frontend\modules\sigi\interfaces\colectoresInterface*/
+class SigiCargosedificio extends \common\models\base\modelBase implements
+\frontend\modules\sigi\interfaces\colectoresInterface
 {
    private $_monto;
     public $booleanFields= [

@@ -8,7 +8,7 @@ $params = array_merge(
 
 return [
     'name'=>'Minerva',
-    'sourceLanguage' => 'es',
+    'sourceLanguage' => 'en',
     'id' => 'frontend',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],

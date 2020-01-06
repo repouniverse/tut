@@ -63,16 +63,20 @@ class SigiFacturacion extends \common\models\base\modelBase
         ];
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getSigiDetfacturacions()
-    {
-        return $this->hasMany(SigiDetfacturacion::className(), ['facturacion_id' => 'id']);
-    }
+   
     public function getSigiCuentaspor()
     {
         return $this->hasMany(SigiCuentaspor::className(), ['facturacion_id' => 'id']);
+    }
+    
+    public function getSigiDetfacturacion()
+    {
+        return $this->hasMany(SigiDetfacturacion::className(), ['facturacion_id' => 'id']);
+    }
+    
+    
+    public function montoTotal(){
+       RETURN $this->getSigiCuentaspor()->sum('monto');
     }
     /**
      * @return \yii\db\ActiveQuery
@@ -168,5 +172,49 @@ class SigiFacturacion extends \common\models\base\modelBase
             'codmon'=>\common\helpers\h::gsetting('general', 'moneda'),
             'monto'=>$colector->montoTotal($this->mes,$this->ejercicio),
         ];
+    }
+    
+    public function generateFacturacionMes(){
+        $errores=[];
+        foreach($this->sigiCuentaspor as $cuentapor){
+            $errores['error']=$cuentapor->generateFacturacion();
+        }
+       $this->asignaIdentidad();
+        
+        return $errores;
+    }
+    /*
+     * Esta funcion revisa la columna identidad de
+     * la tabla facturaciondetalle y la catualiza
+     * segune lgrupo de facturacion , de este modo ya se puede separar
+     * lso recibos mediante un id 
+     */
+    private function asignaIdentidad(){
+        foreach($this->grupos() as $filaGrupo){
+          $criterio= SigiDetfacturacion::criteriaDepa(
+                  $filaGrupo->grupofacturacion,
+                  $filaGrupo->mes,
+                  $filaGrupo->anio,
+                  $filaGrupo->facturacion_id
+                  );
+          $identidad= SigiDetfacturacion::maxIdentidad();
+            SigiDetfacturacion::updateAll(['identidad'=>$identidad], $criterio);
+       }
+       return true;
+    }
+    
+    
+    public function grupos(){
+       return  $this->getSigiDetfacturacion()->
+                select(['grupofacturacion','mes','anio','facturacion_id'])->
+                distinct()->all();
+        
+    }
+    
+    public function idsToFacturacion(){
+       return  array_column($this->getSigiDetfacturacion()->
+                select('identidad')->distinct()
+                ->all(),'identidad');
+        
     }
 }

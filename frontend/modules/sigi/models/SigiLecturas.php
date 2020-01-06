@@ -43,7 +43,7 @@ class SigiLecturas extends \common\models\base\modelBase
             
             [['suministro_id', 'unidad_id'], 'integer'],
             [['lectura', 'lecturaant', 'delta'], 'number'],
-             [['lectura', 'valida_lectura'], 'number'],
+            [['lectura'], 'valida_lectura'],
             [['codepa'], 'string', 'max' => 12],
              [['codedificio'], 'string', 'max' => 12],
             [['codepa','codedificio','codtipo'], 'safe'],

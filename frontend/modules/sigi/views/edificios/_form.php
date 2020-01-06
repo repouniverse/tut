@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use common\widgets\cbodepwidget\cboDepWidget as ComboDep;
 use common\helpers\ComboHelper;
@@ -18,9 +19,10 @@ use common\widgets\selectwidget\selectWidget;
       <div class="box-header">
         <div class="col-md-12">
             <div class="form-group no-margin">
-                
+         <?php $url=Url::to(['/sigi/'.$this->context->id.'/verificar-datos','id'=>$model->id]);  ?>       
         <?= Html::submitButton('<span class="fa fa-save"></span>'.'  '.Yii::t('sigi.labels', 'Guardar'), ['class' => 'btn btn-success']) ?>
-            
+            <?=Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Verificar datos'), ['href' => $url, 'title' => yii::t('sta.labels','Verificar Datos'),'id'=>'btn-add-test','class' => 'botonAbre btn btn-warning'])?>
+           
 
             </div>
         </div>

@@ -173,7 +173,7 @@ class Reporte extends baseReporte
      // echo $campofiltro; die();
       if(is_null($campofiltro)){
           //echo $clase::find()->where([$model->getTableSchema()->primaryKey()=>$idfiltro])->createCommand()->getRawSql();die();
-          $modelo= $clase::find()->where([$model->getTableSchema()->primaryKey()=>$idfiltro])->one();  
+          $modelo= $clase::find()->where([(new $clase())->getTableSchema()->primaryKey()=>$idfiltro])->one();  
       }else{
         // echo $clase::find()->where([$campofiltro=>$idfiltro])->createCommand()->getRawSql();die(); 
           $modelo= $clase::find()->where([$campofiltro=>$idfiltro])->one();  

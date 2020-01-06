@@ -1,13 +1,13 @@
 <?php
 
 use yii\helpers\Html;
-use yii\grid\GridView;
+use kartik\grid\GridView;
 use yii\widgets\Pjax;
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\modules\sigi\models\SigiFacturacionSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('sigi.labels', 'Facturacion');
+$this->title = Yii::t('sigi.labels', 'Facturación');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="sigi-facturacion-index">
@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
          
          [
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{update}{delete}{view}',
+                'template' => '{update}',
                 'buttons' => [
                     'update' => function($url, $model) {                        
                         $options = [
@@ -61,11 +61,27 @@ $this->params['breadcrumbs'][] = $this->title;
          
          
 
-            'id',
-            'edificio_id',
+           [
+                'attribute'=>'edificio_id',
+                'filter'=>frontend\modules\sigi\helpers\comboHelper::getCboEdificios(),
+                'value' => function($model) { 
+                        //var_dump($model);die();
+                        return $model->edificio->nombre ;
+                         },
+                 'group'=>true,   
+            ],
             'mes',
             'ejercicio',
             'fecha',
+           [
+                'attribute'=>'monto',
+                //'filter'=>frontend\modules\sigi\helpers\comboHelper::getCboEdificios(),
+                'value' => function($model) { 
+                        //var_dump($model);die();
+                        return $model->montoTotal() ;
+                         },
+                 'group'=>true,   
+            ],
             //'descripcion',
             //'detalles:ntext',
 

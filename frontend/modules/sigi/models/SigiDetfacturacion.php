@@ -8,19 +8,24 @@ use Yii;
  * This is the model class for table "{{%sigi_detfacturacion}}".
  *
  * @property int $id
- * @property int $facturacion_id
- * @property int $cargosedificio_id
- * @property string $monto
- * @property string $codocu
- * @property string $femision
- * @property string $fecha
- * @property string $numero
- * @property string $descripcion
+ * @property int $cuentaspor_id
+ * @property int $edificio_id
  * @property int $unidad_id
- * @property string $detalles
+ * @property int $colector_id
+ * @property int $grupo_id
+ * @property string $monto
+ * @property string $igv
+ * @property string $grupounidad agrupa  todos los objetos: cochera, depositos  en el mismo departamento  
+ * @property string $grupofacturacion Agrupa el documento del recibo, ojo lo hace por departametno o apoderado, MUY IMPORTANTES 
+ * @property int $facturacion_id
+ * @property int $mes
+ * @property string $anio
  *
- * @property SigiCargosedificio $cargosedificio
- * @property SigiFacturacion $facturacion
+ * @property SigiUnidades $unidad
+ * @property SigiEdificios $edificio
+ * @property SigiCargosedificio $colector
+ * @property SigiCargosgrupoedificio $grupo
+ * @property SigiCuentaspor $cuentaspor
  */
 class SigiDetfacturacion extends \common\models\base\modelBase
 {
@@ -38,17 +43,16 @@ class SigiDetfacturacion extends \common\models\base\modelBase
     public function rules()
     {
         return [
-            [['facturacion_id', 'cargosedificio_id', 'codocu', 'descripcion'], 'required'],
-            [['facturacion_id', 'cargosedificio_id', 'unidad_id'], 'integer'],
-            [['monto'], 'number'],
-            [['anio','mes'], 'safe'],
-            [['detalles'], 'string'],
-            [['codocu'], 'string', 'max' => 3],
-            [['femision', 'fecha'], 'string', 'max' => 10],
-            [['numero'], 'string', 'max' => 14],
-            [['descripcion'], 'string', 'max' => 40],
-            [['cargosedificio_id'], 'exist', 'skipOnError' => true, 'targetClass' => SigiCargosedificio::className(), 'targetAttribute' => ['cargosedificio_id' => 'id']],
-            [['facturacion_id'], 'exist', 'skipOnError' => true, 'targetClass' => SigiFacturacion::className(), 'targetAttribute' => ['facturacion_id' => 'id']],
+            [['cuentaspor_id', 'edificio_id', 'unidad_id', 'colector_id', 'grupo_id', 'monto', 'igv', 'grupounidad', 'grupofacturacion', 'facturacion_id', 'mes', 'anio'], 'required'],
+            [['cuentaspor_id', 'edificio_id', 'unidad_id', 'colector_id', 'grupo_id', 'facturacion_id', 'mes'], 'integer'],
+            [['monto', 'igv'], 'number'],
+            [['grupounidad', 'grupofacturacion'], 'string', 'max' => 12],
+            [['anio'], 'string', 'max' => 4],
+            [['unidad_id'], 'exist', 'skipOnError' => true, 'targetClass' => SigiUnidades::className(), 'targetAttribute' => ['unidad_id' => 'id']],
+            [['edificio_id'], 'exist', 'skipOnError' => true, 'targetClass' => Edificios::className(), 'targetAttribute' => ['edificio_id' => 'id']],
+            [['colector_id'], 'exist', 'skipOnError' => true, 'targetClass' => SigiCargosedificio::className(), 'targetAttribute' => ['colector_id' => 'id']],
+            [['grupo_id'], 'exist', 'skipOnError' => true, 'targetClass' => SigiCargosgrupoedificio::className(), 'targetAttribute' => ['grupo_id' => 'id']],
+            [['cuentaspor_id'], 'exist', 'skipOnError' => true, 'targetClass' => SigiCuentaspor::className(), 'targetAttribute' => ['cuentaspor_id' => 'id']],
         ];
     }
 
@@ -59,33 +63,59 @@ class SigiDetfacturacion extends \common\models\base\modelBase
     {
         return [
             'id' => Yii::t('sigi.labels', 'ID'),
-            'facturacion_id' => Yii::t('sigi.labels', 'Facturacion ID'),
-            'cargosedificio_id' => Yii::t('sigi.labels', 'Cargosedificio ID'),
-            'monto' => Yii::t('sigi.labels', 'Monto'),
-            'codocu' => Yii::t('sigi.labels', 'Codocu'),
-            'femision' => Yii::t('sigi.labels', 'Femision'),
-            'fecha' => Yii::t('sigi.labels', 'Fecha'),
-            'numero' => Yii::t('sigi.labels', 'Numero'),
-            'descripcion' => Yii::t('sigi.labels', 'Descripcion'),
+            'cuentaspor_id' => Yii::t('sigi.labels', 'Cuentaspor ID'),
+            'edificio_id' => Yii::t('sigi.labels', 'Edificio ID'),
             'unidad_id' => Yii::t('sigi.labels', 'Unidad ID'),
-            'detalles' => Yii::t('sigi.labels', 'Detalles'),
+            'colector_id' => Yii::t('sigi.labels', 'Colector ID'),
+            'grupo_id' => Yii::t('sigi.labels', 'Grupo ID'),
+            'monto' => Yii::t('sigi.labels', 'Monto'),
+            'igv' => Yii::t('sigi.labels', 'Igv'),
+            'grupounidad' => Yii::t('sigi.labels', 'Grupounidad'),
+            'grupofacturacion' => Yii::t('sigi.labels', 'Grupofacturacion'),
+            'facturacion_id' => Yii::t('sigi.labels', 'Facturacion ID'),
+            'mes' => Yii::t('sigi.labels', 'Mes'),
+            'anio' => Yii::t('sigi.labels', 'Anio'),
         ];
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCargosedificio()
+    public function getUnidad()
     {
-        return $this->hasOne(SigiCargosedificio::className(), ['id' => 'cargosedificio_id']);
+        return $this->hasOne(SigiUnidades::className(), ['id' => 'unidad_id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getFacturacion()
+    public function getEdificio()
     {
-        return $this->hasOne(SigiFacturacion::className(), ['id' => 'facturacion_id']);
+        return $this->hasOne(Edificios::className(), ['id' => 'edificio_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getColector()
+    {
+        return $this->hasOne(SigiCargosedificio::className(), ['id' => 'colector_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getGrupo()
+    {
+        return $this->hasOne(SigiCargosgrupoedificio::className(), ['id' => 'grupo_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCuentaspor()
+    {
+        return $this->hasOne(SigiCuentaspor::className(), ['id' => 'cuentaspor_id']);
     }
 
     /**
@@ -97,5 +127,26 @@ class SigiDetfacturacion extends \common\models\base\modelBase
         return new SigiDetfacturacionQuery(get_called_class());
     }
     
-   
+    public static function maxIdentidad(){
+        $maximo=static::find()->max('[[identidad]]');
+       return (is_null($maximo))?1:$maximo+1;
+    }
+    
+    public static function criteriaDepa($grupo,$mes,$anio,$facturacion_id){
+        return [
+            //'edificio_id'=>$this->edificio_id,
+            'facturacion_id'=>$facturacion_id,
+            'mes'=>$mes,
+            'anio'=>$anio,
+             'grupofacturacion'=>$grupo,
+            ];
+    }
+    
+    public function grupoFacturacion(){
+        return static::find()->select([
+            'facturacion_id','mes',
+            'anio',
+             'grupofacturacion'
+            ])->distinct()->all();
+    }
 }

@@ -41,7 +41,7 @@ class SigiPropietarios extends \common\models\base\modelBase
  public function scenarios()
     {
         $scenarios = parent::scenarios(); 
-        $scenarios[self::SCENARIO_EMPRESA] = ['edificio_id','codepa','tipo','dni','nombre','recibemail','correo','celulares','fijo'];
+        $scenarios[self::SCENARIO_EMPRESA] = ['edificio_id','codepa','activo','tipo','dni','nombre','recibemail','correo','celulares','fijo'];
          $scenarios[self::SCENARIO_TELEFONO] = ['id','correo','celulares','fijo'];
         // $scenarios[self::SCENARIO_REGISTER] = ['username', 'email', 'password'];
         return $scenarios;
@@ -58,7 +58,7 @@ class SigiPropietarios extends \common\models\base\modelBase
             [['participacion'], 'number'],
              [['recibemail','nombre','espropietario','user_id'], 'safe'],
             [['detalle'], 'string'],
-             [['codepa'], 'safe'],
+             [['codepa','edificio_id','activo'], 'safe'],
             [['dni'], 'valida_dni'],
             [['codepa'], 'valida_codepa'],
             [['codepa'], 'required', 'on'=>self::SCENARIO_EMPRESA],
@@ -122,7 +122,7 @@ class SigiPropietarios extends \common\models\base\modelBase
     public function beforeSave($insert){
         if($insert){
             $this->activo=true;
-            if(!empty($this->codepa))
+            if(!empty($this->codepa) && empty($this->unidad_id))
            $this->unidad_id=$this->departamento()->id;            
         }
         return parent::beforeSave($insert);

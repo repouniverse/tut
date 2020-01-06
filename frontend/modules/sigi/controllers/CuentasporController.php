@@ -192,4 +192,56 @@ class CuentasporController extends baseController
 
         throw new NotFoundHttpException(Yii::t('sigi.labels', 'The requested page does not exist.'));
     }
+    
+    
+    public function actionCreateAsChildInterno($id)
+    {
+        $this->layout = "install";
+        $modelFacturacion = \frontend\modules\sigi\models\SigiFacturacion::findOne($id);
+        if(is_null($modelFacturacion))
+           // echo "hol";die();
+         throw new NotFoundHttpException(Yii::t('sigi.labels', 'The requested page does not exist.'));
+       // $model->valoresDefault();
+        
+        $model=new SigiCuentaspor();
+        $model->setScenario($model::SCENARIO_RECIBO_INTERNO);
+        $attributesChild=[
+            'edificio_id'=>$modelFacturacion->edificio_id,
+            'facturacion_id'=>$modelFacturacion->id,
+             'mes'=>$modelFacturacion->mes,
+            'anio'=>$modelFacturacion->ejercicio,
+        ];
+        $model->setAttributes($attributesChild);
+        
+        $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                yii::error('seguimiento');
+                yii::error($model->attributes);
+                $model->save();
+                //$model->assignStudentsByRandom();
+                  return ['success'=>1,'id'=>$model->id];
+            }
+        }else{
+           return $this->renderAjax('_form_as_child_interno', [
+                        'model' => $model,
+               'modelFacturacion' =>$modelFacturacion,
+                       // 'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                       'idModal'=>h::request()->get('idModal'),
+                       //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+        
+    }
+
+     
+    
+    
 }

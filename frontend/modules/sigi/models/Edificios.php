@@ -280,7 +280,7 @@ class Edificios extends \common\models\base\modelBase
   public function unidadesImputables(){
       return $this->queryUnidadesImputables()->all();
   }
-  
+
   
   
   
@@ -288,59 +288,69 @@ class Edificios extends \common\models\base\modelBase
       /*
        * Primero porlo enos debe de teer un apoderado con falñg junta directiva y con flag emisor por defecto
        */
-      $mensajes=[];
-      $score=0;
-      $listo=true;
+      
      if($this->hasApoderados()){
-         $score=3;
+            if($this->getApoderados()->andWhere(['tienejunta'=>'1'])->count()>0){
+        
+                }else{
+                        $this->addError('id',yii::t('sigi.labels','No tiene ningún grupo de gestión marcado con "{campo} "  ',['campo'=>$this->getAttributeLabel('tienejuta')]));
+                    }
+                if($this->getApoderados()->andWhere(['emisordefault'=>'1'])->count()>0){
+                         $score+=3;
+                        }else{
+                       $this->addError('id',yii::t('sigi.labels','No tiene ningún grupo de gestión marcado con "{campo} "  ',['campo'=>$this->getAttributeLabel('emisordefault')]));
+                  
+                    }
      }else{
-         return false;
+         $this->addError('id',yii::t('sigi.labels','No tiene ningún grupo de gestión'));
      }
      
-     if($this->apoderados()->andWhere(['tienejunta'=>'1',''])->count()>0){
-         $score+=2;
-     }else{
-         return false;
-     }
-     if($this->apoderados()->andWhere(['emisordefault'=>'1'])->count()>0){
+    
+     if($this->getCuentas()->count()>0){
          $score+=3;
      }else{
-         return false;
+        $this->addError('id',yii::t('sigi.labels','No tiene ninguna cuenta registrada '));
+                  
      }
-     if($this->cuentas()->count()>0){
+     if($this->getCargos()->count()>0){
          $score+=3;
-     }else{
-         return false;
-     }
-     if($this->cargos()->count()>0){
-         $score+=3;
-         foreach($this->cargos() as $cargo){
-             if($cargo->colectores()->count()> 0){
-                 $score+=3;
+         foreach($this->cargos as $cargo){
+             if($cargo->getColectores()->count()> 0){
+                foreach($cargo->colectores as  $colector){
+                  if($colector->isBudget() && !($colector->getBasePresupuesto()->count()>0)) {
+                    $this->addError('id',yii::t('sigi.labels','El colector "{colector} " , no tiene partidas presupuestales asignadas  ',['colector'=>$colector->cargo->descargo]));  
+                  } 
+                }
              }else{
-                 return false;
+                 $this->addError('id',yii::t('sigi.labels','El grupo "{grupo} " , no tiene ningún colector  ',['grupo'=>$cargo->descripcion]));
+                  
              }
          }
          
      }else{
-         return false;
+          $this->addError('id',yii::t('sigi.labels','No tiene ningun grupo de cobranza registrado '));
      }
    
      /*Si los departamentos tienen propietarios asignado*/
      if(count($this->unidadesImputables()) >0 ){
+         $contador=1;
          foreach($this->unidadesImputables() as $unidad){
-             if(!is_null($unidad->currentResidente())){
-                  $score+=3;
+             
+             if(!is_null($unidad->currentPropietario())){
+                  
              }else{
-                 return false;
+                 $contador++;
+                 if($contador < 10 )
+                 $this->addError('id',yii::t('sigi.labels','La unidad "{unidad} " , no tiene asignado ningún propietario activo',['unidad'=>$unidad->numero]));
              }
              
          }
      }else{
-         return false;
+        $this->addError('id',yii::t('sigi.labels','No tiene ninguna unidad imputable para cobranza ')); 
      }
      
   }
   
+
       
 }

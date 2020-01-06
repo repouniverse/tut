@@ -743,10 +743,11 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
         }
         
         
-        public  static function  firstOrCreateStatic($attributes,$scenario=null){  
+        public  static function  firstOrCreateStatic($attributes,$scenario=null,$verifyAttributes=null){  
             //print_r($attributes);
             //$model=self::find()->where($attributes)->one();
-            if(is_null(self::find()->where($attributes)->one())){
+            $myAttributesVerify=(is_null($verifyAttributes))?$attributes:$verifyAttributes;
+            if(is_null(self::find()->where($myAttributesVerify)->one())){
                                 
 
                 try{
@@ -781,9 +782,12 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
             
         }
         
-        public  function  firstOrCreate($attributes,$scenario=null){  
+        public  function  firstOrCreate($attributes,$scenario=null,$verifyAttributes=null){  
             //print_r($attributes);
-            if(is_null($this->find()->where($attributes)->one())){
+            $myAttributesVerify=(is_null($verifyAttributes))?$attributes:$verifyAttributes;
+            if(is_null(self::find()->where($myAttributesVerify)->one())){
+              
+           
                 try{
                     if(!is_null($scenario))
                         $this->setScenario($scenario);

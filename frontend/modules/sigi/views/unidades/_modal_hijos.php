@@ -83,7 +83,11 @@ use frontend\modules\sigi\helpers\comboHelper;
 
  </div>
   <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-     <?= $form->field($model, 'estreno')->textInput(['maxlength' => true]) ?>
+     <?= $form->field($model, 'imputable')->checkbox([]) ?>
+
+ </div>
+  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+     <?= $form->field($model, 'esnuevo')->checkbox([]) ?>
 
  </div>
   

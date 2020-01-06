@@ -88,7 +88,7 @@ class SigiVwPapeletas extends \common\models\base\modelBase
     
      public  function getReportPropietario()
     {
-         $unidad=SigiUnidades::findOne($this->unidad_id)->currentResidente();
+         $unidad=SigiUnidades::findOne($this->unidad_id)->currentPropietario();
          
         return is_null($unidad)?'':$unidad->nombre ;
     }
