@@ -11,6 +11,7 @@ use frontend\modules\report\models\ReporteSearch;
 use common\controllers\base\baseController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use common\helpers\h;
 
 /**
  * MakeController implements the CRUD actions for Reporte model.
@@ -281,45 +282,160 @@ class MakeController extends baseController
         }
   } 
   
-  public function actionCreareporte($id, $idfiltro,$campofiltro=null){
-     // echo $this->putLogo($id, $idfiltro);die();
+  public function actionMultiReport($id/*,$idsToReport*/){
+        set_time_limit(300); // 5 minutes 
+        //echo "maolde";die();
        $model=$this->findModel($id); 
        $this->layout='blank';
-      
-      //$model=$this->findModel($id);      
-      $logo=($model->tienelogo)?$this->putLogo($id, $idfiltro):'';      
-         $header=$model->putHeaderReport($id, $idfiltro); 
-        // var_dump($idfiltro,$campofiltro);die();
-          $cabecera=$model->putCabecera($id,$idfiltro,$model->campofiltro);
+       $idsToReport=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73];
+     
+       $size=h::gsetting('report','sizePage');
+      // yii::error('Numero maximo de paginas '.$size);
+       $arreglos=  array_chunk($idsToReport, $size);
+       //yii::error( $arreglos);
+      // $idsToReport= \yii\helpers\Json::decode($idsToReport);
+      // var_dump($idsToReport);die();
+       foreach($arreglos as $key=>$arreglo){
+          $ruta=$model->pathToStoreFile();
+         // yii::error($ruta);
+          $contenido=$this->contentReportMultiple($id, $arreglo,$model);    
          
-      /*$pdf->methods=[ 
-           'SetHeader'=>[($model->tienecabecera)?$header:''], 
-            'SetFooter'=>[($model->tienepie)?'{PAGENO}':''],
-        ];*/
-    
-       $contenidoSinGrilla=$logo.$cabecera; 
-       //var_dump($model->numeroPaginas($idfiltro));die();
-      $npaginas=$model->numeroPaginas($idfiltro);
+        $pdf=ModuleReporte::getPdf(); 
+         $paginas=count($contenido);
+        foreach($contenido as $index=>$pagina){ 
+           // yii::error('pagination '.count($contenido));
+           
+                        $pdf->WriteHTML($pagina);
+                         // yii::error('index '.$index);
+                          // yii::error('paginas '.($paginas-1));
+                        if($index < $paginas-1){
+                             //yii::error('agregando pagina');
+                            
+                                 $pdf->AddPage();
+                        }
+                             
+                                    }
+        $pdf->output($ruta, \Mpdf\Output\Destination::FILE);
+         $model->routesSplit[]=$ruta;
+         unset($pdf);
+       }
+          $mpdf = new \Mpdf\Mpdf();
+       foreach($model->routesSplit as $route) {
+          $mpdf->AddPage();
+         $mpdf->SetImportUse();
+         $pagecount = $mpdf->SetSourceFile($route);
+         yii::error('numero de paginas   :'.$pagecount   );
+         if ($pagecount > 0) {
+             for ($k = 1; $k <= $pagecount; $k++) {
+                  yii::error('bucle k');
+                   yii::error($k);
+                   
+                 $tplId = $mpdf->ImportPage($k);
+                 $mpdf->UseTemplate($tplId);
+                 if ($k < $pagecount) {
+                     $mpdf->AddPage();
+                 }
+             }
+         }
+        unlink($route);
+       } 
        
+       
+       return $mpdf->Output();
+  }
+  
+  
+  public function actionMergePdf(){
+      $mpdf = new \Mpdf\Mpdf();
+     
+  //$mpdf->SetHTMLHeader($header);
+     // $path='/home/neotegni/public_html/sigi/frontend/uploads/pdfs/LLAVE.pdf';
+      //realpath($path);
+      $path1=yii::getalias('@frontend').'/uploads/pdfs/pdf_1.pdf';
+      $path2=yii::getalias('@frontend').'/uploads/pdfs/pdf_2.pdf';
+      $path3=yii::getalias('@frontend').'/uploads/pdfs/pdf_3.pdf';
+      $path4=yii::getalias('@frontend').'/uploads/pdfs/pdf_4.pdf';
+      
+       /*$mpdf->SetImportUse();   
+  $pagecount = $mpdf->setSourceFile($path1);
+  $tplIdx = $mpdf->importPage($pagecount);
+  $mpdf->useTemplate($tplIdx);
+  $mpdf->addPage();
+   return $mpdf->Output(); */
+   
+    
+      for ($i = 1; $i <= 4; $i++) {
+          yii::error('bucle i');
+          $mpdf->AddPage();
+         $mpdf->SetImportUse();
+         $pagecount = $mpdf->SetSourceFile(yii::getalias('@frontend').'/uploads/pdfs/pdf_'.$i.'.pdf');
+         yii::error('numero de paginas   :'.$pagecount   );
+         if ($pagecount > 0) {
+             for ($k = 1; $k <= $pagecount; $k++) {
+                  yii::error('bucle k');
+                   yii::error($k);
+                   
+                 $tplId = $mpdf->ImportPage($k);
+                 $mpdf->UseTemplate($tplId);
+                 if ($k < $pagecount) {
+                     $mpdf->AddPage();
+                 }
+             }
+         }
+          
+        
+  
+            }
+   return $mpdf->Output(); 
+  }
+  
+  
+  private function contentReportMultiple($id,$idsToReport,$model){
+      // $model=$this->findModel($id); 
+       $content=[];
+     
+      foreach($idsToReport as $key=>$idkey){
+       
+          //var_dump($this->contentReport($id, $idkey, $model))
+          $contenidos=$this->contentReport($id, $idkey, $model);
+          foreach( $contenidos as $clave=>$valor){
+              $content[]=$valor;
+          }
+          $i++;
+          
+      }
+      //var_dump(count($content));die();
+      return $content;
+  }
+  
+  private function contentReport($id, $idfiltro,$model){
+       //$model=$this->findModel($id); 
+       $logo=($model->tienelogo)?$this->putLogo($id, $idfiltro):''; 
+       $cabecera=$model->putCabecera($id,$idfiltro,$model->campofiltro);
+      $contenidoSinGrilla=$logo.$cabecera; 
+      $npaginas=$model->numeroPaginas($idfiltro);
       $contenido="";
       $dataProvider=$model->dataProvider($idfiltro);
-    
-     // var_dump($dataProvider);die();
       $pageContents=[]; //aray con las paginas cotneido un elemento potr pagina
       for($i = 1; $i <= $npaginas; $i++){
-         // yii::error('pagina :'.$npaginas);
-          $dataProvider->pagination->page = $i-1; //Set page 1
+         $dataProvider->pagination->page = $i-1; //Set page 1
           $dataProvider->refresh(); //Refresh models
-    
          $pageContents[]=trim($this->render('reporte',[
              'modelo'=>$model,             
              'dataProvider'=>$dataProvider,
              'contenidoSinGrilla'=>$contenidoSinGrilla,
              'columnas'=>$model->makeColumns(),             
                  ]).$this->pageBreak());
-        
-         
               }
+     return $pageContents;   
+  }
+  
+  
+  public function actionCreareporte($id, $idfiltro/*,$campofiltro=null*/){
+     // echo $this->putLogo($id, $idfiltro);die();
+       $model=$this->findModel($id); 
+       $this->layout='blank';
+      $pageContents=$this->contentReport($id, $idfiltro,$model);
       //echo $pageContents[0];die();
       return $this->prepareFormat($pageContents, $model);
      
@@ -357,63 +473,36 @@ class MakeController extends baseController
   * delñ reporte 
   */
   private function prepareFormat($contenido,$model){
-      if($model->type=='pdf'){          
-            $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
-            $fontDirs = $defaultConfig['fontDir'];
-            $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
-            $fontData = $defaultFontConfig['fontdata'];
-
-//$mpdf = new \common\components\MyMpdf([/*
-$mpdf = new \Mpdf\Mpdf([
-    'fontDir' => array_merge($fontDirs,[
-       Yii::getAlias('@fonts')
-    ]),
-    'fontdata' => $fontData + [
-        'cour' => [
-            'R' => 'cour.ttf',
-            'I' => 'CourierITALIC.ttf',
-        ]
-    ],
-    //'default_font' => 'cour'
-]);
-
-//print_r($mpdf->fontdata);die();
-          
-          //$mpdf=new \Mpdf\Mpdf();
-          //echo get_class($mpdf);die();
-          /* $pdf->methods=[ 
-           'SetHeader'=>[($model->tienecabecera)?$header:''], 
-            'SetFooter'=>[($model->tienepie)?'{PAGENO}':''],
-        ];*/
-           $mpdf->simpleTables = true;
-                 $mpdf->packTableData = true;
-           $mpdf->showImageErrors = true;
-           $mpdf->curlAllowUnsafeSslRequests = true;
-          $paginas=count($contenido);
-          //echo $contenido[0];die();
-         foreach($contenido as $index=>$pagina){
-            $mpdf->WriteHTML($pagina);
-            if($index < $paginas-1)
-             $mpdf->AddPage();
-         }
-              
-         
-        
-         return $mpdf->Output(); 
+      if($model->type=='pdf'){  
+            $mpdf=ModuleReporte::getPdf();
+             $paginas=count($contenido);
+            //echo $contenido[0];die();
+                foreach($contenido as $index=>$pagina){
+                                $mpdf->WriteHTML($pagina);
+                                if($index < $paginas-1)
+                                            $mpdf->AddPage();
+                                        }
+                        return $mpdf->Output(); 
       }elseif($model->type=='html'){
-          return $contenido[0];
+          $cadenaHtml='';
+          foreach($contenido as $index=>$pagina){
+              $cadenaHtml.=$pagina;
+          }
+          return $cadenaHtml;
       }elseif($model->type=='file'){
-          $pdf=ModuleReporte::getPdf();
-           $pdf->methods=[ 
-           'SetHeader'=>[($model->tienecabecera)?$header:''], 
-            'SetFooter'=>[($model->tienepie)?'{PAGENO}':''],
-        ];
-        $pdf->content=$contenido;
-        $pdf->output($contenido, $model->pathToStoreFile());
-        return true;
+                $pdf=ModuleReporte::getPdf();
+                    $pdf->methods=[ 
+                                'SetHeader'=>[($model->tienecabecera)?$header:''], 
+                                'SetFooter'=>[($model->tienepie)?'{PAGENO}':''],
+                                ];
+        foreach($contenido as $index=>$pagina){
+                        $pdf->WriteHTML($pagina);
+                        if($index < $paginas-1)
+                                 $pdf->AddPage();
+                                    }
+       return $pdf->output($model->pathToStoreFile(), \Mpdf\Output\Destination::FILE);
+        
       }
-      
-      
       
         }  
   

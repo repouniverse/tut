@@ -164,4 +164,8 @@ class SigiFacturacion extends \common\models\base\modelBase
             'monto'=>$colector->montoTotal($this->mes,$this->ejercicio),
         ];
     }
+    
+    public function montoTotal(){
+        return 0;
+    }
 }

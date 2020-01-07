@@ -25,7 +25,7 @@ use common\widgets\selectwidget\selectWidget;
           <?= \common\widgets\buttonsubmitwidget\buttonSubmitWidget::widget(
                   ['idModal'=>$idModal,
                     'idForm'=>'myformulario',
-                      'url'=> \yii\helpers\Url::to(['/sigi/'.$this->context->id.'/create-as-child','id'=>$modelFacturacion->id]),
+                      'url'=> \yii\helpers\Url::to(['/sigi/'.$this->context->id.'/create-as-child-interno','id'=>$modelFacturacion->id]),
                      'idGrilla'=>$gridName, 
                       ]
                   )?>
@@ -49,7 +49,7 @@ use common\widgets\selectwidget\selectWidget;
   <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
     
      <?= $form->field($model, 'colector_id')->dropDownList(
-             comboHelper::getCboColectorMasivo($modelFacturacion->edificio_id),
+             comboHelper::getCboColectorNoMasivo($modelFacturacion->edificio_id),
              ['prompt'=>yii::t('sigi.labels','--Escoja un valor--')]
              ) ?>
  </div>
@@ -100,18 +100,6 @@ use common\widgets\selectwidget\selectWidget;
              ) ?>
 
  </div>
-          
-<div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
-      <?= $form->field($model, 'mesconsumo')->dropDownList(
- common\helpers\timeHelper::cboMeses(),
-            ['prompt'=>yii::t('sigi.labels','--Escoja un valor--')]
-             ) ?>
-
- </div>
-  <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
-      <?= $form->field($model, 'consumo')->textInput() ?>
-
- </div>
   <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
       <?= $form->field($model, 'anio')->dropDownList(
  common\helpers\timeHelper::cboAnnos(),
@@ -121,19 +109,22 @@ use common\widgets\selectwidget\selectWidget;
  </div>
           
  
-       <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12"> 
-     <?php 
-  // $necesi=new Parametros;
-    echo selectWidget::widget([
-           // 'id'=>'mipapa',
-            'model'=>$model,
-            'form'=>$form,
-            'campo'=>'codpro',
-         'ordenCampo'=>1,
-         'addCampos'=>[2],
-        ]);  ?>
+<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+      <?= $form->field($model, 'codpro')->dropDownList(
+ comboHelper::getCboApoderados($modelFacturacion->edificio_id),
+             ['prompt'=>yii::t('sigi.labels','--Escoja un valor--')]
+             ) ?>
 
- </div>    
+ </div>
+          
+   <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+      <?= $form->field($model, 'unidad_id')->dropDownList(
+ comboHelper::getCboUnitsByEdificio($modelFacturacion->edificio_id),
+             ['prompt'=>yii::t('sigi.labels','--Escoja un valor--')]
+             ) ?>
+
+ </div>       
+          
    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
      <?= $form->field($model, 'monto')->textInput(['maxlength' => true]) ?>
 

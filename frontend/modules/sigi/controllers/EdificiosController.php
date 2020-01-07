@@ -43,6 +43,20 @@ class EdificiosController extends baseController
      */
     public function actionIndex()
     {
+        $modelo=new \frontend\modules\sigi\models\SigiLecturas();
+        $modelo->setScenario($modelo::SCENARIO_IMPORTACION);
+        $modelo->setAttributes([
+            'codepa'=>'204',
+            'mes'=>9,
+            'flectura'=>'13/09/2019',
+            'lectura'=>1,
+            'anio'=>'2019',
+            'codedificio'=>'PRUEBA',
+            'codtipo'=>'101',
+        ]);
+        var_dump($modelo->medidor()->lastRead());die();
+        $modelo->validate();
+        
        /* $plantilla=\common\helpers\h::settings()->get('general','formatoDNI');
         $plantilla='[0-9]{8}';
         var_dump($plantilla,preg_match('10201403',$plantilla));die();*/

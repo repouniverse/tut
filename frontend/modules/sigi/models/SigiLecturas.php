@@ -22,6 +22,8 @@ use Yii;
  */
 class SigiLecturas extends \common\models\base\modelBase
 {
+    
+    public $dateorTimeFields=['flectura'=>self::_FDATE];
     /**
      * {@inheritdoc}
      */
@@ -50,6 +52,7 @@ class SigiLecturas extends \common\models\base\modelBase
            
             /*Escenario imortacion*/
              [['codepa'], 'valida_depa','on'=>self::SCENARIO_IMPORTACION],
+             [['codepa'], 'valida_lectura','on'=>self::SCENARIO_IMPORTACION],
              [['codepa','codedificio','codtipo','mes','anio','lectura','flectura'], 'required','on'=>self::SCENARIO_IMPORTACION],
              [['codedificio'], 'exist', 'skipOnError' => true, 'targetClass' => Edificios::className(), 'targetAttribute' => ['codedificio' => 'codigo'],'on'=>self::SCENARIO_IMPORTACION],
              //[['codepa'], 'exist', 'skipOnError' => true, 'targetClass' => Edificios::className(), 'targetAttribute' => ['codedificio' => 'codigo']],
@@ -64,7 +67,7 @@ class SigiLecturas extends \common\models\base\modelBase
  public function scenarios()
     {
         $scenarios = parent::scenarios(); 
-        $scenarios[self::SCENARIO_IMPORTACION] = ['codepa','codedificio','codtipo','codum','codpro'];
+        $scenarios[self::SCENARIO_IMPORTACION] = ['codepa','codedificio','codtipo','mes','anio','lectura','flectura'];
        return $scenarios;
     }
     
@@ -107,7 +110,8 @@ class SigiLecturas extends \common\models\base\modelBase
     public function beforeSave($insert) {
       if($insert){
           $this->resolveIds();
-        $this->lecturaant=$this->lastReadNumeric();   
+        $this->lecturaant=$this->lastReadNumeric(); 
+         $this->delta=$this->lectura-$this->lastReadNumeric();    
       }else{
          if($this->hasChanged('lectura'))
            $this->delta=$this->lectura-$this->lastReadNumeric();    
@@ -116,15 +120,20 @@ class SigiLecturas extends \common\models\base\modelBase
     }
     
     
-    public function rawSuministro(){
-        return ($this->isNewRecord)?SigiSuministros::findOne($this->suministro_id):
+    public function rawSuministro(){        
+             return ($this->isNewRecord)?SigiSuministros::findOne($this->suministro_id):
            $this->suministro ;
     }
    
     
     public function lastReadNumeric(){
-        $ll=$this->rawSuministro()->lastRead();
+        $ll=$this->medidor()->lastRead();
        return (is_null($ll))?0:$ll->lectura;
+    }
+    
+    public function lastDateRead(){
+        $ll=$this->medidor()->lastRead();
+       return (is_null($ll))?0:$ll->flectura; 
     }
     
      public function valida_lectura($attribute, $params)
@@ -172,7 +181,7 @@ class SigiLecturas extends \common\models\base\modelBase
         'edificio_id'=>$this->edificio()->id,
             ])->one();
     }
-    private function medidor(){
+    public function medidor(){
        return  $this->depa()->firstMedidor(SigiSuministros::COD_TYPE_SUMINISTRO_DEFAULT);
     }
 }

@@ -123,8 +123,8 @@ public function scenarios()
     public function lastRead()
     {
         return $this->queryReads()->
-                andWhere(['<','id',$this->id])
-                ->orderBy('id desc')->limit(1)->one();
+                andWhere(['id'=>$this->queryReads()->max('id')])->
+                orderBy('id desc')->limit(1)->one();
     }
     
     
