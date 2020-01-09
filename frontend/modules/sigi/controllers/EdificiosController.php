@@ -44,23 +44,39 @@ class EdificiosController extends baseController
      */
     public function actionIndex()
     {
-       /*$registro=\frontend\modules\sigi\models\SigiFacturacion::findOne(50);
-       VAR_DUMP($registro->grupos());DIE();*/
-      /*$existe= \frontend\modules\sigi\models\SigiDetfacturacion::find()->
-                where([
-                    'cuentaspor_id'=>25,
-                    'colector_id'=>45
-                        ])
-                ->exists();
-        var_dump($existe);die();*/
         
-        /* $plantilla=\common\helpers\h::settings()->get('general','formatoDNI');
+        /*$model= \frontend\modules\sigi\models\SigiFacturacion::findOne(50);
+        $model->providerFaltaLecturas('101');
+        var_dump($model->isCompleteReadsSuministros('101'));
+        var_dump($model->providerFaltaLecturas('101')->getCount());
+        die();
+        $modelo=new \frontend\modules\sigi\models\SigiLecturas();
+        $modelo->setScenario($modelo::SCENARIO_IMPORTACION);
+        $modelo->setAttributes([
+            'codepa'=>'204',
+            'mes'=>10,
+            'flectura'=>'13/10/2019',
+            'lectura'=>600,
+            'anio'=>'2019',
+            'codedificio'=>'PRUEBA',
+            'codtipo'=>'101',
+        ]);*/
+       /* var_dump($modelo->medidor()->lastRead('16/12/2019'));
+        echo "<br><br><br>";
+        var_dump($modelo->medidor()->nextRead('16/12/2019'));
+        echo "<br><br><br>";
+        die();
+        var_dump($modelo::SwichtFormatDate('15/08/2019', 'date',false),$modelo->medidor()->lastRead());die();
+        $modelo->validate();
+        print_r($modelo->getErrors());die();
+       /* $plantilla=\common\helpers\h::settings()->get('general','formatoDNI');
         $plantilla='[0-9]{8}';
         var_dump($plantilla,preg_match('10201403',$plantilla));die();*/
         
         /*$MODELI=\frontend\modules\sigi\models\SigiCargosgrupoedificio::findOne(7);
         VAR_DUMP($MODELI->hasChilds());DIE();
         */
+        
         $searchModel = new EdificiosSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -170,7 +186,7 @@ class EdificiosController extends baseController
         $modeledificio = $this->findModel($id);        
        $model=New \frontend\modules\sigi\models\SigiApoderados();
        $model->edificio_id=$id;
-       $model->facturindividual=true;
+       
        $datos=[];
         if(h::request()->isPost){
             $model->load(h::request()->post());

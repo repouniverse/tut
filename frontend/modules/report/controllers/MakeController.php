@@ -11,6 +11,7 @@ use frontend\modules\report\models\ReporteSearch;
 use common\controllers\base\baseController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use common\helpers\h;
 
 /**
  * MakeController implements the CRUD actions for Reporte model.
@@ -283,24 +284,105 @@ class MakeController extends baseController
   
   public function actionMultiReport($id,$idsToReport){
         set_time_limit(300); // 5 minutes 
+        //echo "maolde";die();
        $model=$this->findModel($id); 
        $this->layout='blank';
        $idsToReport= \yii\helpers\Json::decode($idsToReport);
       // var_dump($idsToReport);die();
-       $contenido=$this->contentReportMultiple($id, $idsToReport,$model);
+       $size=h::gsetting('report','sizePage');
+      // yii::error('Numero maximo de paginas '.$size);
+       $arreglos=  array_chunk($idsToReport, $size);
+       foreach($arreglos as $key=>$arreglo){
+          $ruta=$model->pathToStoreFile();
+         // yii::error($ruta);
+          $contenido=$this->contentReportMultiple($id, $arreglo,$model);    
+         
+        $pdf=ModuleReporte::getPdf(); 
+         $paginas=count($contenido);
+        foreach($contenido as $index=>$pagina){ 
+           // yii::error('pagination '.count($contenido));
+           
+                        $pdf->WriteHTML($pagina);
+                         // yii::error('index '.$index);
+                          // yii::error('paginas '.($paginas-1));
+                        if($index < $paginas-1){
+                             //yii::error('agregando pagina');
+                            
+                                 $pdf->AddPage();
+                        }
+                             
+                                    }
+        $pdf->output($ruta, \Mpdf\Output\Destination::FILE);
+         $model->routesSplit[]=$ruta;
+         unset($pdf);
+       }
+          $mpdf = new \Mpdf\Mpdf();
+       foreach($model->routesSplit as $route) {
+          $mpdf->AddPage();
+         $mpdf->SetImportUse();
+         $pagecount = $mpdf->SetSourceFile($route);
+         yii::error('numero de paginas   :'.$pagecount   );
+         if ($pagecount > 0) {
+             for ($k = 1; $k <= $pagecount; $k++) {
+                  yii::error('bucle k');
+                   yii::error($k);
+                   
+                 $tplId = $mpdf->ImportPage($k);
+                 $mpdf->UseTemplate($tplId);
+                 if ($k < $pagecount) {
+                     $mpdf->AddPage();
+                 }
+             }
+         }
+        unlink($route);
+       } 
        
-       return $this->prepareFormat($contenido, $model);
+       
+       return $mpdf->Output();
   }
   
   
   public function actionMergePdf(){
       $mpdf = new \Mpdf\Mpdf();
+     
   //$mpdf->SetHTMLHeader($header);
-  $pagecount = $mpdf->setSourceFile('/public_html/sigi/frontend/uploads/pdfs/KALMAR.pdf');
+     // $path='/home/neotegni/public_html/sigi/frontend/uploads/pdfs/LLAVE.pdf';
+      //realpath($path);
+      $path1=yii::getalias('@frontend').'/uploads/pdfs/pdf_1.pdf';
+      $path2=yii::getalias('@frontend').'/uploads/pdfs/pdf_2.pdf';
+      $path3=yii::getalias('@frontend').'/uploads/pdfs/pdf_3.pdf';
+      $path4=yii::getalias('@frontend').'/uploads/pdfs/pdf_4.pdf';
+      
+       /*$mpdf->SetImportUse();   
+  $pagecount = $mpdf->setSourceFile($path1);
   $tplIdx = $mpdf->importPage($pagecount);
   $mpdf->useTemplate($tplIdx);
-
-  $mpdf->WriteHTML('');
+  $mpdf->addPage();
+   return $mpdf->Output(); */
+   
+    
+      for ($i = 1; $i <= 4; $i++) {
+          yii::error('bucle i');
+          $mpdf->AddPage();
+         $mpdf->SetImportUse();
+         $pagecount = $mpdf->SetSourceFile(yii::getalias('@frontend').'/uploads/pdfs/pdf_'.$i.'.pdf');
+         yii::error('numero de paginas   :'.$pagecount   );
+         if ($pagecount > 0) {
+             for ($k = 1; $k <= $pagecount; $k++) {
+                  yii::error('bucle k');
+                   yii::error($k);
+                   
+                 $tplId = $mpdf->ImportPage($k);
+                 $mpdf->UseTemplate($tplId);
+                 if ($k < $pagecount) {
+                     $mpdf->AddPage();
+                 }
+             }
+         }
+          
+        
+  
+            }
    return $mpdf->Output(); 
   }
   
@@ -308,11 +390,9 @@ class MakeController extends baseController
   private function contentReportMultiple($id,$idsToReport,$model){
       // $model=$this->findModel($id); 
        $content=[];
-       $i=1;
+     
       foreach($idsToReport as $key=>$idkey){
-         if($i >= 60){
-             break;
-         }
+       
           //var_dump($this->contentReport($id, $idkey, $model))
           $contenidos=$this->contentReport($id, $idkey, $model);
           foreach( $contenidos as $clave=>$valor){

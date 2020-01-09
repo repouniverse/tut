@@ -120,14 +120,38 @@ public function getEdificio()
     
     public function getLecturas()
     {
-        return $this->hasMany(SigiLecturas::className(), ['id' => 'suministro_id']);
+        return $this->hasMany(SigiLecturas::className(), ['suministro_id' =>'id']);
     }
     
-    public function lastRead()
+    public function lastRead($fecha=null)
     {
-        return $this->queryReads()->
-                andWhere(['<','id',$this->id])
-                ->orderBy('id desc')->limit(1)->one();
+        $query=$this->queryReads();
+                
+        if(is_null($fecha)){
+            $query=$query->andWhere(['id'=>$this->queryReads()->max('id')]);
+        }else{
+           $query=$query->andWhere(['<=','flectura',static::SwichtFormatDate($fecha, 'date',false)])/*->andWhere(['<=','id',$this->queryReads()->max('id')])*/
+                   ->orderBy('id desc')->limit(1); 
+        }
+        yii::error($query->createCommand()->getRawSql());
+        return $query->one();
+    }
+      
+    public function nextRead($fecha){
+        $query=$this->queryReads()->
+      andWhere(['>=','flectura',static::SwichtFormatDate($fecha, 'date',false)])->
+      orderBy('id ASC')->limit(1);
+        yii::error($query->createCommand()->getRawSql());
+      return $query->one();  
+    }
+    
+    /*Verifica con una fecha si esta fecha es mayor a cualquier lectura 
+     * Corresponderia a una nueva lectura
+     * En otro caso , habria ya una lectura con esta fecha o una fecha anterior
+     * fecha   en formato dd/mm/yyyy (Formato usuario)
+     */
+    public function isDateForLastRead($fecha){
+        return is_null($this->nextRead($fecha))?true:false;
     }
     
     
@@ -142,7 +166,10 @@ public function getEdificio()
     
     
     public function consumoTotal($mes,$anio){
-        $this->queryReadsForThisMonth($mes,$anio)->select('sum(lectura)')->scalar();
+        $query=$this->queryReadsForThisMonth($mes,$anio);
+        if($query->count()>0)
+         return  $query->select('sum(lectura)')->scalar();
+        return 0;
     }
     
     
@@ -204,6 +231,14 @@ public function getEdificio()
           
       }  
         RETURN parent::beforeSave($insert);
-    }   
+    }
+   
+/*
+ * Devuelve un array de lecturas 
+ * 
+ */
+public function matrixReads(){
+    
+}
     
 }

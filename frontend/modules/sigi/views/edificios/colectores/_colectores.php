@@ -43,8 +43,9 @@ $gridColumns = [
                 ],
                
                 
-                ['attribute' => 'tasamora',],
+                'cargo.codcargo',
                 'cargo.descargo',
+                ['attribute' => 'tasamora',],
                      [
                           'attribute' => 'regular',
                          'format' => 'raw',

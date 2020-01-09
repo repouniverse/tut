@@ -73,7 +73,7 @@ use frontend\modules\sta\helpers\comboHelper;
         <?php 
        
         echo GridView::widget([
-             'id' => 'kv-grid-demo',
+             'id' => 'grid-sumilla',
         'dataProvider' => (new \frontend\modules\sta\models\StaTestdetSearch())->searchByTest($model->codtest),
          //'summary' => '',
         // 'tableOptions'=>['class'=>'table table-condensed table-hover table-bordered table-striped'],
@@ -102,6 +102,7 @@ echo linkAjaxGridWidget::widget([
             'family'=>'pink',
           'type'=>'POST',
            'evento'=>'click',
+    'posicion'=>\yii\web\View::POS_END
             //'foreignskeys'=>[1,2,3],
         ]); 
 

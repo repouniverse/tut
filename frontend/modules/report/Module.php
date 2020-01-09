@@ -1,7 +1,8 @@
 <?php
-
 namespace frontend\modules\report;
-use kartik\mpdf\Pdf;
+//use kartik\mpdf\Pdf;
+use yii;
+use common\helpers\h;
 /**
  * report module definition class
  */
@@ -11,17 +12,21 @@ class Module extends \yii\base\Module
      * {@inheritdoc}
      */
     public $controllerNamespace = 'frontend\modules\report\controllers';
-
     /**
      * {@inheritdoc}
      */
     public function init()
     {
         parent::init();
-
         // custom initialization code goes here
+        static::putSettingsModule();
     }
-    
+     private static function putSettingsModule(){
+        h::getIfNotPutSetting('report','sizePage',5, \yii2mod\settings\models\enumerables\SettingType::STRING_TYPE);
+       //  h::getIfNotPutSetting('sigi','urlimagesalu','http:://www.orce.uni.edu.pe/alumnos/', SettingType::STRING_TYPE);
+        // h::getIfNotPutSetting('sigi','prefiximagesalu','0060', SettingType::STRING_TYPE);
+          return true;
+    }
    
     
     public static function  getPdf(){
@@ -29,7 +34,6 @@ class Module extends \yii\base\Module
             $fontDirs = $defaultConfig['fontDir'];
             $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
             $fontData = $defaultFontConfig['fontdata'];
-
 //$mpdf = new \common\components\MyMpdf([/*
 $mpdf = new \Mpdf\Mpdf([
     'fontDir' => array_merge($fontDirs,[
@@ -43,7 +47,6 @@ $mpdf = new \Mpdf\Mpdf([
     ],
     //'default_font' => 'cour'
 ]);
-
 //print_r($mpdf->fontdata);die();
           
           //$mpdf=new \Mpdf\Mpdf();

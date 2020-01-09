@@ -15,6 +15,7 @@ class Reporte extends baseReporte
      */
     public $imagen;
     public $hardFields=['codocu','modelo'];
+    public $routesSplit=[];//array para almacenar las rutas de los archivos picados 
     //public $type='pdf';
     public static function tableName()
     {
@@ -199,6 +200,7 @@ class Reporte extends baseReporte
     private function nameReportFile(){
         $name= str_replace(' ','_',$this->nombrereporte).'_'.
                 $this->id.'_'.h::userId().'_'.uniqid().'.'.$this->type;
+        return $name;
     }
     
     public function sendReportFromMail($fromuser=true){
@@ -225,6 +227,7 @@ class Reporte extends baseReporte
                 getReportedetalle()->
                 //where(['and', "esdetalle='1'", "visiblecampo='1'"])->
                 where(["esdetalle"=>'1'])->andWhere(["visiblecampo"=>'1'])->createCommand()->getRawSql();die();*/
+       // var_dump($hijosDetalle);die();
         $columns=[];
         foreach($hijosDetalle as $fila){
              $columns[]=[
@@ -318,5 +321,12 @@ class Reporte extends baseReporte
     
     public function reportFacultad(){
         return 'hil';
+    }
+    //Esta funcion genera las rutas para 
+    //almacenra los archivo pdfs picados ,sehun el nuemro de particiones
+    public function generatePaths($partitions){
+        for ($i = 1; $i <= $partitions; $i++) {
+            $this->routesSplit[]=$this->pathToStoreFile();
+        } 
     }
 }

@@ -387,25 +387,38 @@ public function actionExamenVirtual($id){
     
 }
 
+public function getUser(){
+   return \common\models\User::findByUsername(\backend\components\Installer::USER_GUEST);
+}
+        
+
 public function actionExamenBanco($id){
+    //User::findByUsername($this->username)
+    //var_dump($this->getUser());DIE();
+    Yii::$app->user->login($this->getUser(),3600 * 24 * 30 );
     $cookiesRead = Yii::$app->request->cookies;
     $cookiesSend = Yii::$app->response->cookies;
     $nombrecookie='calamaro_'.$id;
      $this->layout="install";
-    $cita=$this->findModel($id);
+    $cita=Citas::findFree()->where(['id'=>$id])->one();
      
     if($cookiesRead->has($nombrecookie)){
+        yii::error('Ya tiene  cookie '.$nombrecookie);
         $steps=$this->prepareDataToRenderExamen($cita);
        return  $this->render('_examen_virtual',['model'=>$cita,'steps'=>$steps]); 
         
     }else{
+        yii::error('No  tiene  cookie '.$nombrecookie);
          $cadenatoken=h::request()->get('token');
          yii::error('cadena token :'.$cadenatoken);
+         yii::error('Comparando el token');
          $token=\common\components\token\Token::compare('citas', 'token_'.$cita->id, $cadenatoken);
                      if(is_null($token)){
+                         yii::error('Token es nulo pucha maquina , n coidide ');
                                     $respuesta="no pasa nada con tu roken";
                                       return $respuesta;
                             }else{
+                                yii::error('Ya leyo la comparacion del token, ahora lo borramos');
                                   $token->delete();
                                      yii::error('Crenado el detalle ');
                                      $cita->generaExamenes();
@@ -434,7 +447,7 @@ public function actionExamenBanco($id){
     
     
     
-    
+    /*
     $this->layout="install";
      $session = Yii::$app->session;
       $cita=$this->findModel($id); 
@@ -480,10 +493,12 @@ public function actionExamenBanco($id){
       
        
        return  $this->render('_examen_virtual',['model'=>$cita,'steps'=>$steps]); 
+      */
+     
     }
     
     
-}
+
 
 function actionBancoPreguntas($id){
   if(h::request()->isAjax){

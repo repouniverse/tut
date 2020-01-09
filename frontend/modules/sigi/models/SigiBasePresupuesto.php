@@ -180,6 +180,13 @@ class SigiBasePresupuesto extends \common\models\base\modelBase
             $this->resolveFieldsToImport();
           if($this->cargosedificio_id >0)
             $this->resolveFieldsToIds ();
+          if(empty($this->anual)){
+              $this->anual=$this->mensual*12;
+          }
+          if(empty($this->mensual)){
+              $this->mensual=$this->anual/12;
+          }
+          
         }
         return parent::beforeSave($insert);
     }

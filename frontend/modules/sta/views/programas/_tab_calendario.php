@@ -151,6 +151,7 @@ echo CalendarScheduleWidget::widget([
                     if (confirm("'.yii::t('sta.labels','¿Confirmar que desea cambiar la duración de esta cita ?').'")) {
                                var fechainicio=event.start.format("YYYY-MM-DD HH:mm:ss");
                                var fechatermino=event.end.format("YYYY-MM-DD HH:mm:ss");
+                              // alert(event.id);
         $.ajax({ 
                     method:"get",    
                     url: "'.\yii\helpers\Url::toRoute(['/sta/citas/reprograma-cita']).'",

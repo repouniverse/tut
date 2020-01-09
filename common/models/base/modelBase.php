@@ -646,7 +646,13 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
          // $this->setPrimaryKey($this->prefijo);
          return  parent::beforeSave( $insert);
         }
-        
+        public function beforeValidate() {
+                $insert=$this->isNewRecord;
+         //$this->prepareTimeFields(false);//Convierte los campos fechas y tiempo almacenables en BD
+       $this->convertBooleanFields(true);
+         // $this->setPrimaryKey($this->prefijo);
+         return  parent::beforeValidate();
+        }
         
         
         /*Detecta si el usuario ha modificado un campo 

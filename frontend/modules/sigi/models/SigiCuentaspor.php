@@ -160,6 +160,10 @@ class SigiCuentaspor extends \common\models\base\modelBase
     {
         return $this->hasOne(SigiFacturacion::className(), ['id' => 'facturacion_id']);
     }
+      public function getDetFacturacion()
+    {
+        return $this->hasMany(SigiDetfacturacion::className(), ['cuentaspor_id'=>'id']);
+    }
     /**
      * {@inheritdoc}
      * @return SigiCuentasporQuery the active query used by this AR class.

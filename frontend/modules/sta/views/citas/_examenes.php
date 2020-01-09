@@ -25,7 +25,7 @@
     
    <?php //var_dump((new SigiApoderadosSearch())->searchByEdificio($model->id)); die(); ?>
     <?= GridView::widget([
-        'id'=>'grid-test',
+        'id'=>'grid-examenis',
         'dataProvider' =>(new ExamenesSearch())->searchByTaller($model->id),
          'summary' => '',
          'tableOptions'=>['class'=>'table table-condensed table-hover table-bordered table-striped'],
@@ -49,7 +49,7 @@
                      
                         
                         },
-                        'delete' => function ($url,$model) {
+                       'delete' => function ($url,$model) {
 			   $url = \yii\helpers\Url::toRoute($this->context->id.'/deletemodel-for-ajax');
                               return \yii\helpers\Html::a('<span class="btn btn-danger glyphicon glyphicon-trash"></span>', '#', ['title'=>$url,/*'id'=>$model->codparam,*/'family'=>'holas','id'=>\yii\helpers\Json::encode(['id'=>$model->id,'modelito'=> str_replace('@','\\',get_class($model))]),/*'title' => 'Borrar'*/]);
                             },
@@ -95,7 +95,22 @@
                     ],
         ],
     ]); ?>
-       <?php Pjax::end(); ?>   
+    
+     <?php 
+   echo linkAjaxGridWidget::widget([
+           'id'=>'widgetgruidBancos',
+            'idGrilla'=>'grilla-examenes',
+            'family'=>'holas',
+          'type'=>'POST',
+           'evento'=>'click',
+       'posicion'=>\yii\web\View::POS_END
+            //'foreignskeys'=>[1,2,3],
+        ]); 
+   ?>
+    
+       <?php Pjax::end(); ?> 
+ 
+    
     <?php 
   $string="$('#boton_bateria').on( 'click', function(){ 
      
@@ -171,9 +186,7 @@ $string2="$('#boton_notifica').on( 'click', function(){
 ?>
     
     
-   
-    
-    
+  
     <br>
     <br>
     <br>

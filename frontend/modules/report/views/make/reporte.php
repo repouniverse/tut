@@ -4,6 +4,7 @@
 //var_dump($modelo->tienecabecera);
 // ?>
   <?php 
+if(count($columnas)>0)
 echo \yii\grid\GridView::widget([
         'id'=>'detallerepoGrid',
     'summary' => '',

@@ -26,11 +26,12 @@ use frontend\modules\report\models\Reporte;
 class Test extends \common\models\base\modelBase
 {
   use testTrait;
+  const DOCUMENTO_TEST='800';
     public static function tableName()
     {
         return '{{%sta_test}}';
     }
-
+public $booleanFields=['opcional'];
     
      public function behaviors()
 {
@@ -120,5 +121,10 @@ class Test extends \common\models\base\modelBase
     
     public function arrayCalificaciones(){
        return array_column( $this->getCalificiones()->select(['valor','descripcion'])->asArray()->all(),'descripcion','valor');
+    }
+    
+    public function beforeSaveSave($insert){
+        $this->codocu=self::DOCUMENTO_TEST;
+        return parent::beforeSave($insert);
     }
 }

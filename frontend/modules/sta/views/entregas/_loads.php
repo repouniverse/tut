@@ -57,18 +57,28 @@ use yii\helpers\Html;
              },
 
           ], */ 
-            [ 'attribute' => 'hasFile',
+            /*[ 'attribute' => 'hasFile',
                'headerOptions' => ['style' => 'width:10%'],
                 'format' => 'raw',
                 'value' =>  function ($model, $key, $index, $column){
                         //$options=['width' => '40','height' => '42','class'=>"img-thumbnail"];
                         
-        return ($model->hasAttachments())?Html::a('<span class="glyphicon glyphicon-paperclip"></span>',$model->urlFirstFile,['data-pjax'=>'0']/*, $options*/):
+        return ($model->hasAttachments())?Html::a('<span class="glyphicon glyphicon-paperclip"></span>',$model->urlFirstFile,['data-pjax'=>'0']/*, $options*//*):
             '<span class="glyphicon glyphicon-folder-open"></span>';
                        
               },
-            ],
-               
+            ],*/
+              [ 'attribute' => 'hasFile',
+               'headerOptions' => ['style' => 'width:10%'],
+                'format' => 'raw',
+                'value' =>  function ($model, $key, $index, $column){
+                        //$options=['width' => '40','height' => '42','class'=>"img-thumbnail"];
+                 $cad=($model->activo==$model::STATUS_CARGADO)?'<span style="font-size:16px;" class="glyphicon glyphicon-check"></span>':'';      
+        return ($model->hasAttachments())?Html::a('<span class="glyphicon glyphicon-save"></span>',$model->urlFirstFile,['data-pjax'=>'0']).$cad:
+            '<span class="glyphicon glyphicon-folder-open"></span>';
+                       
+              },
+            ], 
             'descripcion',
             'fechacarga',
             'tienecabecera',

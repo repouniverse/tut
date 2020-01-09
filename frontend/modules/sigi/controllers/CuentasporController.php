@@ -6,6 +6,8 @@ use Yii;
 use frontend\modules\sigi\models\SigiCuentaspor;
 use frontend\modules\sigi\models\SigiCuentasporSearch;
 use frontend\controllers\base\baseController;
+use frontend\modules\sigi\models\SigiLecturasTempSearch;
+use frontend\modules\sigi\models\SigiLecturasTemp;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use common\helpers\h;
@@ -242,6 +244,26 @@ class CuentasporController extends baseController
     }
 
      
-    
+ public function generaLecturas($id){
+     $model=$this->findModel($id);
+     $suministros=$model->edificio->suministros();
+     $tipo=$model->colector->tipomedidor;
+     foreach($suministros as $suministro){
+        if($tipo==$suministro->tipo)
+         SigiLecturasTemp::firstOrCreateStatic([
+             'suministro_id'=>$suministro->id,
+             'unidad_id'=>$suministro->unidad->id,
+             'mes'=>$model->mes,
+              'anio'=>$model->anio,
+         ]);
+     }
+      $searchModel = new SigiLecturasTempSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('lecturas', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+ } 
     
 }

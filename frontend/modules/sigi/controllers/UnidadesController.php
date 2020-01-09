@@ -150,7 +150,8 @@ class UnidadesController extends baseController
         $modelunidad = $this->findModel($id);        
        $model=New \frontend\modules\sigi\models\SigiPropietarios();
        $model->unidad_id=$id;
-       
+        $model->edificio_id=$modelunidad->edificio_id;
+        $model->codepa=$modelunidad->numero;
        $datos=[];
         if(h::request()->isPost){
             $model->load(h::request()->post());

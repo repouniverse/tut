@@ -6,6 +6,7 @@ use frontend\modules\sigi\models\SigiUnidades;
 use frontend\modules\sigi\models\SigiCuentaspor;
 use common\models\masters\Centros;
 use yii\web\NotFoundHttpException;
+use frontend\models\SignupForm;
 use Yii;
 
 /**
@@ -121,7 +122,10 @@ class Edificios extends \common\models\base\modelBase
         return $this->hasOne(Centros::className(), ['codcen' => 'codcen']);
     }
     
-    
+    public function getSuministros()
+    {
+        return $this->hasMany(SigiSuministros::className(), ['edificio_id' => 'id']);
+    }
 
     /**
      * {@inheritdoc}
@@ -235,7 +239,7 @@ class Edificios extends \common\models\base\modelBase
      foreach($idsTipo as $tipo){
           $idsDepas= array_column(SigiSuministros::find()->select('[[unidad_id]]')->
                where(['[[edificio_id]]'=>$this->id,
-                     ''=>$tipo,
+                     'tipo'=>$tipo,
                    ])->
                asArray()->all(),'unidad_id');
         $Noestan=array_column(SigiUnidades::find()->select(['numero'])->
@@ -348,9 +352,33 @@ class Edificios extends \common\models\base\modelBase
      }else{
         $this->addError('id',yii::t('sigi.labels','No tiene ninguna unidad imputable para cobranza ')); 
      }
+     /*Ahor veriifcar que los medidores ya estan cargados*/
+     
+     
+     
+     
+     
      
   }
   
-
+   public function nMedidores($type=SigiSuministros::COD_TYPE_SUMINISTRO_DEFAULT){
+       return $this->getSuministros()->where(['tipo'=>$type])->count();
+   }
+   public function idsMedidores($type){
+      return array_column($this->getSuministros()->select('id')->where(['tipo'=>$type])->asArray()->all(),'id'); 
+   }
+   
+   public function typeMedidores(){
+      return array_column($this->getSuministros()->
+              select('tipo')->distinct()->asArray()->
+              all(),'tipo'); 
+   }
+   
+   
+   public function generateUsers(){
+       /*foreach($this->pr){
+           
+       }*/
+   }
       
 }

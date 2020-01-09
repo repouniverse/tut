@@ -122,7 +122,8 @@ class SigiPropietarios extends \common\models\base\modelBase
     public function beforeSave($insert){
         if($insert){
             $this->activo=true;
-            if(!empty($this->codepa) && empty($this->unidad_id))
+          //  if((!empty($this->codepa) && empty($this->unidad_id)))
+          IF($this->getScenario()==static::SCENARIO_EMPRESA)
            $this->unidad_id=$this->departamento()->id;            
         }
         return parent::beforeSave($insert);

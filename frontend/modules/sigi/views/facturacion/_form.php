@@ -86,7 +86,7 @@ use yii\widgets\Pjax;
  </div>
      
     <?php ActiveForm::end(); ?>
-
+       <?php if(!$model->isNewRecord) {?>
       <?php Pjax::begin(['id'=>'grilla_cargospor']); ?>
     <?php echo GridView::widget([
         'dataProvider' =>$dataProviderCuentasPor,
@@ -171,7 +171,7 @@ use yii\widgets\Pjax;
           
     <?php Pjax::end(); ?>
 </div>       
-      
+       <?php }?>  
     
 </div>
 <?php
