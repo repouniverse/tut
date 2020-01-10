@@ -73,7 +73,7 @@ echo CalendarScheduleWidget::widget([
                     method:"get",    
                     url: "'.\yii\helpers\Url::toRoute('/sta/programas/make-cita-by-student').'",
                     delay: 250,
-                        data: {id:'.$model->id.', fecha:fechainicio,codalu:event.title  },
+                        data: {id:'.$model->tallerdet->tallerPsico()->id.', fecha:fechainicio,codalu:event.title  },
              error:  function(xhr, textStatus, error){               
                             revertFunc();
                                 }, 

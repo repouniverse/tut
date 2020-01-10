@@ -120,18 +120,29 @@ class Examenes extends modelSensibleAccess
    * la tabl 'examenesdet', copiando de la tabla 'testdet'
    */
   public function creaExamen(){
+      $valor=false;
       $detalles=$this->test->testdets;
-     //var_dump($detalles);die();
+    //var_dump($this->test);die();
       foreach($detalles as $detalle){
-          //yii::error('recorreindo');
+          yii::error('recorreindo '.$detalle->pregunta);
            $attributos=[
           'examenes_id'=>$this->id,
            'codfac'=>$this->codfac,
           'test_id'=>$detalle->id
                    ];
       $valor=StaExamenesdet::firstOrCreateStatic($attributos, StaExamenesdet::SCENARIO_MIN );
-       //yii::error($valor);
+       if($valor===false){
+           yii::error('fallo');
+           $mimodelo=new StaExamenesdet();
+           $mimodelo->setScenario(StaExamenesdet::SCENARIO_MIN);
+           $mimodelo->setAttributes($attributos);
+           $mimodelo->validate();
+           yii::error($mimodelo->getErrors());
+           break;
+       }
+
       }
+     return $valor;
   }  
   
   

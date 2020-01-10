@@ -8,9 +8,9 @@ namespace frontend\modules\sigi\interfaces;
 interface  colectoresInterface { 
     /*  
      */
-    public function factorProRateo();
+    //public function factorProRateo();
     
-    public function montoTotal();
+    public function montoTotal($mes,$anio);
     
 }
 

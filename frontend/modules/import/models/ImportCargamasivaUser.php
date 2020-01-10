@@ -202,7 +202,8 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
    */
  public function verifyFirstRow(){
      $row=$this->csv->getFirstRow();
-    // yii::error($row);
+     yii::error('la primera fila es ');
+    yii::error($row);
      if(is_null($row) or $row===false)
      {
          $this->addError('activo',Yii::t('import.errors', 'Error; la primera fila  del archivo de carga no se ha encontrado, esto porque pued eque el archivo no tenga filas  o la propiedad firstLineToBegin(): {primera} llego al final del archivo ',['primera'=>$this->firstLineTobegin()]));
@@ -220,11 +221,26 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
       $validacion=true;
      // var_dump($filashijas,$row);die();
       foreach($row as $index=>$valor){
+          $valor=utf8_encode($valor);
           $tipo=$filashijas[$index]['tipo'];
           $longitud=$filashijas[$index]['sizecampo'];
           $nombrecampo=$filashijas[$index]['nombrecampo'];
-          //yii::error('verificando aqui');
-        // yii::error(var_dump($tipo,$valor));
+         /*yii::error($nombrecampo);
+         yii::error($tipo);
+           yii::error($valor);
+             yii::error($longitud);
+             
+             yii::error(($carga->isTypeChar($tipo)));
+             yii::error(strlen($valor));
+             var_dump(substr($valor,0,1),substr($valor,1,1),substr($valor,2,1),substr($valor,3,1),$valor,(integer)$longitud,strlen($valor));die();
+            yii::error( ($carga->isTypeVarChar($tipo) &&($longitud < strlen($valor))));
+            yii::error(($carga->isNumeric($tipo)&& (!is_numeric($valor)) ) );
+            yii::error($carga->isDateorTime($tipo,$nombrecampo,$longitud));
+            yii::error((
+                            (strpos($valor,"-")===false) &&
+                            (strpos($valor,"/")===false) &&
+                             (strpos($valor,".")===false)
+                          ));
          //yii::error(var_dump($tipo,$valor));
           /*Detectando inconsistencias*/
           if(($carga->isTypeChar($tipo)&&($longitud <> strlen($valor))) or

@@ -26,6 +26,8 @@ if(!$this->existsTable($table)) {
         'codum'=>$this->string(4)->notNull(),
         'unidad_id'=>$this->integer(11)->notNull(),
         'edificio_id'=>$this->integer(11)->notNull(),
+         'limpsup'=>$this->decimal(12,2),
+         'liminf'=>$this->decimal(12,2),
         'detalles'=>$this->text()->append($this->collateColumn()),
         'frecuencia'=>$this->integer(5),
        // 'indicaciones2'=>$this->text()->append($this->collateColumn()),

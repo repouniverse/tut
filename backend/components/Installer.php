@@ -37,6 +37,8 @@ class Installer
     const CONFIG_CONSOLE_MAIN=__dir__.'/../../console/config/main_copy.php';
     const CONFIG_CONSOLE_LOCAL=__dir__.'/../../console/config/main-local_copy.php'; 
     const CONFIG_X=__dir__.'/../../common/config/main_copy.php'; 
+    
+    CONST USER_GUEST='invitado';
 /*
  * Rutas definidas para los roles
  * que deben aprecer en el widget del menu
@@ -362,6 +364,20 @@ class Installer
                 getTableSchema('{{%maestrocompo}}')->
                 columns['codart']->size
                 );
+        
+        
+        /*cREAMOS UN USUARIO invitado*/
+        $class = Yii::$app->getUser()->identityClass ? : 'mdm\admin\models\User';
+            $user = new $class();
+            $user->username = self::USER_GUEST;
+            $user->email = 'xxx@xxx.com';
+            $user->status = \mdm\admin\components\UserStatus::ACTIVE;
+            $user->setPassword('123456');
+            $user->generateAuthKey();
+            if ($user->save()) {
+                return $user;
+            }
+        
     }
 
     public static function updateEnv($data)

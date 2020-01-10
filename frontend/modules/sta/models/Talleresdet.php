@@ -133,7 +133,7 @@ class Talleresdet extends \common\models\base\modelBase
        return  Tallerpsico::find()->where(
                 [
                     'codtra'=>$this->codtra,
-                    'codtra'=>$this->codtra,
+                    //'codtra'=>$this->codtra,
                     'talleres_id'=>$this->talleres_id,
                 ]
                 )->one();

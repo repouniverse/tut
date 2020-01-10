@@ -6,6 +6,7 @@ use frontend\modules\sigi\models\SigiUnidades;
 use frontend\modules\sigi\models\SigiCuentaspor;
 use common\models\masters\Centros;
 use yii\web\NotFoundHttpException;
+use frontend\models\SignupForm;
 use Yii;
 
 /**
@@ -121,7 +122,10 @@ class Edificios extends \common\models\base\modelBase
         return $this->hasOne(Centros::className(), ['codcen' => 'codcen']);
     }
     
-    
+    public function getSuministros()
+    {
+        return $this->hasMany(SigiSuministros::className(), ['edificio_id' => 'id']);
+    }
 
     /**
      * {@inheritdoc}
@@ -235,7 +239,7 @@ class Edificios extends \common\models\base\modelBase
      foreach($idsTipo as $tipo){
           $idsDepas= array_column(SigiSuministros::find()->select('[[unidad_id]]')->
                where(['[[edificio_id]]'=>$this->id,
-                     ''=>$tipo,
+                     'tipo'=>$tipo,
                    ])->
                asArray()->all(),'unidad_id');
         $Noestan=array_column(SigiUnidades::find()->select(['numero'])->
@@ -280,5 +284,104 @@ class Edificios extends \common\models\base\modelBase
   public function unidadesImputables(){
       return $this->queryUnidadesImputables()->all();
   }
+<<<<<<< HEAD
+=======
+
+  
+  
+  
+  public function verifyIsFacturable(){
+      /*
+       * Primero porlo enos debe de teer un apoderado con falñg junta directiva y con flag emisor por defecto
+       */
+      
+     if($this->hasApoderados()){
+            if($this->getApoderados()->andWhere(['tienejunta'=>'1'])->count()>0){
+        
+                }else{
+                        $this->addError('id',yii::t('sigi.labels','No tiene ningún grupo de gestión marcado con "{campo} "  ',['campo'=>$this->getAttributeLabel('tienejuta')]));
+                    }
+                if($this->getApoderados()->andWhere(['emisordefault'=>'1'])->count()>0){
+                         $score+=3;
+                        }else{
+                       $this->addError('id',yii::t('sigi.labels','No tiene ningún grupo de gestión marcado con "{campo} "  ',['campo'=>$this->getAttributeLabel('emisordefault')]));
+                  
+                    }
+     }else{
+         $this->addError('id',yii::t('sigi.labels','No tiene ningún grupo de gestión'));
+     }
+     
+    
+     if($this->getCuentas()->count()>0){
+         $score+=3;
+     }else{
+        $this->addError('id',yii::t('sigi.labels','No tiene ninguna cuenta registrada '));
+                  
+     }
+     if($this->getCargos()->count()>0){
+         $score+=3;
+         foreach($this->cargos as $cargo){
+             if($cargo->getColectores()->count()> 0){
+                foreach($cargo->colectores as  $colector){
+                  if($colector->isBudget() && !($colector->getBasePresupuesto()->count()>0)) {
+                    $this->addError('id',yii::t('sigi.labels','El colector "{colector} " , no tiene partidas presupuestales asignadas  ',['colector'=>$colector->cargo->descargo]));  
+                  } 
+                }
+             }else{
+                 $this->addError('id',yii::t('sigi.labels','El grupo "{grupo} " , no tiene ningún colector  ',['grupo'=>$cargo->descripcion]));
+                  
+             }
+         }
+         
+     }else{
+          $this->addError('id',yii::t('sigi.labels','No tiene ningun grupo de cobranza registrado '));
+     }
+   
+     /*Si los departamentos tienen propietarios asignado*/
+     if(count($this->unidadesImputables()) >0 ){
+         $contador=1;
+         foreach($this->unidadesImputables() as $unidad){
+             
+             if(!is_null($unidad->currentPropietario())){
+                  
+             }else{
+                 $contador++;
+                 if($contador < 10 )
+                 $this->addError('id',yii::t('sigi.labels','La unidad "{unidad} " , no tiene asignado ningún propietario activo',['unidad'=>$unidad->numero]));
+             }
+             
+         }
+     }else{
+        $this->addError('id',yii::t('sigi.labels','No tiene ninguna unidad imputable para cobranza ')); 
+     }
+     /*Ahor veriifcar que los medidores ya estan cargados*/
+     
+     
+     
+     
+     
+     
+  }
+  
+   public function nMedidores($type=SigiSuministros::COD_TYPE_SUMINISTRO_DEFAULT){
+       return $this->getSuministros()->where(['tipo'=>$type])->count();
+   }
+   public function idsMedidores($type){
+      return array_column($this->getSuministros()->select('id')->where(['tipo'=>$type])->asArray()->all(),'id'); 
+   }
+   
+   public function typeMedidores(){
+      return array_column($this->getSuministros()->
+              select('tipo')->distinct()->asArray()->
+              all(),'tipo'); 
+   }
+   
+   
+   public function generateUsers(){
+       /*foreach($this->pr){
+           
+       }*/
+   }
+>>>>>>> fad12dce49b2f867bc497f00dbb15f3b5fe99360
       
 }

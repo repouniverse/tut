@@ -42,13 +42,14 @@ class SigiLecturas extends \common\models\base\modelBase
             [['suministro_id', 'unidad_id', 'mes','anio'], 'required','on'=>'default'],
             
             [['suministro_id', 'unidad_id', 'mes'], 'required','on'=>'default'],
+            [['suministro_id','mes', 'anio'], 'unique', 'targetAttribute' => ['mes']],
             
             [['suministro_id', 'unidad_id'], 'integer'],
             [['lectura', 'lecturaant', 'delta'], 'number'],
              [['lectura', 'valida_lectura'], 'number'],
             [['codepa'], 'string', 'max' => 12],
-             [['codedificio'], 'string', 'max' => 12],
-            [['codepa','codedificio','codtipo'], 'safe'],
+             [['codedificio'], 'string', 'max' => 12], 
+            [['codepa','codedificio','codtipo','edificio_id'], 'safe'],
            
             /*Escenario imortacion*/
              [['codepa'], 'valida_depa','on'=>self::SCENARIO_IMPORTACION],
@@ -126,21 +127,48 @@ class SigiLecturas extends \common\models\base\modelBase
     }
    
     
-    public function lastReadNumeric(){
-        $ll=$this->medidor()->lastRead();
+    public function lastReadNumeric($fecha=null){
+        $ll=$this->medidor()->lastRead($fecha);
        return (is_null($ll))?0:$ll->lectura;
     }
-    
-    public function lastDateRead(){
-        $ll=$this->medidor()->lastRead();
+    public function lastDateRead($fecha=null){
+        $ll=$this->medidor()->lastRead($fecha);
        return (is_null($ll))?0:$ll->flectura; 
     }
+    public function nextReadNumeric($fecha){
+        $ll=$this->medidor()->nextRead($fecha);
+       return (is_null($ll))?null:$ll->lectura;
+    }
+    public function nextDateRead($fecha){
+        $ll=$this->medidor()->nextRead($fecha);
+       return (is_null($ll))?null:$ll->flectura;
+    }
+    
+    
+    
+    
     
      public function valida_lectura($attribute, $params)
     {
-      if($this->lastReadNumeric() > $this->lectura){
-          $this->addError('lecura','Este valor es menor que la última lectura {\'ultimalectura\'}',['ultimalectura'=>$this->lastReadNumeric()]);
-      }
+      /*Validando fecha*/
+         $mes=$this->toCarbon('flectura')->month+0;
+        if(!((integer)$this->mes == (integer)$mes)){
+            $this->addError('flectura',yii::t('sigi.errors','La fecha no corresponde al mes'));
+        }
+         
+         
+         
+         if($this->lectura < $this->lastReadNumeric($this->flectura))
+              $this->addError('lectura','Este valor es menor que la última lectura {\'ultimalectura\'}',['ultimalectura'=>$this->lastReadNumeric()]);
+        
+         $medidor=$this->medidor($type=SigiSuministros::COD_TYPE_SUMINISTRO_DEFAULT);
+         
+      /*Si la lectura corresponde a una nueva lectura */
+         if(!$medidor->isDateForLastRead($this->flectura)){
+              if($this->lectura > $this->nextReadNumeric($this->flectura))
+              $this->addError('lectura','Existe una lectura posterior, y es menor que la lectura que esta intentando ingresar "{{ultimalectura}}"',['ultimalectura'=>$this->nextReadNumeric($this->flectura)]);
+           }
+        
      } 
      
     private function resolveIds(){
@@ -178,10 +206,23 @@ class SigiLecturas extends \common\models\base\modelBase
     private function depa(){
        return  SigiUnidades::find()->where([
             'numero'=>$this->codepa,
-        'edificio_id'=>$this->edificio()->id,
+        'edificio_id'=>$this->edificio_id,
             ])->one();
     }
-    public function medidor(){
-       return  $this->depa()->firstMedidor(SigiSuministros::COD_TYPE_SUMINISTRO_DEFAULT);
+    public function medidor($type=SigiSuministros::COD_TYPE_SUMINISTRO_DEFAULT){
+       if($this->suministro_id >0)
+         return $this->suministro; 
+       if(!empty($this->codepa) && !is_null($this->edificio()))
+       return  $this->depa()->firstMedidor($type);
+        
+       
+    }
+    
+    public function hasUsedFactur(){
+        if(!$this->facturable){
+           return false; 
+        }else{
+            
+        }
     }
 }

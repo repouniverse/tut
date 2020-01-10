@@ -41,6 +41,7 @@ class SigiSuministros extends \common\models\base\modelBase
     {
         return [
             [['tipo', 'codpro', 'codum', 'unidad_id'], 'required'],
+              [['liminf', 'limsup'], 'safe'],
             [['unidad_id', 'frecuencia'], 'integer'],
             [['detalles'], 'string'],
             [['tipo'], 'string', 'max' => 3],
@@ -113,24 +114,82 @@ public function scenarios()
     {
         return $this->hasOne(Clipro::className(), ['codpro' => 'codpro']);
     }
-
+public function getEdificio()
+    {
+        return $this->hasOne(Edificios::className(), ['id' => 'edificio_id']);
+    }
     
     public function getLecturas()
     {
-        return $this->hasMany(SigiLecturas::className(), ['id' => 'suministro_id']);
+        return $this->hasMany(SigiLecturas::className(), ['suministro_id' =>'id']);
     }
     
-    public function lastRead()
+    public function lastRead($fecha=null,$facturable=false)
     {
-        return $this->queryReads()->
-                andWhere(['id'=>$this->queryReads()->max('id')])->
-                orderBy('id desc')->limit(1)->one();
+        $query=$this->queryReads(); 
+        $valorFacturable=($facturable)?'1':'0';        
+             if(is_null($fecha)){
+                        $query=$query->andWhere(['facturable'=>$valorFacturable ,'id'=>$this->queryReads()->max('id')]);
+                }else{
+                        $query=$query->andWhere(['facturable'=>$valorFacturable ,'<=','flectura',$fecha])/*->andWhere(['<=','id',$this->queryReads()->max('id')])*/
+                   ->orderBy('id desc')->limit(1); 
+                    }        
+       return $query->one(); 
+    }
+   
+    
+    
+  public function lastReadValue($fecha=null){
+      $registro=$this->lastRead($fecha,$facturable);
+      return(is_null($registro))?$this->liminf:$registro->valor;
+  } 
+    
+    
+      
+    public function nextRead($fecha,$facturable){
+         $valorFacturable=($facturable)?'1':'0';   
+        $query=$this->queryReads()->
+      andWhere(['facturable'=>$valorFacturable ,'>=','flectura',static::SwichtFormatDate($fecha, 'date',false)])->
+      orderBy('id ASC')->limit(1);
+        yii::error($query->createCommand()->getRawSql());
+      return $query->one();  
+    }
+    
+     public function nextReadValue($fecha=null,$facturable=false){
+      $registro=$this->nextRead($fecha,$facturable);
+      return(is_null($registro))?$this->limsup:$registro->valor;
+  } 
+    
+    
+    /*Verifica con una fecha si esta fecha es mayor a cualquier lectura.
+     * 
+     * Corresponderia a una nueva lectura
+     * En otro caso , habria ya una lectura con esta fecha o una fecha anterior
+     * fecha   en formato dd/mm/yyyy (Formato usuario)
+     */
+    public function isDateForLastRead($fecha,$facturable=false){
+        return is_null($this->nextRead($fecha,$facturable))?true:false;
     }
     
     
     private function queryReads(){
         return SigiLecturas::find()->where(['suministro_id' => $this->id]);
     }
+    
+    private function queryReadsForThisMonth($mes,$anio){
+        return $this->queryReads()->
+                andWhere(['mes' => $mes,'anio'=>$anio]);
+    }
+    
+    
+    public function consumoTotal($mes,$anio){
+        $query=$this->queryReadsForThisMonth($mes,$anio);
+        if($query->count()>0)
+         return  $query->select('sum(lectura)')->scalar();
+        return 0;
+    }
+    
+    
     
     /**
      * {@inheritdoc}
@@ -189,6 +248,18 @@ public function scenarios()
           
       }  
         RETURN parent::beforeSave($insert);
-    }   
+    }
+   
+/*
+ * Devuelve un array de lecturas 
+ * 
+ */
+public function matrixReads(){
+    
+}
+
+public function hasUsedFactur(SigiLecturas $lectura){
+    return $lectura->hasUsedFactur();
+}
     
 }

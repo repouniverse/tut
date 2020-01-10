@@ -2,9 +2,9 @@
 namespace frontend\modules\sigi\database\migrations;
 //use yii\db\Migration;
 use console\migrations\baseMigration;
-class m191130_165905_create_table_lecturas extends  baseMigration
+class m200108_064502_create_temp_lecturas extends  baseMigration
 {
-    const NAME_TABLE='{{%sigi_lecturas}}';
+    const NAME_TABLE='{{%sigi_temp_lecturas}}';
    const NAME_TABLE_SUMINISTROS='{{%sigi_suministros}}';
    //const NAME_TABLE_CONCEPTO_EDIFICIO='{{%sigi_cargosedificio}}';
    
@@ -26,9 +26,9 @@ if(!$this->existsTable($table)) {
          'anio'=>$this->char(4)->notNull()->append($this->collateColumn()),
         'codedificio'=>$this->string(12)->append($this->collateColumn()),
         'codtipo'=>$this->char(3)->append($this->collateColumn()),
-        'delta'=>$this->decimal(12,4),  
          'facturable'=>$this->char(1)->append($this->collateColumn()),
-         'edificio_id'=>$this->integer(11)->notNull(),      
+        'delta'=>$this->decimal(12,4),     
+                'edificio_id'=>$this->integer(11)->notNull(),
         ],$this->collateTable());
   
    /* $this->addForeignKey($this->generateNameFk($table), $table,

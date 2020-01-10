@@ -18,13 +18,14 @@ use common\widgets\selectwidget\selectWidget;
             <div class="form-group no-margin">
                 
         <?= Html::submitButton(Yii::t('sta.labels', 'Grabar'), ['class' => 'btn btn-success']) ?>
+          <?php if(!$model->isNewRecord){ ?>
            <?= frontend\modules\report\widgets\linkReportWidget\linkReportWidget::widget(['model'=>$model])?>
-
+          <?php } ?>
             </div>
         </div>
     </div>
       <div class="box-body">
-    
+          <div>
         <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
     <?= \common\widgets\imagewidget\ImageWidget::widget(['name'=>'imagenrep','isImage'=>false,'model'=>$model,'extensions'=> FileHelper::extDocs()]); ?>
    </div>   
@@ -51,7 +52,7 @@ use common\widgets\selectwidget\selectWidget;
 
  </div>
   <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
-     <?= $form->field($model, 'opcional')->textInput(['maxlength' => true]) ?>
+     <?= $form->field($model, 'opcional')->checkBox([]) ?>
 
  </div>
   <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
@@ -59,23 +60,26 @@ use common\widgets\selectwidget\selectWidget;
 
  </div>
   
-     
-    <?php ActiveForm::end(); ?>
-          
-       <?php 
-   if(!$model->isNewRecord){
-       echo $this->render('_tabs',['model'=>$model,
-                ]);
-   }else{
-       ?>
          
-    <?php
-   }
+    <?php ActiveForm::end(); ?>
+     
+              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                  <?php 
+                    if(!$model->isNewRecord){
+                        echo $this->render('_tabs',['model'=>$model,
+                        ]);
+                    }else{
+                        ?>
+         
+                    <?php
+                        }
    
-     ?>       
+                    ?>      
+              </div>       
+        
               
           
-
+             </div>
           
     
 

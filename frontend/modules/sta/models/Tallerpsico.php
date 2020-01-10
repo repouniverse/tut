@@ -355,6 +355,8 @@ class Tallerpsico extends \common\models\base\modelBase
    * 
    */   
      public  function modelTalleresdet($codalu){
+         //yii::error($this->talleres_id);
+         //yii::error($codalu);
           return Talleresdet::find()->where([
               'talleres_id' => $this->talleres_id,
               'codalu'=>$codalu,

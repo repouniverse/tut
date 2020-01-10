@@ -79,11 +79,10 @@ echo linkAjaxGridWidget::widget([
             'idGrilla'=>'grid-cali',
             'family'=>'pink',
           'type'=>'POST',
-           'evento'=>'click',
+           'evento'=>'click',     
+       'posicion'=>\yii\web\View::POS_END,
             //'foreignskeys'=>[1,2,3],
         ]); 
-
-
  Pjax::end();
 ?>
     </div>

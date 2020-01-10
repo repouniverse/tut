@@ -171,7 +171,7 @@ use common\helpers\h;
                   $('#btn-conf-asistencia').hide();
                         var n = Noty('id');
                        if ( !(typeof json['error']==='undefined') ) {
-                       revertFunc();
+                      
                    $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-remove-sign\'></span>      '+ json['error']);
                               $.noty.setType(n.options.id, 'error'); 
                               }

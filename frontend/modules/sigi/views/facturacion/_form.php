@@ -1,5 +1,6 @@
 <?php
  use kartik\date\DatePicker;
+
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
@@ -25,8 +26,8 @@ use yii\widgets\Pjax;
             <div class="form-group no-margin">
                 
         <?= Html::submitButton('<span class="fa fa-save"></span>   '.Yii::t('sigi.labels', 'Grabar'), ['class' => 'btn btn-success']) ?>
-            
-
+           <?=Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Facturar'), ['id'=>'boton_facturacion','class' => 'btn btn-warning'])?>    
+        <?=Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Resetear'), ['id'=>'boton_resetear','class' => 'btn btn-warning'])?>    
             </div>
         </div>
     </div>
@@ -78,14 +79,18 @@ use yii\widgets\Pjax;
                             'options'=>['class'=>'form-control']
                             ]) ?>
  </div>
-  
+  <?php echo Html::a('reporte', Url::to(['/report/make/multi-report','id'=>2,'idsToReport'=> \yii\helpers\Json::encode($model->idsToFacturacion())]), $options); ?>
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
      <?= $form->field($model, 'detalles')->textarea(['rows' => 6]) ?>
 
  </div>
      
     <?php ActiveForm::end(); ?>
+<<<<<<< HEAD
 
+=======
+       <?php if(!$model->isNewRecord) {?>
+>>>>>>> fad12dce49b2f867bc497f00dbb15f3b5fe99360
       <?php Pjax::begin(['id'=>'grilla_cargospor']); ?>
     <?php echo GridView::widget([
         'dataProvider' =>$dataProviderCuentasPor,
@@ -170,10 +175,100 @@ use yii\widgets\Pjax;
           
     <?php Pjax::end(); ?>
 </div>       
+<<<<<<< HEAD
       
+=======
+       <?php }?>  
+>>>>>>> fad12dce49b2f867bc497f00dbb15f3b5fe99360
     
 </div>
 <?php
  $url= Url::to(['/sigi/cuentaspor/create-as-child','id'=>$model->id,'gridName'=>'grilla_cargospor','idModal'=>'buscarvalor']);
+<<<<<<< HEAD
    echo  Html::button(yii::t('base.verbs','Insertar '), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Elemento'),'id'=>'btn_apoderado', 'class' => 'botonAbre btn btn-success']); 
 ?> 
+=======
+   echo  Html::button(yii::t('base.verbs','Cobranza masiva'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Elemento'),'id'=>'btn_apoderado', 'class' => 'botonAbre btn btn-success']); 
+?> 
+<?php
+ $url= Url::to(['/sigi/cuentaspor/create-as-child-interno','id'=>$model->id,'gridName'=>'grilla_cargospor','idModal'=>'buscarvalor']);
+   echo  Html::button(yii::t('base.verbs','Cobranza Individual'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Elemento'),'id'=>'btn_apoderado', 'class' => 'botonAbre btn btn-success']); 
+?> 
+
+
+ <?php 
+  $string="$('#boton_facturacion').on( 'click', function(){      
+       $.ajax({
+              url: '".Url::to(['/sigi/facturacion/facturacion-mes','id'=>$model->id])."', 
+              type: 'get',
+              data:{},
+              dataType: 'json', 
+              error:  function(xhr, textStatus, error){               
+                            var n = Noty('id');                      
+                              $.noty.setText(n.options.id, error);
+                              $.noty.setType(n.options.id, 'error');       
+                                }, 
+              success: function(json) {
+              var n = Noty('id');
+                      
+                       if ( !(typeof json['error']==='undefined') ) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['error']);
+                              $.noty.setType(n.options.id, 'error');  
+                          }    
+
+                             if ( !(typeof json['warning']==='undefined' )) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['warning']);
+                              $.noty.setType(n.options.id, 'warning');  
+                             } 
+                          if ( !(typeof json['success']==='undefined' )) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['success']);
+                              $.noty.setType(n.options.id, 'success');  
+                             }      
+                   
+                        }
+                        });
+
+
+             })";
+  
+  $this->registerJs($string, \yii\web\View::POS_END);
+?>
+
+ <?php 
+  $string="$('#boton_resetear').on( 'click', function(){      
+       $.ajax({
+              url: '".Url::to(['/sigi/facturacion/reset-facturacion-mes','id'=>$model->id])."', 
+              type: 'get',
+              data:{},
+              dataType: 'json', 
+              error:  function(xhr, textStatus, error){               
+                            var n = Noty('id');                      
+                              $.noty.setText(n.options.id, error);
+                              $.noty.setType(n.options.id, 'error');       
+                                }, 
+              success: function(json) {
+              var n = Noty('id');
+                      
+                       if ( !(typeof json['error']==='undefined') ) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['error']);
+                              $.noty.setType(n.options.id, 'error');  
+                          }    
+
+                             if ( !(typeof json['warning']==='undefined' )) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['warning']);
+                              $.noty.setType(n.options.id, 'warning');  
+                             } 
+                          if ( !(typeof json['success']==='undefined' )) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['success']);
+                              $.noty.setType(n.options.id, 'success');  
+                             }      
+                   
+                        }
+                        });
+
+
+             })";
+  
+  $this->registerJs($string, \yii\web\View::POS_END);
+?>
+>>>>>>> fad12dce49b2f867bc497f00dbb15f3b5fe99360

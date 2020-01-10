@@ -66,6 +66,7 @@ echo ModalAjax::widget([
     'header' => 'Buscar Valor',
     'toggleButton' => false,
     //'mode'=>ModalAjax::MODE_MULTI,
+    'size'=>\yii\bootstrap\Modal::SIZE_LARGE,    
     'selector'=>'.botonAbre',
    // 'url' => $url, // Ajax view with form to load
     'ajaxSubmit' => true, // Submit the contained form as ajax, true by default

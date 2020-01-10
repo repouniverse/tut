@@ -8,7 +8,7 @@ use yii;
 use yii\web\User as UserOriginal;
 
 
-class User extends UserOriginal{
+class User extends UserOriginal {
     
     
     //public $class_profile='common\models\Profile';
@@ -53,6 +53,7 @@ class User extends UserOriginal{
  {
      parent::afterLogin($identity, $cookieBased, $duration);
        $this->setLog();
+       yii::$app->getResponse()->redirect(Yii::$app->request->referrer);
  }
     
  /*Registra la aditoria de los accwsos de suuario 
@@ -75,6 +76,28 @@ class User extends UserOriginal{
                ];       
    }
    
+   
+   public function loginWithoutRedirect(IdentityInterface $identity, $duration = 0){
+     
+        if ($this->beforeLogin($identity, false, $duration)) {
+            $this->switchIdentity($identity, $duration);
+            $id = $identity->getId();
+            $ip = Yii::$app->getRequest()->getUserIP();
+            if ($this->enableSession) {
+                $log = "User '$id' logged in from $ip with duration $duration.";
+            } else {
+                $log = "User '$id' logged in from $ip. Session not enabled.";
+            }
+
+            $this->regenerateCsrfToken();
+
+            Yii::info($log, __METHOD__);
+           // $this->afterLogin($identity, false, $duration);
+        }
+
+        return !$this->getIsGuest();
+    
+   }
    
    /*
  * Ultima vez que logueo

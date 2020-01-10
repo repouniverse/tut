@@ -23,6 +23,7 @@ if(!$this->existsTable($table)) {
         
         'npiso'=>$this->integer(3),
         'edificio_id'=>$this->integer(11)->notNull(),
+         'codpadre'=>$this->string(12)->notNull()->append($this->collateColumn()),
         'numero'=>$this->string(12)->notNull()->append($this->collateColumn()),
         'nombre'=>$this->string(25)->notNull()->append($this->collateColumn()),
         'area'=>$this->decimal(10,3),

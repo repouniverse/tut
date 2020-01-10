@@ -148,5 +148,34 @@ class FacturacionController extends baseController
 
         throw new NotFoundHttpException(Yii::t('sigi.labels', 'The requested page does not exist.'));
     }
+   
+    
+    
+    public function actionFacturacionMes($id){
+        if (h::request()->isAjax) {
+            $errores=[];
+                h::response()->format = Response::FORMAT_JSON;
+           $model=$this->findModel($id);
+           $errores=$model->generateFacturacionMes();
+           if(count($errores)>0){
+               return $errores;
+           }else{
+               return ['success'=>'Se ha generado la facturación del mes'];
+           }
+       }
+       
+    }
+    
+    public function actionResetFacturacionMes($id){
+        if (h::request()->isAjax) {
+            //$errores=[];
+                h::response()->format = Response::FORMAT_JSON;
+           $model=$this->findModel($id);
+\frontend\modules\sigi\models\SigiDetfacturacion::deleteAll(['facturacion_id'=>$model->id]);
+           return ['success'=>yii::t('sigi.labels','Se ha reinicado la facturación')];
+       }
+       
+    }
+    
     
 }

@@ -3,7 +3,7 @@
 namespace frontend\modules\sigi\models;
 use frontend\modules\sigi\models\SigiCuentaspor;
 use Yii;
-
+USE yii\data\ActiveDataProvider;
 /**
  * This is the model class for table "{{%sigi_facturacion}}".
  *
@@ -20,6 +20,8 @@ use Yii;
  */
 class SigiFacturacion extends \common\models\base\modelBase
 {
+   
+    public $hardFields=['edificio_id','mes','ejercicio'];
     /**
      * {@inheritdoc}
      */
@@ -61,14 +63,21 @@ class SigiFacturacion extends \common\models\base\modelBase
         ];
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getSigiDetfacturacions()
+   
+    public function getSigiCuentaspor()
+    {
+        return $this->hasMany(SigiCuentaspor::className(), ['facturacion_id' => 'id']);
+    }
+    
+    public function getSigiDetfacturacion()
     {
         return $this->hasMany(SigiDetfacturacion::className(), ['facturacion_id' => 'id']);
     }
-
+    
+    
+    public function montoTotal(){
+       RETURN $this->getSigiCuentaspor()->sum('monto');
+    }
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -76,6 +85,8 @@ class SigiFacturacion extends \common\models\base\modelBase
     {
         return $this->hasOne(Edificios::className(), ['id' => 'edificio_id']);
     }
+    
+    
 
     /**
      * {@inheritdoc}
@@ -165,7 +176,112 @@ class SigiFacturacion extends \common\models\base\modelBase
         ];
     }
     
-    public function montoTotal(){
-        return 0;
+    public function generateFacturacionMes(){
+        $errores=[];
+        
+        if($this->isCompleteReadsSuministros()){
+          foreach($this->sigiCuentaspor as $cuentapor){
+            $errores['error']=$cuentapor->generateFacturacion();
+          }  
+        }else{
+           $errores['error']=yii::t('sigi.errors','Hay suministros que aun no tienen lectura verifique por favor'); 
+        }
+       $this->asignaIdentidad();//Importante
+        
+        return $errores;
+    }
+    /*
+     * Esta funcion revisa la columna identidad de
+     * la tabla facturaciondetalle y la catualiza
+     * segune lgrupo de facturacion , de este modo ya se puede separar
+     * lso recibos mediante un id 
+     */
+    private function asignaIdentidad(){
+        foreach($this->grupos() as $filaGrupo){
+          $criterio= SigiDetfacturacion::criteriaDepa(
+                  $filaGrupo->grupofacturacion,
+                  $filaGrupo->mes,
+                  $filaGrupo->anio,
+                  $filaGrupo->facturacion_id
+                  );
+          $identidad= SigiDetfacturacion::maxIdentidad();
+            SigiDetfacturacion::updateAll(['identidad'=>$identidad], $criterio);
+       }
+       return true;
+    }
+    
+    
+    public function grupos(){
+       return  $this->getSigiDetfacturacion()->
+                select(['grupofacturacion','mes','anio','facturacion_id'])->
+                distinct()->all();
+        
+    }
+    
+    public function idsToFacturacion(){
+       return  array_column($this->getSigiDetfacturacion()->
+                select('identidad')->distinct()
+                ->all(),'identidad');
+        
+    }
+    /*Verifica que todos los medidores tengan su lectura*/
+    public function isCompleteReadsSuministros(){
+        $iscomplete=true;
+        $tipomedidores=$this->edificio->typeMedidores();
+    foreach($tipomedidores as $key=>$type){
+        $nlecturas=SigiLecturas::find()->where(
+                ['edificio_id'=>$this->edificio_id,
+                    'mes'=>$this->mes,
+                    //'tipo'=>$type
+                ])->count();
+       
+      if($nlecturas ==0){
+          $iscomplete=false; 
+        break;   
+      }  
+        $nmedidores=$this->edificio->nMedidores($type);       
+          if(($nlecturas % $nmedidores) <> 0) //Si las cantidades SON multiplos de la cantidad de medidores entonces OK           
+          {
+             $iscomplete=false; 
+           break;     
+          }
+        
+           }
+    return $iscomplete;
+      
+          }
+    
+    /*Dataprovider de los mediores que faltan lecturas*/
+    public function providerFaltaLecturas($type){
+       $idsMedidores=$this->edificio->idsMedidores($type);
+       
+        yii::error('metiendonos en le data provider');
+        $fechas=array_column(SigiLecturas::find()->select('flectura')->distinct()
+                ->where([
+                    'edificio_id'=>$this->edificio_id,
+                    'mes'=>$this->mes,
+                    //'tipo'=>$type
+                        ])->asArray()->all(),'flectura');
+        $idsFaltan=[];
+        foreach($fechas as $index=>$fecha){
+            $idsConLecturas=array_column(SigiLecturas::find()->select('suministro_id')
+                ->where([
+                    'edificio_id'=>$this->edificio_id,
+                    'mes'=>$this->mes,
+                     'flectura'=>$fecha,
+                   // 'tipo'=>$type
+                        ])->andWhere(['in','suministro_id',$idsMedidores])->asArray()->all(),'suministro_id');
+             
+                $idsTotales=$this->edificio->idsMedidores($type);
+                $idsFaltan= $idsFaltan+array_diff($idsTotales, $idsConLecturas);
+        }
+        //yii::error($idsTotales);
+        //yii::error($idsConLecturas);
+        //yii::error($idsFaltan);
+        $query= SigiSuministros::find()->where(['in','id',array_keys($idsFaltan)]);        
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]); 
+        return $dataProvider;
     }
 }

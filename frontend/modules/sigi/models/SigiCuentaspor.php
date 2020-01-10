@@ -76,11 +76,11 @@ class SigiCuentaspor extends \common\models\base\modelBase
              [['codpro','codmon'], 'safe'],
             /*ESCENARIO RECIBO INTERNO */
             [['edificio_id','unidad_id','colector_id','fedoc','descripcion',
-                'mes','anio','monto','codmon','codpro','detalles'],
+                'mes','anio','monto','codmon','codpro','detalles','codocu'],
               'safe','on'=>self::SCENARIO_RECIBO_INTERNO
              ],
             [['edificio_id','unidad_id','colector_id','fedoc','descripcion',
-                'mes','anio','monto','codmon','codpro'],
+                'mes','anio','monto','codmon','codpro','codocu'],
               'required','on'=>self::SCENARIO_RECIBO_INTERNO
              ],
             /*FIN DE ESCENARIO INTERNO */
@@ -97,9 +97,9 @@ class SigiCuentaspor extends \common\models\base\modelBase
             /*FIN DE ESCENARIO RECINBO AUTOMATRICO */
            
             
-           [ ['numerodoc','facturacion_id','edificio_id','codpro','colector_id','fedoc','descripcion','detalle','mes','anio','monto','codmon','codocu'],'safe','on'=>self::SCENARIO_RECIBO_EXTERNO_MASIVO],
+           [ ['numerodoc','facturacion_id','edificio_id','codpro','colector_id','fedoc','descripcion','detalle','mes','anio','monto','codmon','codocu','mesconsumo','consumo'],'safe','on'=>self::SCENARIO_RECIBO_EXTERNO_MASIVO],
             [['ejercicio','mes'], 'validatePeriodo', 'on' => self::SCENARIO_RECIBO_EXTERNO_MASIVO], 
-           [['numerodoc','facturacion_id','edificio_id','codpro','colector_id','fedoc','mes','anio','monto','codmon','codocu'],'required','on'=>self::SCENARIO_RECIBO_EXTERNO_MASIVO], 
+           [['numerodoc','facturacion_id','edificio_id','codpro','colector_id','fedoc','mes','anio','monto','codmon','codocu','mesconsumo','consumo'],'required','on'=>self::SCENARIO_RECIBO_EXTERNO_MASIVO], 
             
             
             [['monto'], 'number'],
@@ -138,8 +138,8 @@ class SigiCuentaspor extends \common\models\base\modelBase
  public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios[self::SCENARIO_RECIBO_INTERNO] = ['facturacion_id','edificio_id','unidad_id','codpro','colector_id','fechadoc','descripcion','mes','anio','monto','codmon'];
-       $scenarios[self::SCENARIO_RECIBO_EXTERNO_MASIVO] = ['numerodoc','facturacion_id','edificio_id','codpro','colector_id','fedoc','descripcion','detalle','mes','anio','monto','codmon'];
+        $scenarios[self::SCENARIO_RECIBO_INTERNO] = ['facturacion_id','edificio_id','unidad_id','codpro','colector_id','fechadoc','descripcion','mes','anio','monto','codmon','codocu'];
+       $scenarios[self::SCENARIO_RECIBO_EXTERNO_MASIVO] = ['numerodoc','facturacion_id','edificio_id','codpro','colector_id','fedoc','descripcion','detalle','mes','anio','monto','codmon','codocu','mesconsumo','consumo'];
         //$scenarios[self::SCENARIO_UPDATE_TABULAR] = ['codigo','coditem','tarifa'];
        // $scenarios[self::SCENARIO_REGISTER] = ['username', 'email', 'password'];*/
         return $scenarios;
@@ -165,7 +165,14 @@ class SigiCuentaspor extends \common\models\base\modelBase
     {
         return $this->hasOne(SigiFacturacion::className(), ['id' => 'facturacion_id']);
     }
+<<<<<<< HEAD
 
+=======
+      public function getDetFacturacion()
+    {
+        return $this->hasMany(SigiDetfacturacion::className(), ['cuentaspor_id'=>'id']);
+    }
+>>>>>>> fad12dce49b2f867bc497f00dbb15f3b5fe99360
     /**
      * {@inheritdoc}
      * @return SigiCuentasporQuery the active query used by this AR class.
@@ -215,7 +222,10 @@ class SigiCuentaspor extends \common\models\base\modelBase
   
   public function beforeSave($insert) {
       if($insert){
+            yii::error('Los atriburtos son:');
+          yii::error($this->attributes);
           $this->resolveFieldsDefault();
+           yii::error($this->attributes);
       }
       return parent::beforeSave($insert);
   }
@@ -284,20 +294,98 @@ class SigiCuentaspor extends \common\models\base\modelBase
     * la facturacion o par l aemision de los recibos individuales
     */ 
     public function generateFacturacion(){
+<<<<<<< HEAD
         foreach($this->edificio->unidadesInputables() as $unidad){
             $attributes=[
+=======
+        $errores=[];
+    $colector=$this->colector;
+         if($colector->individual){
+               $unidad= SigiUnidades::find()->where(['id'=>$this->unidad_id])->one();
+               $this->createRegistroFacturacion($unidad,$colector);
+           }else{
+               foreach($this->edificio->unidadesImputables() as $unidad){
+                    $this->createRegistroFacturacion($unidad,$colector);
+                }
+           }
+        
+      return $errores; 
+    }
+ 
+    
+  private function createRegistroFacturacion($unidad,$colector){
+           
+           
+            $participacion=$unidad->porcParticipacion($colector,$this->mes,$this->anio);
+          if(!$this->existsDetalleFacturacion($unidad,$colector)){
+             $model=New SigiDetfacturacion();
+            $model->setAttributes($this->prepareAttributes($participacion,$unidad,$colector));
+            /*PARA AGRUPAR EN EL DEP A PADRE LOS HIJOS*/
+            $model->grupounidad=($unidad->isChild())?$unidad->parentNumero():$unidad->numero;
+            $model->grupounidad_id=($unidad->isChild())?$unidad->parent_id:$unidad->id;
+            $model->grupofacturacion=($unidad->miApoderado()->facturindividual)?$unidad->codpro:$model->grupounidad;
+            /*****************************************************/
+            if(!$model->save()){
+                yii::error($model->getFirstError()); 
+                $errores[]=$model->getFirstError();
+            }else{
+                
+            }
+            return $model->grupofacturacion;
+          }
+                     
+               
+  } 
+    
+ private function prepareAttributes($participacion,$unidad,$colector){
+     return [
+>>>>>>> fad12dce49b2f867bc497f00dbb15f3b5fe99360
                 'cuentaspor_id'=>$this->id,
                 'edificio_id'=>$this->edificio_id,
+         'facturacion_id'=>$this->facturacion_id,
                 'unidad_id'=>$unidad->id,
+<<<<<<< HEAD
                 'colector_id'=>$this->colector_id,
                 'grupo_id'=>$this->colector->cargo_id,
                 'monto'=>$this->colector->montoProRateado(),
                 
+=======
+                'colector_id'=>$colector->id,
+                'grupo_id'=>$colector->grupo_id,
+                'monto'=>$this->monto*$participacion,
+                'igv'=>$this->monto*$participacion*h::gsetting('general', 'igv'),
+>>>>>>> fad12dce49b2f867bc497f00dbb15f3b5fe99360
                 //'cuentaspor_id'=>$this->id,
             ];
+<<<<<<< HEAD
             
         }
     }
+=======
+ }  
+
+private function existsDetalleFacturacion($unidad,$colector){    
+    return SigiDetfacturacion::find()->
+                where([
+                    'cuentaspor_id'=>$this->id,
+                    'edificio_id'=>$this->edificio_id,
+                    'facturacion_id'=>$this->facturacion_id,
+                     'unidad_id'=>$unidad->id,
+                     'colector_id'=>$colector->id,
+                'grupo_id'=>$colector->grupo_id,
+                'mes'=>$this->mes,
+                'anio'=>$this->anio,
+                   
+                        ])
+                ->exists();
+    
+} 
+
+private function sanitizeDetalles(){
+    
+}
+
+>>>>>>> fad12dce49b2f867bc497f00dbb15f3b5fe99360
     
  }
        

@@ -62,10 +62,7 @@ class SigiCargos extends \common\models\base\modelBase
     /**
      * @return \yii\db\ActiveQuery
      */
-   /* public function getSigiCargosedificios()
-    {
-        return $this->hasMany(SigiCargosedificio::className(), ['cargo_id' => 'id']);
-    }*/
+   
 
     /**
      * {@inheritdoc}

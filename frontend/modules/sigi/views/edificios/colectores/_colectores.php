@@ -43,8 +43,9 @@ $gridColumns = [
                 ],
                
                 
-                ['attribute' => 'tasamora',],
+                'cargo.codcargo',
                 'cargo.descargo',
+                ['attribute' => 'tasamora',],
                      [
                           'attribute' => 'regular',
                          'format' => 'raw',
@@ -97,7 +98,7 @@ $gridColumns = [
    ?> 
  <?php
  $url= \yii\helpers\Url::to(['agrega-concepto-tree','id'=>$grupo_id,'gridName'=>$idPjax,'idModal'=>'buscarvalor']);
-   echo \yii\helpers\Html::button(yii::t('base.verbs','Nuevo'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Colector'),'id'=>'btn_grupos_edixr', 'class' => 'botonAbre btn btn-success']); 
+   echo \yii\helpers\Html::button(yii::t('base.verbs','Nuevo'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Agrupacion'),'id'=>'btn_grupos_edixr', 'class' => 'botonAbre btn btn-success']); 
  Pjax::end();
    
    ?>   

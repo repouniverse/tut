@@ -31,9 +31,9 @@ class SigiUnidades extends \common\models\base\modelBase
      //const TYP_EX_PROPIETARIO='E';
     //const TYP_EX_INQUILINO='X';
     const SCENARIO_HIJO='import_hijos';
-    const SCENARIO_EDIFICIO='edificio';
-    const SCENARIO_COMPLETO='import_completo';
-    const SCENARIO_BASICO='basica';
+    //const SCENARIO_EDIFICIO='edificio';
+    //const SCENARIO_COMPLETO='import_completo';
+    //const SCENARIO_BASICO='basica';
     const SCENARIO_UPDATE_BASICO='update_basico';
     public $booleanFields=['esnuevo','imputable'];
     public $hardFields=['edificio_id','numero'];
@@ -45,7 +45,7 @@ class SigiUnidades extends \common\models\base\modelBase
         return '{{%sigi_unidades}}';
     }
 
-    public $codpadre='';//PARA HACER UN ARTIDFICIO EN LA IMPORTACION DE 
+    //public $codpadre='';//PARA HACER UN ARTIDFICIO EN LA IMPORTACION DE 
     
     /**
      * {@inheritdoc}
@@ -53,29 +53,33 @@ class SigiUnidades extends \common\models\base\modelBase
     public function rules()
     {
         return [
-            [['codtipo', 'npiso','edificio_id','codpro', 'numero', 'nombre'], 'required'],
+            [['codtipo', 'npiso','edificio_id', 'numero', 'nombre'], 'required'],
             [['npiso', 'edificio_id'], 'integer'],
+            ['numero', 'validateChild'],
+            [['area','imputable'], 'validateArea'],
+             ['codpro', 'validateApoderado'],
             ['numero', 'unique', 'targetAttribute' => ['edificio_id','numero']],
             [['area', 'participacion'], 'number'],
-            ['imputable', 'validateArea'],
+            //[['area'], 'required'],
             //['imputable', 'validateArea'],
-            ['parent_id', 'validateParent',
+            //['imputable', 'validateArea'],
+            /*['parent_id', 'validateParent',
                 'except' => ['import_basica',self::SCENARIO_UPDATE_BASICO,self::SCENARIO_HIJO,self::SCENARIO_COMPLETO]
-             ],
+             ],*/
             ['id', 'required',
                 'on' => [self::SCENARIO_UPDATE_BASICO]
              ],
-            [['codpro'], 'validateApoderado'],
+           // [['codpro'], 'validateApoderado'],
             [['detalles'], 'string'],
-            [['codpro','esnuevo','codpadre'], 'safe'],
-            [['estreno','imputable'], 'safe'],
+            [['codpro','esnuevo','codpadre','imputable','estreno'], 'safe'],
+           // [['estreno','imputable'], 'safe'],
             [['codtipo'], 'string', 'max' => 4],
             [['numero'], 'string', 'max' => 12],
             [['nombre'], 'string', 'max' => 25],
-             [
+             /*[
                  ['parent_id'], 'resolveParent',
                 'on'=>[self::SCENARIO_HIJO,self::SCENARIO_COMPLETO]
-              ],
+              ],*/
             [['codtipo'], 'exist', 'skipOnError' => true, 'targetClass' => SigiTipoUnidades::className(), 'targetAttribute' => ['codtipo' => 'codtipo']],
             [['edificio_id'], 'exist', 'skipOnError' => true, 'targetClass' => Edificios::className(), 'targetAttribute' => ['edificio_id' => 'id']],
             [['codpro'], 'exist', 'skipOnError' => true, 'targetClass' => Clipro::className(), 'targetAttribute' => ['codpro' => 'codpro']],
@@ -86,9 +90,9 @@ class SigiUnidades extends \common\models\base\modelBase
       public function scenarios()
     {
         $scenarios = parent::scenarios(); 
-        $scenarios['basica'] = ['edificio_id','codtipo','imputable','npiso','numero','area','codpro'];
-        $scenarios[self::SCENARIO_HIJO] = ['edificio_id','parent_id','codtipo','imputable','numero','area','codpro','npiso'];
-        $scenarios[self::SCENARIO_COMPLETO] = ['edificio_id','parent_id','codtipo','imputable','numero','area','codpro','npiso','nombre','detalles','estreno'];
+        //$scenarios['basica'] = ['edificio_id','codtipo','imputable','npiso','numero','area','codpro'];
+        $scenarios[self::SCENARIO_HIJO] = ['edificio_id','codpadre','codtipo','imputable','numero','area','npiso'];
+        //$scenarios[self::SCENARIO_COMPLETO] = ['edificio_id','parent_id','codtipo','imputable','numero','area','codpro','npiso','nombre','detalles','estreno'];
         $scenarios[self::SCENARIO_UPDATE_BASICO] = ['id','imputable','codpro'];
         return $scenarios;
     }
@@ -108,6 +112,7 @@ class SigiUnidades extends \common\models\base\modelBase
             'area' => Yii::t('sigi.labels', 'Area (m2)'),
             'participacion' => Yii::t('sigi.labels', '% Part'),
             'parent_id' => Yii::t('sigi.labels', 'Padre'),
+            'codpadre' => Yii::t('sigi.labels', 'Cod Padre'),
             'detalles' => Yii::t('sigi.labels', 'Detalles'),
             'imputable' => Yii::t('sigi.labels', 'Imputable'),
         ];
@@ -171,7 +176,8 @@ class SigiUnidades extends \common\models\base\modelBase
     
     public function beforeSave($insert) {
         if($insert){
-            $this->arreglaParent();
+            //Solo si es child
+            $this->resolveChildBeforeSave();
             if(empty($this->nombre)){
               $this->nombre=substr(SigiTipoUnidades::findOne($this->codtipo)->desunidad.'-'.$this->numero,0,25); 
             }
@@ -181,47 +187,61 @@ class SigiUnidades extends \common\models\base\modelBase
     }
     public function afterSave($insert, $changedAttributes)  {
          if($insert){
-            /*if($this->codpro <> SigiModule::getCodeNaturalPerson()){
+           /*  $this->refresh();
+            if($this->esnuevo){
                 //$this->estreno=null;
                $this->insertPropietarioEmpresa() ;
             } */
-         } 
-        return parent::afterSave($insert, $changedAttributes);
-    }
+          if($this->isChild()){
+              $this->refresh();
+              
+              yii::error('la nueva identidad es ');
+               yii::error($this->id);
+              $this->copyPropietarios();
+                 } 
+        
+        }
+    return parent::afterSave($insert, $changedAttributes);
+          }
+          
+          
+          
+          
     public function hasChildunits(){
         return($this->getChildsUnits()->count()==0)?true:false;
     }
+    
+    
+    /*
+     * VCerifica si la unidad a isnertar es una unidad 
+     * hija, verifica si los campos parent_id o codpadre son
+     * consistentes para alcanzar esta condicion
+     */
+    public function  isChild(){
+        return is_null($this->myPadre())?false:true;
+    }
+    
+    public function myPadre(){
+       if(($this->parent_id >0 )){
+            return static::findOne($this->parent_id);  
+        }elseif(!empty($this->codpadre)){
+           return static::find()->where(['edificio_id'=>$this->edificio_id,'numero'=>$this->codpadre])->one();  
+        }else{
+           return null;       
+        }
+        return null; 
+    }
+    
+    
     
     public function isEntregado(){
         return (empty($this->estreno))?false:true;
     }
     
-    public function resolveParent($attribute, $params){
-        //Sio se trata de una imortacion 
-        if(substr($this->getScenario(),0,6)=='import'){
-            if(!empty($this->parent_id)){
-               $registro= $this->find()->where([
-                   'numero'=>$this->parent_id,
-                     'edificio_id'=>$this->edificio_id,   
-                       ])->one();
-               if(is_null($registro)){
-                   $this->addError ('parent_id',yii::t('sigi.errors','Este número de unidad no está registrado en el edificio'));
-      
-               } else{
-                   if($registro->codpro <> $this->codpro){
-                       yii::error('este es l nombnre : '.$registro->nombre);
-                       $this->addError ('parent_id',yii::t('sigi.errors','La unidad padre "{nombre}" tiene otro grupo de gestión "{gpadre}" <> "{ghijo}" ',['nombre'=>$registro->id,'gpadre'=>$registro->codpro,'ghijo'=>$this->codpro]));  
-                   }
-               }
-                
-            }
-        }
-       
-    }
-    
+   
     /*CALCULA LA PARTICIPACION */
     
-    public function participacion($porcentaje=false){
+    public function participacionArea($porcentaje=false){
       if($this->isNewRecord){
           return 0;
       }else{
@@ -257,70 +277,77 @@ class SigiUnidades extends \common\models\base\modelBase
               $this->addError ('edificio_id',yii::t('sigi.errors','El edificio no Existe'));
               return; 
          }
-           
+      }
+     /*Solo si no es hijo importa validar 
+      * el codpro, si no lo es, se agregara de mnera automatica en
+      * el before save, heredando este valor del padre
+      */
+      if(!$this->isChild()){
+         if(empty($this->codpro)){
+           $this->addError ('codpro',yii::t('sigi.errors','Debe de indicar el grupo de gestión este campo está vacío'));
+            return;
+         }
+             
+        $edificio=$this->edificio;
+         if(!$edificio->hasApoderados())
+        $this->addError ('edificio_id',yii::t('sigi.errors','El edificio no tiene Grupos de gestión'));
+        if(!in_array($this->codpro,$edificio->apoderados()))
+         $this->addError ('codpro',yii::t('sigi.errors','Esta empresa no esta registrado en el edificio'));
       }
        
-     
       
-       $edificio=$this->edificio;
-       if(!$edificio->hasApoderados())
-        $this->addError ('edificio_id',yii::t('sigi.errors','El edificio no tiene Grupos de gestión'));
-      if(!in_array($this->codpro,$edificio->apoderados()))
-       $this->addError ('codpro',yii::t('sigi.errors','Esta empresa no esta registrado en el edificio'));
       
         
     }
-    /*
-     * Se encarga solode arreglar el campo parent_id para que 
-     * se grabe correctamente al momento de imortar masivamenrwe 
-     */
-    private function arreglaParent(){
-        if(substr($this->getScenario(),0,6)=='import' && ( !empty($this->parent_id))){
-            $this->parent_id= $this->find()->where([
-                   'numero'=>$this->parent_id,
-                     'edificio_id'=>$this->edificio_id,   
-                       ])->one()->id; 
+    
+    
+    public function resolveChildBeforeSave(){
+        if($this->isChild()){
+            $padre=$this->myPadre();
+            if(empty($this->parent_id))
+             $this->parent_id=$this->myPadre()->id; //rellenar el parent_id del padre 
+            $this->codpro=$padre->codpro; //rellenar el codpro del padre 
+            
         }
-           
     }
+    
     public function validateArea($attribute, $params)
     {
+       // var_dump($this->area,$this->imputable);
+        //die();
       /*verificar que cuando es imputable area debe ser obligatorio*/
         yii::error($this->imputable);
-        if(empty($this->area) && $this->imputable){
+        if( empty($this->area) && $this->imputable){
             $this->addError('area',yii::t('sigi.errors','Esta unidad es imputable y debe de tener participación'));
         }
       
     }
-    
-    public function validateParent($attribute, $params)
+   /*
+    * Si es hija, antes de insertarla sus npapas deben de etener propietarios 
+    * si no no peritir ingresar 
+    */ 
+    public function validateChild($attribute, $params)
     {
-      /*verificar que cuando es imputable area debe ser obligatorio*/
-        //yii::error($this->imputable);
-        if(!empty($this->parent_id)){
-           $registro= $this->find()->where([
-                   'id'=>$this->parent_id,
-                     'edificio_id'=>$this->edificio_id,   
-                       ])->one();
-               if(is_null($registro)){
-                   $this->addError ('parent_id',yii::t('sigi.errors','Este número de unidad no está registrado en el edificio'));
-      
-               } else{
-                   if($registro->codpro <> $this->codpro){
-                       $this->addError ('parent_id',yii::t('sigi.errors','La unidad padre tiene otro grupo de gestión "{gpadre}" ',['gpadre'=>$registro->codpro,'ghijo'=>$this->codpro]));  
-                   }
-               }
-              
-           
-        }
-      
+      if($this->getScenario()==self::SCENARIO_HIJO){
+          if(!$this->isChild()){
+               $this->addError('parent_id',yii::t('sigi.errors','Esta unidad no tiene ninguna referencia a su padre, revise el campo {campo1} ó el campo {campo2} ',['campo1'=>$this->getAttributeLabel('parent_id'),'campo2'=>$this->getAttributeLabel('codpadre')]));
+            return ;
+          }
+      }
+        
+      if($this->isChild() && is_null($this->myPadre()->currentPropietario())){
+          $this->addError('numero',yii::t('sigi.errors','La unidad padre {numeropadre} aun no tiene propietarios',['numeropadre'=>$this->myPadre()->numero]));
+      }
     }
+    
+   
    
   private function insertPropietarioEmpresa(){
       $atributos=[
          'unidad_id'=>$this->id,
+           'edificio_id'=>$this->edificio_id,
           'tipo'=>self::TYP_PROPIETARIO,
-          'espropietario'=>true,
+          'activo'=>true,
           'nombre'=>Clipro::find()->where(['codpro'=>$this->codpro])->one()->despro,
           'dni'=>Clipro::find()->where(['codpro'=>$this->codpro])->one()->rucpro,
       ];
@@ -348,11 +375,36 @@ class SigiUnidades extends \common\models\base\modelBase
      
    }
   
+
    
    
    public function CalculoColector(colectoresInterface $colector){
       return $colector->factorProRateo()->montoTotal()->insertCosto();
-      
+   }
+
+   public function porcParticipacion(colectoresInterface $colector,$mes,$anio){
+       if($colector->isMedidor()){
+          $medidor=$this->firstMedidor($colector->tipomedidor);
+          
+          /*Si no encuentra un medidor en el departamento
+           * Simpelnenre devuleve e porcentaje de participacion 
+           * del area 
+           */
+          if(!is_null($medidor)){
+             $lecturatotal=$medidor->consumoTotal($mes,$anio);
+             return ($lecturatotal>0)?round($medidor->lectura/$lecturatotal):$this->participacionArea(); 
+          }else{
+            return $this->participacionArea();   
+          }
+          
+          
+          
+       }elseif($colector->individual){
+           return 1;
+       }else{
+           return $this->participacionArea(); 
+       }
+
    }
    
    
@@ -363,11 +415,51 @@ class SigiUnidades extends \common\models\base\modelBase
        return $this->getSigiSuministros()->andWhere(['tipo'=>$type])->one();
    }   
    
-   public function currentResidente(){
+   public function currentPropietario(){
       return SigiPropietarios::find()->where(
                ['unidad_id'=>$this->id]
+               )->andWhere(
+               ['tipo'=>self::TYP_PROPIETARIO]
                )->andWhere(
                ['activo'=>'1']
                )->one();
    }
+   
+ public function miApoderado(){
+     return SigiApoderados::find()->where(['codpro'=>$this->codpro,'edificio_id'=>$this->edificio_id])->one();
+ }
+ 
+ public function parentNumero(){
+     if($this->isChild()){
+        return $this->myPadre()->numero;
+     }else{
+         return '';
+     }
+ }
+ 
+ public function copyPropietarios(){
+   if($this->isChild()){
+     foreach($this->myPadre()->sigiPropietarios as $propietario){
+         yii::error('copyporpeitarios');
+          yii::error($this->id);
+       $this->insertPropietario($propietario); 
+    }   
+   }
+    
+ }
+ 
+ public function insertPropietario($propietario){
+     yii::error('inserpropietariuos');
+          yii::error($this->id);
+     $model=new SigiPropietarios();
+     $model->attributes=$propietario->attributes;
+     $model->unidad_id=$this->id;
+     if($model->save()){
+        yii::error('GRABO '.$this->id);    
+     }ELSE{
+      yii::error($model->getFirstError());   
+     }
+         
+ }
+ 
 }

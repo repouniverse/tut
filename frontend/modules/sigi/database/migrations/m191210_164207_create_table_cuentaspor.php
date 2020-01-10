@@ -28,6 +28,8 @@ if(!$this->existsTable($table)) {
         'codmon'=>$this->char(3)->notNull()->append($collate),
         'fedoc'=>$this->char(10)->append($collate),
          'mes'=>$this->integer(2)->notNull(),
+         'mesconsumo'=>$this->integer(2)->notNull(),
+         'consumo'=>$this->decimal(12,4)->notNull(),
          'unidad_id'=>$this->integer(11)->notNull(),
          'anio'=>$this->char(4)->notNull()->append($collate),
         'detalle'=>$this->text()->append($collate),

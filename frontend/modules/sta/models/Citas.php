@@ -197,6 +197,11 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
     {
         return new CitasQuery(get_called_class());
     }
+    public static function findFree()
+    {
+        return new CitasQueryFree(get_called_class());
+    }
+    
     public function beforeSave($insert) {
        if($insert){            
           $this->resolveDuration();
@@ -340,10 +345,10 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
      */
     public function isInJourney(){
          $taller=$this->tallerProg();
-          yii::error('rangos');
+         /* yii::error('rangos');
          yii::error($this->range());
            yii::error($taller->range($this->toCarbon('fechaprog')));
-         
+         */
          if(!$this->isRangeIntoOtherRange(
                $this->range(),
                $taller->range($this->toCarbon('fechaprog'))
@@ -550,10 +555,14 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
      * 
      */
     public function generaExamenes(){
+        $valor=false;
         foreach($this->examenes as $examen){
-           $examen->creaExamen();
+           $valor=$examen->creaExamen();
+          if($valor==false){
+              break;
+          }
         }
-            
+          return $valor;  
         }
     /*
      * Funcion que devuelve los dataprovidesr de las preguntas 
@@ -561,6 +570,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
      */
     public function providersExamenes(){
         $proveedores=[];
+        //var_dump($this->codExamenes());die();
         foreach($this->codExamenes() as $codexamen){
             $proveedores[$codexamen]= VwStaExamenesSearch::searchByExamenCode($this->id,$codexamen);
         }
@@ -658,5 +668,14 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
       
   }
   
+  
+  public function validateDispo($attribute, $params)
+    {
+      $this->esFeriado();
+      $this->isInJourney();
+      if($this->inPast())
+      $this->addError('fechaprog',yii::t('sta.errors','La fecha de inicio se encuentra en el pasado'));
+      
+    }
   
 }

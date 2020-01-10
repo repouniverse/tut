@@ -103,6 +103,7 @@
             'family'=>'pinke',
           'type'=>'POST',
            'evento'=>'click',
+        'posicion'=>\yii\web\View::POS_END,
             //'foreignskeys'=>[1,2,3],
         ]); 
    ?>

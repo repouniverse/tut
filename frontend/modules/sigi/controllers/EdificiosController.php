@@ -9,6 +9,7 @@ use frontend\modules\sigi\models\SigiUnidades;
 use frontend\modules\sigi\models\SigiCargosgrupoedificio as Grupos;
 use frontend\modules\sigi\models\SigiCargosedificio as GrupoDetalle;
 use frontend\modules\sigi\models\SigiCargosedificioSearch;
+use frontend\modules\sigi\models\SigiSuministrosSearch;
 use frontend\controllers\base\baseController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -43,20 +44,31 @@ class EdificiosController extends baseController
      */
     public function actionIndex()
     {
+        
+        /*$model= \frontend\modules\sigi\models\SigiFacturacion::findOne(50);
+        $model->providerFaltaLecturas('101');
+        var_dump($model->isCompleteReadsSuministros('101'));
+        var_dump($model->providerFaltaLecturas('101')->getCount());
+        die();
         $modelo=new \frontend\modules\sigi\models\SigiLecturas();
         $modelo->setScenario($modelo::SCENARIO_IMPORTACION);
         $modelo->setAttributes([
             'codepa'=>'204',
-            'mes'=>9,
-            'flectura'=>'13/09/2019',
-            'lectura'=>1,
+            'mes'=>10,
+            'flectura'=>'13/10/2019',
+            'lectura'=>600,
             'anio'=>'2019',
             'codedificio'=>'PRUEBA',
             'codtipo'=>'101',
-        ]);
-        var_dump($modelo->medidor()->lastRead());die();
+        ]);*/
+       /* var_dump($modelo->medidor()->lastRead('16/12/2019'));
+        echo "<br><br><br>";
+        var_dump($modelo->medidor()->nextRead('16/12/2019'));
+        echo "<br><br><br>";
+        die();
+        var_dump($modelo::SwichtFormatDate('15/08/2019', 'date',false),$modelo->medidor()->lastRead());die();
         $modelo->validate();
-        
+        print_r($modelo->getErrors());die();
        /* $plantilla=\common\helpers\h::settings()->get('general','formatoDNI');
         $plantilla='[0-9]{8}';
         var_dump($plantilla,preg_match('10201403',$plantilla));die();*/
@@ -64,6 +76,7 @@ class EdificiosController extends baseController
         /*$MODELI=\frontend\modules\sigi\models\SigiCargosgrupoedificio::findOne(7);
         VAR_DUMP($MODELI->hasChilds());DIE();
         */
+        
         $searchModel = new EdificiosSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -587,4 +600,28 @@ public function actionPropietarios(){
             'dataProvider' => $dataProvider,
         ]);
 }
+
+
+public function actionSuministros(){
+   $searchModel = new SigiSuministrosSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('suministros', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]); 
+}
+
+public function actionVerificarDatos($id){
+    $this->layout = "install";
+        
+       $model=$this->findModel($id);   
+      $model->verifyIsFacturable();
+           return $this->renderAjax('_modal_verificar_datos', [
+                        'model' => $model,
+                        
+            ]);  
+         
+}
+
 }
