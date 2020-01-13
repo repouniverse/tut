@@ -753,8 +753,9 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
             //print_r($attributes);
             //$model=self::find()->where($attributes)->one();
             $myAttributesVerify=(is_null($verifyAttributes))?$attributes:$verifyAttributes;
-            if(is_null(self::find()->where($myAttributesVerify)->one())){
-                                
+            //yii::error($myAttributesVerify); 
+            if(!self::find()->where($myAttributesVerify)->exists()){
+                         //yii::error($myAttributesVerify);       
 
                 try{
                     $clase= static::class;
@@ -791,7 +792,7 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
         public  function  firstOrCreate($attributes,$scenario=null,$verifyAttributes=null){  
             //print_r($attributes);
             $myAttributesVerify=(is_null($verifyAttributes))?$attributes:$verifyAttributes;
-            if(is_null(self::find()->where($myAttributesVerify)->one())){
+            if(self::find()->where($myAttributesVerify)->exists()){
               
            
                 try{

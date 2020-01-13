@@ -6,6 +6,7 @@ use Yii;
 use frontend\modules\sigi\models\SigiFacturacion;
 use frontend\modules\sigi\models\SigiFacturacionSearch;
 use frontend\modules\sigi\models\SigiCuentasporSearch;
+use frontend\modules\sigi\models\VwSigiTempLecturasSearch;
 use frontend\controllers\base\baseController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -98,22 +99,20 @@ class FacturacionController extends baseController
     {
         $model = $this->findModel($id);
           $searchModel = new SigiCuentasporSearch();
-         $dataProviderCuentasPor = $searchModel->searchByFactu($model->id);
-
-        
-        
-        if (h::request()->isAjax && $model->load(h::request()->post())) {
+         $dataProviderCuentasPor = $searchModel->searchByFactu($model->id); 
+         $searchModelLecturas = new VwSigiTempLecturasSearch();
+        $dataProviderLecturas = $searchModelLecturas->searchByCuentasPor($model->idsToCuentasPor(),Yii::$app->request->queryParams);
+         if (h::request()->isAjax && $model->load(h::request()->post())) {
                 h::response()->format = Response::FORMAT_JSON;
                 return ActiveForm::validate($model);
         }
-        
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
-
         return $this->render('update', [
             'model' => $model,
-            'dataProviderCuentasPor' =>$dataProviderCuentasPor,
+            'dataProviderCuentasPor' =>$dataProviderCuentasPor,           
+            'dataProviderLecturas' =>$dataProviderLecturas
         ]);
     }
 
@@ -157,6 +156,7 @@ class FacturacionController extends baseController
                 h::response()->format = Response::FORMAT_JSON;
            $model=$this->findModel($id);
            $errores=$model->generateFacturacionMes();
+           $model->providerFaltaLecturas('101');
            if(count($errores)>0){
                return $errores;
            }else{
@@ -171,11 +171,25 @@ class FacturacionController extends baseController
             //$errores=[];
                 h::response()->format = Response::FORMAT_JSON;
            $model=$this->findModel($id);
-\frontend\modules\sigi\models\SigiDetfacturacion::deleteAll(['facturacion_id'=>$model->id]);
+           $model->resetFacturacion();
            return ['success'=>yii::t('sigi.labels','Se ha reinicado la facturación')];
        }
        
     }
     
-    
+    public function actionCrearLecturas($id){
+        if (h::request()->isAjax) {
+              h::response()->format = Response::FORMAT_JSON;
+           $model= \frontend\modules\sigi\models\SigiCuentaspor::findOne($id);
+           if(!is_null($model)){
+               $model->creaRegistroLecturasTemp();
+               return ['success'=>yii::t('sigi.labels','Se ha generado la plantilla de lecturas')];
+           }else{
+               return ['error'=>yii::t('sigi.labels','No se ha encontrado un registro para este id')]; 
+           }
+            
+           
+       }
+       
+    }
 }

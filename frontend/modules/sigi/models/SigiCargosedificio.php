@@ -23,8 +23,8 @@ use Yii;
  * @property SigiCargosgrupoedificio $codgrupo0
  * @property SigiCargos $cargo
  */
-class SigiCargosedificio extends \common\models\base\modelBase implements
-\frontend\modules\sigi\interfaces\colectoresInterface
+class SigiCargosedificio extends \common\models\base\modelBase /*implements
+frontend\modules\sigi\interfaces\colectoresInterface*/
 {
    private $_monto;
     public $booleanFields= [
@@ -50,8 +50,8 @@ class SigiCargosedificio extends \common\models\base\modelBase implements
             [['edificio_id', 'cargo_id', 'tasamora', 'grupo_id'], 'required'],
             [['edificio_id', 'cargo_id', 'plazovencimiento', 'frecuencia'], 'integer'],
             [['tasamora'], 'number'],
-            [['individual'],'safe'],
-            [['regular', 'montofijo'], 'string', 'max' => 1],
+            [['individual','tipomedidor'],'safe'],
+            //[['regular', 'montofijo'], 'string', 'max' => 1],
             [['edificio_id'], 'exist', 'skipOnError' => true, 'targetClass' => Edificios::className(), 'targetAttribute' => ['edificio_id' => 'id']],
             //[['codgrupo'], 'exist', 'skipOnError' => true, 'targetClass' => SigiCargosgrupoedificio::className(), 'targetAttribute' => ['grupo_id' => 'id']],
             [['cargo_id'], 'exist', 'skipOnError' => true, 'targetClass' => SigiCargos::className(), 'targetAttribute' => ['cargo_id' => 'id']],

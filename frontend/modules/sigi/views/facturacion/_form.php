@@ -86,11 +86,7 @@ use yii\widgets\Pjax;
  </div>
      
     <?php ActiveForm::end(); ?>
-<<<<<<< HEAD
-
-=======
        <?php if(!$model->isNewRecord) {?>
->>>>>>> fad12dce49b2f867bc497f00dbb15f3b5fe99360
       <?php Pjax::begin(['id'=>'grilla_cargospor']); ?>
     <?php echo GridView::widget([
         'dataProvider' =>$dataProviderCuentasPor,
@@ -100,7 +96,7 @@ use yii\widgets\Pjax;
         'columns' => [
          [
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{update}{delete}',
+                'template' => '{update}{delete}{generate}',
                 'buttons' => [
                     'update' => function($url, $model) {                        
                         $options = [
@@ -125,6 +121,17 @@ use yii\widgets\Pjax;
 			   $url = \yii\helpers\Url::toRoute($this->context->id.'/deletemodel-for-ajax');
                             if(!$model->colector->isBudget())  
                            return \yii\helpers\Html::a('<span class="btn btn-danger glyphicon glyphicon-trash"></span>', '#', ['title'=>$url,/*'id'=>$model->codparam,*/'family'=>'holas','id'=>\yii\helpers\Json::encode(['id'=>$model->id,'modelito'=> str_replace('@','\\',get_class($model))]),/*'title' => 'Borrar'*/]);
+                            },
+                            
+                            'generate' => function ($url,$model) {
+                             $options = [
+                            'data-confirm' => Yii::t('sigi.labels', 'Esta seguro de generar lecturas?'),
+                            'title' => Yii::t('base.verbs', 'Generar'),                            
+                        ];
+			   $url = \yii\helpers\Url::toRoute([$this->context->id.'/crear-lecturas','id'=>$model->id]);
+                            $colector=$model->colector;
+                           if(!$colector->isBudget() && $colector->isMedidor() && $colector->isMassive())  
+                              return \yii\helpers\Html::a('<span class="btn btn-success glyphicon glyphicon-th-list"></span>', '#', ['title'=>$url,/*'id'=>$model->codparam,*/'family'=>'holas','id'=>\yii\helpers\Json::encode(['id'=>$model->id,'modelito'=> str_replace('@','\\',get_class($model))]),/*'title' => 'Borrar'*/]);
                             }
                          
                     ]
@@ -147,6 +154,8 @@ use yii\widgets\Pjax;
                   ],  */             
            // 'codocu',
             'descripcion',
+           // 'colector.id',
+          
            // 'fedoc',
                             
             //'mes',
@@ -175,19 +184,11 @@ use yii\widgets\Pjax;
           
     <?php Pjax::end(); ?>
 </div>       
-<<<<<<< HEAD
-      
-=======
        <?php }?>  
->>>>>>> fad12dce49b2f867bc497f00dbb15f3b5fe99360
     
 </div>
 <?php
  $url= Url::to(['/sigi/cuentaspor/create-as-child','id'=>$model->id,'gridName'=>'grilla_cargospor','idModal'=>'buscarvalor']);
-<<<<<<< HEAD
-   echo  Html::button(yii::t('base.verbs','Insertar '), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Elemento'),'id'=>'btn_apoderado', 'class' => 'botonAbre btn btn-success']); 
-?> 
-=======
    echo  Html::button(yii::t('base.verbs','Cobranza masiva'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Elemento'),'id'=>'btn_apoderado', 'class' => 'botonAbre btn btn-success']); 
 ?> 
 <?php
@@ -271,4 +272,3 @@ use yii\widgets\Pjax;
   
   $this->registerJs($string, \yii\web\View::POS_END);
 ?>
->>>>>>> fad12dce49b2f867bc497f00dbb15f3b5fe99360

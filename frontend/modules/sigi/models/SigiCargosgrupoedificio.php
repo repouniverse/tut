@@ -57,7 +57,7 @@ class SigiCargosgrupoedificio extends \common\models\base\modelBase
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getSigiCargosedificios()
+    public function getColectores()
     {
         return $this->hasMany(SigiCargosedificio::className(), ['grupo_id' => 'id']);
     }

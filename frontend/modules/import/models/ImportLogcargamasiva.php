@@ -37,7 +37,7 @@ class ImportLogcargamasiva extends \yii\db\ActiveRecord
             [[ 'cargamasiva_id', 'nombrecampo', 'mensaje', 'user_id', 'numerolinea'], 'required'],
             [['id', 'cargamasiva_id', 'user_id', 'numerolinea'], 'integer'],
             [['nombrecampo'], 'string', 'max' => 60],
-            [['mensaje'], 'string', 'max' => 80],
+            [['mensaje'], 'string', 'max' =>180],
             [['level'], 'string', 'max' => 1],
             [['fecha'], 'safe'],
             [['cargamasiva_id'], 'exist', 'skipOnError' => true, 'targetClass' => ImportCargamasivaUser::className(), 'targetAttribute' => ['cargamasiva_id' => 'id']],

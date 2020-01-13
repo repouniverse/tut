@@ -282,31 +282,16 @@ class MakeController extends baseController
         }
   } 
   
-<<<<<<< HEAD
-  public function actionMultiReport($id/*,$idsToReport*/){
-=======
   public function actionMultiReport($id,$idsToReport){
->>>>>>> fad12dce49b2f867bc497f00dbb15f3b5fe99360
         set_time_limit(300); // 5 minutes 
         //echo "maolde";die();
        $model=$this->findModel($id); 
        $this->layout='blank';
-<<<<<<< HEAD
-       $idsToReport=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73];
-     
-       $size=h::gsetting('report','sizePage');
-      // yii::error('Numero maximo de paginas '.$size);
-       $arreglos=  array_chunk($idsToReport, $size);
-       //yii::error( $arreglos);
-      // $idsToReport= \yii\helpers\Json::decode($idsToReport);
-      // var_dump($idsToReport);die();
-=======
        $idsToReport= \yii\helpers\Json::decode($idsToReport);
       // var_dump($idsToReport);die();
        $size=h::gsetting('report','sizePage');
       // yii::error('Numero maximo de paginas '.$size);
        $arreglos=  array_chunk($idsToReport, $size);
->>>>>>> fad12dce49b2f867bc497f00dbb15f3b5fe99360
        foreach($arreglos as $key=>$arreglo){
           $ruta=$model->pathToStoreFile();
          // yii::error($ruta);

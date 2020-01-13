@@ -307,11 +307,13 @@ class SiteController extends Controller
        
        $datos=[];
        if(h::request()->isAjax){
-           if( h::app()->hasModule('bigitems')){
+           
               h::settings()->invalidateCache();
-              $datos['success']=yii::t('base.actions','
+              \console\components\Command::execute('cache/flush-all', ['interactive' => false]);
+              \console\components\Command::execute('cache/flush-schema', ['interactive' => false]);
+           $datos['success']=yii::t('base.actions','
 Datos de caché de configuración han sido borrados');
-            }
+           
            h::response()->format = \yii\web\Response::FORMAT_JSON;
            return $datos;
         }

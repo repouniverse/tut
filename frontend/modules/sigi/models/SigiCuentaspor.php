@@ -1,5 +1,4 @@
 <?php
-
 namespace frontend\modules\sigi\models;
 use frontend\modules\sigi\interfaces\colectoresInterface;
 use common\models\masters\Clipro;
@@ -26,7 +25,6 @@ use common\behaviors\FileBehavior;
  * @property SigiEdificios $id0
  */
 class SigiCuentaspor extends \common\models\base\modelBase 
-
 {
     const SCENARIO_RECIBO_INTERNO='interno';
         const SCENARIO_RECIBO_EXTERNO_MASIVO='externo';
@@ -52,7 +50,6 @@ class SigiCuentaspor extends \common\models\base\modelBase
     {
         return '{{%sigi_cuentaspor}}';
     }
-
      public function behaviors()
     {
 	return [		
@@ -110,7 +107,6 @@ class SigiCuentaspor extends \common\models\base\modelBase
            // [['id'], 'exist', 'skipOnError' => true, 'targetClass' => Edificios::className(), 'targetAttribute' => ['id' => 'id']],
         ];
     }
-
     /**
      * {@inheritdoc}
      */
@@ -151,7 +147,6 @@ class SigiCuentaspor extends \common\models\base\modelBase
     {
         return $this->hasOne(Edificios::className(), ['id' => 'edificio_id']);
     }
-
     public function getDocumento()
     {
         return $this->hasOne(Documentos::className(), ['codocu' => 'codocu']);
@@ -165,14 +160,10 @@ class SigiCuentaspor extends \common\models\base\modelBase
     {
         return $this->hasOne(SigiFacturacion::className(), ['id' => 'facturacion_id']);
     }
-<<<<<<< HEAD
-
-=======
       public function getDetFacturacion()
     {
         return $this->hasMany(SigiDetfacturacion::className(), ['cuentaspor_id'=>'id']);
     }
->>>>>>> fad12dce49b2f867bc497f00dbb15f3b5fe99360
     /**
      * {@inheritdoc}
      * @return SigiCuentasporQuery the active query used by this AR class.
@@ -215,7 +206,6 @@ class SigiCuentaspor extends \common\models\base\modelBase
             // $this->codpro=$this->generateNumero();
         }
     }
-
   private function generateNumero(){
       return '994950y4';
   } 
@@ -294,10 +284,6 @@ class SigiCuentaspor extends \common\models\base\modelBase
     * la facturacion o par l aemision de los recibos individuales
     */ 
     public function generateFacturacion(){
-<<<<<<< HEAD
-        foreach($this->edificio->unidadesInputables() as $unidad){
-            $attributes=[
-=======
         $errores=[];
     $colector=$this->colector;
          if($colector->individual){
@@ -305,6 +291,13 @@ class SigiCuentaspor extends \common\models\base\modelBase
                $this->createRegistroFacturacion($unidad,$colector);
            }else{
                foreach($this->edificio->unidadesImputables() as $unidad){
+                   
+                   if($colector->isMedidor()){
+                       $medidor=$unidad->firstMedidor($colector->tipomedidor);
+                       if(!is_null($medidor))
+                        $medidor->updateReadFacturable($mes,$anio,$this->id);
+                    }
+                    
                     $this->createRegistroFacturacion($unidad,$colector);
                 }
            }
@@ -339,29 +332,18 @@ class SigiCuentaspor extends \common\models\base\modelBase
     
  private function prepareAttributes($participacion,$unidad,$colector){
      return [
->>>>>>> fad12dce49b2f867bc497f00dbb15f3b5fe99360
                 'cuentaspor_id'=>$this->id,
                 'edificio_id'=>$this->edificio_id,
          'facturacion_id'=>$this->facturacion_id,
                 'unidad_id'=>$unidad->id,
-<<<<<<< HEAD
-                'colector_id'=>$this->colector_id,
-                'grupo_id'=>$this->colector->cargo_id,
-                'monto'=>$this->colector->montoProRateado(),
-                
-=======
                 'colector_id'=>$colector->id,
                 'grupo_id'=>$colector->grupo_id,
                 'monto'=>$this->monto*$participacion,
                 'igv'=>$this->monto*$participacion*h::gsetting('general', 'igv'),
->>>>>>> fad12dce49b2f867bc497f00dbb15f3b5fe99360
                 //'cuentaspor_id'=>$this->id,
+                'mes'=>$this->mes,
+                'anio'=>$this->anio,
             ];
-<<<<<<< HEAD
-            
-        }
-    }
-=======
  }  
 
 private function existsDetalleFacturacion($unidad,$colector){    
@@ -381,13 +363,49 @@ private function existsDetalleFacturacion($unidad,$colector){
     
 } 
 
-private function sanitizeDetalles(){
-    
-}
 
->>>>>>> fad12dce49b2f867bc497f00dbb15f3b5fe99360
+
+public function creaRegistroLecturasTemp(){
+    $colector=$this->colector;
+    foreach($this->edificio->unidadesImputables() as $unidad){                   
+                   if($colector->isMedidor()){
+                       $medidor=$unidad->firstMedidor($colector->tipomedidor);
+                       if(!is_null($medidor)){
+                           SigiLecturasTemp::firstOrCreateStatic(
+                                   static::attributesForTempRead($colector->tipomedidor,$unidad->id,$medidor->id)
+                                   , null, static::attributesForVerifyTemp($medidor,$colector)
+                                   );
+                       }
+                        
+                    }
+                }
+         }
+
+  
+ private function attributesForTempRead($tipo,$unidad_id,$suministro_id){
+     return [
+         'cuentaspor_id'=>$this->id,
+         'edificio_id'=>$this->edificio_id,
+         'facturable'=>true,
+         'codtipo'=>$tipo,
+         'anio'=>$this->anio,
+         'flectura'=>$this->fedoc,
+          'mes'=>$this->mes,
+          'user_id'=>h::userId(),
+          'unidad_id'=>$unidad_id,
+         'suministro_id'=>$suministro_id,
+     ];
+ }        
     
+ private function attributesForVerifyTemp($medidor,$colector){
+     return [
+             'suministro_id'=>$medidor->id,
+              'codtipo'=>$colector->tipomedidor,
+            'mes'=>$this->mes,
+             'anio'=>$this->anio,
+             'user_id'=>h::userId()
+        ];
  }
-       
-       
-
+                    
+ 
+ }

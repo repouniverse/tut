@@ -1,1 +1,120 @@
 /nbproject/private/
+.gitignore
+.log
+.sql
+.bmp
+.data
+.ser
+.bin
+.ico
+.txt
+.ico
+.yml
+.gif
+.jpeg
+.yml
+.html
+.md
+.png
+
+
+
+# directorios a ignorar
+backend/web/assets/*
+frontend/web/assets/*
+frontend/runtime/*
+backend/runtime/*
+# yii console commands
+/yii
+/yii_test
+/yii_test.bat
+
+# phpstorm project files
+.idea
+
+# netbeans project files
+nbproject
+
+# zend studio for eclipse project files
+.project
+.settings
+
+# windows thumbnail cache
+Thumbs.db
+
+# composer vendor dir
+
+
+# composer itself is not needed
+composer.phar
+
+# Mac DS_Store Files
+.DS_Store
+
+# phpunit itself is not needed
+phpunit.phar
+# local phpunit config
+/phpunit.xml
+
+# vagrant runtime
+/.vagrant
+
+*
+!.gitignore
+!assets
+main-local.php
+runtime/cache/*
+nuget/content/
+nuget/bootstrap-fileinput.*.nupkg
+.DS_Store
+.idea
+# Auto detect text files and perform LF normalization
+*       text=auto
+
+# Denote text files explicitly, normalize line endings to LF on checkin and forbid conversion to CRLF on checkout
+# Without eol=lf, core.autocrlf might come in effect
+*.html  eol=lf diff=html
+*.css   eol=lf
+*.js    eol=lf
+*.sql   eol=lf
+*.php   eol=lf diff=php
+*.yml   eol=lf
+*.xml   eol=lf
+*.dist  eol=lf
+*.conf  eol=lf
+*.json  eol=lf
+*.lock  eol=lf
+
+# Denote all files that are truly binary and should not be modified.
+# Git would detect them automatically, but this will save the autodetection
+*.png   binary
+*.jpg   binary
+*.gif   binary
+*.ico   binary
+*.zip   binary
+*.jar   binary
+*.docx  binary
+*.docx  binary
+*.dot   binary
+*.xls   binary
+*.otf   binary
+*.eot   binary
+*.ttf   binary
+*.ttf   binary
+*.woff  binary
+*.phar  binary
+.idea
+.DS_store
+/vendor/
+composer.phar
+composer.lock
+*.crt -crlf
+*.key -crlf
+*.srl -crlf
+*.pub -crlf
+*.priv -crlf
+*.txt -crlf
+
+# ignore /notes in the git-generated distributed .zip archive
+/doc/notes export-ignore
+

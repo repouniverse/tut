@@ -20,13 +20,16 @@ use Yii;
  *
  * @property SigiSuministros $suministro
  */
-class SigiLecturasTemp extends SigiLecturas
+class SigiLecturasTemp extends \common\models\base\modelBase
 {
     
-   
+       public $dateorTimeFields=['flectura'=>self::_FDATE];
+    public $booleanFields=['facturable'];
       public function rules()
     {
         return [
+            [['mes','suministro_id','edificio_id','unidad_id','cuentaspor_id','codtipo','codedificio','anio','delta','codepa','user_id','lecturaant','lectura','flectura','delta','facturable'], 'safe'],
+           
             ];
     }
  public function scenarios()
@@ -39,4 +42,6 @@ class SigiLecturasTemp extends SigiLecturas
         return '{{%sigi_temp_lecturas}}';
     }
 
+    
+    
 }

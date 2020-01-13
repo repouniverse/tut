@@ -28,7 +28,8 @@ if(!$this->existsTable($table)) {
         'codtipo'=>$this->char(3)->append($this->collateColumn()),
         'delta'=>$this->decimal(12,4),  
          'facturable'=>$this->char(1)->append($this->collateColumn()),
-         'edificio_id'=>$this->integer(11)->notNull(),      
+         'edificio_id'=>$this->integer(11)->notNull(), 
+         'cuentaspor_id'=>$this->integer(11)->comment('Para relacionar con la facturacion'), 
         ],$this->collateTable());
   
    /* $this->addForeignKey($this->generateNameFk($table), $table,

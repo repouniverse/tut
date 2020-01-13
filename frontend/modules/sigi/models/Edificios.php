@@ -122,7 +122,12 @@ class Edificios extends \common\models\base\modelBase
         return $this->hasOne(Centros::className(), ['codcen' => 'codcen']);
     }
     
-    public function getSuministros()
+    public function getUnidades()
+    {
+        return $this->hasMany(SigiUnidades::className(), ['edificio_id' => 'id']);
+    }
+    
+     public function getSuministros()
     {
         return $this->hasMany(SigiSuministros::className(), ['edificio_id' => 'id']);
     }
@@ -284,8 +289,6 @@ class Edificios extends \common\models\base\modelBase
   public function unidadesImputables(){
       return $this->queryUnidadesImputables()->all();
   }
-<<<<<<< HEAD
-=======
 
   
   
@@ -382,6 +385,5 @@ class Edificios extends \common\models\base\modelBase
            
        }*/
    }
->>>>>>> fad12dce49b2f867bc497f00dbb15f3b5fe99360
       
 }

@@ -36,7 +36,7 @@ $this->params['breadcrumbs'][] = Yii::t('sigi.labels', 'Editar');
         ],
         [
           'label'=>'<i class="fa fa-users"></i> '.yii::t('sta.labels','Detalles'), //$this->context->countDetail() obtiene el contador del detalle
-            'content'=> $this->render('_segunda',[ 'model' => $model]),
+            'content'=> $this->render('_lecturas',[ 'model' => $model,'dataProviderLecturas' =>$dataProviderLecturas]),
             'active' => false,
              'options' => ['id' => 'myownID4'],
         ],

@@ -184,6 +184,7 @@ class SigiFacturacion extends \common\models\base\modelBase
             $errores['error']=$cuentapor->generateFacturacion();
           }  
         }else{
+            
            $errores['error']=yii::t('sigi.errors','Hay suministros que aun no tienen lectura verifique por favor'); 
         }
        $this->asignaIdentidad();//Importante
@@ -224,6 +225,13 @@ class SigiFacturacion extends \common\models\base\modelBase
                 ->all(),'identidad');
         
     }
+    
+    public function idsToCuentasPor(){
+       return  array_column($this->getSigiCuentaspor()->
+                select('id')->distinct()
+                ->all(),'id');
+        
+    }
     /*Verifica que todos los medidores tengan su lectura*/
     public function isCompleteReadsSuministros(){
         $iscomplete=true;
@@ -232,56 +240,58 @@ class SigiFacturacion extends \common\models\base\modelBase
         $nlecturas=SigiLecturas::find()->where(
                 ['edificio_id'=>$this->edificio_id,
                     'mes'=>$this->mes,
-                    //'tipo'=>$type
+               'facturable'=>'1',
+                    'codtipo'=>$type,
                 ])->count();
        
       if($nlecturas ==0){
           $iscomplete=false; 
         break;   
-      }  
-        $nmedidores=$this->edificio->nMedidores($type);       
+      }
+      $nmedidores=$this->edificio->nMedidores($type); 
+       // var_dump($nmedidores,$nlecturas,$nlecturas % $nmedidores);die();
           if(($nlecturas % $nmedidores) <> 0) //Si las cantidades SON multiplos de la cantidad de medidores entonces OK           
           {
              $iscomplete=false; 
            break;     
           }
-        
            }
-    return $iscomplete;
-      
+    return $iscomplete;      
           }
     
     /*Dataprovider de los mediores que faltan lecturas*/
     public function providerFaltaLecturas($type){
        $idsMedidores=$this->edificio->idsMedidores($type);
-       
-        yii::error('metiendonos en le data provider');
-        $fechas=array_column(SigiLecturas::find()->select('flectura')->distinct()
+      $idsFaltan=[];
+           $idsConLecturas=array_column(SigiLecturas::find()->select('suministro_id')
                 ->where([
                     'edificio_id'=>$this->edificio_id,
                     'mes'=>$this->mes,
-                    //'tipo'=>$type
-                        ])->asArray()->all(),'flectura');
-        $idsFaltan=[];
-        foreach($fechas as $index=>$fecha){
-            $idsConLecturas=array_column(SigiLecturas::find()->select('suministro_id')
-                ->where([
-                    'edificio_id'=>$this->edificio_id,
-                    'mes'=>$this->mes,
-                     'flectura'=>$fecha,
-                   // 'tipo'=>$type
-                        ])->andWhere(['in','suministro_id',$idsMedidores])->asArray()->all(),'suministro_id');
+                    'anio'=>$this->ejercicio,
+                    // 'flectura'=>static::SwichtFormatDate($this->fecha, 'date',false),
+                   'facturable'=>'1',
+                    'codtipo'=>$type,
+                        ])->asArray()->all(),'suministro_id');
              
                 $idsTotales=$this->edificio->idsMedidores($type);
-                $idsFaltan= $idsFaltan+array_diff($idsTotales, $idsConLecturas);
-        }
-        //yii::error($idsTotales);
-        //yii::error($idsConLecturas);
-        //yii::error($idsFaltan);
-        $query= SigiSuministros::find()->where(['in','id',array_keys($idsFaltan)]);        
+              $query= SigiSuministros::find()->where(['in','id',array_keys($idsFaltan)]);        
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]); 
         return $dataProvider;
     }
+    
+    public function resetFacturacion(){
+      \frontend\modules\sigi\models\SigiDetfacturacion::deleteAll(['facturacion_id'=>$model->id]);
+      \frontend\modules\sigi\models\SigiLecturas::updateAll(['cuentaspor_id'=>null],
+              [ 
+                 'mes'=>$this->mes,
+                  'anio'=>$this->ejercicio,
+                  'cuentaspor_id'=>$this->idsToCuentasPor()
+            ]);
+    }
+            
+  public function generateTempReads(){
+      
+  }        
 }

@@ -131,7 +131,8 @@ public function getEdificio()
              if(is_null($fecha)){
                         $query=$query->andWhere(['facturable'=>$valorFacturable ,'id'=>$this->queryReads()->max('id')]);
                 }else{
-                        $query=$query->andWhere(['facturable'=>$valorFacturable ,'<=','flectura',$fecha])/*->andWhere(['<=','id',$this->queryReads()->max('id')])*/
+                    yii::error('ya pe');
+                        $query=$query->andWhere(['facturable'=>$valorFacturable])->andWhere(['<=','flectura',$fecha])/*->andWhere(['<=','id',$this->queryReads()->max('id')])*/
                    ->orderBy('id desc')->limit(1); 
                     }        
        return $query->one(); 
@@ -139,7 +140,7 @@ public function getEdificio()
    
     
     
-  public function lastReadValue($fecha=null){
+  public function lastReadValue($fecha=null,$facturable){
       $registro=$this->lastRead($fecha,$facturable);
       return(is_null($registro))?$this->liminf:$registro->valor;
   } 
@@ -149,7 +150,16 @@ public function getEdificio()
     public function nextRead($fecha,$facturable){
          $valorFacturable=($facturable)?'1':'0';   
         $query=$this->queryReads()->
-      andWhere(['facturable'=>$valorFacturable ,'>=','flectura',static::SwichtFormatDate($fecha, 'date',false)])->
+      andWhere(['facturable'=>$valorFacturable])->andWhere(['>=','flectura',static::SwichtFormatDate($fecha, 'date',false)])->
+      orderBy('id ASC')->limit(1);
+        yii::error($query->createCommand()->getRawSql());
+      return $query->one();  
+    }
+    
+    public function previousRead($fecha,$facturable=false){
+         $valorFacturable=($facturable)?'1':'0';   
+        $query=$this->queryReads()->
+      andWhere(['facturable'=>$valorFacturable ,'<=','flectura',static::SwichtFormatDate($fecha, 'date',false)])->
       orderBy('id ASC')->limit(1);
         yii::error($query->createCommand()->getRawSql());
       return $query->one();  
@@ -172,18 +182,24 @@ public function getEdificio()
     }
     
     
+    public function isDateForFirstRead($fecha,$facturable=false){
+        return is_null($this->previousRead($fecha,$facturable))?true:false;
+    }
+    
     private function queryReads(){
         return SigiLecturas::find()->where(['suministro_id' => $this->id]);
     }
     
-    private function queryReadsForThisMonth($mes,$anio){
+    private function queryReadsForThisMonth($mes,$anio,$facturable=true){
+        $valor=($facturable)?'1':'0';
         return $this->queryReads()->
-                andWhere(['mes' => $mes,'anio'=>$anio]);
+                andWhere(['facturable'=>$valor,'mes' => $mes,'anio'=>$anio]);
     }
     
     
-    public function consumoTotal($mes,$anio){
-        $query=$this->queryReadsForThisMonth($mes,$anio);
+    public function consumoTotal($mes,$anio,$facturable=true){
+        //$valor=($facturable)?'1':'0';
+        $query=$this->queryReadsForThisMonth($mes,$anio,$facturable);
         if($query->count()>0)
          return  $query->select('sum(lectura)')->scalar();
         return 0;
@@ -243,6 +259,10 @@ public function getEdificio()
  public function beforeSave($insert) {
       if($insert){
           $this->resolveIds();
+          if(empty($this->liminf))
+              $this->liminf=0;
+          if(empty($this->limsup))
+              $this->limsup=999999999;
         //$this->lecturaant=$this->lastReadNumeric();   
       }else{
           
@@ -260,6 +280,41 @@ public function matrixReads(){
 
 public function hasUsedFactur(SigiLecturas $lectura){
     return $lectura->hasUsedFactur();
+}
+
+/*
+ * Coloca el flag de facturado a la
+ * lectura del mes 
+ */
+public function updateReadFacturable($mes,$anio,$idcuentaspor){
+   $registro=$this->readFacturableByMonth($mes, $anio);
+   if(is_null($registro)){
+       return false;
+   }else{
+       return $registro->putFacturado($idcuentaspor);
+   }
+}
+
+public function readFacturableByMonth($mes,$anio){
+   return $this->queryReadsForThisMonth($mes, $anio, true)->one();
+}
+
+/*Agrega una lectura 
+ * solo conl afecha y el valor del 
+ * se nrtga de validar 
+ */
+public function addRead(SigiLecturas $lectura){
+    if($this->isDateForFirstRead($fecha, $facturable)){
+        $lectura->save();
+    }elseif($this->isDateForLastRead($fecha,$facturable)){
+        
+    }else{
+        
+    }
+}
+
+private function createRead(){
+    
 }
     
 }

@@ -18,7 +18,7 @@ class SigiSuministrosSearch extends SigiSuministros
     {
         return [
             //[['id', 'edificio_id','cargo_id','grupo_id'], 'integer'],
-            [['unidad_id','codsuministro','numerocliente','codpro'], 'safe'],
+            [['unidad_id','edificio_id','codsuministro','tipo','numerocliente','codpro'], 'safe'],
         ];
     }
 
@@ -54,7 +54,7 @@ class SigiSuministrosSearch extends SigiSuministros
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
             return $dataProvider;
-        }*/
+        }
 
         // grid filtering conditions
        /* $query->andFilterWhere([
@@ -70,6 +70,53 @@ class SigiSuministrosSearch extends SigiSuministros
 $query->andFilterWhere([
             'unidad_id' => $idunidad
                     ]);
+        return $dataProvider;
+    }
+    
+    public function searchByEdificio($id)
+    {
+        $query = SigiSuministros::find();
+
+        // add conditions that should always apply here
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+
+       
+$query->andFilterWhere([
+            'edificio_id' => $id
+                    ]);
+        return $dataProvider;
+    }
+    
+    public function search($params){
+         $query = SigiSuministros::find();
+    $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+
+       $this->load($params);
+
+      
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to return any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+       
+       
+        
+
+        // grid filtering conditions
+        $query->andFilterWhere(['edificio_id' => $this->edificio_id])->
+            andFilterWhere(['unidad_id' => $this->unidad_id])->
+          andFilterWhere(['tipo' => $this->tipo])->
+                 andFilterWhere(['like','codpro', $this->codpro])->
+              andFilterWhere(['like','codsuministro', $this->codsuministro])->   
+             andFilterWhere(['codum' => $this->codum]);
+            
+        
         return $dataProvider;
     }
     
