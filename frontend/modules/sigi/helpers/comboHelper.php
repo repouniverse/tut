@@ -145,17 +145,19 @@ class comboHelper extends Combito
          $colec= \frontend\modules\sigi\models\VwSigiColectores::find()
                  ->select(['idcolector','descargo'])
                  ->where(['edificio_id'=>$idedificio])
-                 ->andWhere(['<>','montofijo','1'])
+                 ->andWhere(['=','montofijo','0'])
                 // ->andWhere(['<>','regular','1'])
-                  ->andWhere(['<>','individual','1'])
+                  ->andWhere(['=','individual','0'])
                  ->asArray()->all();
+         
          /*echo  \frontend\modules\sigi\models\VwSigiColectores::find()
                  ->select(['idcolector','descargo'])
                  ->where(['edificio_id'=>$idedificio])
-                 ->andWhere(['<>','montofijo','1'])
-                 ->andWhere(['<>','regular','1'])
-                  ->andWhere(['<>','individual','1'])->createCommand()->getRawSql();DIE();*/
-         return ArrayHelper::map($colec,'idcolector','descargo'); 
+                 ->andWhere(['=','montofijo','0'])
+                // ->andWhere(['<>','regular','1'])
+                  ->andWhere(['=','individual','0'])->createCommand()->getRawSql();DIE();
+         */
+                  return ArrayHelper::map($colec,'idcolector','descargo'); 
     }
     
     

@@ -208,7 +208,7 @@ class SigiUnidades extends \common\models\base\modelBase
           
           
     public function hasChildunits(){
-        return($this->getChildsUnits()->count()==0)?true:false;
+        return($this->getChildsUnits()->count()> 0)?true:false;
     }
     
     
@@ -385,16 +385,47 @@ class SigiUnidades extends \common\models\base\modelBase
    public function porcParticipacion(colectoresInterface $colector,$mes,$anio){
        if($colector->isMedidor()){
           $medidor=$this->firstMedidor($colector->tipomedidor);
+          $participacionInterna=$this->porcInterno();
           
           /*Si no encuentra un medidor en el departamento
            * Simpelnenre devuleve e porcentaje de participacion 
            * del area 
            */
           if(!is_null($medidor)){
-             $lecturatotal=$medidor->consumoTotal($mes,$anio);
-             return ($lecturatotal>0)?round($medidor->lectura/$lecturatotal):$this->participacionArea(); 
+               yii::error($this->numero.' Es Padre y tiene medidor  ');
+               yii::error($this->numero.' Participacion Interna  ');
+                yii::error($participacionInterna);
+                  yii::error('Lectura ultima de '.$this->numero.' ');
+                    yii::error($medidor->LastReadFacturable($mes,$anio));
+                     yii::error('Lectura total de  '.$this->numero.' ');
+                     $lecturatotal=$medidor->consumoTotal($mes,$anio);
+                     yii::error($lecturatotal);
+             
+             $valor=($lecturatotal>0)?round($medidor->LastReadFacturable($mes,$anio)/$lecturatotal,3):$this->participacionArea();
+              yii::error('Retornando en padre   '.$valor);
+             return  $valor*$participacionInterna;
           }else{
-            return $this->participacionArea();   
+              //Puede ser que el padre lo tenga
+             if($this->isChild()){
+                  yii::error($this->numero.' Es hijo  ');
+                   yii::error($this->numero.' Participacion Interna  ');
+                yii::error($participacionInterna);
+                 IF(!is_null($medidor=$this->padre->firstMedidor($colector->tipomedidor))){
+                    $lecturatotal=$medidor->consumoTotal($mes,$anio);
+                    yii::error('Lectura ultima del medidor del padre '.$this->numero.' ');
+                    yii::error($medidor->LastReadFacturable($mes,$anio));
+                     yii::error('Lectura total del medidor del padre '.$this->numero.' ');
+                     yii::error($lecturatotal);
+                     $valor=($lecturatotal>0)?round($medidor->LastReadFacturable($mes,$anio)/$lecturatotal,3):$this->participacionArea();  
+                     yii::error('Retornando en hijo '.$valor);
+                    return $valor*$participacionInterna;
+                 }else{
+                   return $this->participacionArea();    
+                 }
+             }ELSE{
+                return $this->participacionArea();    
+             }
+            
           }
           
           
@@ -461,5 +492,36 @@ class SigiUnidades extends \common\models\base\modelBase
      }
          
  }
+ /*
+  * Funcion que permite calcular le porcentaje de particiapcion interno
+  * para cada unidad, agrupada según  la unidad padre
+  * por EJEMPLO
+  *       Depa  205 =>  80 m2
+  *       Cochera del 205 => 10m2
+  *       Deposito del 205  => 5 m2
+  * Porcentaje interno del Depa= (80)/(80+10+5)=
+  * Porcentaje interno del Deposito= (5)/(80+10+5)=
+  * Porcentaje interno de la cochera= (10)/(80+10+5)=
+  */
+ public function porcInterno(){
+     if($this->isChild()){//Es un hijo
+         //Calculando el área de los hijos
+         $Schilds=self::find()->select('sum(area)')->where(['parent_id'=>$this->parent_id])->scalar();
+         $Sparent=$this->padre->area;
+         $St=$Sparent+$Schilds;
+         
+         return round($this->area/$St,4);
+     }elseif($this->hasChildunits()){ //Es un padre
+         yii::error('tiene hijitos ');
+         $Schilds=self::find()->select('sum(area)')->where(['parent_id'=>$this->id])->scalar();
+          $Smio=$this->area;
+          $St=$Smio+$Schilds;
+          return round($Smio/$St,4);
+     }else{//Es un departamento solo
+         yii::error('el departametno esta solo');
+         return 1;
+     }
+ }
+ 
  
 }

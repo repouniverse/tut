@@ -100,8 +100,10 @@ class FacturacionController extends baseController
         $model = $this->findModel($id);
           $searchModel = new SigiCuentasporSearch();
          $dataProviderCuentasPor = $searchModel->searchByFactu($model->id); 
-         $searchModelLecturas = new VwSigiTempLecturasSearch();
-        $dataProviderLecturas = $searchModelLecturas->searchByCuentasPor($model->idsToCuentasPor(),Yii::$app->request->queryParams);
+        // $searchModelLecturas = new VwSigiTempLecturasSearch();
+        //$dataProviderLecturas = $searchModelLecturas->searchByCuentasPor($model->idsToCuentasPor(),Yii::$app->request->queryParams);
+         
+         $dataProviderLecturas =$model->providerFaltaLecturas('101');
          if (h::request()->isAjax && $model->load(h::request()->post())) {
                 h::response()->format = Response::FORMAT_JSON;
                 return ActiveForm::validate($model);
@@ -155,8 +157,8 @@ class FacturacionController extends baseController
             $errores=[];
                 h::response()->format = Response::FORMAT_JSON;
            $model=$this->findModel($id);
-           $errores=$model->generateFacturacionMes();
-           $model->providerFaltaLecturas('101');
+           $model->generateFacturacionMes();
+          // $model->providerFaltaLecturas('101');
            if(count($errores)>0){
                return $errores;
            }else{
@@ -192,4 +194,6 @@ class FacturacionController extends baseController
        }
        
     }
+    
+   
 }

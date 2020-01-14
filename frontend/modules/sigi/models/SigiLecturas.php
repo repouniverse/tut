@@ -41,15 +41,15 @@ class SigiLecturas extends \common\models\base\modelBase
     public function rules()
     {
         return [
-            [['suministro_id', 'unidad_id', 'mes','anio'], 'required','on'=>'default'],
+            [['suministro_id','lectura','flectura', 'unidad_id', 'mes','anio'], 'required','on'=>'default'],
             
             [['suministro_id', 'unidad_id', 'mes'], 'required','on'=>'default'],
             //[['suministro_id','mes', 'anio'], 'unique', 'targetAttribute' => ['mes']],
              [['suministro_id', 'unidad_id'], 'integer'],
             [['lectura', 'lecturaant', 'delta'], 'number'],
-             [['lectura', 'valida_lectura'], 'number'],
+           // ['lectura', 'valida_lectura'],
             [['codepa'], 'string', 'max' => 12],
-            
+             [['mes'], 'safe'],
             /*
              * VALIDACIONES GENERALES
              */
@@ -350,6 +350,8 @@ class SigiLecturas extends \common\models\base\modelBase
     public function validate_duplicado(){
       if(!$this->facturable)
       return false;
+      if(!$this->isNewRecord)
+       return;
         $criteria=[
             'mes'=>$this->mes,
             'anio'=>$this->anio,

@@ -44,19 +44,27 @@ class timeHelper {
    
     public static  function cboMeses(){
        return [
-           '01'=>yii::t('base.names','ENERO'),
-           '02'=>yii::t('base.names','FEBRERO'),
-           '03'=>yii::t('base.names','MARZO'),
-           '04'=>yii::t('base.names','ABRIL'),
-           '05'=>yii::t('base.names','MAYO'),
-           '06'=>yii::t('base.names','JUNIO'),
-           '07'=>yii::t('base.names','JULIO'),
-           '08'=>yii::t('base.names','AGOSTO'),
-           '09'=>yii::t('base.names','SETIEMBRE'),
+           '1'=>yii::t('base.names','ENERO'),
+           '2'=>yii::t('base.names','FEBRERO'),
+           '3'=>yii::t('base.names','MARZO'),
+           '4'=>yii::t('base.names','ABRIL'),
+           '5'=>yii::t('base.names','MAYO'),
+           '6'=>yii::t('base.names','JUNIO'),
+           '7'=>yii::t('base.names','JULIO'),
+           '8'=>yii::t('base.names','AGOSTO'),
+           '9'=>yii::t('base.names','SETIEMBRE'),
            '10'=>yii::t('base.names','OCTUBRE'),
            '11'=>yii::t('base.names','NOVIEMBRE'),
            '12'=>yii::t('base.names','DICIEMBRE'),
        ];
+   }
+   
+   public function mapMonths($arrayIntegers){
+       $arr=[];
+       foreach($arrayIntegers as $key=>$value){
+           $arr[$value]=substr(static::cboMeses()[$value],0,3);
+       }
+       return $arr;
    }
    
    public static function getDateTimeInitial(){

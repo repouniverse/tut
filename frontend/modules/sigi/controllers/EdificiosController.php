@@ -624,4 +624,19 @@ public function actionVerificarDatos($id){
          
 }
 
+public function actionLecturas($id){
+    
+   $model= \frontend\modules\sigi\models\SigiSuministros::findOne($id);
+$searchModel = new \frontend\modules\sigi\models\SigiLecturasSearch();
+$dataProvider = $searchModel->searchBySuministro($id,Yii::$app->request->queryParams);
+
+     return  $this->render('/edificios/suministros/_form_suministro',
+             ['model'=>$model,
+               'dataProvider' =>$dataProvider , 
+               'searchModel' =>$searchModel , 
+                 ]);
+    
+}
+
+
 }

@@ -4,6 +4,7 @@ namespace frontend\modules\sigi\controllers;
 
 use Yii;
 use frontend\modules\sigi\models\SigiUnidades;
+use frontend\modules\sigi\models\SigiLecturas;
 use frontend\modules\sigi\models\SigiUnidadesSearch;
 use frontend\modules\sigi\helpers\comboHelper;
 use frontend\controllers\base\baseController;
@@ -246,7 +247,10 @@ class UnidadesController extends baseController
          
         //$modelunidad = $this->findModel($id);        
        $model=\frontend\modules\sigi\models\SigiSuministros::findOne($id);
-        if(is_null($model))
+      // PRINT_R($model->lastReads(true));die();
+       
+       
+       if(is_null($model))
         throw new NotFoundHttpException(Yii::t('sigi.labels', 'The requested page does not exist.'));
       
        
@@ -324,5 +328,72 @@ class UnidadesController extends baseController
          //var_dump($items);die();
          echo \yii\helpers\Html::renderSelectOptions('', $items);
       }
-  }  
+  } 
+  
+  
+   public function actionAgregaLectura($id){        
+         $this->layout = "install";
+         
+        $modelSuministro = \frontend\modules\sigi\models\SigiSuministros::findOne($id);        
+       $model=New \frontend\modules\sigi\models\SigiLecturas();
+       $model->unidad_id=$modelSuministro->unidad_id;
+       $model->edificio_id=$modelSuministro->edificio_id;
+       $model->suministro_id=$modelSuministro->id;
+        $model->facturable=true;
+        $model->codtipo=$modelSuministro->tipo;
+       $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                
+                $model->save();
+                //yii::error();
+                //$model->assignStudentsByRandom();
+                  return ['success'=>1,'id'=>$model->unidad_id];
+            }
+        }else{
+           return $this->renderAjax('_modal_lectura', [
+                        'model' => $model,
+                       'modelSuministro'=> $modelSuministro,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                        //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+    }
+  
+   public function actionEditaLectura($id){        
+         $this->layout = "install";
+        $model=SigiLecturas::findOne($id);
+       $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                
+                $model->save();
+                //yii::error();
+                //$model->assignStudentsByRandom();
+                  return ['success'=>1,'id'=>$model->unidad_id];
+            }
+        }else{
+           return $this->renderAjax('_modal_lectura', [
+                        'model' => $model,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                        //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+    }
 }

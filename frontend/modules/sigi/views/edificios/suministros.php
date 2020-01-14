@@ -30,7 +30,7 @@ use frontend\modules\sigi\models\SigiSuministrosSearch;
                  [
                 'class' => 'yii\grid\ActionColumn',
                 //'template' => Helper::filterActionColumn(['view', 'activate', 'delete']),
-            'template' => '{edit}{delete}',
+            'template' => '{edit}{delete}{view}',
                'buttons' => [
                      'edit' => function($url, $model) {  
                          $url=\yii\helpers\Url::toRoute(['/sigi/unidades/edita-medidor','id'=>$model->id,'isImage'=>false,'idModal'=>'buscarvalor','gridName'=>'grilla-medidores','nombreclase'=> str_replace('\\','_',get_class($model))]);
@@ -49,8 +49,15 @@ use frontend\modules\sigi\models\SigiSuministrosSearch;
                         'delete' => function ($url,$model) {
 			   $url = \yii\helpers\Url::toRoute($this->context->id.'/deletemodel-for-ajax');
                               return \yii\helpers\Html::a('<span class="btn btn-danger glyphicon glyphicon-trash"></span>', '#', ['title'=>$url,/*'id'=>$model->codparam,*/'family'=>'holas','id'=>\yii\helpers\Json::encode(['id'=>$model->id,'modelito'=> str_replace('@','\\',get_class($model))]),/*'title' => 'Borrar'*/]);
-                            }
-                        
+                            },
+                        'view' => function($url, $model) {  
+                           $url = \yii\helpers\Url::toRoute([$this->context->id.'/lecturas','id'=>$model->id]);       
+                        $options = [
+                            'target'=>'_blank',
+                            'title' => Yii::t('base.verbs', 'Lecturas'),                            
+                        ];
+                        return Html::a('<span class="btn btn-warning btn-sm glyphicon glyphicon-time"></span>', $url, $options/*$options*/);
+                         }, 
                     ]
                 ],
                ['attribute'=>'edificio_id',

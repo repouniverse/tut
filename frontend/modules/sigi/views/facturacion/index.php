@@ -71,8 +71,10 @@ $this->params['breadcrumbs'][] = $this->title;
                  'group'=>true,   
             ],
             'mes',
+                                 
             'ejercicio',
             'fecha',
+            'descripcion',
            [
                 'attribute'=>'monto',
                 //'filter'=>frontend\modules\sigi\helpers\comboHelper::getCboEdificios(),

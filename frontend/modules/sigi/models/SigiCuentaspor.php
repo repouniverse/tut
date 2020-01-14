@@ -290,16 +290,29 @@ class SigiCuentaspor extends \common\models\base\modelBase
                $unidad= SigiUnidades::find()->where(['id'=>$this->unidad_id])->one();
                $this->createRegistroFacturacion($unidad,$colector);
            }else{
-               foreach($this->edificio->unidadesImputables() as $unidad){
-                   
-                   if($colector->isMedidor()){
+               if($colector->isMedidor()){
+                   $medidores=$this->edificio->suministrosByTypeQuery($colector->tipomedidor)->all();
+                foreach( $medidores as $medidor){
+                      $unidad=$medidor->unidad;
+                      if($unidad->imputable){
+                         $this->createRegistroFacturacion($unidad,$colector); 
+                      }else{
+                          
+                      }
+                         
+                      }
+               }else{
+                   foreach($this->edificio->unidadesImputables() as $unidad){
+                   /*if($colector->isMedidor()){
                        $medidor=$unidad->firstMedidor($colector->tipomedidor);
                        if(!is_null($medidor))
                         $medidor->updateReadFacturable($mes,$anio,$this->id);
-                    }
-                    
+                    }*/
                     $this->createRegistroFacturacion($unidad,$colector);
-                }
+                      }
+                   
+               }
+               
            }
         
       return $errores; 
@@ -310,8 +323,12 @@ class SigiCuentaspor extends \common\models\base\modelBase
            
            
             $participacion=$unidad->porcParticipacion($colector,$this->mes,$this->anio);
+            yii::error('participacion de '.$unidad->numero.'  Colector  '.$colector->cargo->descargo);
+            yii::error($participacion);
           if(!$this->existsDetalleFacturacion($unidad,$colector)){
+              
              $model=New SigiDetfacturacion();
+             
             $model->setAttributes($this->prepareAttributes($participacion,$unidad,$colector));
             /*PARA AGRUPAR EN EL DEP A PADRE LOS HIJOS*/
             $model->grupounidad=($unidad->isChild())?$unidad->parentNumero():$unidad->numero;

@@ -22,10 +22,15 @@ use common\widgets\selectwidget\selectWidget;
       <div class="box-header">
         <div class="col-md-12">
             <div class="form-group no-margin">
+            <?php
+              $url=\yii\helpers\Url::toRoute(['/sigi/'.$this->context->id.'/'.(($model->isNewRecord)?'create-as-child':'edita-cobranza'),'id'=>($model->isNewRecord)?$modelFacturacion->id:$model->id]); 
+            //var_dump($url);die();
+            ?>
           <?= \common\widgets\buttonsubmitwidget\buttonSubmitWidget::widget(
                   ['idModal'=>$idModal,
                     'idForm'=>'myformulario',
-                      'url'=> \yii\helpers\Url::to(['/sigi/'.$this->context->id.'/create-as-child','id'=>$modelFacturacion->id]),
+                      //'url'=>null,
+                      'url'=> $url,
                      'idGrilla'=>$gridName, 
                       ]
                   )?>
@@ -47,9 +52,9 @@ use common\widgets\selectwidget\selectWidget;
  </div> 
           
   <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
-    
+   
      <?= $form->field($model, 'colector_id')->dropDownList(
-             comboHelper::getCboColectorMasivo($modelFacturacion->edificio_id),
+             comboHelper::getCboColectorMasivo(($model->isNewRecord)?$modelFacturacion->edificio_id:$model->edificio_id),
              ['prompt'=>yii::t('sigi.labels','--Escoja un valor--')]
              ) ?>
  </div>

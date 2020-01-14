@@ -37,7 +37,7 @@ class Module extends \yii\base\Module
     
     
       private static function putSettingsModule(){
-      //  h::getIfNotPutSetting('sigi','','.jpg', SettingType::STRING_TYPE);
+        h::getIfNotPutSetting('sigi','numeroMaxLecturas',5, SettingType::INTEGER_TYPE);
        //  h::getIfNotPutSetting('sigi','urlimagesalu','http:://www.orce.uni.edu.pe/alumnos/', SettingType::STRING_TYPE);
         // h::getIfNotPutSetting('sigi','prefiximagesalu','0060', SettingType::STRING_TYPE);
           return true;

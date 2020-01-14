@@ -8,6 +8,7 @@ use frontend\modules\sigi\models\SigiCuentasporSearch;
 use frontend\controllers\base\baseController;
 use frontend\modules\sigi\models\SigiLecturasTempSearch;
 use frontend\modules\sigi\models\SigiLecturasTemp;
+use frontend\modules\sigi\models\forms\lecturas AS Lectura;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use common\helpers\h;
@@ -265,5 +266,99 @@ class CuentasporController extends baseController
             'dataProvider' => $dataProvider,
         ]);
  } 
+ 
+  public function actionEditaCobranza($id){        
+         $this->layout = "install";
+       $model=$this->findModel($id);
+       $colector=$model->colector;
+      
+      if(!$colector->isBudget()) { //Si no es presupeusto hacer algo
+          if(!$colector->individual){
+              $model->setScenario($model::SCENARIO_RECIBO_EXTERNO_MASIVO);
+              $renderVista='create_as_child';
+             
+              
+          }else{
+              $model->setScenario($model::SCENARIO_RECIBO_INTERNO);
+              $renderVista='_form_as_child_interno';
+              //$renderVista='create_as_child';
+             
+          }
+          $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                $model->save();
+                //$model->assignStudentsByRandom();
+                  return ['success'=>1,'id'=>$model->id];
+            }
+        }else{
+           return $this->renderAjax($renderVista, [
+                        'model' => $model,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                        //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+          
+      } else{ //SIO es presupeusto, no hace rnad no se pued emodificar 
+          echo "nada";
+      }
+       
+       
+       
+    } 
+   
+  public function actionCreaLecturas($id){
+     
+      $this->layout = "install";
+      $modelPadre= SigiCuentaspor::findOne($id);
+      if(is_null($modelPadre)){
+           echo "NOS E ECNONTRÓ EL REGISTRO";DIE();
+      }
+     
+        /*$modelFacturacion = \frontend\modules\sigi\models\SigiFacturacion::findOne($id);
+        if(is_null($modelFacturacion))
+           // echo "hol";die();
+         throw new NotFoundHttpException(Yii::t('sigi.labels', 'The requested page does not exist.'));
+       // $model->valoresDefault();*/
+        
+        $model=new Lectura();
+        
+        $datos=[];
+       
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                
+               
+                  return ['success'=>1,1];
+            }
+        }else{
+           return $this->renderAjax('_fecha_lecturas', [
+                        'model' => $model,
+               'id'=>$id,
+               'mes' =>$modelPadre->mes,
+               'anio' =>$modelPadre->anio,
+                       // 'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                       'idModal'=>h::request()->get('idModal'),
+                       //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+         
+   }
+        
     
 }

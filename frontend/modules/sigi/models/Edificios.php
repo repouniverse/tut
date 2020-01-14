@@ -385,5 +385,12 @@ class Edificios extends \common\models\base\modelBase
            
        }*/
    }
-      
+   
+  public function suministrosByTypeQuery($tipo){
+      return SigiSuministros::find()->where([
+          'edificio_id'=>$this->id,
+          'tipo'=>$tipo,
+          ]);
+  }
+   
 }

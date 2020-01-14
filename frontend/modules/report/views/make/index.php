@@ -26,11 +26,12 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'id',
-            'xgeneral',
-            'ygeneral',
-            'xlogo',
-            'ylogo',
+            //'id',
+            'nombrereporte',
+            'tamanopapel',
+            'type',
+            'documento.desdocu',
+            //'ylogo',
             //'codocu',
             //'codcen',
             //'modelo',

@@ -98,13 +98,23 @@ use yii\widgets\Pjax;
                 'class' => 'yii\grid\ActionColumn',
                 'template' => '{update}{delete}{generate}',
                 'buttons' => [
-                    'update' => function($url, $model) {                        
-                        $options = [
-                            'title' => Yii::t('base.verbs', 'Update'),                            
+                     'update' => function($url, $model) {  
+                       $url= Url::to(['/sigi/cuentaspor/edita-cobranza','id'=>$model->id,'gridName'=>'grilla_cargospor','idModal'=>'buscarvalor']);
+                         $options = [
+                           'class'=>'botonAbre',
+                            //'title' => Yii::t('sta.labels', 'Editar'),
+                            //'aria-label' => Yii::t('rbac-admin', 'Activate'),
+                            //'data-confirm' => Yii::t('rbac-admin', 'Are you sure you want to activate this user?'),
+                            //'data-method' => 'get',
+                            'data-pjax' => '0',
+                             //'target'=>'_blank'
                         ];
+                        //return Html::button('<span class="glyphicon glyphicon-pencil"></span>', ['href' => $url, 'title' => 'Editar Adjunto', 'class' => ' btn btn-sm btn-success']);
                         if(!$model->colector->isBudget())
-                        return Html::a('<span class="btn btn-info btn-sm glyphicon glyphicon-pencil"></span>', $url, $options/*$options*/);
-                         },
+                         return Html::a('<span class="btn btn-success glyphicon glyphicon-pencil"></span>',$url,$options);
+                     
+                        
+                        },
                           'view' => function($url, $model) {                        
                         $options = [
                             'title' => Yii::t('base.verbs', 'View'),                            
@@ -123,7 +133,7 @@ use yii\widgets\Pjax;
                            return \yii\helpers\Html::a('<span class="btn btn-danger glyphicon glyphicon-trash"></span>', '#', ['title'=>$url,/*'id'=>$model->codparam,*/'family'=>'holas','id'=>\yii\helpers\Json::encode(['id'=>$model->id,'modelito'=> str_replace('@','\\',get_class($model))]),/*'title' => 'Borrar'*/]);
                             },
                             
-                            'generate' => function ($url,$model) {
+                           /* 'generate' => function ($url,$model) {
                              $options = [
                             'data-confirm' => Yii::t('sigi.labels', 'Esta seguro de generar lecturas?'),
                             'title' => Yii::t('base.verbs', 'Generar'),                            
@@ -131,8 +141,27 @@ use yii\widgets\Pjax;
 			   $url = \yii\helpers\Url::toRoute([$this->context->id.'/crear-lecturas','id'=>$model->id]);
                             $colector=$model->colector;
                            if(!$colector->isBudget() && $colector->isMedidor() && $colector->isMassive())  
-                              return \yii\helpers\Html::a('<span class="btn btn-success glyphicon glyphicon-th-list"></span>', '#', ['title'=>$url,/*'id'=>$model->codparam,*/'family'=>'holas','id'=>\yii\helpers\Json::encode(['id'=>$model->id,'modelito'=> str_replace('@','\\',get_class($model))]),/*'title' => 'Borrar'*/]);
-                            }
+                              return \yii\helpers\Html::a('<span class="btn btn-success glyphicon glyphicon-th-list"></span>', '#', ['title'=>$url,'family'=>'holas','id'=>\yii\helpers\Json::encode(['id'=>$model->id,'modelito'=> str_replace('@','\\',get_class($model))])]);
+                            },*/
+                       'generate' => function($url, $model) {  
+                       $url= Url::to(['/sigi/cuentaspor/crea-lecturas','id'=>$model->id,'gridName'=>'grilla_cargospor','idModal'=>'buscarvalor']);
+                         $options = [
+                           'class'=>'botonAbre',
+                            //'title' => Yii::t('sta.labels', 'Editar'),
+                            //'aria-label' => Yii::t('rbac-admin', 'Activate'),
+                            //'data-confirm' => Yii::t('rbac-admin', 'Are you sure you want to activate this user?'),
+                            //'data-method' => 'get',
+                            'data-pjax' => '0',
+                             //'target'=>'_blank'
+                        ];
+                         $colector=$model->colector;
+                        //return Html::button('<span class="glyphicon glyphicon-pencil"></span>', ['href' => $url, 'title' => 'Editar Adjunto', 'class' => ' btn btn-sm btn-success']);
+                        if(!$colector->isBudget() && $colector->isMedidor() && $colector->isMassive())  
+                         return Html::a('<span class="btn btn-success glyphicon glyphicon-th-list"></span>',$url,$options);
+                     
+                        
+                        },    
+                            
                          
                     ]
                 ],

@@ -274,7 +274,8 @@ class SigiFacturacion extends \common\models\base\modelBase
                         ])->asArray()->all(),'suministro_id');
              
                 $idsTotales=$this->edificio->idsMedidores($type);
-              $query= SigiSuministros::find()->where(['in','id',array_keys($idsFaltan)]);        
+                $idsFaltan= array_diff($idsTotales,  $idsConLecturas);
+              $query= SigiSuministros::find()->where(['in','id',$idsFaltan]);        
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]); 

@@ -124,6 +124,12 @@ public function getEdificio()
         return $this->hasMany(SigiLecturas::className(), ['suministro_id' =>'id']);
     }
     
+    public function lecturasFacturablesQuery()
+    {
+        return SigiLecturas::find()->where(['suministro_id' =>$this->id,'facturable'=>'1']);
+        
+          }
+    
     public function lastRead($fecha=null,$facturable=false)
     {
         $query=$this->queryReads(); 
@@ -192,16 +198,22 @@ public function getEdificio()
     
     private function queryReadsForThisMonth($mes,$anio,$facturable=true){
         $valor=($facturable)?'1':'0';
-        return $this->queryReads()->
-                andWhere(['facturable'=>$valor,'mes' => $mes,'anio'=>$anio]);
+        return SigiLecturas::find()->
+                where(['facturable'=>$valor,'mes' => $mes,'anio'=>$anio]);
     }
     
+     Public function LastReadFacturable($mes,$anio){
+     $reg= $this->queryReads()->
+                andWhere(['facturable'=>'1','mes' => $mes,'anio'=>$anio])->one();
+     return (is_null($reg))?0:$reg->lectura;
+    }
     
     public function consumoTotal($mes,$anio,$facturable=true){
         //$valor=($facturable)?'1':'0';
         $query=$this->queryReadsForThisMonth($mes,$anio,$facturable);
+        yii::error($query->select('sum(delta)')->createCommand()->getRawSql());
         if($query->count()>0)
-         return  $query->select('sum(lectura)')->scalar();
+         return  $query->select('sum(delta)')->scalar();
         return 0;
     }
     
@@ -313,7 +325,23 @@ public function addRead(SigiLecturas $lectura){
     }
 }
 
-private function createRead(){
+public function lastReads($forGraphical=false){
+   $nlecturas=min(\common\helpers\h::gsetting('sigi','numeroMaxLecturas'),
+                $this->lecturasFacturablesQuery()->count()
+               );
+   $registrosLecturas=$this->
+           lecturasFacturablesQuery()->
+           orderBy('flectura ASC')->limit($nlecturas)->all();
+   $lecturas=[];
+    foreach($registrosLecturas as $lectura){
+        $lecturas[$lectura->mes]=$lectura->delta;
+    }
+    if($forGraphical){
+        $meses= array_values(\common\helpers\timeHelper::mapMonths(array_keys($lecturas)));
+        return array_combine($meses,array_values($lecturas));
+    }else{
+        return $lecturas;
+    }
     
 }
     

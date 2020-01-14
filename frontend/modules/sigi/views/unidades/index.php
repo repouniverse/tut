@@ -93,10 +93,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute'=>'participacion',
                 'value' => function($model) { 
                         //var_dump($model);die();
-                         $participacion=$model->participacion(true);
+                         $participacion=$model->participacionArea();
                         if(empty($participacion) or $participacion==0)
                          return '--';
-                        return round($model->participacion(true),2).'  %';
+                        return round($model->participacionArea(),2).'  %';
                          },
             ],
             
