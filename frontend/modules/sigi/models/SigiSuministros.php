@@ -344,5 +344,16 @@ public function lastReads($forGraphical=false){
     }
     
 }
-    
+  
+public function participacionRead($mes,$anio){
+    $consumoT=$this->consumoTotal($mes, $anio);
+    $consumo=$this->LastReadFacturable($mes,$anio);
+    if($consumoT > 0){
+        return round($consumo/$consumoT);
+    }else{
+        return 0;
+    }
+}
+
+
 }

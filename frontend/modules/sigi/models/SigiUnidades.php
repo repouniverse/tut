@@ -392,33 +392,36 @@ class SigiUnidades extends \common\models\base\modelBase
            * del area 
            */
           if(!is_null($medidor)){
-               yii::error($this->numero.' Es Padre y tiene medidor  ');
+              /* yii::error($this->numero.' Es Padre y tiene medidor  ');
                yii::error($this->numero.' Participacion Interna  ');
                 yii::error($participacionInterna);
                   yii::error('Lectura ultima de '.$this->numero.' ');
                     yii::error($medidor->LastReadFacturable($mes,$anio));
                      yii::error('Lectura total de  '.$this->numero.' ');
                      $lecturatotal=$medidor->consumoTotal($mes,$anio);
-                     yii::error($lecturatotal);
-             
-             $valor=($lecturatotal>0)?round($medidor->LastReadFacturable($mes,$anio)/$lecturatotal,3):$this->participacionArea();
-              yii::error('Retornando en padre   '.$valor);
+                     yii::error($lecturatotal);*/
+                    $parti=$medidor->participacionRead($mes,$anio);
+             $valor=($parti>0)?$parti:$this->participacionArea();
+              //yii::error('Retornando en padre   '.$valor);
              return  $valor*$participacionInterna;
           }else{
               //Puede ser que el padre lo tenga
              if($this->isChild()){
-                  yii::error($this->numero.' Es hijo  ');
+                 /* yii::error($this->numero.' Es hijo  ');
                    yii::error($this->numero.' Participacion Interna  ');
-                yii::error($participacionInterna);
+                yii::error($participacionInterna);*/
                  IF(!is_null($medidor=$this->padre->firstMedidor($colector->tipomedidor))){
-                    $lecturatotal=$medidor->consumoTotal($mes,$anio);
-                    yii::error('Lectura ultima del medidor del padre '.$this->numero.' ');
+                    //$lecturatotal=$medidor->consumoTotal($mes,$anio);
+                   /* yii::error('Lectura ultima del medidor del padre '.$this->numero.' ');
                     yii::error($medidor->LastReadFacturable($mes,$anio));
                      yii::error('Lectura total del medidor del padre '.$this->numero.' ');
-                     yii::error($lecturatotal);
-                     $valor=($lecturatotal>0)?round($medidor->LastReadFacturable($mes,$anio)/$lecturatotal,3):$this->participacionArea();  
-                     yii::error('Retornando en hijo '.$valor);
-                    return $valor*$participacionInterna;
+                     yii::error($lecturatotal);*/
+                     //$valor=($lecturatotal>0)?round($medidor->LastReadFacturable($mes,$anio)/$lecturatotal,3):$this->participacionArea();  
+                     //yii::error('Retornando en hijo '.$valor);
+                     $parti=$medidor->participacionRead($mes,$anio);
+                    $valor=($parti>0)?$parti:$this->participacionArea();
+                         //yii::error('Retornando en padre   '.$valor);
+                        return  $valor*$participacionInterna;
                  }else{
                    return $this->participacionArea();    
                  }

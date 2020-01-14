@@ -319,17 +319,12 @@ class SigiCuentaspor extends \common\models\base\modelBase
     }
  
     
-  private function createRegistroFacturacion($unidad,$colector){
-           
-           
-            $participacion=$unidad->porcParticipacion($colector,$this->mes,$this->anio);
-            yii::error('participacion de '.$unidad->numero.'  Colector  '.$colector->cargo->descargo);
-            yii::error($participacion);
+  private function createRegistroFacturacion($unidad,$colector,$medidor){
           if(!$this->existsDetalleFacturacion($unidad,$colector)){
-              
-             $model=New SigiDetfacturacion();
-             
-            $model->setAttributes($this->prepareAttributes($participacion,$unidad,$colector));
+               $participacion=$unidad->porcParticipacion($colector,$this->mes,$this->anio);
+               $monto=$participacion*$this->monto;
+               $model=New SigiDetfacturacion();
+               $model->setAttributes($this->prepareAttributes($participacion,$unidad,$colector,$monto));
             /*PARA AGRUPAR EN EL DEP A PADRE LOS HIJOS*/
             $model->grupounidad=($unidad->isChild())?$unidad->parentNumero():$unidad->numero;
             $model->grupounidad_id=($unidad->isChild())?$unidad->parent_id:$unidad->id;
@@ -343,11 +338,10 @@ class SigiCuentaspor extends \common\models\base\modelBase
             }
             return $model->grupofacturacion;
           }
-                     
-               
+          
   } 
     
- private function prepareAttributes($participacion,$unidad,$colector){
+ private function prepareAttributes($participacion,$unidad,$colector,$monto){
      return [
                 'cuentaspor_id'=>$this->id,
                 'edificio_id'=>$this->edificio_id,
@@ -355,8 +349,8 @@ class SigiCuentaspor extends \common\models\base\modelBase
                 'unidad_id'=>$unidad->id,
                 'colector_id'=>$colector->id,
                 'grupo_id'=>$colector->grupo_id,
-                'monto'=>$this->monto*$participacion,
-                'igv'=>$this->monto*$participacion*h::gsetting('general', 'igv'),
+                'monto'=>$monto,
+                'igv'=>$monto*h::gsetting('general', 'igv'),
                 //'cuentaspor_id'=>$this->id,
                 'mes'=>$this->mes,
                 'anio'=>$this->anio,
@@ -374,6 +368,7 @@ private function existsDetalleFacturacion($unidad,$colector){
                 'grupo_id'=>$colector->grupo_id,
                 'mes'=>$this->mes,
                 'anio'=>$this->anio,
+                //'prorateo'=>
                    
                         ])
                 ->exists();
