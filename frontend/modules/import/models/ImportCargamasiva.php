@@ -49,7 +49,7 @@ class ImportCargamasiva extends modelBase
         return [
             [['insercion', 'escenario', 'descripcion', 'format', 'modelo'], 'required'],
             [['user_id'], 'integer'],
-            [['insercion'], 'string', 'max' => 1],
+           // [['insercion'], 'string', 'max' => 1],
             [['escenario', 'descripcion'], 'string', 'max' => 40],
             [['lastimport'], 'string', 'max' => 18],
             [['format'], 'string', 'max' => 3],

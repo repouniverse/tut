@@ -155,5 +155,14 @@ class staModule extends \yii\base\Module
  public static function docCodes(){
      return ['104','105','106'];
  } 
+ 
+ public function isPcRegistered($taller_id){
+     return models\StaIpslab::find()->
+             where([
+                 'taller_id'=>$taller_id,
+                 'ip'=>h::request()->getUserIP()
+                     ])->exists();
+     
+ }
   
 }

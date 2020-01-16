@@ -90,7 +90,12 @@ use frontend\modules\sta\helpers\comboHelper;
                                 'target'=>'_blank'
                                ];
                     $url=\yii\helpers\Url::to(['programas/trata-alumno','id'=>$model->id,'idalumno'=>$model->idalumno,'codperiodo'=>$model->codperiodo,'codalu'=>$model->codalu]);
-                    return Html::a($model->codalu,$url, $options);
+                    if(!empty($model->codtra)){
+                        return Html::a($model->codalu,$url, $options);
+                    }else{
+                        return $model->codalu;
+                    }
+                    
                         },
 ],
 [ 

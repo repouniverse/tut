@@ -17,6 +17,7 @@ use frontend\modules\sta\models\VwAluriesgoSearch;
 use frontend\modules\sta\models\TallerpsicoSearch;
 use frontend\modules\sta\models\StaTestTalleres;
 use frontend\modules\sta\models\VwStaTutoresSearch;
+use frontend\modules\sta\models\StaIpslab;
 use frontend\modules\sta\models\Rangos;
 use frontend\modules\sta\models\Test;
 use frontend\modules\sta\models\Citas;
@@ -544,6 +545,7 @@ public function actionProgramarCitas($id){
  */
 public function actionMakeCitaByStudent(){
     if(h::request()->isAjax){
+        h::response()->format = \yii\web\Response::FORMAT_JSON;
         $id=h::request()->get('id');
         $codalu=h::request()->get('codalu');
         $fecha=h::request()->get('fecha');
@@ -562,16 +564,18 @@ public function actionMakeCitaByStudent(){
             ];
            // var_dump($fecha,$model::_FDATETIME,$model::SwichtFormatDate($fecha,$model::_FDATETIME,true));die();
        
-             h::response()->format = \yii\web\Response::FORMAT_JSON;
+             
             if(Citas::firstOrCreateStatic($attributes,Citas::SCE_CREACION_BASICA)){
               $datos['success']=yii::t('sta.errors','Se ha creado la cita satisfactoriamente');
                 
             }else{
-                $mod=new Citas(Citas::SCE_CREACION_BASICA);
+                $mod=new Citas();
+                $mod->setScenario(Citas::SCE_CREACION_BASICA);
                 $mod->setAttributes($attributes);
                 $mod->validate();
-              $datos['error']=yii::t('sta.errors','Hubo un problema interno al grabar el registro de las citas : '.$mod->getFirstErrors());
+              $datos['error']=yii::t('sta.errors','Hubo un problema interno al grabar el registro de las citas : '.$mod->getFirstError());
                 UNSET($mod);
+               // RETURN $datos;
             }
                 
            return $datos; 
@@ -789,4 +793,27 @@ public function actionEditaDocu($id){
 
     }
 
+ public function actionRegistraLab($id){
+     $modelTaller=$this->findModel($id);
+     $model=new StaIpslab();
+     $model->ip=h::request()->getUserIP();
+     $model->activo=true;
+     $model->taller_id=$id;
+      if (h::request()->isAjax && $model->load(h::request()->post())) {
+                h::response()->format = \yii\web\Response::FORMAT_JSON;
+                return \yii\widgets\ActiveForm::validate($model);
+        }
+        if ($model->load(h::request()->post()) && $model->save()) {
+            return $this->redirect(['complete-matricula']);
+        }
+        return $this->render('_matricula_pc', [
+            'model' => $model,
+            'modelTaller'=>$modelTaller,
+        ]);
+   } 
+   
+   public function actionCompleteMatricula(){    
+        return $this->render('_complete_matricula', [            
+        ]);
+   }  
 }

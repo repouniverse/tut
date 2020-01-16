@@ -149,7 +149,7 @@ echo $form->field($model, 'codpro')->
       <?PHP IF(!$model->isNewRecord){ ?>
      <?=Html::label(yii::t('base.names','Participacion'),'45545rrxet',['class' => 'control-label']) ?>
            
-            <?=  Html::textInput('45545rrxet',  $model->participacion(),['disabled'=>true,'class' => 'form-control form-group']) ?>
+            <?=  Html::textInput('45545rrxet',  $model->participacionArea(),['disabled'=>true,'class' => 'form-control form-group']) ?>
           
  </div>
       <?PHP } ?>

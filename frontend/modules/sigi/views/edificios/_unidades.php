@@ -106,7 +106,7 @@ $gridColumns = [
              'attribute'=>'participacion',
              'format'=>'raw',
              'value'=>function($model){
-                   return $model->participacion();
+                   return $model->participacionArea();
              }
          ],                
                  

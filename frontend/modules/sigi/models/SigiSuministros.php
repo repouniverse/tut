@@ -349,11 +349,58 @@ public function participacionRead($mes,$anio){
     $consumoT=$this->consumoTotal($mes, $anio);
     $consumo=$this->LastReadFacturable($mes,$anio);
     if($consumoT > 0){
-        return round($consumo/$consumoT);
+        return round($consumo/$consumoT,4);
     }else{
         return 0;
     }
 }
+public function getSigiSumiDepa(){
+     return $this->hasMany( SigiSumiDepa::className(), ['suministro_id' =>'id']);
+}
+public function depasReparto(){
+   return  $this->sigiSumiDepa;
+}
+public function ndepasReparto(){
+   return  $this->getSigiSumiDepa()->count();
+}
 
+
+public function afterSave($insert, $changedAttributes) {
+    if(!$this->unidad->imputable){
+        $this->fillDepas();
+    }
+    return parent::afterSave($insert, $changedAttributes);
+}
+
+public function fillDepas(){
+    foreach($this->edificio->unidadesImputables() as $unidad){
+        //yii::error('recorriendo '.$unidad->numero);
+        $attributes=[
+            'edificio_id'=>$this->edificio_id,
+             'unidad_id'=>$unidad->id,
+            'suministro_id'=>$this->id, 
+            //'afiliado'=>'1'
+        ];
+        $attributesFill=[
+            'edificio_id'=>$this->edificio_id,
+             'unidad_id'=>$unidad->id,
+            'suministro_id'=>$this->id, 
+            'afiliado'=>'1'
+        ];
+        SigiSumiDepa::firstOrCreateStatic($attributesFill,null,$attributes);
+            
+            
+    }
+}
+
+public function providerAfiliados(){
+    $provider = new \yii\data\ActiveDataProvider([
+    'query' => $this->getSigiSumiDepa(),
+    'pagination' => [
+        'pageSize' => 100,
+    ],
+]);
+    return $provider;
+}
 
 }

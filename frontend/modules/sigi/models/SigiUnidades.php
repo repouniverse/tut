@@ -33,7 +33,7 @@ class SigiUnidades extends \common\models\base\modelBase
     const SCENARIO_HIJO='import_hijos';
     //const SCENARIO_EDIFICIO='edificio';
     //const SCENARIO_COMPLETO='import_completo';
-    //const SCENARIO_BASICO='basica';
+    const SCENARIO_BASICO='basica';
     const SCENARIO_UPDATE_BASICO='update_basico';
     public $booleanFields=['esnuevo','imputable'];
     public $hardFields=['edificio_id','numero'];
@@ -69,6 +69,11 @@ class SigiUnidades extends \common\models\base\modelBase
             ['id', 'required',
                 'on' => [self::SCENARIO_UPDATE_BASICO]
              ],
+            [['codpadre','area','imputable'], 'required',
+                'on' => [self::SCENARIO_HIJO]
+             ],
+            
+            
            // [['codpro'], 'validateApoderado'],
             [['detalles'], 'string'],
             [['codpro','esnuevo','codpadre','imputable','estreno'], 'safe'],
@@ -90,7 +95,7 @@ class SigiUnidades extends \common\models\base\modelBase
       public function scenarios()
     {
         $scenarios = parent::scenarios(); 
-        //$scenarios['basica'] = ['edificio_id','codtipo','imputable','npiso','numero','area','codpro'];
+        $scenarios['basica'] = ['edificio_id','codtipo','imputable','npiso','numero','area','codpro'];
         $scenarios[self::SCENARIO_HIJO] = ['edificio_id','codpadre','codtipo','imputable','numero','area','npiso'];
         //$scenarios[self::SCENARIO_COMPLETO] = ['edificio_id','parent_id','codtipo','imputable','numero','area','codpro','npiso','nombre','detalles','estreno'];
         $scenarios[self::SCENARIO_UPDATE_BASICO] = ['id','imputable','codpro'];

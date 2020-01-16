@@ -121,4 +121,12 @@ class VwSigiFacturecibo extends \common\models\base\modelBase
     {
         return new VwSigiFactureciboQuery(get_called_class());
     }
+    
+    public function getReportPropietario(){
+        
+        $controller=Yii::$app->controller;
+        $nameView= \common\helpers\FileHelper::getShortName($this::className());
+        $pathView='/'.$controller->id.'/reports/'.$nameView.'/calificaciones';
+      return  $controller->getView()->render($pathView,['model'=>$this]);
+    }
 }

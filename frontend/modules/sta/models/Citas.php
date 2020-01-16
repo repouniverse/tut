@@ -123,6 +123,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
             [['detalles'], 'string'],
              [['duracion','codfac','asistio','activo'], 'safe'],
             [['fechaprog', 'finicio', 'ftermino'], 'string', 'max' => 19],
+            ['fechaprog', 'validateDispo'],
             [['codtra'], 'string', 'max' => 6],
             [['fingreso', 'codaula'], 'string', 'max' => 10],
             [['fechaprog','duracion','finicio','ftermino'],'safe','on'=>self::SCENARIO_REPROGRAMA],
@@ -673,7 +674,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
     {
       $this->esFeriado();
       $this->isInJourney();
-      if($this->inPast())
+      if($this->isInPast())
       $this->addError('fechaprog',yii::t('sta.errors','La fecha de inicio se encuentra en el pasado'));
       
     }

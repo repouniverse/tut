@@ -288,16 +288,20 @@ class SigiCuentaspor extends \common\models\base\modelBase
     $colector=$this->colector;
          if($colector->individual){
                $unidad= SigiUnidades::find()->where(['id'=>$this->unidad_id])->one();
-               $this->createRegistroFacturacion($unidad,$colector);
+               $errores[]=$this->createRegistroFacturacion($unidad,$colector);
            }else{
                if($colector->isMedidor()){
                    $medidores=$this->edificio->suministrosByTypeQuery($colector->tipomedidor)->all();
                 foreach( $medidores as $medidor){
                       $unidad=$medidor->unidad;
                       if($unidad->imputable){
-                         $this->createRegistroFacturacion($unidad,$colector); 
+                         $errores[]=$this->createRegistroFacturacion($unidad,$colector); 
                       }else{
-                          
+                          $depasReparto=$medidor->depasReparto();
+                          foreach($depasReparto as $depa){
+                              $errores[]=$this->createRegistroFacturacion($depa->unidad,$colector,$medidor);  
+                          }
+                         
                       }
                          
                       }
@@ -308,23 +312,32 @@ class SigiCuentaspor extends \common\models\base\modelBase
                        if(!is_null($medidor))
                         $medidor->updateReadFacturable($mes,$anio,$this->id);
                     }*/
-                    $this->createRegistroFacturacion($unidad,$colector);
+                    $errores[]=$this->createRegistroFacturacion($unidad,$colector);
                       }
                    
                }
                
            }
         
-      return $errores; 
+      return array_filter($errores); 
     }
  
     
-  private function createRegistroFacturacion($unidad,$colector,$medidor){
-          if(!$this->existsDetalleFacturacion($unidad,$colector)){
-               $participacion=$unidad->porcParticipacion($colector,$this->mes,$this->anio);
+  private function createRegistroFacturacion($unidad,$colector,$medidor=null){
+      $msgError='';
+      $prorateo=(is_null($medidor))?false:true;
+          if(!$this->existsDetalleFacturacion($unidad,$colector,$prorateo)){
+              if(is_null($medidor)){
+                   $participacion=$unidad->porcParticipacion($colector,$this->mes,$this->anio);
+              }else{
+                  //La lectura de este medidor entre el numero de departamentos comprometidos
+                 $ndepas=($medidor->ndepasReparto() >0)?$medidor->ndepasReparto():$unidad->edificio->queryUnidadesImputables()->count();
+                yii::error('La particiapc  es '.$medidor->participacionRead($this->mes,$this->anio));
+                 $participacion=$medidor->participacionRead($this->mes,$this->anio)/$ndepas;  
+              }
                $monto=$participacion*$this->monto;
                $model=New SigiDetfacturacion();
-               $model->setAttributes($this->prepareAttributes($participacion,$unidad,$colector,$monto));
+               $model->setAttributes($this->prepareAttributes($unidad,$colector,$monto,$prorateo));
             /*PARA AGRUPAR EN EL DEP A PADRE LOS HIJOS*/
             $model->grupounidad=($unidad->isChild())?$unidad->parentNumero():$unidad->numero;
             $model->grupounidad_id=($unidad->isChild())?$unidad->parent_id:$unidad->id;
@@ -332,16 +345,16 @@ class SigiCuentaspor extends \common\models\base\modelBase
             /*****************************************************/
             if(!$model->save()){
                 yii::error($model->getFirstError()); 
-                $errores[]=$model->getFirstError();
+                $msgError=$model->getFirstError();
             }else{
                 
             }
-            return $model->grupofacturacion;
+            //return $model->grupofacturacion;
           }
-          
+      return $msgError;    
   } 
     
- private function prepareAttributes($participacion,$unidad,$colector,$monto){
+ private function prepareAttributes($unidad,$colector,$monto,$prorateo=false){
      return [
                 'cuentaspor_id'=>$this->id,
                 'edificio_id'=>$this->edificio_id,
@@ -354,10 +367,11 @@ class SigiCuentaspor extends \common\models\base\modelBase
                 //'cuentaspor_id'=>$this->id,
                 'mes'=>$this->mes,
                 'anio'=>$this->anio,
+                 'aacc'=>($prorateo)?'1':'0',
             ];
  }  
 
-private function existsDetalleFacturacion($unidad,$colector){    
+private function existsDetalleFacturacion($unidad,$colector,$prorateo=false){    
     return SigiDetfacturacion::find()->
                 where([
                     'cuentaspor_id'=>$this->id,
@@ -368,6 +382,7 @@ private function existsDetalleFacturacion($unidad,$colector){
                 'grupo_id'=>$colector->grupo_id,
                 'mes'=>$this->mes,
                 'anio'=>$this->anio,
+                    'aacc'=>($prorateo)?'1':'0',
                 //'prorateo'=>
                    
                         ])

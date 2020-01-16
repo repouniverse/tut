@@ -97,6 +97,8 @@ class FacturacionController extends baseController
      */
     public function actionUpdate($id)
     {
+        //$modelo=\frontend\modules\sigi\models\SigiSuministros::findOne(117);
+        //var_dump($modelo->LastReadFacturable('12','2019'));DIE();
         $model = $this->findModel($id);
           $searchModel = new SigiCuentasporSearch();
          $dataProviderCuentasPor = $searchModel->searchByFactu($model->id); 
@@ -157,7 +159,8 @@ class FacturacionController extends baseController
             $errores=[];
                 h::response()->format = Response::FORMAT_JSON;
            $model=$this->findModel($id);
-           $model->generateFacturacionMes();
+           //$model->generateFacturacionMes();
+           $errores=$model->generateFacturacionMes();
           // $model->providerFaltaLecturas('101');
            if(count($errores)>0){
                return $errores;

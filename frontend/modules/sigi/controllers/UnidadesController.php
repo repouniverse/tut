@@ -396,4 +396,23 @@ class UnidadesController extends baseController
             ]);  
         }
     }
+    
+    
+ public function actionLlenaAfiliados($id){
+   if(h::request()->isAjax){
+        h::response()->format = Response::FORMAT_JSON;
+      $medidor= \frontend\modules\sigi\models\SigiSuministros::findOne($id);
+    if(!is_null($medidor)){
+        if(!$medidor->unidad->imputable){
+            $medidor->fillDepas();
+            return ['success'=>'Se agregaron unidades afiliadas'];
+        }else{
+            return ['error'=>'La unidad de este medidor no es imputable'];
+        }
+    }else{
+      return ['error'=>'No existe un registro para este id'];  
+    } 
+   }
+    
+ }   
 }

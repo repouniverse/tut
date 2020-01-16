@@ -2,6 +2,7 @@
 use kriss\calendarSchedule\CalendarScheduleWidget;
 use yii\web\JsExpression;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use common\helpers\h;
 use yii\grid\GridView;
@@ -72,7 +73,7 @@ echo CalendarScheduleWidget::widget([
         
         
         
-        'eventReceive' => new JsExpression('function(event, delta,minuteDelta, revertFunc) {
+        'eventReceive' => new JsExpression('function(event, delta, revertFunc) {
        if (confirm("'.yii::t('sta.labels','¿Confirmar que desea crear esta Cita ?').'")) {
                   var fechainicio=event.start.format("YYYY-MM-DD HH:mm:ss");
         $.ajax({ 
@@ -86,7 +87,9 @@ echo CalendarScheduleWidget::widget([
               success: function(json) {  
                         var n = Noty("id");
                        if ( !(typeof json["error"]==="undefined") ) {
-                       revertFunc();
+                      // event.remove();
+                        //revert();
+                       //revertFunc();
                    $.noty.setText(n.options.id,"<span class=\'glyphicon glyphicon-remove-sign\'></span>      "+ json["error"]);
                               $.noty.setType(n.options.id, "error"); 
                               }
@@ -186,41 +189,17 @@ echo CalendarScheduleWidget::widget([
                             }
                   }'),
         /*fin del veno resize*/
+
+        
+         //'eventClick' => new JsExpression('function(event) { alert("dobleclick");  }'),
+        
         
         
         /*evento Click*/
-        'eventClick' => new JsExpression('function(event) {'
-                . 'if (confirm("'.yii::t('sta.labels','¿Confirmar que desea notificar ?').'")) {
-                 $.ajax({ 
-                    method:"get",    
-                    url: "'.\yii\helpers\Url::toRoute('/sta/programas/notifica-cita').'",
-                    delay: 250,
-                        data: {idalu:'.$idalu.',id:'.$model->id.',idcita:event.id, psicoid:'.$modelPsico->id.',codalu:event.title  },
-             error:  function(xhr, textStatus, error){               
-                            revertFunc();
-                                }, 
-              success: function(json) {  
-                        var n = Noty("id");
-                       if ( !(typeof json["error"]==="undefined") ) {
-                      // revertFunc();
-                   $.noty.setText(n.options.id,"<span class=\'glyphicon glyphicon-remove-sign\'></span>      "+ json["error"]);
-                              $.noty.setType(n.options.id, "error"); 
-                              }
-                         if ( !(typeof json["success"]==="undefined") ) {
-                                        $.noty.setText(n.options.id,"<span class=\'glyphicon glyphicon-ok-sign\'></span>" + json["success"]);
-                             $.noty.setType(n.options.id, "success");
-                              } 
-                               if ( !(typeof json["warning"]==="undefined") ) {
-                                        $.noty.setText(n.options.id,"<span class=\'glyphicon glyphicon-info-sign\'></span>" +json["warning"]);
-                             $.noty.setType(n.options.id, "warning");
-                              } 
-                              
-                      
-                        },
-   cache: true
-  })
-                }'
-                . '}'),
+        'eventClick' => new JsExpression('function(event) { '
+                . ' var url="'.Url::to(['citas/update','id'=>'secretkey']).'";  '
+                . '  url=url.replace("secretkey",event.id); '
+                . ' window.location.href = url;     }'),
     ]
 ]);?>
  </div>  

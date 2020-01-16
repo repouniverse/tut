@@ -14,6 +14,7 @@ use common\helpers\h;
 <div class="citas-form">
 
     <?php $form = ActiveForm::begin([
+        'enableAjaxValidation'=>true,
     'fieldClass'=>'\common\components\MyActiveField'
     ]); ?>
       <div class="box-header">

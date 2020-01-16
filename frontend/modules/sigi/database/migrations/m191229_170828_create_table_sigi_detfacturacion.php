@@ -25,7 +25,13 @@ if(!$this->existsTable($table)) {
         'monto'=>$this->decimal(12, 4)->notNull(),
          'igv'=>$this->decimal(8, 4)->notNull(),
        'grupounidad'=>$this->integer(11)->notNull()->comment('agrupa  todos los objetos: cochera, depositos  en el mismo departamento  '),
-         'grupofacturacion'=>$this->integer(11)->notNull()->comment('Agrupa el documento del recibo, ojo lo hace por departametno o apoderado, MUY IMPORTANTES '),
+          'grupounidad_id'=>$this->integer(11)->notNull()->comment('Agrupa los ids del mismo departameno  '),
+          'facturacion_id'=>$this->integer(11)->notNull()->comment('Id facturacion  '),
+          'identidad'=>$this->integer(11)->notNull()->comment('identidad para agrupar un solo reporte'),
+        'aacc'=>$this->char(1)->notNull()->comment('flag para discrimianr cual es prorateo y cual no , areas comunes o es directo, pejem el agua de las areas comunes'),
+         'mes'=>$this->integer(2)->notNull(),
+          'anio'=>$this->char(4)->notNull(),
+        'grupofacturacion'=>$this->integer(11)->notNull()->comment('Agrupa el documento del recibo, ojo lo hace por departametno o apoderado, MUY IMPORTANTES '),
         ],$this->collateTable());
   
    /* $this->addForeignKey($this->generateNameFk($table), $table,

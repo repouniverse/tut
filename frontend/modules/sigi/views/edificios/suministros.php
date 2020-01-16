@@ -67,6 +67,13 @@ use frontend\modules\sigi\models\SigiSuministrosSearch;
                              return $model->edificio->nombre;
                             }
                    ],
+           ['attribute'=>'Unidad',
+                    'filter'=>comboHelper::getCboEdificios(),
+                   'value'=> function ($model) {
+			   //$url = \yii\helpers\Url::toRoute($this->context->id.'/deletemodel-for-ajax');
+                             return $model->unidad->numero;
+                            }
+                   ],
            ['attribute'=>'tipo',
                     'filter'=>$searchModel::comboDataField('tipo'),
                    'value'=> function ($model) {

@@ -46,6 +46,7 @@ class SigiDetfacturacion extends \common\models\base\modelBase
             [['cuentaspor_id', 'edificio_id', 'unidad_id', 'colector_id', 'grupo_id', 'monto', 'igv', 'grupounidad', 'grupofacturacion', 'facturacion_id', 'mes', 'anio'], 'required'],
             [['cuentaspor_id', 'edificio_id', 'unidad_id', 'colector_id', 'grupo_id', 'facturacion_id', 'mes'], 'integer'],
             [['monto', 'igv'], 'number'],
+             [['aacc'], 'safe'],
             [['grupounidad', 'grupofacturacion'], 'string', 'max' => 12],
             [['anio'], 'string', 'max' => 4],
             [['unidad_id'], 'exist', 'skipOnError' => true, 'targetClass' => SigiUnidades::className(), 'targetAttribute' => ['unidad_id' => 'id']],

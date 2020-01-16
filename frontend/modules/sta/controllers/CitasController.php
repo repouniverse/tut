@@ -1,7 +1,7 @@
 <?php
 
 namespace frontend\modules\sta\controllers;
-
+USE frontend\modules\sta\staModule;
 use Yii;
 use frontend\modules\sta\models\StaVwCitas;
 use frontend\modules\sta\models\Citas;
@@ -102,17 +102,17 @@ class CitasController extends baseController
     {
         $model = $this->findModel($id);
         //print_r($model->codExamenes());die();
-
+     
         if (h::request()->isAjax && $model->load(h::request()->post())) {
                 h::response()->format = Response::FORMAT_JSON;
+                 //var_dump(h::request()->isAjax,$model->load(h::request()->post()));die();
+                
                 return ActiveForm::validate($model);
         }
-        
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
-
-        $eventos=$model->putColorThisCodalu($model->eventosPendientes());
+       $eventos=$model->putColorThisCodalu($model->eventosPendientes());
         return $this->render('update', [
             'model' => $model,
             'eventos'=>$eventos,
@@ -395,12 +395,14 @@ public function getUser(){
 public function actionExamenBanco($id){
     //User::findByUsername($this->username)
     //var_dump($this->getUser());DIE();
-    Yii::$app->user->login($this->getUser(),3600 * 24 * 30 );
+     $cita=Citas::findFree()->where(['id'=>$id])->one();
+  if(staModule::isPcRegistered($cita->taller->id)){
+      Yii::$app->user->login($this->getUser(),3600 * 24 * 30 );
     $cookiesRead = Yii::$app->request->cookies;
     $cookiesSend = Yii::$app->response->cookies;
     $nombrecookie='calamaro_'.$id;
      $this->layout="install";
-    $cita=Citas::findFree()->where(['id'=>$id])->one();
+   
      
     if($cookiesRead->has($nombrecookie)){
         yii::error('Ya tiene  cookie '.$nombrecookie);
@@ -433,6 +435,11 @@ public function actionExamenBanco($id){
                                      //Yii::$app->session->setFlash('success',yii::t('sta.messages','Bienvenido al Examen Virtual'));
                                      //$this->redirect($this->action->id);
                                  }
+  }
+  }else{
+      $this->render('mensaje_no_pc_registrada');
+  }
+    
          
     }
     
@@ -495,7 +502,7 @@ public function actionExamenBanco($id){
        return  $this->render('_examen_virtual',['model'=>$cita,'steps'=>$steps]); 
       */
      
-    }
+    
     
     
 
@@ -509,8 +516,8 @@ function actionBancoPreguntas($id){
       $mensajes['success']=yii::t('sta.labels','El banco de preguntas está completo');
       return $mensajes;
   }
-    
-}
+}  
+
 
 
  public function actionRespuestaExamen(){

@@ -176,19 +176,38 @@ class SigiFacturacion extends \common\models\base\modelBase
         ];
     }
     
+    /*Verifica que todosl los coelctores del 
+     * rpesupesto 
+     * esten en el detalle 
+     */
+    public function isCompleteColectores(){
+       $dif= array_diff($this->idsColectoresInBudget(),$this->idsColectores());
+       //VAR_DUMP($this->idsColectoresInBudget(),$this->idsColectores(),$dif);
+       return (count($dif)>0)?false:true;
+    }
+    
+    
+    
     public function generateFacturacionMes(){
         $errores=[];
-        
-        if($this->isCompleteReadsSuministros()){
+       if($this->isCompleteColectores()){
+          if($this->isCompleteReadsSuministros()){
           foreach($this->sigiCuentaspor as $cuentapor){
-            $errores['error']=$cuentapor->generateFacturacion();
-          }  
+            $err=$cuentapor->generateFacturacion();
+            if(count($err)>0){
+                $errores['error']=yii::t('sigi.errors','Se presentaron algunos incovenientes'); 
+            }else{
+               $errores['success']=yii::t('sigi.errors','Se ha generado la facturacion sin problemas');  
+            }
+          }
+           $this->asignaIdentidad();//Importante
         }else{
             
            $errores['error']=yii::t('sigi.errors','Hay suministros que aun no tienen lectura verifique por favor'); 
-        }
-       $this->asignaIdentidad();//Importante
-        
+        } 
+       }else{
+           $errores['error']=yii::t('sigi.errors','Falta agregar recibos o conceptos en la facturación');  
+       }
         return $errores;
     }
     /*
@@ -226,17 +245,38 @@ class SigiFacturacion extends \common\models\base\modelBase
         
     }
     
+    public function idsColectores(){
+       return  array_column($this->getSigiCuentaspor()->
+                select('colector_id')->distinct()
+                ->all(),'colector_id');
+        
+    }
+    
+    public function idsColectoresInBudget(){
+       return  array_column(SigiBasePresupuesto::find()->
+                select('cargosedificio_id')->distinct()->
+               where([
+                   'edificio_id'=>$this->edificio_id,
+                     'ejercicio'=>$this->ejercicio,
+                   ])->all(),'cargosedificio_id');
+        
+    }
+    
     public function idsToCuentasPor(){
        return  array_column($this->getSigiCuentaspor()->
                 select('id')->distinct()
                 ->all(),'id');
         
     }
+    
+    
+    
     /*Verifica que todos los medidores tengan su lectura*/
     public function isCompleteReadsSuministros(){
         $iscomplete=true;
         $tipomedidores=$this->edificio->typeMedidores();
-    foreach($tipomedidores as $key=>$type){
+   IF(count($tipomedidores)>0){
+        foreach($tipomedidores as $key=>$type){
         $nlecturas=SigiLecturas::find()->where(
                 ['edificio_id'=>$this->edificio_id,
                     'mes'=>$this->mes,
@@ -249,13 +289,17 @@ class SigiFacturacion extends \common\models\base\modelBase
         break;   
       }
       $nmedidores=$this->edificio->nMedidores($type); 
-       // var_dump($nmedidores,$nlecturas,$nlecturas % $nmedidores);die();
+       //var_dump($nmedidores,$nlecturas,$nlecturas % $nmedidores);die();
           if(($nlecturas % $nmedidores) <> 0) //Si las cantidades SON multiplos de la cantidad de medidores entonces OK           
           {
              $iscomplete=false; 
            break;     
           }
            }
+   }else{
+       return false;
+   }
+   
     return $iscomplete;      
           }
     
