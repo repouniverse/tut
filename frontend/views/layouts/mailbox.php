@@ -1,11 +1,12 @@
 
      <li class="dropdown tasks-menu">
                 <?php
-                   $messagelabel = '<span class="fas fa-envelope"></span>';
-$unread = \frontend\modules\message\models\Message::find()->where(['to' => $user->id, 'status' => 0])->count();
-if ($unread > 0)
-      $messagelabel .= '(' . $unread . ')';
-      
+                $unread = (integer)\frontend\modules\message\models\Message::find()->where(['to' => yii::$app->user->id, 'status' => 0])->count();
+                // var_dump(\frontend\modules\message\models\Message::find()->where(['to' => $user->id, 'status' => 0])->createCommand()->getRawSql(),$unread );die();
+                   if ($unread > 0)
+                            $messagelabel='<span style="font-size:14px; font-weight:600;"><span class="label label-danger">'.$unread.'</span></span>';
+                $messagelabel .='<span class="fas fa-envelope"></span>';
+
 echo yii\bootstrap\Nav::widget([
     'encodeLabels' => false, // important to display HTML-code (fontawesome icons)
     'items' => [

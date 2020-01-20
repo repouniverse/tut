@@ -18,8 +18,8 @@ class m200104_141941_create_view_facturacionrecibos extends viewMigration
         $comando->createView($vista,
                 (new \yii\db\Query())
     ->select([
-         'a.id','a.cuentaspor_id','a.edificio_id','a.unidad_id','a.colector_id','a.grupo_id','a.monto','a.igv','a.grupounidad','a.grupofacturacion','a.facturacion_id','a.mes','a.anio','a.identidad',//detalle facturacion  a
-         'b.fecha','b.descripcion','b.detalles', //facturacionion b
+         'a.id','a.consumototal','a.montototal','a.participacion','a.codsuministro','a.aacc','a.delta','a.lectura','a.cuentaspor_id','a.edificio_id','a.unidad_id','a.colector_id','a.grupo_id','a.monto','a.igv','a.grupounidad','a.grupofacturacion','a.facturacion_id','a.mes','a.anio','a.identidad',//detalle facturacion  a
+         'b.fecha','b.fvencimiento','b.descripcion','b.detalles', //facturacionion b
          'c.nombre as nombreedificio','c.codigo','c.direccion', //EDIFICIOS C
         'd.numero','d.nombre','d.area','d.participacion', ///UNIDADES d  POR DETALLE
         //'d.numero','d.nombre','d.area','d.participacion', ///coelctores e

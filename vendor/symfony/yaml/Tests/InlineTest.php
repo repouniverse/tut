@@ -717,7 +717,23 @@ class InlineTest extends TestCase
     public function testUnfinishedInlineMap()
     {
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
-        $this->expectExceptionMessage('Unexpected end of line, expected one of ",}" at line 1 (near "{abc: \'def\'").');
+        $this->expectExceptionMessage("Unexpected end of line, expected one of \",}\n\" at line 1 (near \"{abc: 'def'\").");
         Inline::parse("{abc: 'def'");
+    }
+
+    /**
+     * @dataProvider getTestsForOctalNumbers
+     */
+    public function testParseOctalNumbers($expected, $yaml)
+    {
+        self::assertSame($expected, Inline::parse($yaml));
+    }
+
+    public function getTestsForOctalNumbers()
+    {
+        return [
+            'positive octal number' => [28, '034'],
+            'negative octal number' => [-28, '-034'],
+        ];
     }
 }

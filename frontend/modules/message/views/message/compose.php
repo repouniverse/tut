@@ -3,7 +3,7 @@
 use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-
+use frontend\modules\message\models\Message;
 /* @var $this yii\web\View */
 /* @var $model app\models\Message */
 
@@ -18,6 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
 rmrevin\yii\fontawesome\AssetBundle::register($this);
 ?>
 <h4><i class="fa fa-edit"></i><?='   '.Yii::t('message', 'Write a message')?></h4>
+
 <div class="box box-succes">
  <div class="box-body">   
 

@@ -101,7 +101,10 @@ class Edificios extends \common\models\base\modelBase
     {
         return $this->hasMany(SigiCuentas::className(), ['edificio_id' => 'id']);
     }
-    
+     public function getPropietarios()
+    {
+        return $this->hasMany(SigiPropietarios::className(), ['edificio_id' => 'id']);
+    }
      public function getApoderados()
     {
         return $this->hasMany(SigiApoderados::className(), ['edificio_id' => 'id']);
@@ -391,6 +394,10 @@ class Edificios extends \common\models\base\modelBase
           'edificio_id'=>$this->id,
           'tipo'=>$tipo,
           ]);
+  }
+  
+  public function queryPropietariosActivos(){
+      return $this->getPropietarios()->where(['activo'=>'1']);
   }
    
 }

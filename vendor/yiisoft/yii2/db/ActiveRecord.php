@@ -433,7 +433,7 @@ class ActiveRecord extends BaseActiveRecord
         $tableSchema = static::getDb()
             ->getSchema()
             ->getTableSchema(static::tableName());
-       
+
         if ($tableSchema === null) {
             throw new InvalidConfigException('The table does not exist: ' . static::tableName());
         }

@@ -2,6 +2,7 @@
 
 namespace frontend\modules\sigi\models;
 use frontend\modules\sigi\models\SigiCuentaspor;
+use frontend\modules\sigi\models\SigiDetfacturacion;
 use Yii;
 USE yii\data\ActiveDataProvider;
 /**
@@ -182,7 +183,7 @@ class SigiFacturacion extends \common\models\base\modelBase
      */
     public function isCompleteColectores(){
        $dif= array_diff($this->idsColectoresInBudget(),$this->idsColectores());
-       //VAR_DUMP($this->idsColectoresInBudget(),$this->idsColectores(),$dif);
+       //VAR_DUMP($this->idsColectoresInBudget(),$this->idsColectores(),$dif);die();
        return (count($dif)>0)?false:true;
     }
     
@@ -190,6 +191,7 @@ class SigiFacturacion extends \common\models\base\modelBase
     
     public function generateFacturacionMes(){
         $errores=[];
+        yii::error('generando facturacion');
        if($this->isCompleteColectores()){
           if($this->isCompleteReadsSuministros()){
           foreach($this->sigiCuentaspor as $cuentapor){
@@ -197,10 +199,10 @@ class SigiFacturacion extends \common\models\base\modelBase
             if(count($err)>0){
                 $errores['error']=yii::t('sigi.errors','Se presentaron algunos incovenientes'); 
             }else{
-               $errores['success']=yii::t('sigi.errors','Se ha generado la facturacion sin problemas');  
+               $errores['success']=yii::t('sigi.errors','Se ha generado la facturacion sin problemas '.$this->balanceMontos());  
             }
           }
-           $this->asignaIdentidad();//Importante
+           $this->asignaIdentidad();//Importante           
         }else{
             
            $errores['error']=yii::t('sigi.errors','Hay suministros que aun no tienen lectura verifique por favor'); 
@@ -318,7 +320,9 @@ class SigiFacturacion extends \common\models\base\modelBase
                         ])->asArray()->all(),'suministro_id');
              
                 $idsTotales=$this->edificio->idsMedidores($type);
+                
                 $idsFaltan= array_diff($idsTotales,  $idsConLecturas);
+               // var_dump($idsTotales,$idsConLecturas,$idsFaltan);die();
               $query= SigiSuministros::find()->where(['in','id',$idsFaltan]);        
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -338,5 +342,21 @@ class SigiFacturacion extends \common\models\base\modelBase
             
   public function generateTempReads(){
       
-  }        
+  } 
+  /*
+   * Verifica que la suma de los notos de cuentas por
+   * DEBE DE SER IGUAL A La Suma de los valores
+   * de detfacturacion
+   * Es un balance 
+   */
+   public function balanceMontos(){
+      return $this->montoFacturado()-$this->montoTotal();
+   }
+   
+   public function montoFacturado(){
+      return  $this->detfacturacionQuery()->select('sum(monto)')->scalar();
+   }
+   public function detfacturacionQuery(){
+      return SigiDetfacturacion::find()->where(['facturacion_id'=>$this->id]); 
+   }
 }

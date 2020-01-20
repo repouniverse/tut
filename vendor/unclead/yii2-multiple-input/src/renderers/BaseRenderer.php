@@ -533,7 +533,6 @@ abstract class BaseRenderer extends BaseObject implements RendererInterface
         $attributes = [];
         foreach ($this->columns as $column) {
             $model = $column->getModel();
-            
             $inputID = str_replace(['-0', '-0-'], '', $column->getElementId(0));
             if ($this->form instanceof ActiveForm && $model instanceof Model) {
                 $field = $this->form->field($model, $column->name);

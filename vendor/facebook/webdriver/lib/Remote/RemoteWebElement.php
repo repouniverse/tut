@@ -1,20 +1,8 @@
 <?php
-// Copyright 2004-present Facebook. All Rights Reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 namespace Facebook\WebDriver\Remote;
 
+use Facebook\WebDriver\Exception\UnsupportedOperationException;
 use Facebook\WebDriver\Exception\WebDriverException;
 use Facebook\WebDriver\Interactions\Internal\WebDriverCoordinates;
 use Facebook\WebDriver\Internal\WebDriverLocatable;
@@ -39,23 +27,29 @@ class RemoteWebElement implements WebDriverElement, WebDriverLocatable
      */
     protected $id;
     /**
-     * @var UselessFileDetector
+     * @var FileDetector
      */
     protected $fileDetector;
+    /**
+     * @var bool
+     */
+    protected $isW3cCompliant;
 
     /**
      * @param RemoteExecuteMethod $executor
      * @param string $id
+     * @param bool $isW3cCompliant
      */
-    public function __construct(RemoteExecuteMethod $executor, $id)
+    public function __construct(RemoteExecuteMethod $executor, $id, $isW3cCompliant = false)
     {
         $this->executor = $executor;
         $this->id = $id;
         $this->fileDetector = new UselessFileDetector();
+        $this->isW3cCompliant = $isW3cCompliant;
     }
 
     /**
-     * If this element is a TEXTAREA or text INPUT element, this will clear the value.
+     * Clear content editable or resettable element
      *
      * @return RemoteWebElement The current instance.
      */
@@ -94,17 +88,15 @@ class RemoteWebElement implements WebDriverElement, WebDriverLocatable
      */
     public function findElement(WebDriverBy $by)
     {
-        $params = [
-            'using' => $by->getMechanism(),
-            'value' => $by->getValue(),
-            ':id' => $this->id,
-        ];
+        $params = JsonWireCompat::getUsing($by, $this->isW3cCompliant);
+        $params[':id'] = $this->id;
+
         $raw_element = $this->executor->execute(
             DriverCommand::FIND_CHILD_ELEMENT,
             $params
         );
 
-        return $this->newElement($raw_element['ELEMENT']);
+        return $this->newElement(JsonWireCompat::getElement($raw_element));
     }
 
     /**
@@ -117,11 +109,8 @@ class RemoteWebElement implements WebDriverElement, WebDriverLocatable
      */
     public function findElements(WebDriverBy $by)
     {
-        $params = [
-            'using' => $by->getMechanism(),
-            'value' => $by->getValue(),
-            ':id' => $this->id,
-        ];
+        $params = JsonWireCompat::getUsing($by, $this->isW3cCompliant);
+        $params[':id'] = $this->id;
         $raw_elements = $this->executor->execute(
             DriverCommand::FIND_CHILD_ELEMENTS,
             $params
@@ -129,7 +118,7 @@ class RemoteWebElement implements WebDriverElement, WebDriverLocatable
 
         $elements = [];
         foreach ($raw_elements as $raw_element) {
-            $elements[] = $this->newElement($raw_element['ELEMENT']);
+            $elements[] = $this->newElement(JsonWireCompat::getElement($raw_element));
         }
 
         return $elements;
@@ -148,10 +137,23 @@ class RemoteWebElement implements WebDriverElement, WebDriverLocatable
             ':id' => $this->id,
         ];
 
-        return $this->executor->execute(
-            DriverCommand::GET_ELEMENT_ATTRIBUTE,
-            $params
-        );
+        if ($this->isW3cCompliant && ($attribute_name === 'value' || $attribute_name === 'index')) {
+            $value = $this->executor->execute(DriverCommand::GET_ELEMENT_PROPERTY, $params);
+
+            if ($value === true) {
+                return 'true';
+            }
+
+            if ($value === false) {
+                return 'false';
+            }
+
+            if ($value !== null) {
+                return (string) $value;
+            }
+        }
+
+        return $this->executor->execute(DriverCommand::GET_ELEMENT_ATTRIBUTE, $params);
     }
 
     /**
@@ -324,20 +326,34 @@ class RemoteWebElement implements WebDriverElement, WebDriverLocatable
     public function sendKeys($value)
     {
         $local_file = $this->fileDetector->getLocalFile($value);
+
         if ($local_file === null) {
-            $params = [
-                'value' => WebDriverKeys::encode($value),
-                ':id' => $this->id,
-            ];
-            $this->executor->execute(DriverCommand::SEND_KEYS_TO_ELEMENT, $params);
+            if ($this->isW3cCompliant) {
+                $params = [
+                    'text' => (string) $value,
+                    ':id' => $this->id,
+                ];
+            } else {
+                $params = [
+                    'value' => WebDriverKeys::encode($value),
+                    ':id' => $this->id,
+                ];
+            }
         } else {
-            $remote_path = $this->upload($local_file);
-            $params = [
-                'value' => WebDriverKeys::encode($remote_path),
-                ':id' => $this->id,
-            ];
-            $this->executor->execute(DriverCommand::SEND_KEYS_TO_ELEMENT, $params);
+            if ($this->isW3cCompliant) {
+                $params = [
+                    'text' => $local_file,
+                    ':id' => $this->id,
+                ];
+            } else {
+                $params = [
+                    'value' => WebDriverKeys::encode($this->upload($local_file)),
+                    ':id' => $this->id,
+                ];
+            }
         }
+
+        $this->executor->execute(DriverCommand::SEND_KEYS_TO_ELEMENT, $params);
 
         return $this;
     }
@@ -371,6 +387,19 @@ class RemoteWebElement implements WebDriverElement, WebDriverLocatable
      */
     public function submit()
     {
+        if ($this->isW3cCompliant) {
+            $this->executor->execute(DriverCommand::EXECUTE_SCRIPT, [
+                // cannot call the submit method directly in case an input of this form is named "submit"
+                'script' => sprintf(
+                    'return Object.getPrototypeOf(%1$s).submit.call(%1$s);',
+                    'form' === $this->getTagName() ? 'arguments[0]' : 'arguments[0].form'
+                ),
+                'args' => [[JsonWireCompat::WEB_DRIVER_ELEMENT_IDENTIFIER => $this->id]],
+            ]);
+
+            return $this;
+        }
+
         $this->executor->execute(
             DriverCommand::SUBMIT_ELEMENT,
             [':id' => $this->id]
@@ -390,6 +419,33 @@ class RemoteWebElement implements WebDriverElement, WebDriverLocatable
     }
 
     /**
+     * Take screenshot of a specific element.
+     *
+     * @param string $save_as The path of the screenshot to be saved.
+     * @return string The screenshot in PNG format.
+     */
+    public function takeElementScreenshot($save_as = null)
+    {
+        $screenshot = base64_decode(
+            $this->executor->execute(
+                DriverCommand::TAKE_ELEMENT_SCREENSHOT,
+                [':id' => $this->id]
+            )
+        );
+
+        if ($save_as !== null) {
+            $directoryPath = dirname($save_as);
+            if (!file_exists($directoryPath)) {
+                mkdir($directoryPath, 0777, true);
+            }
+
+            file_put_contents($save_as, $screenshot);
+        }
+
+        return $screenshot;
+    }
+
+    /**
      * Test if two element IDs refer to the same DOM element.
      *
      * @param WebDriverElement $other
@@ -397,6 +453,10 @@ class RemoteWebElement implements WebDriverElement, WebDriverLocatable
      */
     public function equals(WebDriverElement $other)
     {
+        if ($this->isW3cCompliant) {
+            throw new UnsupportedOperationException('"elementEquals" is not supported by the W3C specification');
+        }
+
         return $this->executor->execute(DriverCommand::ELEMENT_EQUALS, [
             ':id' => $this->id,
             ':other' => $other->getID(),
@@ -412,7 +472,7 @@ class RemoteWebElement implements WebDriverElement, WebDriverLocatable
      */
     protected function newElement($id)
     {
-        return new static($this->executor, $id);
+        return new static($this->executor, $id, $this->isW3cCompliant);
     }
 
     /**
@@ -432,9 +492,10 @@ class RemoteWebElement implements WebDriverElement, WebDriverLocatable
         // Create a temporary file in the system temp directory.
         $temp_zip = tempnam(sys_get_temp_dir(), 'WebDriverZip');
         $zip = new ZipArchive();
-        if ($zip->open($temp_zip, ZipArchive::CREATE) !== true) {
-            return false;
+        if (($errorCode = $zip->open($temp_zip, ZipArchive::CREATE)) !== true) {
+            throw new WebDriverException(sprintf('Error creating zip archive: %s', $errorCode));
         }
+
         $info = pathinfo($local_file);
         $file_name = $info['basename'];
         $zip->addFile($local_file, $file_name);

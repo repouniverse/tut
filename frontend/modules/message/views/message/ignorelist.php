@@ -15,10 +15,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
 rmrevin\yii\fontawesome\AssetBundle::register($this);
 ?>
-
+ <h4><?=$this->title?></h4>
+<div class="box box-succes">
+ <div class="box-body"> 
 <div class="row">
     <div class="col-md-12">
-        <h2> <?= $this->title; ?> </h2>
+        
 
         <?= $this->render('_actions'); ?>
 
@@ -44,3 +46,5 @@ rmrevin\yii\fontawesome\AssetBundle::register($this);
 
 <?= Html::endForm(); ?>
 
+ </div>
+</div>

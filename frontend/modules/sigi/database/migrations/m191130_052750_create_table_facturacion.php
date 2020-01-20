@@ -18,6 +18,7 @@ if(!$this->existsTable($table)) {
         'mes'=>$this->char(2)->notNull()->append($this->collateColumn()),       
         'ejercicio'=>$this->char(4)->append($this->collateColumn()),
         'fecha'=>$this->char(10)->append($this->collateColumn()),
+         'fvencimiento'=>$this->char(10)->append($this->collateColumn()),
         //'periodo'=>$this->char(4)->append($this->collateColumn()),
         'descripcion'=>$this->string(40)->notNull()->append($this->collateColumn()),        
         'detalles'=>$this->text()->append($this->collateColumn()),

@@ -6,7 +6,9 @@ use Yii;
 use frontend\modules\sigi\models\SigiFacturacion;
 use frontend\modules\sigi\models\SigiFacturacionSearch;
 use frontend\modules\sigi\models\SigiCuentasporSearch;
-use frontend\modules\sigi\models\VwSigiTempLecturasSearch;
+use frontend\modules\sigi\models\VwSigiFacturecibo;
+use frontend\modules\sigi\models\VwSigiFactureciboSearch;
+use frontend\modules\sigi\models\VwSigiLecturasSearch;
 use frontend\controllers\base\baseController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -157,6 +159,7 @@ class FacturacionController extends baseController
     public function actionFacturacionMes($id){
         if (h::request()->isAjax) {
             $errores=[];
+            yii::error('que pasa');
                 h::response()->format = Response::FORMAT_JSON;
            $model=$this->findModel($id);
            //$model->generateFacturacionMes();
@@ -198,5 +201,26 @@ class FacturacionController extends baseController
        
     }
     
+   public function actionDetalleFacturacion($id){
+      $this->findModel($id);
+         $searchModel = new  VwSigiFactureciboSearch();
+        $dataProvider = $searchModel->search($id,Yii::$app->request->queryParams);
+
+        return $this->render('detalle', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+   }
    
+   
+   public function actionLecturas(){
+      
+         $searchModel = new VwSigiLecturasSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('lecturas', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]); 
+   }
 }

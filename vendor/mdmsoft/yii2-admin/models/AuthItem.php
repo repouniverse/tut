@@ -93,7 +93,6 @@ class AuthItem extends Model
     public function checkRule()
     {
         $name = $this->ruleName;
-       // var_dump(Configs::authManager());die();
         if (!Configs::authManager()->getRule($name)) {
             try {
                 $rule = Yii::createObject($name);
@@ -155,7 +154,6 @@ class AuthItem extends Model
     {
         if ($this->validate()) {
             $manager = Configs::authManager();
-            //echo get_class($manager);die();
             if ($this->_item === null) {
                 if ($this->type == Item::TYPE_ROLE) {
                     $this->_item = $manager->createRole($this->name);

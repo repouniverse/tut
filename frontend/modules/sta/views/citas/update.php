@@ -14,8 +14,8 @@ $this->title = Yii::t('sta.labels', 'Edita Cita: {name}', [
     'name' => $model->fechaprog,
 ]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('sta.labels', 'Citas'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = Yii::t('sta.labels', 'Update');
+$this->params['breadcrumbs'][] = ['label' =>yii::t('sta.labels', 'Ir a programa').' '.$model->taller->numero, 'url' => ['/sta/programas/update', 'id' => $model->talleres_id]];
+$this->params['breadcrumbs'][] = Yii::t('sta.labels', 'Editar');
 ?>
 
 

@@ -118,21 +118,8 @@ class Configs extends \mdm\admin\BaseObject
      * ]
      * ```     *
      */
-    public $advanced;/*=[
-         'frontend' => [
-            '@common/config/main.php',
-              '@common/config/main-local.php',
-              '@frontend/config/main.php',
-              '@frontend/config/main-local.php',
-          ],
-          'backend' => [
-              '@common/config/main.php',
-             '@common/config/main-local.php',
-             '@backend/config/main.php',
-              '@backend/config/main-local.php',
-          ],
-      ];
-*/
+    public $advanced;
+
     /**
      * @var self Instance of self
      */
@@ -151,11 +138,8 @@ class Configs extends \mdm\admin\BaseObject
     {
         foreach (self::$_classes as $key => $class) {
             try {
-                //var_dump($key,$class,$this->{$key});
                 $this->{$key} = empty($this->{$key}) ? null : Instance::ensure($this->{$key}, $class);
-           
-                } catch (\Exception $exc) {
-                //DIE();
+            } catch (\Exception $exc) {
                 $this->{$key} = null;
                 Yii::error($exc->getMessage());
             }
@@ -169,7 +153,6 @@ class Configs extends \mdm\admin\BaseObject
     public static function instance()
     {
         if (self::$_instance === null) {
-          // var_dump(Yii::$app->params);die();
             $type = ArrayHelper::getValue(Yii::$app->params, 'mdm.admin.configs', []);
             if (is_array($type) && !isset($type['class'])) {
                 $type['class'] = static::className();

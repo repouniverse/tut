@@ -133,7 +133,6 @@ trait WidgetTrait
      */
     protected function mergeDefaultOptions()
     {
-        
         $this->pluginOptions = ArrayHelper::merge($this->defaultPluginOptions, $this->pluginOptions);
         $this->options = ArrayHelper::merge($this->defaultOptions, $this->options);
     }

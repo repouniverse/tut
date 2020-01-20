@@ -295,7 +295,11 @@ class SigiCuentaspor extends \common\models\base\modelBase
                 foreach( $medidores as $medidor){
                       $unidad=$medidor->unidad;
                       if($unidad->imputable){
-                         $errores[]=$this->createRegistroFacturacion($unidad,$colector); 
+                         $errores[]=$this->createRegistroFacturacion($unidad,$colector,$medidor); 
+                         foreach($unidad->childsUnits as $childUnit){
+                           $errores[]=$this->createRegistroFacturacion($childUnit,$colector,$medidor); 
+                          }
+                             
                       }else{
                           $depasReparto=$medidor->depasReparto();
                           foreach($depasReparto as $depa){
@@ -325,15 +329,30 @@ class SigiCuentaspor extends \common\models\base\modelBase
     
   private function createRegistroFacturacion($unidad,$colector,$medidor=null){
       $msgError='';
-      $prorateo=(is_null($medidor))?false:true;
+      if(is_null($medidor)){
+           $medidorHasAfiliados=false;
+           $prorateo=false;
+      }else{
+         $medidorHasAfiliados=$medidor->hasAfiliados(); 
+         $prorateo=$medidorHasAfiliados;
+      }
+     
+      
           if(!$this->existsDetalleFacturacion($unidad,$colector,$prorateo)){
               if(is_null($medidor)){
                    $participacion=$unidad->porcParticipacion($colector,$this->mes,$this->anio);
               }else{
-                  //La lectura de este medidor entre el numero de departamentos comprometidos
+                 if($medidorHasAfiliados){
+                   //$prorateo=true;
+                     //La lectura de este medidor entre el numero de departamentos comprometidos
                  $ndepas=($medidor->ndepasReparto() >0)?$medidor->ndepasReparto():$unidad->edificio->queryUnidadesImputables()->count();
                 yii::error('La particiapc  es '.$medidor->participacionRead($this->mes,$this->anio));
                  $participacion=$medidor->participacionRead($this->mes,$this->anio)/$ndepas;  
+                  
+                 }else{
+                    $participacion=$unidad->porcParticipacion($colector,$this->mes,$this->anio); 
+                 }
+                 
               }
                $monto=$participacion*$this->monto;
                $model=New SigiDetfacturacion();
@@ -343,6 +362,11 @@ class SigiCuentaspor extends \common\models\base\modelBase
             $model->grupounidad_id=($unidad->isChild())?$unidad->parent_id:$unidad->id;
             $model->grupofacturacion=($unidad->miApoderado()->facturindividual)?$unidad->codpro:$model->grupounidad;
             /*****************************************************/
+            $model->participacion=$participacion;
+            $model->codsuministro=(!is_null($medidor))?$medidor->codsuministro:null;
+            $model->lectura=(!is_null($medidor))?$medidor->LastReadFacturable($this->mes,$this->anio)->lectura:null;
+             $model->delta=(!is_null($medidor))?$medidor->LastReadFacturable($this->mes,$this->anio)->delta:null;
+             $model->consumototal=(!is_null($medidor))?$medidor->consumoTotal($this->mes,$this->anio,true):null;
             if(!$model->save()){
                 yii::error($model->getFirstError()); 
                 $msgError=$model->getFirstError();
@@ -368,6 +392,7 @@ class SigiCuentaspor extends \common\models\base\modelBase
                 'mes'=>$this->mes,
                 'anio'=>$this->anio,
                  'aacc'=>($prorateo)?'1':'0',
+                   'montototal'=>$this->monto,
             ];
  }  
 

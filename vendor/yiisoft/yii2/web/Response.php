@@ -858,7 +858,7 @@ class Response extends \yii\base\Response
      */
     public function redirect($url, $statusCode = 302, $checkAjax = true)
     {
-       if (is_array($url) && isset($url[0])) {
+        if (is_array($url) && isset($url[0])) {
             // ensure the route is absolute
             $url[0] = '/' . ltrim($url[0], '/');
         }
@@ -869,7 +869,7 @@ class Response extends \yii\base\Response
         }
 
         if ($checkAjax) {
-              if ($request->getIsAjax()) {
+            if ($request->getIsAjax()) {
                 if (in_array($statusCode, [301, 302]) && preg_match('/Trident\/|MSIE[ ]/', $request->userAgent)) {
                     $statusCode = 200;
                 }
@@ -882,9 +882,11 @@ class Response extends \yii\base\Response
                 $this->getHeaders()->set('Location', $url);
             }
         } else {
-           $this->getHeaders()->set('Location', $url);
+            $this->getHeaders()->set('Location', $url);
         }
-         $this->setStatusCode($statusCode);       
+
+        $this->setStatusCode($statusCode);
+
         return $this;
     }
 

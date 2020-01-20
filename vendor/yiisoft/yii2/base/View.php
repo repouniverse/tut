@@ -223,12 +223,13 @@ class View extends Component implements DynamicContentAwareInterface
     public function renderFile($viewFile, $params = [], $context = null)
     {
         $viewFile = $requestedFile = Yii::getAlias($viewFile);
-         if ($this->theme !== null) {
-           $viewFile = $this->theme->applyTo($viewFile);
-             }
+
+        if ($this->theme !== null) {
+            $viewFile = $this->theme->applyTo($viewFile);
+        }
         if (is_file($viewFile)) {
-             $viewFile = FileHelper::localize($viewFile);
-             } else {
+            $viewFile = FileHelper::localize($viewFile);
+        } else {
             throw new ViewNotFoundException("The view file does not exist: $viewFile");
         }
 
@@ -260,7 +261,8 @@ class View extends Component implements DynamicContentAwareInterface
 
         array_pop($this->_viewFiles);
         $this->context = $oldContext;
-           return $output;
+
+        return $output;
     }
 
     /**

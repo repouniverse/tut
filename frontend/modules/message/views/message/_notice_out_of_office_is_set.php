@@ -14,7 +14,9 @@ if (!isset(Yii::$app->get('i18n')->translations['message*'])) {
 }
 
 ?>
-
+<h4><?=Yii::t('message', 'Manage Out of Office Message')?></h4>
+<div class="box box-succes">
+ <div class="box-body">
 <?php if (!Yii::$app->user->isGuest && Message::find()->where([
         'from' => Yii::$app->user->id,
         'status' => Message::STATUS_OUT_OF_OFFICE_ACTIVE,
@@ -32,4 +34,7 @@ if (!isset(Yii::$app->get('i18n')->translations['message*'])) {
         </div>
     </div>
 
-<?php }
+<?php } ?>
+
+ </div>
+</div>

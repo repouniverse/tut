@@ -3,7 +3,7 @@
 /**
  * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2014 - 2018
  * @package yii2-mpdf
- * @version 1.0.5
+ * @version 1.0.6
  */
 
 namespace kartik\mpdf;
@@ -306,11 +306,15 @@ class Pdf extends Component
         if (!empty($this->_css)) {
             return $this->_css;
         }
-        $cssFile = empty($this->cssFile) ? '' : Yii::getAlias($this->cssFile);
-        if (empty($cssFile) || !file_exists($cssFile)) {
-            $css = '';
-        } else {
-            $css = file_get_contents($cssFile);
+        $css = '';
+        $cssFiles = is_array($this->cssFile) ? $this->cssFile : [$this->cssFile];
+        foreach($cssFiles as $cssFile) {
+            $cssFile = Yii::getAlias($cssFile);
+            if (!empty($cssFile) && file_exists($cssFile)) {
+                $css .= file_get_contents($cssFile);
+            } else {
+                throw new InvalidConfigException("CSS File not found: '{$cssFile}'.");
+            }
         }
         $css .= $this->cssInline;
         return $css;

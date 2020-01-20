@@ -12,6 +12,9 @@ $this->params['breadcrumbs'][] = $this->title;
 rmrevin\yii\fontawesome\AssetBundle::register($this);
 
 ?>
+<h4><?=Yii::t('message', 'Sent')?></h4>
+<div class="box box-succes">
+ <div class="box-body">  
 <div class="message-index">
 
     <?= $this->render('_actions'); ?>
@@ -52,3 +55,5 @@ rmrevin\yii\fontawesome\AssetBundle::register($this);
             ],
         ],
     ]); ?>
+</div>
+ </div></div>

@@ -35,7 +35,7 @@ class Module extends BaseModule
      * if he wants to receive messages e.g.
      * 'mailMessages' => function($recipient) { return $recipient->profile->i_want_to_receive_messages_by_email; }
      */
-    public $mailMessages = true;
+    public $mailMessages = false;
 
     /**
      * @var string A string that should be prefixed to the title when answering an message.
@@ -113,6 +113,7 @@ class Module extends BaseModule
 
     public function init()
     {
+       
         if (!isset(Yii::$app->get('i18n')->translations['message*'])) {
             Yii::$app->get('i18n')->translations['message*'] = [
                 'class' => PhpMessageSource::class,

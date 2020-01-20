@@ -60,9 +60,10 @@ class DefaultController extends Controller
         $profile->setScenario($profile::SCENARIO_INTERLOCUTOR);
         if(h::request()->isPost){
             $arrpost=h::request()->post();
-              
+              echo "fallo"; die();
             $profile->tipo=$arrpost[$profile->getShortNameClass()]['tipo'];
-           if ($profile->save()) {
+            $newIdentity->status=$arrpost[$newIdentity->getShortNameClass()]['tipo'];
+           if ($profile->save() &&  $newIdentity->save()) {
             $this->updateUserFacultades($arrpost[UserFacultades::getShortNameClass()]);
             yii::$app->session->setFlash('success',yii::t('sta.messages','Se grabaron los datos '));
             return $this->redirect(['view-users']);

@@ -303,10 +303,7 @@ class TranslatorCacheTest extends TestCase
         return [[true], [false]];
     }
 
-    /**
-     * @return LoaderInterface
-     */
-    private function createFailingLoader()
+    private function createFailingLoader(): LoaderInterface
     {
         $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
         $loader
@@ -319,7 +316,7 @@ class TranslatorCacheTest extends TestCase
 
 class StaleResource implements SelfCheckingResourceInterface
 {
-    public function isFresh($timestamp)
+    public function isFresh($timestamp): bool
     {
         return false;
     }
@@ -328,7 +325,7 @@ class StaleResource implements SelfCheckingResourceInterface
     {
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return '';
     }

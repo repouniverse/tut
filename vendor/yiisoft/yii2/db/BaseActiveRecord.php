@@ -143,7 +143,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
                 throw new InvalidConfigException('"' . get_called_class() . '" must have a primary key.');
             }
         }
-           //ECHO $query->andWhere($condition)->createCommand()->getRawSql();die();
+
         return $query->andWhere($condition);
     }
 

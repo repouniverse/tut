@@ -28,6 +28,8 @@ class SigiLecturas extends \common\models\base\modelBase
     /**
      * {@inheritdoc}
      */
+    
+    
     const SCENARIO_IMPORTACION='importacion_simple';
     const SCENARIO_FLAG_FACTURACION='factur';
     public static function tableName()
@@ -123,8 +125,14 @@ class SigiLecturas extends \common\models\base\modelBase
     public function beforeSave($insert) {
       if($insert){
           $this->resolveIds();
-        $this->lecturaant=$this->lastReadValue(); 
-         $this->delta=$this->lectura-$this->lecturaant;    
+          if($this->isDateForFirstRead(true)){
+               $this->lecturaant=$this->lastReadValue(); 
+                $this->delta=0;  
+          }else{
+            $this->lecturaant=$this->lastReadValue(); 
+                $this->delta=$this->lectura-$this->lecturaant; 
+          }
+          
       }else{
          if($this->hasChanged('lectura'))
            $this->delta=$this->lectura-$this->lastReadValue();    
@@ -261,50 +269,56 @@ class SigiLecturas extends \common\models\base\modelBase
     }
     
     
-    
-    public function isDateForFirstRead(){
-        return is_null($this->previousRead($this->flectura,$this->facturable))?true:false;
+    /*
+     * AllRECORDS:  TRUE Criterio apra facturables y no facturables
+     * false:  criterios para solamente facturables por default  false
+     */
+    public function isDateForFirstRead($allRecords=false){
+        return is_null($this->previousRead($allRecords))?true:false;
     }
-    public function previousRead(){
+    public function previousRead($allRecords=false){
         
        $this->hasCompleteCriteriaFields();       
        yii::error($this->facturable);
          $valorFacturable=($this->resolveFacturable())?'1':'0'; 
-       //$valorFacturable='1'; 
-        $query=self::find()->where(['suministro_id'=>$this->resolveSuministroId()])->
+          $query=self::find()->where(['suministro_id'=>$this->resolveSuministroId()])->
                  andWhere(['<>','id',!is_null($this->id)?$this->id:0])->
-      andWhere(['facturable'=>$valorFacturable])->andWhere(['<=','flectura',static::SwichtFormatDate($this->flectura, 'date',false)])->
+      andWhere(['<=','flectura',static::SwichtFormatDate($this->flectura, 'date',false)])->
       orderBy('flectura DESC')->limit(1);
-        yii::error('Sql previousRead');
-        yii::error($query->createCommand()->getRawSql());
+       if(!$allRecords){///Si se trata de solo facturables 
+           $query=$query->andWhere(['facturable'=>$valorFacturable]);
+       }yii::error($query->createCommand()->getRawSql());
       return $query->one();  
     }
     
-    public function isDateForLastRead(){
-        return is_null($this->nextRead($this->flectura,$this->facturable))?true:false;
+    public function isDateForLastRead($allRecords=false){
+        return is_null($this->nextRead($allRecords))?true:false;
     }
     
     
-    public function nextRead(){
+    public function nextRead($allRecords=false){
        $this->hasCompleteCriteriaFields();        
-        $valorFacturable=($this->resolveFacturable())?'1':'0';   
-        $query=self::find()->where(['suministro_id'=>$this->resolveSuministroId()])->
+        $valorFacturable=($this->resolveFacturable())?'1':'0'; 
+         $query=self::find()->where(['suministro_id'=>$this->resolveSuministroId()])->
                  andWhere(['<>','id',!is_null($this->id)?$this->id:0])->
-      andWhere(['facturable'=>$valorFacturable])->andWhere(['>=','flectura',static::SwichtFormatDate($this->flectura, 'date',false)])->
+      andWhere(['>=','flectura',static::SwichtFormatDate($this->flectura, 'date',false)])->
       orderBy('flectura ASC')->limit(1);
+        if(!$allRecords){///Si se trata de solo facturables 
+           $query=$query->andWhere(['facturable'=>$valorFacturable]);
+       }
         yii::error('Sql nextRead');
         yii::error($query->createCommand()->getRawSql(),__FUNCTION__);
       return $query->one();  
     }
-    public function lastReadValue(){
+    public function lastReadValue($allRecords=false){
         yii::error('** lastReadValue() **');
        
-      $registro=$this->previousRead();
+      $registro=$this->previousRead($allRecords);
        yii::error('Registro '.(IS_NULL($registro)?' ES ':' NO ES ').'  NULO');
       return(is_null($registro))?$this->medidor()->liminf:$registro->lectura;
     } 
-    public function nextReadValue(){
-      $registro=$this->nextRead();
+    public function nextReadValue($allRecords=false){
+      $registro=$this->nextRead($allRecords);
       return(is_null($registro))?$this->medidor()->limsup:$registro->lectura;
   } 
     private function hasCompleteCriteriaFields(){
@@ -316,29 +330,31 @@ class SigiLecturas extends \common\models\base\modelBase
     public function validate_general($attribute, $params){
         yii::error('**** validategeneral *****'.$this->codepa.'********');
           yii::error('isDateForFirstRead');  
-          yii::error($this->isDateForFirstRead());  
+          yii::error($this->isDateForFirstRead(true));  
           yii::error('isDateForLASTRead');  
-          yii::error($this->isDateForLastRead()); 
+          yii::error($this->isDateForLastRead(true)); 
           yii::error('lectura');  
           yii::error($this->lectura); 
            yii::error('ultima lectura');  
-          yii::error($this->lastReadValue()); 
+          yii::error($this->lastReadValue(true)); 
           
-        if($this->isDateForFirstRead()){
+        if($this->isDateForFirstRead(true) && $this->isNewRecord){
             
-        }elseif($this->isDateForLastRead()){
+            
+            
+        }elseif($this->isDateForLastRead(true)){
            
-             if($this->lectura < $this->lastReadValue()){
+             if($this->lectura < $this->lastReadValue(true)){
                  yii::error('isDateForLastRead');
-                 $this->addError('lectura',yii::t('sigi.errors','Hay una lectura anterior a esta fecha, y es mayor a la que pretende ingresar'));
+                 $this->addError('lectura',yii::t('sigi.errors','Hay una lectura {lectura} anterior a esta fecha, y es mayor a la que pretende ingresar',['lectura'=>$this->lastReadValue(true)]));
              }
         }else{
              yii::error('Esta en el medio');
-           if($this->lectura < $this->lastReadValue()){
-               $this->addError('lectura',yii::t('sigi.errors','Hay una lectura anterior a esta fecha, y es mayor a la que pretende ingresar'));
+           if($this->lectura < $this->lastReadValue(true)){
+               $this->addError('lectura',yii::t('sigi.errors','Hay una lectura {lectura} anterior a esta fecha, y es mayor a la que pretende ingresar',['lectura'=>$this->lastReadValue(true)]));
            } 
-           if($this->lectura > $this->nextReadValue()){
-               $this->addError('lectura',yii::t('sigi.errors','Hay una lectura posterior a esta fecha, y  es menor a la que pretende ingresar'));
+           if($this->lectura > $this->nextReadValue(true)){
+               $this->addError('lectura',yii::t('sigi.errors','Hay una lectura {lectura} posterior a esta fecha, y  es menor a la que pretende ingresar',['lectura'=>$this->nextReadValue(true)]));
             
            } 
         }
@@ -377,5 +393,30 @@ class SigiLecturas extends \common\models\base\modelBase
         }else{
             return $this->suministro_id;
         }
+    }
+    /*
+     * Devuel en porcentaje la desviacion del promedio 
+     */
+    public function desviacionConsumo(){
+        $prom=$this->suministro->averageReads($this->id);
+        $consumo=$this->delta;
+        if($prom >0){
+            $desviacion=round(($consumo-$prom)*100/$prom,3);
+        }else{
+           $desviacion=0; 
+        }
+       return $desviacion;
+    }
+    public function calificacionConsumo(){
+        $desviacion=$this->desviacionConsumo($this->id);
+       if( $desviacion > 10 ){
+           return \common\helpers\colorHelper::GREEN;
+       } elseif($desviacion < 30){
+           return \common\helpers\colorHelper::ORANGE;
+           
+       }else{
+          return \common\helpers\colorHelper::RED; 
+       }
+           
     }
 }

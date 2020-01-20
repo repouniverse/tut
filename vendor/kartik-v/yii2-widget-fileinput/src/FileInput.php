@@ -125,7 +125,6 @@ class FileInput extends InputWidget
                     ['validation' => $validation]
                 );
             $content = Html::tag('div', $message, $this->messageOptions) . "<script>{$script};</script>";
-           // $content="";
             $input .= "\n" . $this->validateIE($content);
         }
         return $input;

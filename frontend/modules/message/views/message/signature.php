@@ -11,7 +11,9 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('message', 'Inbox'), 'url' =
 $this->params['breadcrumbs'][] = $this->title;
 
 rmrevin\yii\fontawesome\AssetBundle::register($this);
-?>
+?><h4><?=$this->title?></h4>
+<div class="box box-succes">
+ <div class="box-body">
 <div class="signature-create">
 
     <?= $this->render('_actions'); ?>
@@ -38,3 +40,4 @@ rmrevin\yii\fontawesome\AssetBundle::register($this);
 
     </div>
 </div>
+</div></div>

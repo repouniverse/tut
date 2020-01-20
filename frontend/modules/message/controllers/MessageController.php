@@ -434,10 +434,10 @@ class MessageController extends Controller
     {
         $user_id = Yii::$app->user->id;
         $status = Message::STATUS_DRAFT;
-        $message_table = 'message';
+        $message_table = '{{%message}}';
 
         Yii::$app->db->createCommand(
-            "delete from `$message_table` where `from` = $user_id and `status` = $status and `hash` = '$draft_hash'"
+            "delete from $message_table where `from` = $user_id and `status` = $status and `hash` = '$draft_hash'"
         )->execute();
 
         return true;

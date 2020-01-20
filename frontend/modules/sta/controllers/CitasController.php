@@ -106,13 +106,17 @@ class CitasController extends baseController
         if (h::request()->isAjax && $model->load(h::request()->post())) {
                 h::response()->format = Response::FORMAT_JSON;
                  //var_dump(h::request()->isAjax,$model->load(h::request()->post()));die();
-                
+                yii::error('paso por is ajax  load Post');
                 return ActiveForm::validate($model);
         }
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            yii::error('paso por Load y save()');
             return $this->redirect(['view', 'id' => $model->id]);
+        }else{
+            //print_r($model->getErrors());die();
         }
        $eventos=$model->putColorThisCodalu($model->eventosPendientes());
+       yii::error('Renderizando vista');
         return $this->render('update', [
             'model' => $model,
             'eventos'=>$eventos,

@@ -248,7 +248,6 @@ class TabularInput extends Widget
      */
     public function run()
     {
-       
         return $this->createRenderer()->render();
     }
 

@@ -34,9 +34,12 @@ class TranslatorTest extends TestCase
     {
         $translator = new Translator($locale);
 
-        $this->assertEquals($locale, $translator->getLocale());
+        $this->assertSame($locale, $translator->getLocale());
     }
 
+    /**
+     * @group legacy
+     */
     public function testConstructorWithoutLocale()
     {
         $translator = new Translator(null);
@@ -73,6 +76,17 @@ class TranslatorTest extends TestCase
         $translator->setLocale($locale);
 
         $this->assertEquals($locale, $translator->getLocale());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testSetNullLocale()
+    {
+        $translator = new Translator('en');
+        $translator->setLocale(null);
+
+        $this->assertNull($translator->getLocale());
     }
 
     public function testGetCatalogue()
@@ -158,6 +172,17 @@ class TranslatorTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    /**
+     * @group legacy
+     */
+    public function testSetNullFallbackLocale()
+    {
+        $translator = new Translator('en');
+        $translator->setFallbackLocales(['fr', null]);
+        // no assertion. this method just asserts that no exception is thrown
+        $this->addToAssertionCount(1);
+    }
+
     public function testTransWithFallbackLocale()
     {
         $translator = new Translator('fr_FR');
@@ -188,6 +213,16 @@ class TranslatorTest extends TestCase
         $translator->addResource('array', ['foo' => 'foofoo'], $locale);
         // no assertion. this method just asserts that no exception is thrown
         $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing "null" to the third argument of the "Symfony\Component\Translation\Translator::addResource" method has been deprecated since Symfony 4.4 and will throw an error in 5.0.
+     */
+    public function testAddResourceNull()
+    {
+        $translator = new Translator('fr');
+        $translator->addResource('array', ['foo' => 'foofoo'], null);
     }
 
     public function testAddResourceAfterTrans()
@@ -270,13 +305,36 @@ class TranslatorTest extends TestCase
         $this->assertSame('bar', $translator->trans('bar'));
     }
 
-    public function testTransWithFallbackLocaleBis()
+    /**
+     * @dataProvider getFallbackLocales
+     */
+    public function testTransWithFallbackLocaleBis($expectedLocale, $locale)
     {
-        $translator = new Translator('en_US');
+        $translator = new Translator($locale);
         $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', ['foo' => 'foofoo'], 'en_US');
-        $translator->addResource('array', ['bar' => 'foobar'], 'en');
+        $translator->addResource('array', ['foo' => 'foofoo'], $locale);
+        $translator->addResource('array', ['bar' => 'foobar'], $expectedLocale);
         $this->assertEquals('foobar', $translator->trans('bar'));
+    }
+
+    public function getFallbackLocales()
+    {
+        $locales = [
+            ['en', 'en_US'],
+            ['en', 'en-US'],
+            ['sl_Latn_IT', 'sl_Latn_IT_nedis'],
+            ['sl_Latn', 'sl_Latn_IT'],
+        ];
+
+        if (\function_exists('locale_parse')) {
+            $locales[] = ['sl_Latn_IT', 'sl-Latn-IT-nedis'];
+            $locales[] = ['sl_Latn', 'sl-Latn-IT'];
+        } else {
+            $locales[] = ['sl-Latn-IT', 'sl-Latn-IT-nedis'];
+            $locales[] = ['sl-Latn', 'sl-Latn-IT'];
+        }
+
+        return $locales;
     }
 
     public function testTransWithFallbackLocaleTer()
@@ -378,6 +436,17 @@ class TranslatorTest extends TestCase
     }
 
     /**
+     * @group legacy
+     * @expectedDeprecation Passing "null" to the third argument of the "Symfony\Component\Translation\Translator::addResource" method has been deprecated since Symfony 4.4 and will throw an error in 5.0.
+     */
+    public function testTransNullLocale()
+    {
+        $translator = new Translator(null);
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', ['test' => 'OK'], null);
+    }
+
+    /**
      * @dataProvider getFlattenedTransTests
      */
     public function testFlattenedTrans($expected, $messages, $id)
@@ -431,6 +500,33 @@ class TranslatorTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    /**
+     * @group legacy
+     */
+    public function testTransChoiceNullLocale()
+    {
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', ['foo' => 'foofoo'], 'en');
+
+        $translator->transChoice('foo', 1, [], '', null);
+        // no assertion. this method just asserts that no exception is thrown
+        $this->addToAssertionCount(1);
+    }
+
+    public function testTransNullId()
+    {
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', ['foo' => 'foofoo'], 'en');
+
+        $this->assertSame('', $translator->trans(null));
+
+        (\Closure::bind(function () use ($translator) {
+            $this->assertSame([], $translator->catalogues);
+        }, $this, Translator::class))();
+    }
+
     public function getTransFileTests()
     {
         return [
@@ -452,6 +548,7 @@ class TranslatorTest extends TestCase
             ['Symfony est super !', 'Symfony is great!', 'Symfony est super !', [], 'fr', ''],
             ['Symfony est awesome !', 'Symfony is %what%!', 'Symfony est %what% !', ['%what%' => 'awesome'], 'fr', ''],
             ['Symfony est super !', new StringClass('Symfony is great!'), 'Symfony est super !', [], 'fr', ''],
+            ['', null, '', [], 'fr', ''],
         ];
     }
 
@@ -525,7 +622,6 @@ class TranslatorTest extends TestCase
     {
         return [
             [''],
-            [null],
             ['fr'],
             ['francais'],
             ['FR'],
@@ -603,7 +699,7 @@ class StringClass
         $this->str = $str;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->str;
     }

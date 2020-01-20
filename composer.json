@@ -12,7 +12,7 @@
         "irc": "irc://irc.freenode.net/yii",
         "source": "https://github.com/yiisoft/yii2"
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "require": {
         "php": ">=5.4.0",
        "yiisoft/yii2": "~2.0.20",
@@ -58,7 +58,8 @@
         "yii2mod/yii2-tree": "*",
         "miloschuman/yii2-highcharts-widget": "*",
         "buttflattery/yii2-formwizard": "@dev",
-        "drsdre/yii2-wizardwidget": "*"
+        "drsdre/yii2-wizardwidget": "*",
+        "scotthuangzl/yii2-google-chart": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

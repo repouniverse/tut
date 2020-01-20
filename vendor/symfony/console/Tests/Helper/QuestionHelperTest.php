@@ -166,7 +166,56 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $this->assertEquals('What time is it?', stream_get_contents($output->getStream()));
     }
 
+    public function testAskNonTrimmed()
+    {
+        $dialog = new QuestionHelper();
+
+        $inputStream = $this->getInputStream(' 8AM ');
+
+        $question = new Question('What time is it?', '2PM');
+        $question->setTrimmable(false);
+        $this->assertEquals(' 8AM ', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $output = $this->createOutputInterface(), $question));
+
+        rewind($output->getStream());
+        $this->assertEquals('What time is it?', stream_get_contents($output->getStream()));
+    }
+
     public function testAskWithAutocomplete()
+    {
+        if (!Terminal::hasSttyAvailable()) {
+            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+        }
+
+        // Acm<NEWLINE>
+        // Ac<BACKSPACE><BACKSPACE>s<TAB>Test<NEWLINE>
+        // <NEWLINE>
+        // <UP ARROW><UP ARROW><UP ARROW><NEWLINE>
+        // <UP ARROW><UP ARROW><UP ARROW><UP ARROW><UP ARROW><UP ARROW><UP ARROW><TAB>Test<NEWLINE>
+        // <DOWN ARROW><NEWLINE>
+        // S<BACKSPACE><BACKSPACE><DOWN ARROW><DOWN ARROW><NEWLINE>
+        // F00<BACKSPACE><BACKSPACE>oo<TAB><NEWLINE>
+        // F⭐<TAB><BACKSPACE><BACKSPACE>⭐<TAB><NEWLINE>
+        $inputStream = $this->getInputStream("Acm\nAc\177\177s\tTest\n\n\033[A\033[A\033[A\n\033[A\033[A\033[A\033[A\033[A\033[A\033[A\tTest\n\033[B\nS\177\177\033[B\033[B\nF00\177\177oo\t\nF⭐\t\177\177⭐\t\n");
+
+        $dialog = new QuestionHelper();
+        $helperSet = new HelperSet([new FormatterHelper()]);
+        $dialog->setHelperSet($helperSet);
+
+        $question = new Question('Please select a bundle', 'FrameworkBundle');
+        $question->setAutocompleterValues(['AcmeDemoBundle', 'AsseticBundle', 'SecurityBundle', 'FooBundle', 'F⭐Y']);
+
+        $this->assertEquals('AcmeDemoBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals('AsseticBundleTest', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals('FrameworkBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals('SecurityBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals('FooBundleTest', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals('AcmeDemoBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals('AsseticBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals('FooBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals('F⭐Y', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+    }
+
+    public function testAskWithAutocompleteTrimmable()
     {
         if (!Terminal::hasSttyAvailable()) {
             $this->markTestSkipped('`stty` is required to test autocomplete functionality');
@@ -187,14 +236,15 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $dialog->setHelperSet($helperSet);
 
         $question = new Question('Please select a bundle', 'FrameworkBundle');
-        $question->setAutocompleterValues(['AcmeDemoBundle', 'AsseticBundle', 'SecurityBundle', 'FooBundle']);
+        $question->setAutocompleterValues(['AcmeDemoBundle ', 'AsseticBundle', ' SecurityBundle ', 'FooBundle']);
+        $question->setTrimmable(false);
 
-        $this->assertEquals('AcmeDemoBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals('AcmeDemoBundle ', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
         $this->assertEquals('AsseticBundleTest', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
         $this->assertEquals('FrameworkBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
-        $this->assertEquals('SecurityBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals(' SecurityBundle ', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
         $this->assertEquals('FooBundleTest', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
-        $this->assertEquals('AcmeDemoBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals('AcmeDemoBundle ', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
         $this->assertEquals('AsseticBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
         $this->assertEquals('FooBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
@@ -372,6 +422,21 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $question->setHidden(true);
 
         $this->assertEquals('8AM', $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream("8AM\n")), $this->createOutputInterface(), $question));
+    }
+
+    public function testAskHiddenResponseTrimmed()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('This test is not supported on Windows');
+        }
+
+        $dialog = new QuestionHelper();
+
+        $question = new Question('What time is it?');
+        $question->setHidden(true);
+        $question->setTrimmable(false);
+
+        $this->assertEquals(' 8AM', $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream(' 8AM')), $this->createOutputInterface(), $question));
     }
 
     /**
@@ -709,7 +774,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         // F00<BACKSPACE><BACKSPACE>o<TAB>,A<DOWN ARROW>,<SPACE>SecurityBundle<NEWLINE>
         // Acme<TAB>,<SPACE>As<TAB><29x BACKSPACE>S<TAB><NEWLINE>
         // Ac<TAB>,As<TAB><3x BACKSPACE>d<TAB><NEWLINE>
-        $inputStream = $this->getInputStream("\nF\t\nA\033[A\033[A\033[A\t,F\t\nF00\177\177o\t,A\033[B\t, SecurityBundle\nSecurityBundle\nAcme\t, As\t\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177S\t\nAc\t,As\t\177\177\177d\t\n");
+        $inputStream = $this->getInputStream("\nF\t\nA\033[A\033[A\033[A\t,F\t\nF00\177\177o\t,A\033[B\t, SecurityBundle\nAcme\t, As\t\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177S\t\nAc\t,As\t\177\177\177d\t\n");
 
         $dialog = new QuestionHelper();
         $helperSet = new HelperSet([new FormatterHelper()]);
@@ -766,7 +831,7 @@ class AutocompleteValues implements \IteratorAggregate
         $this->values = $values;
     }
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->values);
     }

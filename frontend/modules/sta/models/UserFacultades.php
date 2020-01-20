@@ -1,5 +1,4 @@
 <?php
-
 namespace frontend\modules\sta\models;
 use yii\db\Query;
 use common\helpers\h;
@@ -148,3 +147,5 @@ class UserFacultades extends \common\models\base\modelBase
    }     
         
 }
+
+?>

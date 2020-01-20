@@ -14,7 +14,7 @@ use common\helpers\h;
 <div class="citas-form">
 
     <?php $form = ActiveForm::begin([
-        'enableAjaxValidation'=>true,
+       'enableAjaxValidation'=>true,
     'fieldClass'=>'\common\components\MyActiveField'
     ]); ?>
       <div class="box-header">
@@ -63,24 +63,24 @@ use common\helpers\h;
           
               
           
-  <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
+  <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
      <?= $form->field($model->taller, 'numero')->textInput(['disabled'=>'disabled']) ?>
 
  </div>
- <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
+ <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
      <?= $form->field($model->taller, 'descripcion')->textInput(['disabled'=>'disabled']) ?>
 
  </div>
-          
-          <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
-               <?= $form->field($model->taller->facultad, 'desfac')->textInput(['disabled'=>'disabled']) ?>
-
-        </div>
-          
-      <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
+<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                <?= $form->field($model->taller, 'codperiodo')->textInput(['disabled'=>'disabled']) ?>
 
-        </div>
+</div>         
+<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+               <?= $form->field($model->taller->facultad, 'desfac')->label(yii::t('sigi.labels','Facultad'))->textInput(['disabled'=>'disabled']) ?>
+
+</div>
+          
+     
           <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
                <?= $form->field($model->tallerdet, 'codalu')->textInput(['disabled'=>'disabled']) ?>
 
@@ -106,10 +106,22 @@ use common\helpers\h;
           
           
   
-  <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
-     <?= $form->field($model, 'fechaprog')->textInput(['disabled'=>'disabled']) ?>
-
- </div>
+  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <?php 
+        echo $form->field($model, 'fechaprog')->widget(
+        DateTimePicker::classname(), [
+         'name' => 'finicio',
+            'language' => h::app()->language,
+            'options' => ['placeholder' =>yii::t('sta.labels', '--Seleccione un valor--')],
+    //'convertFormat' => true,
+                'pluginOptions' => [
+                'format' => h::getFormatShowDateTime(),
+                //'startDate' => '01-Mar-2014 12:00 AM',
+                'todayHighlight' => true
+                                ]
+                    ]);
+                ?>
+  </div> 
   
   <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
       <?php 

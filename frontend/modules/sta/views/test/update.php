@@ -5,12 +5,12 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model frontend\modules\sta\models\Test */
 
-$this->title = Yii::t('sta.labels', 'Update Test: {name}', [
+$this->title = Yii::t('sta.labels', 'Editar test: {name}', [
     'name' => $model->codtest,
 ]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('sta.labels', 'Tests'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->codtest, 'url' => ['view', 'id' => $model->codtest]];
-$this->params['breadcrumbs'][] = Yii::t('sta.labels', 'Update');
+$this->params['breadcrumbs'][] = Yii::t('sta.labels', 'Editar');
 ?>
 <div class="test-update">
 

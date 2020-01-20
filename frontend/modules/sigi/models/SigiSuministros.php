@@ -198,20 +198,32 @@ public function getEdificio()
     
     private function queryReadsForThisMonth($mes,$anio,$facturable=true){
         $valor=($facturable)?'1':'0';
-        return SigiLecturas::find()->
-                where(['facturable'=>$valor,'mes' => $mes,'anio'=>$anio]);
+        yii::error('----queryreas for this mont--');
+        yii::error(SigiLecturas::find()->where(['edificio_id' => $this->edificio_id])->
+                andwhere(['facturable'=>$valor,'mes' => $mes,'anio'=>$anio])->
+                createCommand()->getRawSql());
+        return SigiLecturas::find()->where(['edificio_id' => $this->edificio_id])->
+                andwhere(['facturable'=>$valor,'mes' => $mes,'anio'=>$anio]);
+        
     }
     
      Public function LastReadFacturable($mes,$anio){
      $reg= $this->queryReads()->
                 andWhere(['facturable'=>'1','mes' => $mes,'anio'=>$anio])->one();
+     return $reg;
+    }
+    
+     Public function LastReadFacturableValue($mes,$anio){
+     $reg= $this->LastReadFacturable($mes, $anio);
      return (is_null($reg))?0:$reg->lectura;
     }
     
     public function consumoTotal($mes,$anio,$facturable=true){
         //$valor=($facturable)?'1':'0';
+         
         $query=$this->queryReadsForThisMonth($mes,$anio,$facturable);
-        yii::error($query->select('sum(delta)')->createCommand()->getRawSql());
+       
+       
         if($query->count()>0)
          return  $query->select('sum(delta)')->scalar();
         return 0;
@@ -347,7 +359,7 @@ public function lastReads($forGraphical=false){
   
 public function participacionRead($mes,$anio){
     $consumoT=$this->consumoTotal($mes, $anio);
-    $consumo=$this->LastReadFacturable($mes,$anio);
+    $consumo=$this->LastReadFacturable($mes,$anio)->delta;
     if($consumoT > 0){
         return round($consumo/$consumoT,4);
     }else{
@@ -355,10 +367,10 @@ public function participacionRead($mes,$anio){
     }
 }
 public function getSigiSumiDepa(){
-     return $this->hasMany( SigiSumiDepa::className(), ['suministro_id' =>'id']);
+     return SigiSumiDepa::find()->where(['suministro_id' =>$this->id,'afiliado'=>'1']);
 }
 public function depasReparto(){
-   return  $this->sigiSumiDepa;
+   return  $this->getSigiSumiDepa()->all();
 }
 public function ndepasReparto(){
    return  $this->getSigiSumiDepa()->count();
@@ -371,7 +383,10 @@ public function afterSave($insert, $changedAttributes) {
     }
     return parent::afterSave($insert, $changedAttributes);
 }
-
+/*
+ * Llena los departamenteos afiliados a este mdidor, 
+ * en caso de que la unidad padre no sea imputable
+ */
 public function fillDepas(){
     foreach($this->edificio->unidadesImputables() as $unidad){
         //yii::error('recorriendo '.$unidad->numero);
@@ -392,7 +407,10 @@ public function fillDepas(){
             
     }
 }
-
+/*
+ * Registro de unidad es que comparten el consumo de este medidor
+ * Siemre que la unidad en la queeste montao el medidor sea no imputable 
+ */
 public function providerAfiliados(){
     $provider = new \yii\data\ActiveDataProvider([
     'query' => $this->getSigiSumiDepa(),
@@ -402,5 +420,24 @@ public function providerAfiliados(){
 ]);
     return $provider;
 }
+
+public function hasAfiliados(){
+    return($this->getSigiSumiDepa()->count()>0)?true:false;
+}
+
+public function averageReads($idLectura=null){
+   $nlecturas=min(\common\helpers\h::gsetting('sigi','numeroParaPromedioLecturas'),
+                $this->queryReads()->count()
+               );
+   if($idLectura >0){
+      return $this->queryReads()->sum('avg(delta)')->where(['id'<$idLectura])->orderBy('id DESC')->limit($nlecturas)->scalar();
+     
+   }else{
+       return $this->queryReads()->sum('avg(delta)')->orderBy('id DESC')->limit($nlecturas)->scalar();
+      
+   }
+  
+}
+
 
 }

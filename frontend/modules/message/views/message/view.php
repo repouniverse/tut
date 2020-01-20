@@ -11,7 +11,9 @@ $this->title = StringHelper::truncate($message->title, 80);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('message', 'Inbox'), 'url' => ['inbox']];
 $this->params['breadcrumbs'][] = Yii::t('message', 'Message: ') . $this->title;
 
-?>
+?> <h4><?=$this->title?></h4>
+<div class="box box-succes">
+ <div class="box-body">
 <div class="message-view">
 
     <?= $this->render('_actions'); ?>
@@ -107,4 +109,5 @@ $this->params['breadcrumbs'][] = Yii::t('message', 'Message: ') . $this->title;
         ]);
     }
     ?>
-</div>
+</div>   </div>
+    </div>

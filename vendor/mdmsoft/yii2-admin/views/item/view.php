@@ -21,7 +21,6 @@ YiiAsset::register($this);
 $opts = Json::htmlEncode([
     'items' => $model->getItems(),
 ]);
-
 $this->registerJs("var _opts = {$opts};");
 $this->registerJs($this->render('_script.js'));
 $animateIcon = ' <i class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></i>';

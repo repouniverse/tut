@@ -115,12 +115,8 @@ class Route extends \mdm\admin\BaseObject
     {
         $manager = Configs::authManager();
         // Get advanced configuration
-      
         $advanced = Configs::instance()->advanced;
-        // var_dump(Configs::instance() );die();
-        //var_dump($advanced);die();
         if ($advanced) {
-            //yii::error('app avanzado');
             // Use advanced route scheme.
             // Set advanced route prefix.
             $this->_routePrefix = self::PREFIX_ADVANCED;
@@ -144,7 +140,6 @@ class Route extends \mdm\admin\BaseObject
                 $app = new yii\web\Application($config);
                 // Get all the routes of the newly created app.
                 $r = $this->getAppRoutes($app);
-                
                 // Dump new app
                 unset($app);
                 // Prepend the app id to all routes.
@@ -156,13 +151,11 @@ class Route extends \mdm\admin\BaseObject
             Yii::$app = $yiiApp;
             unset($yiiApp);
         } else {
-             //yii::error('app basica');
             // Use basic route scheme.
             // Set basic route prefix
             $this->_routePrefix = self::PREFIX_BASIC;
             // Get basic app routes.
             $routes = $this->getAppRoutes();
-            
         }
         $exists = [];
         foreach (array_keys($manager->getPermissions()) as $name) {
@@ -245,7 +238,6 @@ class Route extends \mdm\admin\BaseObject
     protected function getControllerFiles($module, $namespace, $prefix, &$result)
     {
         $path = Yii::getAlias('@' . str_replace('\\', '/', $namespace), false);
-        
         $token = "Get controllers from '$path'";
         Yii::beginProfile($token, __METHOD__);
         try {
@@ -253,7 +245,6 @@ class Route extends \mdm\admin\BaseObject
                 return;
             }
             foreach (scandir($path) as $file) {
-               
                 if ($file == '.' || $file == '..') {
                     continue;
                 }

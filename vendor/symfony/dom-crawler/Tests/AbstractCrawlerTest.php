@@ -253,6 +253,22 @@ abstract class AbstractCrawlerTest extends TestCase
         $this->assertCount(0, $crawler->eq(100), '->eq() returns an empty crawler if the nth node does not exist');
     }
 
+    public function testNormalizeWhiteSpace()
+    {
+        $crawler = $this->createTestCrawler()->filterXPath('//p');
+        $this->assertSame('Elsa <3', $crawler->text(null, true), '->text(null, true) returns the text with normalized whitespace');
+        $this->assertNotSame('Elsa <3', $crawler->text(null, false));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyNormalizeWhiteSpace()
+    {
+        $crawler = $this->createTestCrawler()->filterXPath('//p');
+        $this->assertNotSame('Elsa <3', $crawler->text());
+    }
+
     public function testEach()
     {
         $data = $this->createTestCrawler()->filterXPath('//ul[1]/li')->each(function ($node, $i) {
@@ -880,6 +896,105 @@ HTML;
         }
     }
 
+    public function provideMatchTests()
+    {
+        yield ['#foo', true, '#foo'];
+        yield ['#foo', true, '.foo'];
+        yield ['#foo', true, '.other'];
+        yield ['#foo', false, '.bar'];
+
+        yield ['#bar', true, '#bar'];
+        yield ['#bar', true, '.bar'];
+        yield ['#bar', true, '.other'];
+        yield ['#bar', false, '.foo'];
+    }
+
+    /** @dataProvider provideMatchTests */
+    public function testMatch(string $mainNodeSelector, bool $expected, string $selector)
+    {
+        $html = <<<'HTML'
+<html lang="en">
+<body>
+    <div id="foo" class="foo other">
+        <div>
+            <div id="bar" class="bar other"></div>
+        </div>
+    </div>
+</body>
+</html>
+HTML;
+
+        $crawler = $this->createCrawler($this->getDoctype().$html);
+        $node = $crawler->filter($mainNodeSelector);
+        $this->assertSame($expected, $node->matches($selector));
+    }
+
+    public function testClosest()
+    {
+        $html = <<<'HTML'
+<html lang="en">
+<body>
+    <div class="lorem2 ok">
+        <div>
+            <div class="lorem3 ko"></div>
+        </div>
+        <div class="lorem1 ok">
+            <div id="foo" class="newFoo ok">
+                <div class="lorem1 ko"></div>
+            </div>
+        </div>
+    </div>
+    <div class="lorem2 ko">
+    </div>
+</body>
+</html>
+HTML;
+
+        $crawler = $this->createCrawler($this->getDoctype().$html);
+        $foo = $crawler->filter('#foo');
+
+        $newFoo = $foo->closest('#foo');
+        $this->assertInstanceOf(Crawler::class, $newFoo);
+        $this->assertSame('newFoo ok', $newFoo->attr('class'));
+
+        $lorem1 = $foo->closest('.lorem1');
+        $this->assertInstanceOf(Crawler::class, $lorem1);
+        $this->assertSame('lorem1 ok', $lorem1->attr('class'));
+
+        $lorem2 = $foo->closest('.lorem2');
+        $this->assertInstanceOf(Crawler::class, $lorem2);
+        $this->assertSame('lorem2 ok', $lorem2->attr('class'));
+
+        $lorem3 = $foo->closest('.lorem3');
+        $this->assertNull($lorem3);
+
+        $notFound = $foo->closest('.not-found');
+        $this->assertNull($notFound);
+    }
+
+    public function testOuterHtml()
+    {
+        $html = <<<'HTML'
+<html lang="en">
+<body>
+    <div class="foo">
+    <ul>
+        <li>1</li>
+        <li>2</li>
+        <li>3</li>
+    </ul>
+</body>
+</html>
+HTML;
+
+        $crawler = $this->createCrawler($this->getDoctype().$html);
+        $bar = $crawler->filter('ul');
+        $output = $bar->outerHtml();
+        $output = str_replace([' ', "\n"], '', $output);
+        $expected = '<ul><li>1</li><li>2</li><li>3</li></ul>';
+        $this->assertSame($expected, $output);
+    }
+
     public function testNextAll()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//li')->eq(1);
@@ -1192,6 +1307,10 @@ HTML;
                         <li>Two Bis</li>
                         <li>Three Bis</li>
                     </ul>
+                    <p class="whitespace">
+                        Elsa
+                        &lt;3
+                    </p>
                     <div id="parent">
                         <div id="child"></div>
                         <div id="child2" xmlns:foo="http://example.com"></div>

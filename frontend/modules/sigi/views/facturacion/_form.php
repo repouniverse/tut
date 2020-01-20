@@ -1,6 +1,6 @@
 <?php
  use kartik\date\DatePicker;
-
+use kartik\export\ExportMenu;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
@@ -8,8 +8,7 @@ use frontend\modules\sigi\helpers\comboHelper;
 use common\helpers\timeHelper;
 use common\helpers\h;
 use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
-
-use yii\grid\GridView;
+use kartik\grid\GridView;
 use yii\widgets\Pjax;
 /* @var $this yii\web\View */
 /* @var $model frontend\modules\sigi\models\SigiFacturacion */
@@ -86,11 +85,20 @@ use yii\widgets\Pjax;
  </div>
      
     <?php ActiveForm::end(); ?>
+          
        <?php if(!$model->isNewRecord) {?>
       <?php Pjax::begin(['id'=>'grilla_cargospor']); ?>
-    <?php echo GridView::widget([
+    <?=ExportMenu::widget([
+    'dataProvider' => $dataProviderCuentasPor,
+    'columns' => $gridColumns,
+    'dropdownOptions' => [
+        'label' => yii::t('sta.labels','Exportar'),
+        'class' => 'btn btn-success'
+    ]
+]) . "<br><hr>\n".GridView::widget([
         'dataProvider' =>$dataProviderCuentasPor,
          'summary' => '',
+         'showPageSummary' => true,
          'tableOptions'=>['class'=>'table table-condensed table-hover table-bordered table-striped'],
         //'filterModel' => $searchModel,
         'columns' => [
@@ -181,7 +189,7 @@ use yii\widgets\Pjax;
                   //'filter'=> frontend\modules\sigi\helpers\comboHelper::getCboColectores($model->edificio_id),
                   'value'=>'colector.cargo.descargo'
                   ],  */             
-           // 'codocu',
+            'colector.cargo.descargo',
             'descripcion',
            // 'colector.id',
           
@@ -191,7 +199,10 @@ use yii\widgets\Pjax;
             //'anio',
             //'detalle:ntext',
             //'fevenc',
-            'monto',
+            ['attribute'=>'monto',
+                            'format' => ['decimal', 2],
+                            'pageSummary' => true,
+                            ]    ,
             //'igv',
             //'codestado',
 

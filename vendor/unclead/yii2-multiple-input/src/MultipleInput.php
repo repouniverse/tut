@@ -249,7 +249,7 @@ class MultipleInput extends InputWidget
             $this->data = $this->value;
             return;
         }
-          
+
         if ($this->model instanceof Model) {
             $data = ($this->model->hasProperty($this->attribute) || isset($this->model->{$this->attribute}))
                 ? ArrayHelper::getValue($this->model, $this->attribute, [])

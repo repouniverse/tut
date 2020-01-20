@@ -1368,7 +1368,6 @@ class ProcessTest extends TestCase
     {
         $process = $this->getProcess('echo hello');
         $process->setEnv(['bad%%' => '123']);
-        $process->inheritEnvironmentVariables(true);
 
         $process->run();
 
@@ -1382,7 +1381,6 @@ class ProcessTest extends TestCase
         $_ENV['existing_var'] = 'foo';
         $process = $this->getProcess('php -r "echo getenv(\'new_test_var\');"');
         $process->setEnv(['existing_var' => 'bar', 'new_test_var' => 'foo']);
-        $process->inheritEnvironmentVariables();
 
         $process->run();
 
@@ -1463,6 +1461,46 @@ EOTXT;
         yield [1.1];
     }
 
+    public function testPreparedCommand()
+    {
+        $p = Process::fromShellCommandline('echo "${:abc}"DEF');
+        $p->run(null, ['abc' => 'ABC']);
+
+        $this->assertSame('ABCDEF', rtrim($p->getOutput()));
+    }
+
+    public function testPreparedCommandMulti()
+    {
+        $p = Process::fromShellCommandline('echo "${:abc}""${:def}"');
+        $p->run(null, ['abc' => 'ABC', 'def' => 'DEF']);
+
+        $this->assertSame('ABCDEF', rtrim($p->getOutput()));
+    }
+
+    public function testPreparedCommandWithQuoteInIt()
+    {
+        $p = Process::fromShellCommandline('php -r "${:code}" "${:def}"');
+        $p->run(null, ['code' => 'echo $argv[1];', 'def' => '"DEF"']);
+
+        $this->assertSame('"DEF"', rtrim($p->getOutput()));
+    }
+
+    public function testPreparedCommandWithMissingValue()
+    {
+        $this->expectException('Symfony\Component\Process\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Command line is missing a value for parameter "abc": echo "${:abc}".');
+        $p = Process::fromShellCommandline('echo "${:abc}"');
+        $p->run(null, ['bcd' => 'BCD']);
+    }
+
+    public function testPreparedCommandWithNoValues()
+    {
+        $this->expectException('Symfony\Component\Process\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Command line is missing a value for parameter "abc": echo "${:abc}".');
+        $p = Process::fromShellCommandline('echo "${:abc}"');
+        $p->run(null, []);
+    }
+
     public function testEnvArgument()
     {
         $env = ['FOO' => 'Foo', 'BAR' => 'Bar'];
@@ -1484,9 +1522,8 @@ EOTXT;
     }
 
     /**
-     * @param string      $commandline
-     * @param string|null $input
-     * @param int         $timeout
+     * @param string|array $commandline
+     * @param mixed        $input
      */
     private function getProcess($commandline, string $cwd = null, array $env = null, $input = null, ?int $timeout = 60): Process
     {
@@ -1495,7 +1532,6 @@ EOTXT;
         } else {
             $process = new Process($commandline, $cwd, $env, $input, $timeout);
         }
-        $process->inheritEnvironmentVariables();
 
         if (self::$process) {
             self::$process->stop(0);

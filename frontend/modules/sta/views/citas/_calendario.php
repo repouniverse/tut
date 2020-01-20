@@ -75,12 +75,12 @@ echo CalendarScheduleWidget::widget([
                     delay: 250,
                         data: {id:'.$model->tallerdet->tallerPsico()->id.', fecha:fechainicio,codalu:event.title  },
              error:  function(xhr, textStatus, error){               
-                            revertFunc();
+                            //revertFunc();
                                 }, 
               success: function(json) {  
                         var n = Noty("id");
                        if ( !(typeof json["error"]==="undefined") ) {
-                       revertFunc();
+                       //revertFunc();
                    $.noty.setText(n.options.id,"<span class=\'glyphicon glyphicon-remove-sign\'></span>      "+ json["error"]);
                               $.noty.setType(n.options.id, "error"); 
                               }

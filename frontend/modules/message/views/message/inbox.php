@@ -31,7 +31,8 @@ rmrevin\yii\fontawesome\AssetBundle::register($this);
                 'value' => function ($message) {
                     $module = Yii::$app->getModule('message');
                     if ($message->sender !== null) {
-                        return $message->sender->linkTo();
+                        return $message->sender->username;
+                        //return 'holis';
                     } else {
                         return $module->no_sender_caption;
                     }

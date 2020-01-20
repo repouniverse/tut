@@ -28,10 +28,10 @@ class WizardWidget extends Widget {
 	 * @var array default button configuration
 	 */
 	public $default_buttons = [
-		'prev' => ['title' => 'Previo', 'options' => [ 'class' => 'btn btn-success', 'type' => 'button']],
-		'next' => ['title' => 'Siguiente', 'options' => [ 'class' => 'btn btn-success', 'type' => 'button']],
-		'save' => ['title' => 'Grabar', 'options' => [ 'class' => 'btn btn-success', 'type' => 'button']],
-		'skip' => ['title' => 'Saltar', 'options' => [ 'class' => 'btn btn-danger', 'type' => 'button']],
+		'prev' => ['title' => 'Previous', 'options' => [ 'class' => 'btn btn-default', 'type' => 'button']],
+		'next' => ['title' => 'Next', 'options' => [ 'class' => 'btn btn-default', 'type' => 'button']],
+		'save' => ['title' => 'Save', 'options' => [ 'class' => 'btn btn-default', 'type' => 'button']],
+		'skip' => ['title' => 'Skip', 'options' => [ 'class' => 'btn btn-default', 'type' => 'button']],
 	];
 
 	/**

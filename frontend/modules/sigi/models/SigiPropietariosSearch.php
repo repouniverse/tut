@@ -58,12 +58,11 @@ class SigiPropietariosSearch extends SigiPropietarios
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'edificio_id' => $this->edificio_id,
-            'codepa' => $this->codepa,
-            'correo' => $this->correo,
-            'dni' => $this->dni,
-             'nombres' => $this->nombre,
-           ]);
+            'edificio_id' => $this->edificio_id])->
+            andFilterWhere(['like','codepa', $this->codepa])->
+            andFilterWhere(['like','correo' , $this->correo])->
+             andFilterWhere(['like','dni', $this->dni])->
+              andFilterWhere(['like','nombre' , $this->nombre]);
 
         return $dataProvider;
     }

@@ -106,8 +106,6 @@ class Helper
     {
         $config = Configs::instance();
         $r = static::normalizeRoute($route, $config->advanced);
-       // VAR_DUMP($r,$config->advanced);DIE();
-        //var_dump(static::getRegisteredRoutes());die();
         if ($config->onlyRegisteredRoute && !isset(static::getRegisteredRoutes()[$r])) {
             return true;
         }
@@ -164,8 +162,6 @@ class Helper
         }
         // Prefix @app-id to route.
         if ($advanced) {
-           // echo Yii::$app->id."<br>";
-            //echo $normalized."<br>"; die();
             $normalized = Route::PREFIX_ADVANCED . Yii::$app->id . $normalized;
         }
         return $normalized;

@@ -59,7 +59,7 @@ class VwSigiFacturecibo extends \common\models\base\modelBase
             [['id', 'cuentaspor_id', 'edificio_id', 'unidad_id', 'colector_id', 'grupo_id', 'facturacion_id', 'mes', 'identidad'], 'integer'],
             [['cuentaspor_id', 'edificio_id', 'unidad_id', 'colector_id', 'grupo_id', 'monto', 'igv', 'grupounidad', 'grupofacturacion', 'facturacion_id', 'mes', 'anio', 'descripcion', 'nombreedificio', 'direccion', 'numero', 'nombre', 'descargo', 'codcargo', 'codgrupo', 'numerodepa', 'nombredepa'], 'required'],
             [['monto', 'igv', 'area', 'participacion', 'areadepa', 'participaciondepa'], 'number'],
-            [['detalles'], 'string'],
+            //[['particiapcion','codsuministro',''], 'string'],
             [['grupounidad', 'grupofacturacion', 'numero', 'numerodepa'], 'string', 'max' => 12],
             [['anio', 'codcargo'], 'string', 'max' => 4],
             [['fecha'], 'string', 'max' => 10],

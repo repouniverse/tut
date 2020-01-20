@@ -60,8 +60,6 @@ class Settings extends Component
         parent::init();
 
         if ($this->cache !== null) {
-           // var_dump(Cache::class);echo "<br>";
-            //var_dump($this->cache);die();
             $this->cache = Instance::ensure($this->cache, Cache::class);
         }
 
@@ -101,7 +99,7 @@ class Settings extends Component
     public function get($section, $key, $default = null)
     {
         $items = $this->getSettingsConfig();
- 
+
         if (isset($items[$section][$key])) {
             $this->setting = ArrayHelper::getValue($items[$section][$key], 'value');
             $type = ArrayHelper::getValue($items[$section][$key], 'type');
@@ -109,7 +107,7 @@ class Settings extends Component
         } else {
             $this->setting = $default;
         }
-        
+
         return $this->setting;
     }
 
@@ -145,8 +143,7 @@ class Settings extends Component
     public function has($section, $key): bool
     {
         $setting = $this->get($section, $key);
-        if(is_bool($setting))return true;
-      
+
         return !empty($setting);
     }
 

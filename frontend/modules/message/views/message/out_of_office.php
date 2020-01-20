@@ -13,6 +13,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
 rmrevin\yii\fontawesome\AssetBundle::register($this);
 ?>
+<h4><?=$this->title?></h4>
+<div class="box box-succes">
+ <div class="box-body">
 <div class="out-of-office-create">
 
     <?= $this->render('_actions'); ?>
@@ -40,8 +43,7 @@ rmrevin\yii\fontawesome\AssetBundle::register($this);
             <div class="col-md-8">
                 <?= $form->field($outOfOffice, 'title')
                     ->textInput([
-                        'placeholder' => Yii::t('message',
-                            'Title of your automatically sent answer'),
+                       
                     ])
                     ->label(Yii::t('message', 'Title')) ?>
             </div>
@@ -76,4 +78,6 @@ rmrevin\yii\fontawesome\AssetBundle::register($this);
         <?php ActiveForm::end(); ?>
 
     </div>
+</div>
+   </div>
 </div>
