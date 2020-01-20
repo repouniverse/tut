@@ -38,6 +38,7 @@ if(!$this->existsTable($table)) {
         'delta'=>$this->decimal(14,5)->comment('consumo'),
         'consumototal'=>$this->decimal(15,5)->comment('Consumo total de las lecturas del mes'),
         'montototal'=>$this->decimal(15,5)->comment('MOnto total del recibo o del prepuesto emnsual, cuentas por '),
+         'numerorecibo'=>$this->string(12)->comment('Numero recibo '),
         ],$this->collateTable());
   
    /* $this->addForeignKey($this->generateNameFk($table), $table,

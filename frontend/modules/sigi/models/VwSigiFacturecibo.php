@@ -1,7 +1,7 @@
 <?php
 
 namespace frontend\modules\sigi\models;
-
+use frontend\modules\sigi\models\SigiUnidades;
 use Yii;
 
 /**
@@ -42,6 +42,9 @@ use Yii;
  */
 class VwSigiFacturecibo extends \common\models\base\modelBase
 {
+    public $extraMethodsToReport=['reportAreas'];
+    
+    
     /**
      * {@inheritdoc}
      */
@@ -122,11 +125,18 @@ class VwSigiFacturecibo extends \common\models\base\modelBase
         return new VwSigiFactureciboQuery(get_called_class());
     }
     
-    public function getReportPropietario(){
+    public function getReportAreas(){        
         
-        $controller=Yii::$app->controller;
+      $controller=Yii::$app->controller;
         $nameView= \common\helpers\FileHelper::getShortName($this::className());
-        $pathView='/'.$controller->id.'/reports/'.$nameView.'/calificaciones';
-      return  $controller->getView()->render($pathView,['model'=>$this]);
+        $pathView='/'.$controller->id.'/reports/'.$nameView.'/detalleAreas';
+       return  $controller->getView()->render($pathView,['areas'=>$this->unidad->arrayParticipaciones()]);
     }
+    public function getUnidad()
+    {
+         
+        return $this->hasOne(SigiUnidades::className(), ['id' => 'unidad_id']);
+    }
+    
+    
 }

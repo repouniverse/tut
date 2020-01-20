@@ -182,9 +182,11 @@ class SigiUnidades extends \common\models\base\modelBase
     public function beforeSave($insert) {
         if($insert){
             //Solo si es child
+           // $this->participacion=$this->participacionArea();
             $this->resolveChildBeforeSave();
             if(empty($this->nombre)){
               $this->nombre=substr(SigiTipoUnidades::findOne($this->codtipo)->desunidad.'-'.$this->numero,0,25); 
+              
             }
                 
         }
@@ -197,6 +199,8 @@ class SigiUnidades extends \common\models\base\modelBase
                 //$this->estreno=null;
                $this->insertPropietarioEmpresa() ;
             } */
+           //refresca el porcentaje de participacion  
+             $this->edificio->refreshPorcentaje();
           if($this->isChild()){
               $this->refresh();
               
@@ -247,9 +251,7 @@ class SigiUnidades extends \common\models\base\modelBase
     /*CALCULA LA PARTICIPACION */
     
     public function participacionArea($porcentaje=false){
-      if($this->isNewRecord){
-          return 0;
-      }else{
+      
          $areaTotal=$this->edificio->area();
          /*if(!$porcentaje){
               $areaTotal=$areaTotal*100;
@@ -262,7 +264,7 @@ class SigiUnidades extends \common\models\base\modelBase
         }else{
            return 0; 
         }  
-      }
+      
        
         
     }
@@ -531,5 +533,22 @@ class SigiUnidades extends \common\models\base\modelBase
      }
  }
  
+ 
+ public function arrayParticipaciones(){
+     $areatotal=$this->edificio->area();
+     
+     $areasHijos=$this->find()->select(['nombre','numero','area','participacion'])->where(['parent_id'=>$this->id])->asArray()->all();
+     if(count($areasHijos)>0){
+         $datosAreas=$areasHijos;
+         $datosAreas[]=['nombre'=>$this->nombre,'numero'=>$this->numero,'area'=>$this->area+0,'participacion'=>$this->participacion+0];
+         
+         
+     }else{
+         $datosAreas=[['nombre'=>$this->nombre,'numero'=>$this->numero,'area'=>$this->area+0,'participacion'=>$this->participacion+0]];
+     }
+     //var_dump($datosAreas);die(); 
+     return ['aareas'=>$datosAreas,'atotal'=>$areatotal];
+    
+ }
  
 }

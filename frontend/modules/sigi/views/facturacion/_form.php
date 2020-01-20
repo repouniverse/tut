@@ -18,6 +18,7 @@ use yii\widgets\Pjax;
 <div class="sigi-facturacion-form">
 
     <?php $form = ActiveForm::begin([
+        'enableAjaxValidation'=>true,
     'fieldClass'=>'\common\components\MyActiveField'
     ]); ?>
       <div class="box-header">
@@ -64,6 +65,21 @@ use yii\widgets\Pjax;
                         ]
                     ) ?>
  </div>
+                    
+<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+      <?= $form->field($model, 'fvencimiento')->widget(DatePicker::class, [
+                            'language' => h::app()->language,
+                           'pluginOptions'=>[
+                                     'format' => h::gsetting('timeUser', 'date')  , 
+                                   'changeMonth'=>true,
+                                  'changeYear'=>true,
+                                 'yearRange'=>'2014:'.date('Y'),
+                               ],
+                          
+                            //'dateFormat' => h::getFormatShowDate(),
+                            'options'=>['class'=>'form-control']
+                            ]) ?>
+ </div>
   <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
       <?= $form->field($model, 'fecha')->widget(DatePicker::class, [
                             'language' => h::app()->language,
@@ -78,6 +94,7 @@ use yii\widgets\Pjax;
                             'options'=>['class'=>'form-control']
                             ]) ?>
  </div>
+
   <?php echo Html::a('reporte', Url::to(['/report/make/multi-report','id'=>2,'idsToReport'=> \yii\helpers\Json::encode($model->idsToFacturacion())]), $options); ?>
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
      <?= $form->field($model, 'detalles')->textarea(['rows' => 6]) ?>
@@ -87,6 +104,7 @@ use yii\widgets\Pjax;
     <?php ActiveForm::end(); ?>
           
        <?php if(!$model->isNewRecord) {?>
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
       <?php Pjax::begin(['id'=>'grilla_cargospor']); ?>
     <?=ExportMenu::widget([
     'dataProvider' => $dataProviderCuentasPor,
@@ -223,10 +241,8 @@ use yii\widgets\Pjax;
         
           
     <?php Pjax::end(); ?>
-</div>       
-       <?php }?>  
-    
-</div>
+      
+     
 <?php
  $url= Url::to(['/sigi/cuentaspor/create-as-child','id'=>$model->id,'gridName'=>'grilla_cargospor','idModal'=>'buscarvalor']);
    echo  Html::button(yii::t('base.verbs','Cobranza masiva'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Elemento'),'id'=>'btn_apoderado', 'class' => 'botonAbre btn btn-success']); 
@@ -311,4 +327,12 @@ use yii\widgets\Pjax;
              })";
   
   $this->registerJs($string, \yii\web\View::POS_END);
-?>
+?> 
+      
+      
+</div>   
+          
+       <?php }?>  
+    
+
+</div>

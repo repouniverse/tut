@@ -99,7 +99,10 @@ class FacturacionController extends baseController
      */
     public function actionUpdate($id)
     {
-        //$modelo=\frontend\modules\sigi\models\SigiSuministros::findOne(117);
+  /*tend\modules\sigi\models\Edificios::findOne(7);
+$edificio->refreshPorcentaje();
+die();*/
+//$modelo=\frontend\modules\sigi\models\SigiSuministros::findOne(117);
         //var_dump($modelo->LastReadFacturable('12','2019'));DIE();
         $model = $this->findModel($id);
           $searchModel = new SigiCuentasporSearch();

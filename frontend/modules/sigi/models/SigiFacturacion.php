@@ -23,6 +23,7 @@ class SigiFacturacion extends \common\models\base\modelBase
 {
    
     public $hardFields=['edificio_id','mes','ejercicio'];
+     public $dateorTimeFields=['fvencimiento'=>self::_FDATE,'fecha'=>self::_FDATE];
     /**
      * {@inheritdoc}
      */
@@ -37,8 +38,10 @@ class SigiFacturacion extends \common\models\base\modelBase
     public function rules()
     {
         return [
-            [['edificio_id', 'mes', 'descripcion'], 'required'],
+            [['edificio_id', 'mes', 'descripcion','fecha','fvencimiento'], 'required'],
             [['edificio_id'], 'integer'],
+              [['fvencimiento'], 'safe'],
+            ['fvencimiento', 'validateFechas'],
             [['detalles'], 'string'],
             [['mes'], 'string', 'max' => 2],
             [['ejercicio'], 'string', 'max' => 4],
@@ -202,7 +205,8 @@ class SigiFacturacion extends \common\models\base\modelBase
                $errores['success']=yii::t('sigi.errors','Se ha generado la facturacion sin problemas '.$this->balanceMontos());  
             }
           }
-           $this->asignaIdentidad();//Importante           
+           $this->asignaIdentidad();//Importante  
+           $this->asignaNumero();
         }else{
             
            $errores['error']=yii::t('sigi.errors','Hay suministros que aun no tienen lectura verifique por favor'); 
@@ -359,4 +363,45 @@ class SigiFacturacion extends \common\models\base\modelBase
    public function detfacturacionQuery(){
       return SigiDetfacturacion::find()->where(['facturacion_id'=>$this->id]); 
    }
+   /*
+    * Citeriop de filtro del mes anterior*/
+    
+   private function previousQuery(){
+      
+        $mesprev=($this->mes=='1')?'12':(($this->mes-1).'');
+        $anioPrev=($this->mes=='1')?(($this->ejercicio-1).''):$this->ejercicio;
+      return $this->getSigiDetfacturacion()->where(['mes'=>$mesprev,'anio'=>$anioPrev]);
+   }
+   //nUMERO MAXIMO ANTEIROR DEL RECIBO , DONDE SE QUEDO
+   private function numeroAnterior(){
+       RETURN $this->previousQuery()->max(numero);
+   }
+   
+   private function asignaNumero(){
+       $mes= str_pad( $this->mes , 2,  "0",STR_PAD_LEFT);       
+      $depas=array_column($this->getSigiDetfacturacion()->select('grupofacturacion')->distinct()->orderBy('grupofacturacion ASC')->asArray()->all(),'grupofacturacion');
+     $contador=1;
+      foreach($depas as $key=>$depa){
+          $numero=$this->ejercicio.'-'.$mes.'-'.str_pad( $contador.'' , 3,  "0",STR_PAD_LEFT);      
+          SigiDetfacturacion::updateAll(['numerorecibo'=>$numero],['grupofacturacion'=>$depa,'facturacion_id'=>$this->id]);
+          $contador++;
+      }
+   }
+   
+   
+    public function validateFechas($attribute, $params)
+    {
+      // $this->toCarbon('fecingreso');
+       //$this->toCarbon('cumple');
+       //self::CarbonNow();
+       //var_dump(self::CarbonNow());
+        
+       if($this->toCarbon('fecha')->greaterThan($this->toCarbon('fvencimiento'))){
+            $this->addError('fvencimiento', yii::t('base.errors','La fecha  {campo} es una fecha anterior a la fecha emisión',
+                    ['campo'=>$this->getAttributeLabel('fvencimiento')]));
+       }
+     
+    }
+ 
+   
 }

@@ -160,7 +160,7 @@ class Edificios extends \common\models\base\modelBase
         if($this->isNewRecord)
         return 0;
         //var_dump($this->queryUnidades()->sum('[[area]]'));die();
-        return $this->queryUnidadesImputables()->sum('[[area]]');
+        return (double)$this->queryUnidadesImputables()->sum('[[area]]');
     }
     
     public function hasApoderados(){
@@ -398,6 +398,13 @@ class Edificios extends \common\models\base\modelBase
   
   public function queryPropietariosActivos(){
       return $this->getPropietarios()->where(['activo'=>'1']);
+  }
+  
+  public function refreshPorcentaje(){
+      $areaTotal=$this->area();
+      $strExp="area/".$areaTotal;
+      if($areaTotal >0 )
+      SigiUnidades::updateAll(['participacion'=> new \yii\db\Expression($strExp)], ['edificio_id'=>$this->id,'imputable'=>'1']);
   }
    
 }

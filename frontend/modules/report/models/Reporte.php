@@ -222,25 +222,28 @@ class Reporte extends baseReporte
                 getReportedetalle()->
                 //where(['and', "esdetalle='1'", "visiblecampo='1'"])->
                 where(["esdetalle"=>'1'])->andWhere(["visiblecampo"=>'1'])->
-                orderBy('orden')->all();
+                orderBy('orden ASC')->asArray()->all();
        /* echo  $hijosDetalle=$this->
                 getReportedetalle()->
                 //where(['and', "esdetalle='1'", "visiblecampo='1'"])->
                 where(["esdetalle"=>'1'])->andWhere(["visiblecampo"=>'1'])->createCommand()->getRawSql();die();*/
        // var_dump($hijosDetalle);die();
+        yii::error('hijos -------');
+        yii::error($hijosDetalle);
         $columns=[];
         foreach($hijosDetalle as $fila){
              $columns[]=[
-                'attribute'=>$fila->nombre_campo,
-                'label'=>$fila->aliascampo,
+                'attribute'=>$fila['nombre_campo'],
+                'label'=>$fila['aliascampo'],
                'format'=>'raw',
                 'options'=>['width'=>
-              $this->sizePercentCampo($fila->nombre_campo).'%'],
+              $this->sizePercentCampo($fila['nombre_campo']).'%'],
             ];
           
           
         }
-        //yii::error($columns);
+        yii::error('CLUMNAS -------');
+        yii::error($columns);
         return $columns;
         
     }
