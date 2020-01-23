@@ -39,7 +39,11 @@ class Module extends \yii\base\Module
       private static function putSettingsModule(){
         h::getIfNotPutSetting('sigi','numeroMaxLecturas',5, SettingType::INTEGER_TYPE);
          h::getIfNotPutSetting('sigi','numeroParaPromedioLecturas',12, SettingType::INTEGER_TYPE);
-       //  h::getIfNotPutSetting('sigi','urlimagesalu','http:://www.orce.uni.edu.pe/alumnos/', SettingType::STRING_TYPE);
+        h::getIfNotPutSetting('sigi','numeroDiasVencimiento',10, SettingType::INTEGER_TYPE);
+        h::getIfNotPutSetting('sigi','correoCobranza1','asistente2@diargestion.com', SettingType::STRING_TYPE);
+h::getIfNotPutSetting('sigi','correoCobranza2','asistente1@diargestion.com', SettingType::INTEGER_TYPE);
+
+//  h::getIfNotPutSetting('sigi','urlimagesalu','http:://www.orce.uni.edu.pe/alumnos/', SettingType::STRING_TYPE);
         // h::getIfNotPutSetting('sigi','prefiximagesalu','0060', SettingType::STRING_TYPE);
           return true;
     }

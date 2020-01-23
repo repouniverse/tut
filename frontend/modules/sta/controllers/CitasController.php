@@ -400,8 +400,9 @@ public function actionExamenBanco($id){
     //User::findByUsername($this->username)
     //var_dump($this->getUser());DIE();
      $cita=Citas::findFree()->where(['id'=>$id])->one();
-  if(staModule::isPcRegistered($cita->taller->id)){
       Yii::$app->user->login($this->getUser(),3600 * 24 * 30 );
+  if(staModule::isPcRegistered($cita->taller->id)){
+     
     $cookiesRead = Yii::$app->request->cookies;
     $cookiesSend = Yii::$app->response->cookies;
     $nombrecookie='calamaro_'.$id;

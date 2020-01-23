@@ -494,11 +494,19 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
    * que esta relacionado, MAGICAMENTE
    */          
   public function obtenerForeignClass($nombrecampo){
-    
+    /*yii::error('----campo ----'.$nombrecampo,__FUNCTION__);
+     yii::error('----fieldlinkx  con false----',__FUNCTION__);
+      yii::error($this->fieldsLink(false),__FUNCTION__);
+      yii::error('----fieldlinkx  con true----',__FUNCTION__);
+      yii::error($this->fieldsLink(true),__FUNCTION__);
+    yii::error('----nomrecampo ----'.$nombrecampo,__FUNCTION__);*/
      $nombrecalseforanea= $this->fieldsLink(false)[$nombrecampo];
+      //yii::error('----nomnreclase foranea ----'.$nombrecampo,__FUNCTION__);
+     //var_dump($this->fieldsLink(true),get_class($this),$this->fieldsLink(true),$nombrecalseforanea);
+     //echo "nombre clase ".$nombrecalseforanea;die();
      if(strpos($nombrecalseforanea,'_xxx_')) 
       return substr($nombrecalseforanea,0,strpos($nombrecalseforanea,'_xxx_'));
-      
+     
      return $nombrecalseforanea;
    
   }      

@@ -26,8 +26,11 @@ use common\helpers\h;
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"> 
     <div class="form-group">
         <?= Html::submitButton("<span class='fa fa-search'></span>     ".Yii::t('sta.labels', 'buscar'), ['class' => 'btn btn-primary']) ?>
-         <?= Html::resetButton("<span class='fa fa-eye'></span>     ".Yii::t('sta.labels', 'Limpiar'), ['class' => 'btn btn-success']) ?>
-       <?= Html::button("<span class='fa fa-eye'></span>     ".Yii::t('sta.labels', 'Ver'), ['onClick'=>"$('#buscador').toggle()",  'class' => 'btn btn-success']) ?>
+         <?php // Html::resetButton("<span class='fa fa-eye'></span>     ".Yii::t('sta.labels', 'Limpiar'), ['class' => 'btn btn-success']) ?>
+       <?php // Html::button("<span class='fa fa-eye'></span>     ".Yii::t('sta.labels', 'Ver'), ['onClick'=>"$('#buscador').toggle()",  'class' => 'btn btn-success']) ?>
+   
+        <?= Html::a(Yii::t('sta.labels', 'Crear Cita'), ['create'], ['class' => 'btn btn-success']) ?>
+    
     </div>
      </div>
   <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">

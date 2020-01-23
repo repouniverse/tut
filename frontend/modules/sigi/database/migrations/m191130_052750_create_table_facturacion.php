@@ -19,9 +19,11 @@ if(!$this->existsTable($table)) {
         'ejercicio'=>$this->char(4)->append($this->collateColumn()),
         'fecha'=>$this->char(10)->append($this->collateColumn()),
          'fvencimiento'=>$this->char(10)->append($this->collateColumn()),
+         'reporte_id'=>integer(11)->notNull(),
         //'periodo'=>$this->char(4)->append($this->collateColumn()),
         'descripcion'=>$this->string(40)->notNull()->append($this->collateColumn()),        
         'detalles'=>$this->text()->append($this->collateColumn()),
+        'detalleinterno'=>$this->text()->append($this->collateColumn()),
         ],$this->collateTable());
   
     $this->addForeignKey($this->generateNameFk($table), $table,

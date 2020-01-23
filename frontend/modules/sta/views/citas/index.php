@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
+    use kartik\export\ExportMenu;
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\modules\sta\models\CitasSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -18,16 +19,9 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php Pjax::begin(); ?>
     <?php  echo $this->render('_search', ['model' => $searchModel]); ?>
          <hr/>
-    <p>
-        <?= Html::a(Yii::t('sta.labels', 'Create Citas'), ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
-    <div style='overflow:auto;'>
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-         //'summary' => '',
-         'tableOptions'=>['class'=>'table table-condensed table-hover table-bordered table-striped'],
-        //'filterModel' => $searchModel,
-        'columns' => [
+    
+    <?php
+    $gridColumns=[
             
          
          [
@@ -99,7 +93,36 @@ $this->params['breadcrumbs'][] = $this->title;
             //'duracion',
 
           
-        ],
+        ];
+    
+    echo ExportMenu::widget([
+    'dataProvider' => $dataProvider,
+     'filename'=>'Citas',
+     'exportConfig'=>[
+         ExportMenu::FORMAT_EXCEL=>[
+             'filename'=>'Exportacion'
+               ],
+         ExportMenu::FORMAT_EXCEL_X=>[
+             'filename'=>'Exportacion'
+               ]
+         ],
+    'columns' => $gridColumns,
+    'dropdownOptions' => [
+        'label' => yii::t('sta.labels','Exportar'),
+        'class' => 'btn btn-success'
+    ]
+]) ?>
+ 
+ <hr>
+    
+    
+    <div style='overflow:auto;'>
+    <?= GridView::widget([
+        'dataProvider' => $dataProvider,
+         //'summary' => '',
+         'tableOptions'=>['class'=>'table table-condensed table-hover table-bordered table-striped'],
+        //'filterModel' => $searchModel,
+        'columns' => $gridColumns,
     ]); ?>
     <?php Pjax::end(); ?>
 </div>

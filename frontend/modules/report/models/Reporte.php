@@ -13,6 +13,7 @@ class Reporte extends baseReporte
     /**
      * {@inheritdoc}
      */
+    
     public $imagen;
     public $hardFields=['codocu','modelo'];
     public $routesSplit=[];//array para almacenar las rutas de los archivos picados 
@@ -217,7 +218,8 @@ class Reporte extends baseReporte
    * Funcion que renderiza el detalle del reporte 
    * Coouna tabla , desde un grid
    */
-    public function makeColumns(){
+    public function makeColumns($idfiltro){
+        //$modelo=$this->modelToRepor($idfiltro);
         $hijosDetalle=$this->
                 getReportedetalle()->
                 //where(['and', "esdetalle='1'", "visiblecampo='1'"])->
@@ -232,13 +234,25 @@ class Reporte extends baseReporte
         yii::error($hijosDetalle);
         $columns=[];
         foreach($hijosDetalle as $fila){
-             $columns[]=[
+            $elementos=[
                 'attribute'=>$fila['nombre_campo'],
                 'label'=>$fila['aliascampo'],
-               'format'=>'raw',
-                'options'=>['width'=>
-              $this->sizePercentCampo($fila['nombre_campo']).'%'],
-            ];
+               'format'=>(($fila['esnumerico']=='1') && !is_null($fila['nombre_campo']))?['decimal',3]:'raw',
+                'contentOptions'=>['width'=>
+              $this->sizePercentCampo($fila['nombre_campo']).'%',
+                    'style'=>($fila['esnumerico']=='1')?'text-align:right;':'text-align:left;'],
+              
+                ];
+            if($fila['totalizable']=='1'){
+               if($fila['esnumerico']=='1'){
+                 $elementos=array_merge($elementos,['footer' => '<div style="font-weight:bold; text-align:right !important;">'.$this->dataProvider($idfiltro)->query->sum($fila['nombre_campo']).'</div>']);
+                   } else{
+                    $elementos=array_merge($elementos,['footer' =>'Total' ]);
+               }
+              
+               
+            }
+             $columns[]=$elementos;
           
           
         }

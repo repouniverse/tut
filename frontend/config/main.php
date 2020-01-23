@@ -40,6 +40,8 @@ return [
        'formatter' => [
         'class' => 'yii\i18n\Formatter',
         'nullDisplay' => '',
+           'decimalSeparator' => '.',
+            'thousandSeparator' => ', ',
           ], 
         
        'urlManager' => [

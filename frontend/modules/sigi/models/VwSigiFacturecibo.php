@@ -42,7 +42,7 @@ use Yii;
  */
 class VwSigiFacturecibo extends \common\models\base\modelBase
 {
-    public $extraMethodsToReport=['reportAreas'];
+    public $extraMethodsToReport=['reportGrafico','reportAreas','reportLecturaAnt','reportPropietarios'];
     
     
     /**
@@ -132,11 +132,46 @@ class VwSigiFacturecibo extends \common\models\base\modelBase
         $pathView='/'.$controller->id.'/reports/'.$nameView.'/detalleAreas';
        return  $controller->getView()->render($pathView,['areas'=>$this->unidad->arrayParticipaciones()]);
     }
+   public function getReportPropietarios(){        
+        
+      $controller=Yii::$app->controller;
+        $nameView= \common\helpers\FileHelper::getShortName($this::className());
+        $pathView='/'.$controller->id.'/reports/'.$nameView.'/propietarios';
+       return  $controller->getView()->render($pathView,['propietarios'=>$this->unidad->arrayPropietarios()]);
+    }
+   public function getReportGrafico(){ 
+       
+       $suministro=SigiSuministros::findOne(['unidad_id'=>$this->unidad_id]);
+      if(!is_null($suministro)) {
+        if(!$suministro->hasAfiliados()){
+           $lecturas=$suministro->lastReads(); 
+        $controller=Yii::$app->controller;
+        $nameView= \common\helpers\FileHelper::getShortName($this::className());
+        $pathView='/'.$controller->id.'/reports/'.$nameView.'/_grafico';
+       
+          return  $controller->getView()->render($pathView,['lecturas'=>$lecturas ]);
+        
+        }
+        
+      } else{
+          return 'No hay Medidores';
+      }
+      }
+    
+     public function getReportLecturaAnt(){        
+      return $this->lectura-$this->delta;
+    }
     public function getUnidad()
     {
          
         return $this->hasOne(SigiUnidades::className(), ['id' => 'unidad_id']);
     }
+    public function getSuministro()
+    {
+         
+        
+    }
+    
     
     
 }

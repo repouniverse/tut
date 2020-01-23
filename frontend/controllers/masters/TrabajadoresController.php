@@ -328,6 +328,7 @@ class TrabajadoresController extends baseController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+     
        /* $modito=\frontend\modules\import\models\ImportCargamasivaUser::find(31)->one();
         $modito->setScenario('fechita');
         $modito->fechacarga=date('Y-m-d H:i:s');

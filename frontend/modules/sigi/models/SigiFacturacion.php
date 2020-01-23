@@ -5,6 +5,7 @@ use frontend\modules\sigi\models\SigiCuentaspor;
 use frontend\modules\sigi\models\SigiDetfacturacion;
 use Yii;
 USE yii\data\ActiveDataProvider;
+use frontend\modules\report\models\Reporte;
 /**
  * This is the model class for table "{{%sigi_facturacion}}".
  *
@@ -21,7 +22,7 @@ USE yii\data\ActiveDataProvider;
  */
 class SigiFacturacion extends \common\models\base\modelBase
 {
-   
+   //public static $varsToReplace=['$cuenta'=>'','$dias'=>'','$banco'=>'','$correo_cobranza'=>''];
     public $hardFields=['edificio_id','mes','ejercicio'];
      public $dateorTimeFields=['fvencimiento'=>self::_FDATE,'fecha'=>self::_FDATE];
     /**
@@ -38,9 +39,9 @@ class SigiFacturacion extends \common\models\base\modelBase
     public function rules()
     {
         return [
-            [['edificio_id', 'mes', 'descripcion','fecha','fvencimiento'], 'required'],
+            [['edificio_id', 'mes', 'descripcion','fecha','fvencimiento','reporte_id'], 'required'],
             [['edificio_id'], 'integer'],
-              [['fvencimiento'], 'safe'],
+              [['fvencimiento','detalleinterno','reporte_id'], 'safe'],
             ['fvencimiento', 'validateFechas'],
             [['detalles'], 'string'],
             [['mes'], 'string', 'max' => 2],
@@ -89,7 +90,10 @@ class SigiFacturacion extends \common\models\base\modelBase
     {
         return $this->hasOne(Edificios::className(), ['id' => 'edificio_id']);
     }
-    
+    public function getReporte(){
+       return $this->hasOne(Reporte::className(), ['id' => 'reporte_id']);
+   
+    }
     
 
     /**
@@ -403,5 +407,12 @@ class SigiFacturacion extends \common\models\base\modelBase
      
     }
  
+    
+  public function beforeSave($insert){
+      if($insert){
+          
+      }
+      return parent::beforeSave($insert);
+  }
    
 }

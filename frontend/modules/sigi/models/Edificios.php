@@ -7,6 +7,7 @@ use frontend\modules\sigi\models\SigiCuentaspor;
 use common\models\masters\Centros;
 use yii\web\NotFoundHttpException;
 use frontend\models\SignupForm;
+use common\helpers\h;
 use Yii;
 
 /**
@@ -31,7 +32,7 @@ use Yii;
  */
 class Edificios extends \common\models\base\modelBase
 {
-   
+   public static $varsToReplace=['$cuenta'=>'','$dias'=>'','$banco'=>'','$correo_cobranza'=>''];
     public $hardFields=['codigo','codcen'];
     /**
      * {@inheritdoc}
@@ -49,7 +50,7 @@ class Edificios extends \common\models\base\modelBase
         return [
             [['codtra', 'nombre','codigo', 'tipo', 'npisos', 'codcen', 'direccion', 'coddepa', 'codprov'], 'required'],
             [['npisos'], 'integer'],
-            [['coddist','codigo'], 'safe'],
+            [['coddist','codigo','facturacion'], 'safe'],
             [['detalles'], 'string'],
             [['codtra', 'codprov'], 'string', 'max' => 6],
             [['nombre', 'proyectista'], 'string', 'max' => 60],
@@ -83,6 +84,7 @@ class Edificios extends \common\models\base\modelBase
             'coddepa' => Yii::t('sigi.labels', 'Departamento'),
             'codprov' => Yii::t('sigi.labels', 'Provincia'),
              'coddist' => Yii::t('sigi.labels', 'Distrito'),
+            'facturacion' => Yii::t('sigi.labels', 'Texto Facturación'),
         ];
     }
 
@@ -406,5 +408,19 @@ class Edificios extends \common\models\base\modelBase
       if($areaTotal >0 )
       SigiUnidades::updateAll(['participacion'=> new \yii\db\Expression($strExp)], ['edificio_id'=>$this->id,'imputable'=>'1']);
   }
-   
+  
+  public function messageFacturacion(){
+      $variables=['$cuenta'=>$this->cuentaActiva()->numero,
+          '$dias'=>h::gsetting('sigi','numeroDiasVencimiento'),
+          '$banco'=>$this->cuentaActiva()->banco->nombre,
+          '$propietario_cuenta'=>$this->cuentaActiva()->clipro->despro,
+           '$moneda'=>$this->cuentaActiva()->moneda->desmon,
+          '$correo_cobranza'=>h::gsetting('sigi','correoCobranza1')
+          ];
+      return str_replace(array_keys($variables), array_values($variables), $this->facturacion);
+          
+  }
+ public function cuentaActiva(){
+     return $this->getCuentas()->where(['activa'=>'1'])->one();
+ } 
 }

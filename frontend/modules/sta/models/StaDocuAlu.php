@@ -63,6 +63,7 @@ public function behaviors()
             'codocu' => Yii::t('app', 'Codocu'),
             'descripcion' => Yii::t('app', 'Descripcion'),
             'detalle' => Yii::t('app', 'Detalle'),
+            'codestado' => Yii::t('app', 'Estado'),
         ];
     }
 

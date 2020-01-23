@@ -97,6 +97,9 @@ $gridColumns = [
 [    
     'attribute' => 'area',
 ],
+                 [    
+    'attribute' => 'codpro',
+],
          [    
     'attribute' => 'tipo',
              'value'=>'tipo.desunidad',

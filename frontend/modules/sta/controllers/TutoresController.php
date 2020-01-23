@@ -2,6 +2,9 @@
 namespace frontend\modules\sta\controllers;
 use Yii;
 use frontend\modules\sta\models\Talleres;
+use frontend\modules\sta\models\Talleresdet;
+use common\models\masters\Trabajadores;
+use frontend\modules\sta\staModule;
 use frontend\modules\sta\models\TalleresSearch;
 use frontend\modules\sta\models\Tallerpsico;
 use frontend\modules\sta\models\VwAlutallerSearch;
@@ -132,6 +135,43 @@ protected function findModel($id)
        
      } 
   
+   public function actionPsicologo($codtra){
+     $model=Trabajadores::findOne(['codigotra'=>$codtra]);
+       if(is_null($model)){
+           
+       } else{
+           //var_dump($model->codpuesto,staModule::COD_TRABAJADOR_PSICOLOGO);
+           if($model->codpuesto== staModule::COD_TRABAJADOR_PSICOLOGO){
+              $idProgramas= Talleresdet::find()->select('talleres_id')->where(['codtra'=>$codtra])->column();
+              $providerTalleresAntiguos=  new \yii\data\ActiveDataProvider([
+                                'query' => Talleres::find()->where(['id'=>$idProgramas])->andWhere(['<>','codperiodo',staModule::getCurrentPeriod()])->orderBy('codperiodo DESC'),
+                                    'pagination' => [
+                                        'pageSize' => 20,
+                                            ],
+                                        ]);
+             $providerTalleresActivos=  new \yii\data\ActiveDataProvider([
+                                'query' => Talleres::find()->where(['id'=>$idProgramas])->andWhere(['codperiodo'=> staModule::getCurrentPeriod()])->orderBy('codperiodo DESC'),
+                                    'pagination' => [
+                                        'pageSize' => 20,
+                                            ],
+                                        ]);
+             
+             return $this->render('consola/_psicologo',['model'=>$model, 'providerTalleresActivos'=>$providerTalleresActivos,  'providerTalleresAntiguos'=>$providerTalleresAntiguos]);
+             
+           }
+       }
+
+    }
     
+public function actionPendientes($id){
+    $this->layout="install";
+    $taller=Talleres::findOne($id);
+   return $this->render('consola/pendientes',[
+     'cpendientes'=>$taller->citasPendientesQuery()->count(),
+       'crealizadas'=>$taller->citasRealizadasQuery()->count(),      
+      'choy'=>$taller->citasForTodayQuery()->count(),      
+     'week'=>$taller->citasForThisWeekQuery()->count()]);
+}
+
 
 }

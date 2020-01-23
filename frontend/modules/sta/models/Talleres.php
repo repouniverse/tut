@@ -445,13 +445,44 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
      
      public function citasPendientesQuery(){
         return  Citas::find()->where([
-            'talleres_id'=>$this->id,
+            'talleres_id'=>$this->id])->andWhere([
             '>','fechaprog',date('Y-d-m')
             ]);
+     }
+     
+     public function citasRealizadasQuery(){
+        return  Citas::find()->where([
+            'talleres_id'=>$this->id,
+            'asistio'=>'1'])->andWhere([
+            '<=','fechaprog',date('Y-d-m')
+            ]);
+     }
+     public function citasForTodayQuery(){
+        return  Citas::find()->where([
+            'talleres_id'=>$this->id,
+            'asistio'=>'0'])->andWhere([
+             'between',
+             'fechaprog',
+             date('Y-d-m'),
+            date('Y-d-m H:i:s',time()+3600*24-1)
+                        ]);
+     }
+     
+     public function citasForThisWeekQuery(){
+         $dia=date('w');
+        return  Citas::find()->where([
+            'talleres_id'=>$this->id,
+            'asistio'=>'0'])->andWhere([
+             'between',
+             'fechaprog',
+             date('Y-d-m'),
+            date('Y-d-m H:i:s',time()+3600*24*(7-$dia))
+                        ]);
      }
    
  public function nAlumnos(){
    return Aluriesgo::studentsInRiskByFacQuery($this->codfac)->count();  
+   
  } 
  
 /*

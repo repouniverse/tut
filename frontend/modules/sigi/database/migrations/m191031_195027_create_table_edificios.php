@@ -29,6 +29,7 @@ if(!$this->existsTable($table)) {
         'npisos'=>$this->integer(2)->notNull(),
         'codigo'=>$this->string(8)->notNull()->append($this->collateColumn()),
          'detalles'=>$this->text()->append($this->collateColumn()),
+        'facturacion'=>$this->text()->append($this->collateColumn()),
          'codcen'=>$this->string(5)->notNull()->append($this->collateColumn()),
         'direccion'=>$this->string(100)->notNull()->append($this->collateColumn()),
         'coddepa'=>$this->char(3)->notNull()->append($this->collateColumn()),

@@ -367,6 +367,7 @@ class SigiCuentaspor extends \common\models\base\modelBase
             $model->lectura=(!is_null($medidor))?$medidor->LastReadFacturable($this->mes,$this->anio)->lectura:null;
              $model->delta=(!is_null($medidor))?$medidor->LastReadFacturable($this->mes,$this->anio)->delta:null;
              $model->consumototal=(!is_null($medidor))?$medidor->consumoTotal($this->mes,$this->anio,true):null;
+              $model->unidades=(!is_null($medidor))?$medidor->codum:null;
             if(!$model->save()){
                 yii::error($model->getFirstError()); 
                 $msgError=$model->getFirstError();

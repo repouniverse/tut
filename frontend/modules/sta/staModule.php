@@ -21,6 +21,11 @@ class staModule extends \yii\base\Module
     const USER_ALUMNO='10';
     const USER_OTROS='20';
     const RESPONSE_SUCCESS_CODE=200;
+    
+    CONST COD_INFORME_DEPARA='104';
+    CONST COD_INFORME_TUTORIA_ACADEMICA='105';
+    CONST COD_INFORME_TUTORIA_PSICOLOGICA='106';
+     CONST COD_TRABAJADOR_PSICOLOGO='200';
     /**
      * {@inheritdoc}
      */

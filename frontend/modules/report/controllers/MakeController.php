@@ -283,13 +283,30 @@ class MakeController extends baseController
   } 
   
   public function actionMultiReport($id,$idsToReport){
-        set_time_limit(300); // 5 minutes 
+      
+        set_time_limit(0); // 5 minutes 
+        ini_set('max_execution_time', 0); //0=NOLIMIT
+       if(h::request()->isAjax){
+           h::response()->format = \yii\web\Response::FORMAT_JSON;
+           
+       }
+        
+               
         //echo "maolde";die();
        $model=$this->findModel($id); 
        $this->layout='blank';
        $idsToReport= \yii\helpers\Json::decode($idsToReport);
+        $size=h::gsetting('report','sizePage');
+       //print_r($idsToReport);die();
+       /*vRIFICANDO PRIMERO SI YA EXISTEN UNOS PFDS ANTERIORES */
+       // $directorio=$this->dirFile();
+       $files= \yii\helpers\FileHelper::findFiles($model->dirFile());
+       //var_dump($files);die();
+         $avance=count($files)*$size;  
+            $idsToReport=array_slice($idsToReport,($avance==0)?0:$avance+1);    
+                
       // var_dump($idsToReport);die();
-       $size=h::gsetting('report','sizePage');
+      
       // yii::error('Numero maximo de paginas '.$size);
        $arreglos=  array_chunk($idsToReport, $size);
        foreach($arreglos as $key=>$arreglo){
@@ -316,8 +333,15 @@ class MakeController extends baseController
          $model->routesSplit[]=$ruta;
          unset($pdf);
        }
+       if(h::request()->isAjax){
+           return ['success'=>yii::t('sigi.labels','Se ha completado de generar los recibos')];
+           
+       }
+       
+       
           $mpdf = new \Mpdf\Mpdf();
-       foreach($model->routesSplit as $route) {
+           $files= \yii\helpers\FileHelper::findFiles($model->dirFile());
+       foreach($files as $route) {
           $mpdf->AddPage();
          $mpdf->SetImportUse();
          $pagecount = $mpdf->SetSourceFile($route);
@@ -337,7 +361,7 @@ class MakeController extends baseController
         unlink($route);
        } 
        
-       
+      //return  $pdf->output('/home/neotegni/public_html/sigi/frontend/uploads/pdfs/pd_grandazo.pdf', \Mpdf\Output\Destination::FILE);
        return $mpdf->Output();
   }
   
@@ -421,7 +445,7 @@ class MakeController extends baseController
              'modelo'=>$model,             
              'dataProvider'=>$dataProvider,
              'contenidoSinGrilla'=>$contenidoSinGrilla,
-             'columnas'=>$model->makeColumns(),             
+             'columnas'=>$model->makeColumns($idfiltro),             
                  ]).$this->pageBreak());
               }
      return $pageContents;   

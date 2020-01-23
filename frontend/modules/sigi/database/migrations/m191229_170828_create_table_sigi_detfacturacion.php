@@ -39,6 +39,7 @@ if(!$this->existsTable($table)) {
         'consumototal'=>$this->decimal(15,5)->comment('Consumo total de las lecturas del mes'),
         'montototal'=>$this->decimal(15,5)->comment('MOnto total del recibo o del prepuesto emnsual, cuentas por '),
          'numerorecibo'=>$this->string(12)->comment('Numero recibo '),
+        'unidades'=>$this->string(6)->comment('Unidades de medida '),
         ],$this->collateTable());
   
    /* $this->addForeignKey($this->generateNameFk($table), $table,

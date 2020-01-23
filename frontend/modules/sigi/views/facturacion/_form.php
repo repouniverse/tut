@@ -10,6 +10,7 @@ use common\helpers\h;
 use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
 use kartik\grid\GridView;
 use yii\widgets\Pjax;
+use common\widgets\selectwidget\selectWidget;
 /* @var $this yii\web\View */
 /* @var $model frontend\modules\sigi\models\SigiFacturacion */
 /* @var $form yii\widgets\ActiveForm */
@@ -28,6 +29,8 @@ use yii\widgets\Pjax;
         <?= Html::submitButton('<span class="fa fa-save"></span>   '.Yii::t('sigi.labels', 'Grabar'), ['class' => 'btn btn-success']) ?>
            <?=Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Facturar'), ['id'=>'boton_facturacion','class' => 'btn btn-warning'])?>    
         <?=Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Resetear'), ['id'=>'boton_resetear','class' => 'btn btn-warning'])?>    
+            <?=Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Generar Recibos'), ['id'=>'boton_recibos','class' => 'btn btn-warning'])?>    
+         
             </div>
         </div>
     </div>
@@ -65,7 +68,10 @@ use yii\widgets\Pjax;
                         ]
                     ) ?>
  </div>
-                    
+    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12"> 
+     
+
+ </div>                  
 <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
       <?= $form->field($model, 'fvencimiento')->widget(DatePicker::class, [
                             'language' => h::app()->language,
@@ -98,6 +104,10 @@ use yii\widgets\Pjax;
   <?php echo Html::a('reporte', Url::to(['/report/make/multi-report','id'=>2,'idsToReport'=> \yii\helpers\Json::encode($model->idsToFacturacion())]), $options); ?>
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
      <?= $form->field($model, 'detalles')->textarea(['rows' => 6]) ?>
+
+ </div>
+          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+     <?= $form->field($model, 'detalleinterno')->textarea(['rows' => 6]) ?>
 
  </div>
      
@@ -290,7 +300,43 @@ use yii\widgets\Pjax;
   
   $this->registerJs($string, \yii\web\View::POS_END);
 ?>
+<?php 
+  $string="$('#boton_recibos').on( 'click', function(){      
+       $.ajax({
+              url: '".Url::to(['/report/make/multi-report','id'=>2,'idsToReport'=>\yii\helpers\Json::encode($model->idsToFacturacion())])."', 
+              type: 'get',
+              data:{},
+              dataType: 'json', 
+              error:  function(xhr, textStatus, error){               
+                            var n = Noty('id');                      
+                              $.noty.setText(n.options.id, error);
+                              $.noty.setType(n.options.id, 'error');       
+                                }, 
+              success: function(json) {
+              var n = Noty('id');
+                      
+                       if ( !(typeof json['error']==='undefined') ) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['error']);
+                              $.noty.setType(n.options.id, 'error');  
+                          }    
 
+                             if ( !(typeof json['warning']==='undefined' )) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['warning']);
+                              $.noty.setType(n.options.id, 'warning');  
+                             } 
+                          if ( !(typeof json['success']==='undefined' )) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['success']);
+                              $.noty.setType(n.options.id, 'success');  
+                             }      
+                   
+                        }
+                        });
+
+
+             })";
+  
+  $this->registerJs($string, \yii\web\View::POS_END);
+?>
  <?php 
   $string="$('#boton_resetear').on( 'click', function(){      
        $.ajax({
@@ -328,11 +374,41 @@ use yii\widgets\Pjax;
   
   $this->registerJs($string, \yii\web\View::POS_END);
 ?> 
-      
+   
       
 </div>   
           
-       <?php }?>  
-    
+       <?php }else{?>  
+    <?php 
+  $string="$('#sigifacturacion-edificio_id').on( 'change', function(){ 
+       var identidad=$('#sigifacturacion-edificio_id').val();
+       //alert(identidad);
+       var Vurl='".Url::to(['/sigi/facturacion/ajax-recomendacion','id'=>'parex456'])."';
+       Vurl=Vurl.replace('parex456',identidad);
+       $.ajax({
+              url:Vurl, 
+              type: 'get',
+              data:{},
+              //dataType: 'json', 
+              error:  function(xhr, textStatus, error){               
+                            var n = Noty('id');                      
+                              $.noty.setText(n.options.id, error);
+                              $.noty.setType(n.options.id, 'error');       
+                                }, 
+              success: function(data) {
+              alert(data);
+              $('#sigifacturacion-detalles').val(data);
+             
+                           
+                   
+                        }
+                        });
+
+
+             })";
+  
+  $this->registerJs($string, \yii\web\View::POS_END);
+       }?>    
 
 </div>
+    </div>

@@ -99,12 +99,17 @@ class FacturacionController extends baseController
      */
     public function actionUpdate($id)
     {
+        
+        
   /*tend\modules\sigi\models\Edificios::findOne(7);
 $edificio->refreshPorcentaje();
 die();*/
 //$modelo=\frontend\modules\sigi\models\SigiSuministros::findOne(117);
         //var_dump($modelo->LastReadFacturable('12','2019'));DIE();
         $model = $this->findModel($id);
+       /* $model->obtenerForeignClass('reporte_id');
+         var_dump($model->obtenerForeignClass('reporte_id'),$model->fieldsLink(false));die();*/
+        
           $searchModel = new SigiCuentasporSearch();
          $dataProviderCuentasPor = $searchModel->searchByFactu($model->id); 
         // $searchModelLecturas = new VwSigiTempLecturasSearch();
@@ -225,5 +230,19 @@ die();*/
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]); 
+   }
+   /*Texto recomendacion*/
+   public function actionAjaxRecomendacion($id){
+       if(h::request()->isAjax){
+           //$modeled=$this->findModel($id);
+           $edificio=\frontend\modules\sigi\models\Edificios::findOne($id); 
+         if(!is_null($edificio)){
+             
+             return $edificio->messageFacturacion();
+             
+             
+         }
+           
+       }
    }
 }

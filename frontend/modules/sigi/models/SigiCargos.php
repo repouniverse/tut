@@ -41,7 +41,7 @@ class SigiCargos extends \common\models\base\modelBase
              ],
             [['codcargo'], 'string', 'max' => 4],
             [['descargo'], 'string', 'max' => 40],
-            [['esegreso', 'regular'], 'string', 'max' => 1],
+            //[['esegreso', 'regular'], 'string', 'max' => 1],
         ];
     }
 

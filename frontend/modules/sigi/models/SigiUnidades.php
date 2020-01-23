@@ -260,7 +260,7 @@ class SigiUnidades extends \common\models\base\modelBase
           */
          
         if($areaTotal>0){
-            return round(($this->area*(($porcentaje)?100:1))/$areaTotal,4);
+            return round(($this->area*(($porcentaje)?100:1))/$areaTotal,8);
         }else{
            return 0; 
         }  
@@ -520,13 +520,13 @@ class SigiUnidades extends \common\models\base\modelBase
          $Sparent=$this->padre->area;
          $St=$Sparent+$Schilds;
          
-         return round($this->area/$St,4);
+         return round($this->area/$St,6);
      }elseif($this->hasChildunits()){ //Es un padre
          yii::error('tiene hijitos ');
          $Schilds=self::find()->select('sum(area)')->where(['parent_id'=>$this->id])->scalar();
           $Smio=$this->area;
           $St=$Smio+$Schilds;
-          return round($Smio/$St,4);
+          return round($Smio/$St,8);
      }else{//Es un departamento solo
          yii::error('el departametno esta solo');
          return 1;
@@ -549,6 +549,11 @@ class SigiUnidades extends \common\models\base\modelBase
      //var_dump($datosAreas);die(); 
      return ['aareas'=>$datosAreas,'atotal'=>$areatotal];
     
+ }
+ 
+ public function arrayPropietarios(){    
+    $arrayProp=$this->getSigiPropietarios()->select(['tipo','nombre','dni'])->where(['activo'=>'1'])->asArray()->all();
+     return $arrayProp;
  }
  
 }
