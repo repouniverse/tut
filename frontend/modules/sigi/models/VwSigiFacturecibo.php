@@ -1,8 +1,10 @@
 <?php
 
 namespace frontend\modules\sigi\models;
+USE common\models\masters\Monedas;
 use frontend\modules\sigi\models\SigiUnidades;
 use Yii;
+use frontend\modules\report\components\NumeroAletras;
 
 /**
  * This is the model class for table "{{%vw_sigi_facturecibo}}".
@@ -42,7 +44,7 @@ use Yii;
  */
 class VwSigiFacturecibo extends \common\models\base\modelBase
 {
-    public $extraMethodsToReport=['reportGrafico','reportAreas','reportLecturaAnt','reportPropietarios'];
+    public $extraMethodsToReport=['reportMontoLetras','reportGrafico','reportAreas','reportLecturaAnt','reportPropietarios'];
     
     
     /**
@@ -172,6 +174,17 @@ class VwSigiFacturecibo extends \common\models\base\modelBase
         
     }
     
-    
+    public function getReportMontoLetras(){  
+        //var_dump($this->subtotal()+0);die();
+      return NumeroAletras::convert(              
+              round($this->subtotal()+0,2),
+               Monedas::findOne($this->codmon)->desmon,
+              true);
+    }
+   
+  private function subtotal(){
+      //var_dump(self::find()->select('sum(monto)')->where(['identidad'=>$this->identidad])->scalar());die();
+     return self::find()->select('sum(monto)')->where(['identidad'=>$this->identidad])->scalar();
+  }  
     
 }

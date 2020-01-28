@@ -35,13 +35,23 @@ $this->params['breadcrumbs'][] = Yii::t('sigi.labels', 'Editar');
              'options' => ['id' => 'myvynID3'],
         ],
         [
-          'label'=>'<i class="fa fa-users"></i> '.yii::t('sta.labels','Detalles'), //$this->context->countDetail() obtiene el contador del detalle
-            'content'=> $this->render('_lecturas',[ 'model' => $model,'dataProviderLecturas' =>$dataProviderLecturas]),
+          'label'=>'<i class="fa fa-users"></i> '.yii::t('sta.labels','Lecturas pendientes'), //$this->context->countDetail() obtiene el contador del detalle
+            'content'=> $this->render('_lecturas',[ 'model' => $model,'dataProviderLecturasFaltan' =>$dataProviderLecturasFaltan]),
             'active' => false,
              'options' => ['id' => 'myownID4'],
         ],
-       
-        
+       [
+          'label'=>'<i class="fa fa-users"></i> '.yii::t('sta.labels','Partidas'), //$this->context->countDetail() obtiene el contador del detalle
+            'content'=> $this->render('_presupuesto',[ 'searchModelPartidas' => $searchModelPartidas,'model' => $model,'dataProviderPartidas' =>$dataProviderPartidas]),
+            'active' => false,
+             'options' => ['id' => 'myownIghghD4'],
+        ],
+        [
+          'label'=>'<i class="fa fa-users"></i> '.yii::t('sta.labels','Lecturas tomadas'), //$this->context->countDetail() obtiene el contador del detalle
+            'content'=> $this->render('_lecturastomadas',[ 'searchModelLecturas' => $searchModelLecturas,'model' => $model,'dataProviderLecturas' =>$dataProviderLecturas]),
+            'active' => false,
+             'options' => ['id' => 'myownI78979hD4'],
+        ],
        
     ],
 ]);  

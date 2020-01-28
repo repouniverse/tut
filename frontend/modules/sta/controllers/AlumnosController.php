@@ -39,7 +39,7 @@ class AlumnosController extends baseController
      */
     public function actionIndex()
     {
-         
+          
          
         //var_dump(\frontend\modules\sta\models\Facultades::find()->select('codfac')->asArray()->all());die();
         $searchModel = new AlumnosSearch();

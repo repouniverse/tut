@@ -40,22 +40,11 @@ $this->params['breadcrumbs'][] = Yii::t('sta.labels', 'Update');
              'options' => ['id' => 'tabid2'],
         ],
        [
-            'label'=>'<i class="fa fa-map-o"></i> '.yii::t('sta.labels','Resultados'), //$this->context->countDetail() obtiene el contador del detalle
-            'content'=> $this->render('_resultados',[ ]),
-           'items'=>[
-             [
-                 'label'=>'Option 1',
-                 'encode'=>false,
-                 'content'=>'Un contenido',
-             ],
-             [
-                 'label'=>'Option 2',
-                 'encode'=>false,
-                 'content'=>'Otro contenido',
-             ],
-           ],
+            'label'=>'<i class="fa fa-map-o"></i> '.yii::t('sta.labels','Citas Vencidas'), //$this->context->countDetail() obtiene el contador del detalle
+            'content'=> $this->render('_citas_vencidas',['model'=>$model ]),
+           
            'active' => false,
-             'options' => ['id' => 'tabID3'],
+             'options' => ['id' => 'tab78ID3'],
         ],
         [
             'label'=>'<i class="fa fa-users"></i> '.yii::t('sta.labels','Alumnos'), //$this->context->countDetail() obtiene el contador del detalle

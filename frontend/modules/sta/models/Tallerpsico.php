@@ -25,14 +25,21 @@ class Tallerpsico extends \common\models\base\modelBase
      */
     const  SCENARIO_CANTIDAD='cantidad';
     const  SCENARIO_STATUS='estado';
+    const  SCENARIO_CAMBIO='cambio';
     public $booleanFields=['calificacion'];
+   // public $codtra2=null; //camo auxiliar
+    public $cantidad_transferir=null;
     public static function tableName()
+            
     {
         return '{{%sta_tallerpsico}}';
     }
 
     
-   
+   public function extraFields()
+    {
+        return ['codtra2',];
+    }
     
     /**
      * {@inheritdoc}
@@ -43,7 +50,14 @@ class Tallerpsico extends \common\models\base\modelBase
             [['talleres_id', 'codtra','nalumnos'], 'required'],
             [['talleres_id','nalumnos'], 'integer'],
             [['codtra'], 'string', 'max' => 6],
-            [['codtra'], 'unique', 'targetAttribute' => ['codtra', 'talleres_id'],'message'=>yii::t('sta.labels','Este tutor ya está registrado')],
+             [['codtra'], 'validateCambio','on'=>self::SCENARIO_CAMBIO], //auxiliar 
+            [['codtra'], 'unique',
+                'targetAttribute' => ['codtra', 'talleres_id'],
+                'message'=>yii::t('sta.labels','Este tutor ya está registrado'),
+                'except'=>self::SCENARIO_CAMBIO
+                ],
+            
+            [['cantidad_transferir'], 'safe'],
              //[['calificacion'], 'string', 'max' => 1],
              [['nalumnos','calificacion'], 'safe'],
             [['nalumnos'], 'validateCantidades','on'=>'default'],
@@ -56,6 +70,7 @@ class Tallerpsico extends \common\models\base\modelBase
         $scenarios = parent::scenarios(); 
         $scenarios[self::SCENARIO_CANTIDAD] = ['nalumnos'];
         $scenarios[self::SCENARIO_STATUS] = ['calificacion','nalumnos'];
+         $scenarios[self::SCENARIO_CAMBIO] = ['codtra','cantidad_transferir'];
        // $scenarios[self::SCENARIO_REGISTER] = ['username', 'email', 'password'];
         return $scenarios;
     }
@@ -82,20 +97,12 @@ class Tallerpsico extends \common\models\base\modelBase
         return $this->hasOne(Talleres::className(), ['id' => 'talleres_id']);
     }
 
-    public function getCitas()
+    /*public function getCitas()
     {
         return $this->hasMany(Citas::className(), ['talleres_id'=>'id','codtra'=>$this->codtra]);
-    }
+    }*/
     
-     public function getCitasPendientes()
-    {
-        return $this->hasMany(Citas::className(), 
-                [  /*'talleres_id'=>'id',*/
-                    'codtra'=>$this->codtra,
-                    'finicio'=> timeHelper::getDateTimeInitial(),
-                    
-                    ]);
-    }
+     
     
     /*
      * Pendientes solo del futuro
@@ -176,13 +183,13 @@ class Tallerpsico extends \common\models\base\modelBase
          */
         
         $cantidad=$this->detachStudents();//desacoplar estudiantes
-        $this->addMessage(self::MESSAGE_SUCCESS,yii::t('import.messages',' {numero} Alumnos fueron desafiliados con este tutor',['numero'=>$cantidad]));
+        //$this->addMessage(self::MESSAGE_SUCCESS,yii::t('import.messages',' {numero} Alumnos fueron desafiliados con este tutor',['numero'=>$cantidad]));
         
         if($this->hasCitas()){
-        $this->addMessage(self::MESSAGE_WARNING,yii::t('import.messages','Este tutor ya tenía citas programadas o efectuadas, sólo es posible desactivarlo '));
+        //$this->addMessage(self::MESSAGE_WARNING,yii::t('import.messages','Este tutor ya tenía citas programadas o efectuadas, sólo es posible desactivarlo '));
       
          $this->disabled();//desactivarlo
-         $this->addMessage(self::MESSAGE_SUCCESS,yii::t('import.messages','El tutor ha sido desactivado '));
+         $this->addMessage(self::MESSAGE_SUCCESS,yii::t('import.messages','Este tutor ya tenía citas, y sólo ha sido desactivado '));
       
       }else{
           $this->delete();
@@ -437,13 +444,44 @@ class Tallerpsico extends \common\models\base\modelBase
          Codtra : COdigo del trabajador destino
      *      */
     
-   public function transfiereAlus($oldCodtra,$newCodtra){
-     return  Tallerdet::updateAll(['codtra'=>$newCodtraodtra],
+   public function transfiereAlus($oldCodtra,$newCodtra,$cantidad=null){
+       if($cantidad < $this->nalumnos){
+           $alumnos=Talleresdet::find()->where(['talleres_id'=>$this->taller->id])->
+            andWhere(['codtra'=>$oldCodtra])->limit($cantidad)->all();
+           foreach($alumnos as $alumno){
+               $alumno->setScenario($alumno::SCENARIO_PSICO_PSICO);
+               $alumno->codtra=$newCodtra;
+               $alumno->save();
+           }
+       }else{
+          return Talleresdet::updateAll(['codtra'=>$newCodtra],
                [
                    'talleres_id'=>$this->talleres_id,
                    'codtra'=>$oldCodtra
                    //'codfac'=>$this->codfac,
-               ]);
+               ]); 
+       }
+       
+     
    } 
-    
+   
+    public function validateCambio($attribute, $params)
+    {
+      if(!$this->hasChanged('codtra'))
+        $this->addError('codtra',yii::t('sta.errors','Escoja un nuevo psicólogo'));
+      
+        if(!($this->cantidad_transferir >0)){
+            var_dump($this->cantidad_transferir); die();
+            $this->addError('codtra',yii::t('sta.errors','Cantida debe de ser mayor a cero'));
+     
+        }else{
+           if(($this->cantidad_transferir >$this->nalumnos))
+            $this->addError('codtra',yii::t('sta.errors','Cantidad a transferir debe de ser menor o igual a la cantidad original'));
+       
+        }
+            
+         
+        
+    }
+   
 }

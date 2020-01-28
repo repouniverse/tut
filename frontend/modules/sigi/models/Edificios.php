@@ -158,6 +158,17 @@ class Edificios extends \common\models\base\modelBase
                 ]);
     }
     
+    /*
+     * Deparatamenteos o unidades que sonimputables y ademas
+     * son padres, o representan una cobranza,      * 
+     */
+    public function unidadesImputablesPadres(){
+         return $this->queryUnidades()->andWhere([
+             'imputable'=>'1',
+                ])->andWhere(['parent_id'=>null])->all(); 
+    }
+        
+    
     public function area(){
         if($this->isNewRecord)
         return 0;
@@ -383,7 +394,13 @@ class Edificios extends \common\models\base\modelBase
               select('tipo')->distinct()->asArray()->
               all(),'tipo'); 
    }
-   
+   /*Medidores de areas comunes */
+    public function medidoresAaCc(){
+       $ids= $this->getUnidades()->select('id')
+                ->where(['imputable'=>'0'])->column();
+      return $this->getSuministros()->where(['unidad_id'=>$ids])->all();
+             
+   }
    
    public function generateUsers(){
        /*foreach($this->pr){

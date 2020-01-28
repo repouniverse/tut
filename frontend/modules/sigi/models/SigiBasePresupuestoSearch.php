@@ -75,4 +75,39 @@ class SigiBasePresupuestoSearch extends SigiBasePresupuesto
 
         return $dataProvider;
     }
+    
+    public function searchByEdificio($edificio_id,$params)
+    {
+        $query = SigiBasePresupuesto::find();
+
+        // add conditions that should always apply here
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+
+        $this->load($params);
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to return any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+        // grid filtering conditions
+        $query->where([
+            //'id' => $this->id,
+            'edificio_id' => $edificio_id,
+            
+        ]);
+
+        $query->andFilterWhere(['like', 'codgrupo', $this->codgrupo])
+            ->andFilterWhere(['like', 'codigo', $this->codigo])
+            ->andFilterWhere(['like', 'descripcion', $this->descripcion])
+            ->andFilterWhere(['like', 'activo', $this->activo])
+            ->andFilterWhere(['like', 'ejercicio', $this->ejercicio])
+            ->andFilterWhere(['like', 'restringir', $this->restringir]);
+
+        return $dataProvider;
+    }
 }

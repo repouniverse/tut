@@ -2,6 +2,7 @@
 namespace common\components;
 use common\models\masters\Usercentros;
 use common\models\Useraudit;
+use common\helpers\h;
 use common\models\Profile;
 use yii\helpers\Html;
 use yii;
@@ -121,6 +122,43 @@ class User extends UserOriginal {
        return Profile::find()->where(['user_id'=>$this->id])->one();
        
    }
+   
+   public function putUrlDefault($url=null){
+       if(is_null($url))
+         $url=\yii\helpers\Url::current();
+      return  $this->profile()->putUrl($url);
+   }
+   
+   public function getUrlDefault(){
+       return $this->profile->url;
+   }
+   
+   public function resolveUrlAfterLogin(){
+       $url=$this->profile->url;
+       if(!empty($url)){
+           yii::error('no esta vacio');
+          return $url;  
+       }else{
+            yii::error(' esta vacio y se leera de settings');
+           $tipo=$this->profile->tipo;
+           yii::error(' tipo '.$tipo);
+           //yii::error(' tipo '.$tipo);
+           $url=h::gsetting('general','url.profile.'.$tipo);
+           yii::error('url.profile.'.$tipo);
+          if(!is_null($url)){
+              yii::error('se leyo del settinds '.$url);
+              
+              return $url;
+          } else{
+              yii::error('NO s encontro nad aen l settinfs ');
+               $url=is_null(\yii\helpers\Url::previous('intentona'))?Yii::$app->homeUrl:Url::previous('intentona');
+           yii::error('de la intenot a');
+           yii::error($url);
+               return $url;
+          }
+       }
+   }
+   
    
    public function hasProfile(){
        return is_null($this->getProfile())?false:true;

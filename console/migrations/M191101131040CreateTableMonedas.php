@@ -21,7 +21,8 @@ if(!$this->existsTable($table)) {
              'codmon'=>$this->string(5)->notNull()->append($this->collateColumn()),
             'desmon'=>$this->string(15)->notNull()->append($this->collateColumn()),
             'activa' =>$this->string(40)->append($this->collateColumn()),         
-             'simbolo' =>$this->string(3)->append($this->collateColumn()),         
+             'simbolo' =>$this->string(3)->append($this->collateColumn()),  
+         'centimo' =>$this->string(50)->append($this->collateColumn()),         
              
         ],$this->collateTable());
       $this->addPrimaryKey($this->generateNameFk($table), $table, 'codmon');

@@ -3,6 +3,7 @@
 namespace frontend\modules\sta\models;
 use frontend\modules\sta\staModule;
 use frontend\modules\sta\models\StaDocuAlu;
+use common\models\masters\Trabajadores;
 use Yii;
  use common\helpers\timeHelper;
 /**
@@ -28,7 +29,7 @@ class Talleresdet extends \common\models\base\modelBase
     const CONTACTO_SIN_RESPUESTA='danger';
     const CONTACTO_CON_RESPUESTA='warning';
     const CONTACTO_CON_CITA='success';
-    
+    const SCENARIO_PSICO_PSICO='mipsico';
     
     
     /**
@@ -45,6 +46,7 @@ class Talleresdet extends \common\models\base\modelBase
         $scenarios[self::SCENARIO_BATCH] = ['talleres_id','codalu','codfac'];
         $scenarios[self::SCENARIO_PSICO] = ['codtra_psico'];
         $scenarios[self::SCENARIO_TUTOR] = ['rank_tutor','detalle_tutor'];
+        $scenarios[self::SCENARIO_PSICO_PSICO] = ['codtra'];
        // $scenarios[self::SCENARIO_BATCH] = [ 'codcar', 'ap', 'am', 'nombres', 'dni','domicilio','correo','celulares','fijos'];
        // $scenarios[self::SCENARIO_REGISTER] = ['username', 'email', 'password'];
         return $scenarios;
@@ -92,7 +94,10 @@ class Talleresdet extends \common\models\base\modelBase
     {
         return $this->hasOne(Talleres::className(), ['id' => 'talleres_id']);
     }
-
+public function getTrabajador()
+    {
+        return $this->hasOne(Trabajadores::className(), ['codigotra' => 'codtra']);
+    }
     
      public function getDocumentos()
     {
@@ -212,5 +217,15 @@ class Talleresdet extends \common\models\base\modelBase
        $ahora=date(timeHelper::formatMysql());
       return $this->getCitas()->
               andWhere(['<','fechaprog',$ahora]);
+  }
+  
+  public function cambiaPsicologo($nuevo){
+      $oldScenario=$this->getScenario();
+      $this->setScenario(self::SCENARIO_PSICO_PSICO);
+      $this->codtra=$nuevo;
+      $this->save();
+      $this->talleres->sincronizeCant();
+      $this->setScenario($oldScenario);
+      
   }
 }

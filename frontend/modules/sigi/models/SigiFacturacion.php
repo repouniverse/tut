@@ -3,7 +3,9 @@
 namespace frontend\modules\sigi\models;
 use frontend\modules\sigi\models\SigiCuentaspor;
 use frontend\modules\sigi\models\SigiDetfacturacion;
+use frontend\modules\sigi\models\SigiKardexdepa;
 use Yii;
+use  yii\web\ServerErrorHttpException;
 USE yii\data\ActiveDataProvider;
 use frontend\modules\report\models\Reporte;
 /**
@@ -41,7 +43,7 @@ class SigiFacturacion extends \common\models\base\modelBase
         return [
             [['edificio_id', 'mes', 'descripcion','fecha','fvencimiento','reporte_id'], 'required'],
             [['edificio_id'], 'integer'],
-              [['fvencimiento','detalleinterno','reporte_id'], 'safe'],
+              [['fvencimiento','detalleinterno','unidad_id','reporte_id'], 'safe'],
             ['fvencimiento', 'validateFechas'],
             [['detalles'], 'string'],
             [['mes'], 'string', 'max' => 2],
@@ -199,16 +201,20 @@ class SigiFacturacion extends \common\models\base\modelBase
     public function generateFacturacionMes(){
         $errores=[];
         yii::error('generando facturacion');
+        if(count($this->getSigiCuentaspor()->select('codmon')->distinct()->column())==1){
+             
+      
        if($this->isCompleteColectores()){
           if($this->isCompleteReadsSuministros()){
-          foreach($this->sigiCuentaspor as $cuentapor){
+        /* foreach($this->sigiCuentaspor as $cuentapor){
             $err=$cuentapor->generateFacturacion();
             if(count($err)>0){
                 $errores['error']=yii::t('sigi.errors','Se presentaron algunos incovenientes'); 
             }else{
                $errores['success']=yii::t('sigi.errors','Se ha generado la facturacion sin problemas '.$this->balanceMontos());  
             }
-          }
+          }*/
+           $this->shortFactu();
            $this->asignaIdentidad();//Importante  
            $this->asignaNumero();
         }else{
@@ -218,6 +224,13 @@ class SigiFacturacion extends \common\models\base\modelBase
        }else{
            $errores['error']=yii::t('sigi.errors','Falta agregar recibos o conceptos en la facturación');  
        }
+       
+       //Verificando que todos los recibos tengan la misma moneda 
+        }else{
+            $errores['error']=yii::t('sigi.errors','Existe más de una moneda verifique los detalles');
+        }
+       
+       
         return $errores;
     }
     /*
@@ -339,7 +352,8 @@ class SigiFacturacion extends \common\models\base\modelBase
     }
     
     public function resetFacturacion(){
-      \frontend\modules\sigi\models\SigiDetfacturacion::deleteAll(['facturacion_id'=>$model->id]);
+      $borrados= \frontend\modules\sigi\models\SigiDetfacturacion::deleteAll(['facturacion_id'=>$this->id]);
+      yii::error('borrados '.$borrados.'  Registros');
       \frontend\modules\sigi\models\SigiLecturas::updateAll(['cuentaspor_id'=>null],
               [ 
                  'mes'=>$this->mes,
@@ -414,5 +428,177 @@ class SigiFacturacion extends \common\models\base\modelBase
       }
       return parent::beforeSave($insert);
   }
+  
+  /*
+   * Funcio que obtiene el registro unico para 
+   * recolectar las cobranzas de los departamenteos
+   * afiliados de la inmobiliaria 
+   */
+  private function hasKardexDepaComun(){
+      if(empty($this->unidad_id))
+      throw new ServerErrorHttpException(Yii::t('base.errors', 'No ha especificado la unidad general para  cobranza masiva'));
+ return SigiKardexdepa::find()->where([
+      'edificio_id'=>$this->edificio,
+      'unidad_id'=>$this->unidad_id,
+      'facturacion_id'=>$this->id,
+      ])->one();
+      
+  }
+  
+  private function hasKardexDepa($unidad_id){
+      return SigiKardexdepa::find()->where([
+      'edificio_id'=>$this->edificio,
+      'unidad_id'=>$unidad_id,
+      'facturacion_id'=>$this->id,
+      ])->one();
+      
+  }
+  
+  private function kardexDepaComun(){
+      $registro=$this->hasKardexDepaComun();
+    if(is_null($registro)){
+        $attributes=[
+        'edificio_id'=>$this->edificio_id,
+        'unidad_id'=>$this->unidad_id,
+        'facturacion_id'=>$this->id,
+        'mes'=>$this->mes,
+        'anio'=>$this->ejercicio,
+        'fecha'=>$this->fecha, ];
+     $modelo=New SigiKardexdepa();
+     $modelo->setAttributes($attributes);
+      if($modelo->save()){
+          //var_dump('0k');die();
+      }else{
+        var_dump($modelo->getErrors());die();  
+      }
+      return $modelo;
+    }else{
+      return $registro;  
+    }
+    
+  }
+  
+    private function kardexDepa($unidad_id){  
+         $registro=$this->hasKardexDepa($unidad_id);
+    if(is_null($registro)){
+        $attributes=[
+        'edificio_id'=>$this->edificio_id,
+        'unidad_id'=>$unidad_id,
+        'facturacion_id'=>$this->id,
+        'mes'=>$this->mes,
+        'anio'=>$this->ejercicio,
+        'fecha'=>$this->fecha, ];
+     $modelo=New SigiKardexdepa();
+     $modelo->setAttributes($attributes);
+      if($modelo->save()){
+          //var_dump('0k');die();
+      }else{
+        var_dump($modelo->getErrors());die();  
+      }
+      return $modelo;
+    }else{
+      return $registro;  
+    }
+  }
+  
+  public function hasCobranzaMasiva(){
+      $valor=false;
+     foreach($this->edificio->apoderados as $apoderado){
+         if(!$apoderado->cobranzaindividual && $apoderado->hasDepasImputables()){
+            $valor=true; break; 
+         }
+    }
+    return $valor;
+  }
+  
+  /*Facturacion sin nmucho detalle */
+  public function shortFactu(){
+     $unidades= $this->edificio->unidadesImputablesPadres();
+     $hasCobranzaMasiva=$this->hasCobranzaMasiva();
+     
+
+     if($hasCobranzaMasiva){
+       //Obteniendo la unidad Grupal
+        
+      $kardexGrupal=$this->kardexDepaComun();
+       $kardexGrupal->refresh();  
+     }
+      
+     foreach($unidades as $unidad){
+       
+         if($hasCobranzaMasiva){
+                  if($unidad->miApoderado()->cobranzaindividual){
+                      $modeltemp=$this->kardexDepa($unidad->id);
+                       $identidad=$modeltemp->id; unset($modeltemp);
+          
+                     }else{
+                        $identidad=$kardexGrupal->id;  
+                  } 
+         }else{
+                     $modeltemp=$this->kardexDepa($unidad->id);
+                     $identidad=$modeltemp->id; unset($modeltemp);
+         }
+         
+       
+       
+        foreach($this->sigiCuentaspor as $cuenta){
+            $colector=$cuenta->colector;
+           if($colector->isMassive()){
+             if($colector->isMedidor()){
+                 $medidor=$unidad->firstMedidor($colector->tipomedidor);
+                 $participacion=$medidor->participacionRead($cuenta->mes,$cuenta->anio);
+                 //yii::error('partici medidor  '.$participacion);
+                $monto=round($participacion*$cuenta->monto,6);
+                 /***insertar un registrio****/
+                if(!$cuenta->existsDetalleFacturacion($unidad,$colector,false))
+                 $cuenta->insertaRegistro($identidad,$unidad,$medidor,$monto,'0',$participacion);
+                 /*****************************/
+                 // yii::error('partici unidada  '.$unidad->porcWithChilds());
+                     $monto=0;
+                     /******Recorreidno los medidores de aareas comunes*/
+                         foreach($this->edificio->medidoresAaCc() as $medidorAACC){
+                             $participacionAACC=$medidorAACC->participacionRead($cuenta->mes,$cuenta->anio);
+                             $monto=$monto+round($participacionAACC //el porc d ecomsumo
+                                     *$unidad->porcWithChilds() //por la participacion 
+                                     *$cuenta->monto,10); ///el monto totañl
+                         }
+                 
+                 /***insertar un registrio  por todfas las sumas de las lecturas****/
+                  if(!$cuenta->existsDetalleFacturacion($unidad,$colector,true))
+                  $cuenta->insertaRegistro($identidad,$unidad,null,$monto,'1',$participacionAACC //el porc d ecomsumo
+                                     *$unidad->porcWithChilds());
+                 /*****************************/
+                 
+                 
+                 
+                }else{
+                   
+                $monto=round($unidad->porcWithChilds()*$cuenta->monto,10);
+                
+                /***insertar un registrio****/
+                if(!$cuenta->existsDetalleFacturacion($unidad,$colector,false))
+                  $cuenta->insertaRegistro($identidad,$unidad,null,$monto,'0',$unidad->porcWithChilds());
+                 /*****************************/
+                 
+                   }
+                }else{
+                   /*Si es un cobro uindividual aplicar aqui*/
+                   if($cuenta->unidad_id>0 && $cuenta->unidad_id==$unidad->id) {
+                       /***insertar un registrio****/
+                       if(!$cuenta->existsDetalleFacturacion($unidad,$colector,false))
+                    $cuenta->insertaRegistro($identidad,$unidad,null,$monto,'1',1);
+                      /*****************************/
+                 
+                 
+                        }
+                 }
+            
+        } 
+     }         
+  }
+  
+  
+  
+  
    
 }

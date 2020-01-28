@@ -71,6 +71,7 @@ class Profile extends \common\models\base\modelBase implements \common\interface
     {
         return [
             [['user_id'], 'integer'],
+            [['url'], 'safe'],
             [['photo', 'detalle'], 'string'],
             [['names'], 'string', 'max' => 60],
              [['names','duration','durationabsolute'], 'safe'],
@@ -247,6 +248,12 @@ class Profile extends \common\models\base\modelBase implements \common\interface
          $strname= ($ucase)?\yii\helpers\StringHelper::mb_ucwords($strname):$strname;
        return str_replace(' ',$delimiter, $strname);
      }
+     
+     
+  public function putUrl($url){
+      $this->url=$url;
+      $this->save();
+  }   
   
   
              }

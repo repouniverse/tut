@@ -1,6 +1,5 @@
 <?php
 namespace frontend\modules\sta\filters;
-
 use Yii;
 use yii\base\ActionFilter;
 use yii\helpers\Url;
@@ -19,7 +18,8 @@ class FilterAccess extends ActionFilter
      if(h::user()->isGuest){
          //header('location: http://www.neotegnia.com');
         //echo "hola"; die();
-        //header('location: http://case.itekron.com/frontend/web/site/login');
+      //var_dump(h::response()->content); die();
+        header('location: http://case.itekron.com/frontend/web/site/login');
          //var_dump(yii::$app->controller->redirect(['/sitryyr8686e/login']));die();
           return yii::$app->controller->redirect(['/site/login']); 
            //return parent::beforeAction($action);

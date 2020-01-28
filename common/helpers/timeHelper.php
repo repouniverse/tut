@@ -97,6 +97,16 @@ class timeHelper {
          return false;
      }
   }
+  
+  public static function Saludo(){
+      $hora=Date('H');
+      if ($hora <= 12)
+          return yii::t('base.names','Buenos días');
+        else if ($hora < 19)
+          return yii::t('base.names','Buenas Tardes');
+        else
+         return yii::t('base.names','Buenas Noches');
+  }
 }  
   
    

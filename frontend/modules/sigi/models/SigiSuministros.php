@@ -361,7 +361,7 @@ public function participacionRead($mes,$anio){
     $consumoT=$this->consumoTotal($mes, $anio);
     $consumo=$this->LastReadFacturable($mes,$anio)->delta;
     if($consumoT > 0){
-        return round($consumo/$consumoT,6);
+        return round($consumo/$consumoT,10);
     }else{
         return 0;
     }

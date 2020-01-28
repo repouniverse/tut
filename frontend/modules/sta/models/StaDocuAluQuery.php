@@ -7,7 +7,7 @@ namespace frontend\modules\sta\models;
  *
  * @see StaDocuAlu
  */
-class StaDocuAluQuery extends \yii\db\ActiveQuery
+class StaDocuAluQuery extends \frontend\modules\sta\components\ActiveQueryScope
 {
     /*public function active()
     {

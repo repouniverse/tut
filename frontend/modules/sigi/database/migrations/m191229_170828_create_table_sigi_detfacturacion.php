@@ -26,6 +26,7 @@ if(!$this->existsTable($table)) {
          'igv'=>$this->decimal(8, 4)->notNull(),
        'grupounidad'=>$this->string(12)->comment('agrupa  todos los objetos: cochera, depositos  en el mismo departamento  '),
           'grupofacturacion'=>$this->string(12)->notNull()->comment('Agrupa el documento del recibo, ojo lo hace por departametno o apoderado, MUY IMPORTANTES '),
+         'grupocobranza'=>$this->string(12)->notNull()->comment('Agrupa el documento para cobrar ojo, puede cobrar de un solo cocacho varios recibos  MUY IMPORTANTES '),
         'grupounidad_id'=>$this->integer(11)->notNull()->comment('Agrupa los ids del mismo departameno  '),
           'facturacion_id'=>$this->integer(11)->notNull()->comment('Id facturacion  '),
           'identidad'=>$this->integer(11)->notNull()->comment('identidad para agrupar un solo reporte'),

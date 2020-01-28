@@ -179,6 +179,18 @@ class comboHelper extends Combito
                 'id','numero'); 
      
     }
+    
+    
+    public static function getCboUnitsNotImputables($id_edificio){
+     
+          return ArrayHelper::map(
+                          \frontend\modules\sigi\models\SigiUnidades::find()
+                  ->where(['edificio_id'=>$id_edificio])
+                  ->andWhere(['not',['imputable'=>'1']])->all(),
+                'id','numero'); 
+      
+       
+    }
 }
 
 

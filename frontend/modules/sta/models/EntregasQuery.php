@@ -1,13 +1,13 @@
 <?php
 
 namespace frontend\modules\sta\models;
-//use frontend\modules\sta\components\ActiveQueryScope;
+use frontend\modules\sta\components\ActiveQueryScope;
 /**
  * This is the ActiveQuery class for [[Entregas]].
  *
  * @see Entregas
  */
-class EntregasQuery extends \yii\db\ActiveQuery
+class EntregasQuery extends ActiveQueryScope
 {
     /*public function active()
     {

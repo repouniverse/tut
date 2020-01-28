@@ -147,6 +147,10 @@ class SigiCuentaspor extends \common\models\base\modelBase
     {
         return $this->hasOne(Edificios::className(), ['id' => 'edificio_id']);
     }
+    public function getMoneda()
+    {
+        return $this->hasOne(\common\models\masters\Monedas::className(), ['codmon' => 'codmon']);
+    }
     public function getDocumento()
     {
         return $this->hasOne(Documentos::className(), ['codocu' => 'codocu']);
@@ -368,6 +372,8 @@ class SigiCuentaspor extends \common\models\base\modelBase
              $model->delta=(!is_null($medidor))?$medidor->LastReadFacturable($this->mes,$this->anio)->delta:null;
              $model->consumototal=(!is_null($medidor))?$medidor->consumoTotal($this->mes,$this->anio,true):null;
               $model->unidades=(!is_null($medidor))?$medidor->codum:null;
+              $model->codmon=$this->codmon;
+              
             if(!$model->save()){
                 yii::error($model->getFirstError()); 
                 $msgError=$model->getFirstError();
@@ -397,7 +403,7 @@ class SigiCuentaspor extends \common\models\base\modelBase
             ];
  }  
 
-private function existsDetalleFacturacion($unidad,$colector,$prorateo=false){    
+public function existsDetalleFacturacion($unidad,$colector,$prorateo=false){    
     return SigiDetfacturacion::find()->
                 where([
                     'cuentaspor_id'=>$this->id,
@@ -415,6 +421,41 @@ private function existsDetalleFacturacion($unidad,$colector,$prorateo=false){
                 ->exists();
     
 } 
+/*
+ * Funcion corta 
+ */
+public function insertaRegistro($identidad,$unidad,$medidor,$monto,$aacc,$participacion){
+     $model=New SigiDetfacturacion();
+         $attributes=[ 'cuentaspor_id'=>$this->id,
+                'edificio_id'=>$this->edificio_id,
+         'facturacion_id'=>$this->facturacion_id,
+                'unidad_id'=>$unidad->id,
+                'colector_id'=>$this->colector->id,
+                'grupo_id'=>$this->colector->grupo_id,
+                'monto'=>$monto,
+                'igv'=>$monto*h::gsetting('general', 'igv'),
+                //'cuentaspor_id'=>$this->id,
+                'mes'=>$this->mes,
+                'anio'=>$this->anio,
+                 'aacc'=>$aacc,
+                   'montototal'=>$this->monto,
+             'kardex_id'=>$identidad, //Importante 
+         'grupounidad'=>$unidad->numero,
+           'grupounidad_id'=>$unidad->id,
+            'grupofacturacion'=>(!$unidad->miApoderado()->facturindividual)?$unidad->codpro:$unidad->numero,
+             'grupocobranza'=>(!$unidad->miApoderado()->cobranzaindividual)?$unidad->codpro:$unidad->numero,
+            'participacion'=>$participacion,
+          'codsuministro'=>(is_null($medidor))?null:$medidor->codsuministro,
+            'lectura'=>(is_null($medidor))?null:$medidor->LastReadFacturable($this->mes,$this->anio)->lectura,
+             'delta'=>(is_null($medidor))?null:$medidor->LastReadFacturable($this->mes,$this->anio)->delta,
+            'consumototal'=>(is_null($medidor))?null:$medidor->consumoTotal($this->mes,$this->anio,true),
+             'unidades'=>(is_null($medidor))?null:$medidor->codum,
+             'codmon'=>$this->codmon,];
+         $model->setAttributes($attributes);
+        return $model->save();
+ 
+    
+}
 
 
 

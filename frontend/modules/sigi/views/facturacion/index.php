@@ -7,7 +7,7 @@ use yii\widgets\Pjax;
 /* @var $searchModel frontend\modules\sigi\models\SigiFacturacionSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('sigi.labels', 'Detalle Facturación');
+$this->title = Yii::t('sigi.labels', 'Facturación');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="sigi-facturacion-index">

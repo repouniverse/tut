@@ -58,7 +58,7 @@ class SigiUnidades extends \common\models\base\modelBase
             ['numero', 'validateChild'],
             [['area','imputable'], 'validateArea'],
              ['codpro', 'validateApoderado'],
-            ['numero', 'unique', 'targetAttribute' => ['edificio_id','numero']],
+            ['numero', 'unique', 'targetAttribute' => ['edificio_id','numero','codtipo']],
             [['area', 'participacion'], 'number'],
             //[['area'], 'required'],
             //['imputable', 'validateArea'],
@@ -554,6 +554,25 @@ class SigiUnidades extends \common\models\base\modelBase
  public function arrayPropietarios(){    
     $arrayProp=$this->getSigiPropietarios()->select(['tipo','nombre','dni'])->where(['activo'=>'1'])->asArray()->all();
      return $arrayProp;
+ }
+ 
+ 
+ public function porcWithChilds($porcentaje=false){
+     $areaEdificio=$this->edificio->area();
+        if($areaEdificio>0){
+            return round(($this->areaTotal()*(($porcentaje)?100:1))/$areaEdificio,12);
+        }else{
+           return 0; 
+        }  
+ }
+ 
+ private function areaTotal(){
+    return $this->area+$this->find()->select('sum(area)')->where(['edificio_id'=>$this->edificio_id,'parent_id'=>$this->id])->scalar();
+ }
+ 
+ public function mailsPropietarios(){
+    return $this->getSigiPropietarios()->select(['correo1'])->
+      where(['recibemail'=>'1'])->column();
  }
  
 }

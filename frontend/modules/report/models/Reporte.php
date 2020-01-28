@@ -1,8 +1,11 @@
 <?php
 
 namespace frontend\modules\report\models;
+use frontend\modules\report\Module as ModuleReporte;
+use common\models\masters\Sociedades;
 use common\models\masters\Centros;
 use common\models\masters\Documentos;
+use common\models\masters\Monedas;
 use frontend\modules\report\behaviors\FileBehavior;
 use Yii;
 use common\helpers\h;
@@ -244,10 +247,12 @@ class Reporte extends baseReporte
               
                 ];
             if($fila['totalizable']=='1'){
+                $elementos=array_merge($elementos,['footerOptions' => ['align'=>'right','style'=>'font-size:14px;']]);
                if($fila['esnumerico']=='1'){
-                 $elementos=array_merge($elementos,['footer' => '<div style="font-weight:bold; text-align:right !important;">'.$this->dataProvider($idfiltro)->query->sum($fila['nombre_campo']).'</div>']);
+                 $elementos=array_merge($elementos,['footer' => '<div style="font-weight:bold; text-align:right !important;">'.round($this->dataProvider($idfiltro)->query->sum($fila['nombre_campo']),2).'</div>']);
                    } else{
-                    $elementos=array_merge($elementos,['footer' =>'Total' ]);
+                       //var_dump($fila['monto'],Monedas::Simbolo($fila['codmon']));die();
+                    $elementos=array_merge($elementos,['footer' =>'Total: ' ]);
                }
               
                
@@ -346,4 +351,89 @@ class Reporte extends baseReporte
             $this->routesSplit[]=$this->pathToStoreFile();
         } 
     }
+    
+    public function creaReporte($id, $idfiltro){
+       Yii::$app->controller->layout='blank';
+      $pageContents=$this->McontentReport($id, $idfiltro);
+      //echo $pageContents[0];die();
+      return $this->MprepareFormat($pageContents);
+     
+    }
+     private function McontentReport($id, $idfiltro){
+       //$model=$this->findModel($id); 
+       $logo=($this->tienelogo)?$this->MputLogo($id, $idfiltro):''; 
+       $cabecera=$this->putCabecera($id,$idfiltro,$this->campofiltro);
+      $contenidoSinGrilla=$logo.$cabecera; 
+      $npaginas=$this->numeroPaginas($idfiltro);
+      $contenido="";
+      $dataProvider=$this->dataProvider($idfiltro);
+      $pageContents=[]; //aray con las paginas cotneido un elemento potr pagina
+      for($i = 1; $i <= $npaginas; $i++){
+         $dataProvider->pagination->page = $i-1; //Set page 1
+          $dataProvider->refresh(); //Refresh models
+         $pageContents[]=trim(Yii::$app->controller->render('reporte',[
+             'modelo'=>$this,             
+             'dataProvider'=>$dataProvider,
+             'contenidoSinGrilla'=>$contenidoSinGrilla,
+             'columnas'=>$this->makeColumns($idfiltro),             
+                 ]).$this->MpageBreak());
+              }
+     return $pageContents;   
+  }
+  
+   private function MputLogo($id, $idfiltro){               
+        return Yii::$app->controller->renderpartial('logo',
+				array(
+			'modelosociedad' =>Sociedades::find()->one(),
+                         'model'=>$this/*->modelToRepor($idfiltro)*/,
+			'idreporte'=>$id,
+					//'xlogo'=>$xlogo,
+					//'ylogo'=>$ylogo,
+					//'rutalogo'=>$rutalogo,
+				),TRUE,	true);
+        
+    }
+  
+  private function MpageBreak(){
+      return "<div class=\"pagebreak\"> </div>";
+  }
+  
+  private function MprepareFormat($contenido){
+      if($this->type=='pdf'){  
+            $mpdf=ModuleReporte::getPdf();
+             $paginas=count($contenido);
+            //echo $contenido[0];die();
+                foreach($contenido as $index=>$pagina){
+                                $mpdf->WriteHTML($pagina);
+                                if($index < $paginas-1)
+                                            $mpdf->AddPage();
+                                        }
+                    
+                       $ruta=$this->pathToStoreFile();
+                        $mpdf->output($ruta, \Mpdf\Output\Destination::FILE);  
+                        return $ruta;  
+                    
+                      
+      }elseif($this->type=='html'){
+          $cadenaHtml='';
+          foreach($contenido as $index=>$pagina){
+              $cadenaHtml.=$pagina;
+          }
+          return $cadenaHtml;
+      }elseif($this->type=='file'){
+                $pdf=ModuleReporte::getPdf();
+                    $pdf->methods=[ 
+                                'SetHeader'=>[($this->tienecabecera)?$header:''], 
+                                'SetFooter'=>[($this->tienepie)?'{PAGENO}':''],
+                                ];
+        foreach($contenido as $index=>$pagina){
+                        $pdf->WriteHTML($pagina);
+                        if($index < $paginas-1)
+                                 $pdf->AddPage();
+                                    }
+       return $pdf->output($this->pathToStoreFile(), \Mpdf\Output\Destination::FILE);
+        
+      }
+      
+        }
 }

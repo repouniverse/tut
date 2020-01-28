@@ -121,6 +121,11 @@ class MakeController extends baseController
        //var_dump($model->methodsReport());die();
        
         
+        /*$ruta=$model->creaReporte(2,1019);
+        var_dump($ruta);die();*/
+        
+        
+        
 //var_dump($model->existsChildField('deslarga'));die();
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -453,14 +458,22 @@ class MakeController extends baseController
   
   
   public function actionCreareporte($id, $idfiltro/*,$campofiltro=null*/){
-     // echo $this->putLogo($id, $idfiltro);die();
+     if(h::request()->get('disk')=='1'){
+        $disco=true;  
+      }else{
+          $disco=false;
+      }
        $model=$this->findModel($id); 
        $this->layout='blank';
       $pageContents=$this->contentReport($id, $idfiltro,$model);
-      //echo $pageContents[0];die();
-      return $this->prepareFormat($pageContents, $model);
+       return $this->prepareFormat($pageContents, $model,$disco);
      
      }
+     
+     
+     
+     
+     
      //die();
       //$contenido=$this->render('reporte',['modelo'=>$model,'cabecera'=>$cabecera]);
      
@@ -493,7 +506,7 @@ class MakeController extends baseController
  /*Prepar el foramto de salida 
   * delñ reporte 
   */
-  private function prepareFormat($contenido,$model){
+  private function prepareFormat($contenido,$model,$disco=false){
       if($model->type=='pdf'){  
             $mpdf=ModuleReporte::getPdf();
              $paginas=count($contenido);
@@ -503,7 +516,14 @@ class MakeController extends baseController
                                 if($index < $paginas-1)
                                             $mpdf->AddPage();
                                         }
-                        return $mpdf->Output(); 
+                    if($disco){
+                       $ruta=$model->pathToStoreFile();
+                        $mpdf->output($ruta, \Mpdf\Output\Destination::FILE);  
+                        return $ruta;  
+                    }else{
+                        return  $mpdf->output();
+                    }
+                      
       }elseif($model->type=='html'){
           $cadenaHtml='';
           foreach($contenido as $index=>$pagina){

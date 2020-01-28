@@ -30,7 +30,7 @@ use common\widgets\selectwidget\selectWidget;
            <?=Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Facturar'), ['id'=>'boton_facturacion','class' => 'btn btn-warning'])?>    
         <?=Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Resetear'), ['id'=>'boton_resetear','class' => 'btn btn-warning'])?>    
             <?=Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Generar Recibos'), ['id'=>'boton_recibos','class' => 'btn btn-warning'])?>    
-         
+         <?=Html::a('<span class="fa fa-file-pdf" ></span>'.'  '.yii::t('sta.labels','Ver Recibos'),Url::to(['/report/make/multi-report','id'=>2,'idsToReport'=> \yii\helpers\Json::encode($model->idsToFacturacion())]),['target'=>'_blank','class'=>"btn btn-success"])?>
             </div>
         </div>
     </div>
@@ -69,8 +69,15 @@ use common\widgets\selectwidget\selectWidget;
                     ) ?>
  </div>
     <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12"> 
-     
-
+       <?Php  if($model->hasCobranzaMasiva() && !$model->isNewRecord){ ?>
+           <?php echo $form->field($model, 'unidad_id')->
+            dropDownList(comboHelper::getCboUnitsNotImputables($model->edificio_id),
+                  ['prompt'=>'--'.yii::t('base.verbs','Seleccione un valor')."--",
+                    // 'class'=>'probandoSelect2',
+                      //'disabled'=>($model->isBlockedField('codpuesto'))?'disabled':null,
+                        ]
+                    ) ?>
+        <?PHP  } ?>
  </div>                  
 <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
       <?= $form->field($model, 'fvencimiento')->widget(DatePicker::class, [
@@ -101,7 +108,7 @@ use common\widgets\selectwidget\selectWidget;
                             ]) ?>
  </div>
 
-  <?php echo Html::a('reporte', Url::to(['/report/make/multi-report','id'=>2,'idsToReport'=> \yii\helpers\Json::encode($model->idsToFacturacion())]), $options); ?>
+  <?php echo Html::a('reporte', Url::to(['/report/make/multi-report','id'=>2,'idsToReport'=> \yii\helpers\Json::encode($model->idsToFacturacion())]), ['target'=>'_blank']); ?>
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
      <?= $form->field($model, 'detalles')->textarea(['rows' => 6]) ?>
 
@@ -245,6 +252,7 @@ use common\widgets\selectwidget\selectWidget;
             'family'=>'holas',
           'type'=>'POST',
            'evento'=>'click',
+           'posicion'=> \yii\web\View::POS_END,
             //'foreignskeys'=>[1,2,3],
         ]); 
    ?> 

@@ -637,7 +637,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
   }  
   
   public function isInPast(){
-     return $this->toCarbon('fechaprog')->lessThanOrEqualTo(self::CarbonNow());
+     return $this->toCarbon('fechaprog')->lessThanOrEqualTo(self::CarbonNow()->subHours(4));
   }
   /*
    * Reporgarma la cita 

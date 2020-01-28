@@ -25,6 +25,9 @@ use Yii;
  */
 class VwAlutaller extends \common\models\base\modelBase
 {
+    public $extraMethodsToReport=['reportTitulo','reportPrograma','reportPsicologo'];
+    
+    
     /**
      * {@inheritdoc}
      */
@@ -124,6 +127,11 @@ class VwAlutaller extends \common\models\base\modelBase
         }
     }
     
+    public function getPrograma(){
+        return Talleres::find()->where(['id'=>$this->talleres_id])->one();
+    }
+    
+    
   public function getCitas()
     {
         return Citas::find()->where(['talleresdet_id' => $this->id]);
@@ -174,5 +182,13 @@ class VwAlutaller extends \common\models\base\modelBase
               andWhere(['<','fechaprog',$ahora]);
   }
   
-
+ public function getReportTitulo(){        
+      return 'LISTADO DE ALUMNOS POR PSICOLOGO ';
+    }
+  public function getReportPrograma(){        
+      return $this->getPrograma()->descripcion ;
+    }
+  public function getReportPsicologo(){        
+      return \common\models\masters\Trabajadores::find(['codigotra'=>$this->codtra])->one()->fullname() ;
+    }
 }

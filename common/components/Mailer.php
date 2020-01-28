@@ -42,6 +42,7 @@ class Mailer extends Correo
     public function init(){
        // yii::$app->settings->set('section', 'key', 1258.5);
         yii::error(static::arrayConfig());
+        //var_dump(static::arrayConfig());die();
         $this->_transport=static::arrayConfig();
         
         return parent::init();

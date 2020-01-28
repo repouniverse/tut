@@ -551,7 +551,11 @@ public static function kp_contactadosEmpty(){
             ];
 }
 
-
+public function codPsicologos($except=[]){
+    $codigos=Tallerpsico::find()->where(['talleres_id'=>$this->id])->
+    select('codtra')->column();
+    return array_diff($codigos,$except);
+}
 
      
     }

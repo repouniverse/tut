@@ -127,7 +127,7 @@ class SigiLecturas extends \common\models\base\modelBase
           $this->resolveIds();
           if($this->isDateForFirstRead(true)){
                $this->lecturaant=$this->lastReadValue(); 
-                $this->delta=0;  
+                $this->delta=$this->lectura;  
           }else{
             $this->lecturaant=$this->lastReadValue(); 
                 $this->delta=$this->lectura-$this->lecturaant; 

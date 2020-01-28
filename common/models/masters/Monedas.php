@@ -68,4 +68,11 @@ class Monedas extends \common\models\base\modelBase
     {
         return new MonedasQuery(get_called_class());
     }
+    
+    public static function Simbolo($codmon){
+        return static::findOne($codmon)->simbolo;
+    }
+    public static function Centimos($codmon){
+        return static::findOne($codmon)->centimos;
+    }
 }
