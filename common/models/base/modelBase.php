@@ -496,9 +496,10 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
   public function obtenerForeignClass($nombrecampo){
     
      $nombrecalseforanea= $this->fieldsLink(false)[$nombrecampo];
+     
      if(strpos($nombrecalseforanea,'_xxx_')) 
       return substr($nombrecalseforanea,0,strpos($nombrecalseforanea,'_xxx_'));
-      
+     
      return $nombrecalseforanea;
    
   }      

@@ -97,6 +97,11 @@ class VwStaExamenes extends \common\models\base\modelBase
     {
         return new VwStaExamenesQuery(get_called_class());
     }
+     public static function findFree()
+    {
+        return new VwStaExamenesQueryFree(get_called_class());
+    }
+    
     public function getTest(){
         return Test::findOne($this->codtest);
     }

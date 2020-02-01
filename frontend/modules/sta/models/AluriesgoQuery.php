@@ -1,8 +1,8 @@
 <?php
 
 namespace frontend\modules\sta\models;
-//use frontend\modules\sta\components\ActiveQueryScope;
-class AluriesgoQuery extends \yii\db\ActiveQuery
+use frontend\modules\sta\components\ActiveQueryScope;
+class AluriesgoQuery extends ActiveQueryScope
 {
     /*public function active()
     {

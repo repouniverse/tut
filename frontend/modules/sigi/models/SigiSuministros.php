@@ -29,6 +29,7 @@ class SigiSuministros extends \common\models\base\modelBase
      */
     CONST COD_TYPE_SUMINISTRO_DEFAULT='101'; //medidor tipo agua 
     const SCENARIO_IMPORTACION='importacion_simple';
+     const SCENARIO_CODSUMINISTRO='cod_suministro';
     public static function tableName()
     {
         return '{{%sigi_suministros}}';
@@ -46,7 +47,7 @@ class SigiSuministros extends \common\models\base\modelBase
             [['detalles'], 'string'],
             [['tipo'], 'string', 'max' => 3],
             
-            
+             [['id','codsuministro'], 'safe','on'=>self::SCENARIO_CODSUMINISTRO],
             /*Escenario imortacion*/
              [['codepa'], 'valida_depa','on'=>self::SCENARIO_IMPORTACION],
              [['codepa','codedificio','tipo','codum','codpro'], 'required','on'=>self::SCENARIO_IMPORTACION],
@@ -70,6 +71,7 @@ public function scenarios()
     {
         $scenarios = parent::scenarios(); 
        $scenarios[self::SCENARIO_IMPORTACION] = ['codepa','codedificio','tipo','codum','codpro'];
+        $scenarios[self::SCENARIO_CODSUMINISTRO] = ['id','codsuministro'];
         return $scenarios;
     }
     
@@ -198,20 +200,32 @@ public function getEdificio()
     
     private function queryReadsForThisMonth($mes,$anio,$facturable=true){
         $valor=($facturable)?'1':'0';
-        return SigiLecturas::find()->
-                where(['facturable'=>$valor,'mes' => $mes,'anio'=>$anio]);
+        yii::error('----queryreas for this mont--');
+        yii::error(SigiLecturas::find()->where(['edificio_id' => $this->edificio_id])->
+                andwhere(['facturable'=>$valor,'mes' => $mes,'anio'=>$anio])->
+                createCommand()->getRawSql());
+        return SigiLecturas::find()->where(['edificio_id' => $this->edificio_id])->
+                andwhere(['facturable'=>$valor,'mes' => $mes,'anio'=>$anio]);
+        
     }
     
      Public function LastReadFacturable($mes,$anio){
      $reg= $this->queryReads()->
                 andWhere(['facturable'=>'1','mes' => $mes,'anio'=>$anio])->one();
+     return $reg;
+    }
+    
+     Public function LastReadFacturableValue($mes,$anio){
+     $reg= $this->LastReadFacturable($mes, $anio);
      return (is_null($reg))?0:$reg->lectura;
     }
     
     public function consumoTotal($mes,$anio,$facturable=true){
         //$valor=($facturable)?'1':'0';
+         
         $query=$this->queryReadsForThisMonth($mes,$anio,$facturable);
-        yii::error($query->select('sum(delta)')->createCommand()->getRawSql());
+       
+       
         if($query->count()>0)
          return  $query->select('sum(delta)')->scalar();
         return 0;
@@ -347,12 +361,84 @@ public function lastReads($forGraphical=false){
   
 public function participacionRead($mes,$anio){
     $consumoT=$this->consumoTotal($mes, $anio);
-    $consumo=$this->LastReadFacturable($mes,$anio);
+    $consumo=$this->LastReadFacturable($mes,$anio)->delta;
     if($consumoT > 0){
-        return round($consumo/$consumoT);
+        return round($consumo/$consumoT,10);
     }else{
         return 0;
     }
+}
+public function getSigiSumiDepa(){
+     return SigiSumiDepa::find()->where(['suministro_id' =>$this->id,'afiliado'=>'1']);
+}
+public function depasReparto(){
+   return  $this->getSigiSumiDepa()->all();
+}
+public function ndepasReparto(){
+   return  $this->getSigiSumiDepa()->count();
+}
+
+
+public function afterSave($insert, $changedAttributes) {
+    if(!$this->unidad->imputable){
+        $this->fillDepas();
+    }
+    return parent::afterSave($insert, $changedAttributes);
+}
+/*
+ * Llena los departamenteos afiliados a este mdidor, 
+ * en caso de que la unidad padre no sea imputable
+ */
+public function fillDepas(){
+    foreach($this->edificio->unidadesImputables() as $unidad){
+        //yii::error('recorriendo '.$unidad->numero);
+        $attributes=[
+            'edificio_id'=>$this->edificio_id,
+             'unidad_id'=>$unidad->id,
+            'suministro_id'=>$this->id, 
+            //'afiliado'=>'1'
+        ];
+        $attributesFill=[
+            'edificio_id'=>$this->edificio_id,
+             'unidad_id'=>$unidad->id,
+            'suministro_id'=>$this->id, 
+            'afiliado'=>'1'
+        ];
+        SigiSumiDepa::firstOrCreateStatic($attributesFill,null,$attributes);
+            
+            
+    }
+}
+/*
+ * Registro de unidad es que comparten el consumo de este medidor
+ * Siemre que la unidad en la queeste montao el medidor sea no imputable 
+ */
+public function providerAfiliados(){
+    $provider = new \yii\data\ActiveDataProvider([
+    'query' => $this->getSigiSumiDepa(),
+    'pagination' => [
+        'pageSize' => 100,
+    ],
+]);
+    return $provider;
+}
+
+public function hasAfiliados(){
+    return($this->getSigiSumiDepa()->count()>0)?true:false;
+}
+
+public function averageReads($idLectura=null){
+   $nlecturas=min(\common\helpers\h::gsetting('sigi','numeroParaPromedioLecturas'),
+                $this->queryReads()->count()
+               );
+   if($idLectura >0){
+      return $this->queryReads()->sum('avg(delta)')->where(['id'<$idLectura])->orderBy('id DESC')->limit($nlecturas)->scalar();
+     
+   }else{
+       return $this->queryReads()->sum('avg(delta)')->orderBy('id DESC')->limit($nlecturas)->scalar();
+      
+   }
+  
 }
 
 

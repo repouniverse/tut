@@ -26,6 +26,11 @@ if($this->existsTable($table)) {
          $this->putCombo($table, 'tipo', 'ALUMNO EN RIESGO');   
             
      }
+     if (!in_array('url', $columns)) {
+       $this->addColumn($table, 'tipo', $this->string(180)->append($this->collateColumn()));
+            }
+         
+     
    
 }
  

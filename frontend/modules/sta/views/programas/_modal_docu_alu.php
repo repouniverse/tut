@@ -30,6 +30,17 @@ use common\helpers\h;
           <div class="col-lg-8 col-md-9 col-sm-6 col-xs-12">
               <?=$form->field($modeldet, 'nombres')->textInput(['disabled'=>true,'value'=>$modeldet->alumno->fullName()])?>
           </div> 
+     <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+     <?= 
+            $form->field($model, 'codestado')->
+            dropDownList($model->comboDataField('codestado') ,
+                    ['prompt'=>'--'.yii::t('base.verbs','Escoja un valor')."--",
+                    // 'class'=>'probandoSelect2',
+                      //'disabled'=>($model->isBlockedField('codpuesto'))?'disabled':null,
+                        ]
+                    )  ?>
+        </div>
+     
     <div class="col-lg-8 col-md-9 col-sm-6 col-xs-12">
       <?PHP
      echo $form->field($model, 'descripcion')->textInput();

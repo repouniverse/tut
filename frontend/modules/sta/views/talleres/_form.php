@@ -10,7 +10,9 @@ use yii\widgets\ActiveForm;
 
 <div class="talleres-form">
     <br>
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin([
+        'enabledAjaxValidation'=>true
+        ]); ?>
       <div class="box-header">
         <div class="col-md-12">
             <div class="form-group no-margin">

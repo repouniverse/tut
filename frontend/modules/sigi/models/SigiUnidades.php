@@ -33,7 +33,7 @@ class SigiUnidades extends \common\models\base\modelBase
     const SCENARIO_HIJO='import_hijos';
     //const SCENARIO_EDIFICIO='edificio';
     //const SCENARIO_COMPLETO='import_completo';
-    //const SCENARIO_BASICO='basica';
+    const SCENARIO_BASICO='basica';
     const SCENARIO_UPDATE_BASICO='update_basico';
     public $booleanFields=['esnuevo','imputable'];
     public $hardFields=['edificio_id','numero'];
@@ -58,7 +58,7 @@ class SigiUnidades extends \common\models\base\modelBase
             ['numero', 'validateChild'],
             [['area','imputable'], 'validateArea'],
              ['codpro', 'validateApoderado'],
-            ['numero', 'unique', 'targetAttribute' => ['edificio_id','numero']],
+            ['numero', 'unique', 'targetAttribute' => ['edificio_id','numero','codtipo']],
             [['area', 'participacion'], 'number'],
             //[['area'], 'required'],
             //['imputable', 'validateArea'],
@@ -69,6 +69,11 @@ class SigiUnidades extends \common\models\base\modelBase
             ['id', 'required',
                 'on' => [self::SCENARIO_UPDATE_BASICO]
              ],
+            [['codpadre','area','imputable'], 'required',
+                'on' => [self::SCENARIO_HIJO]
+             ],
+            
+            
            // [['codpro'], 'validateApoderado'],
             [['detalles'], 'string'],
             [['codpro','esnuevo','codpadre','imputable','estreno'], 'safe'],
@@ -90,7 +95,7 @@ class SigiUnidades extends \common\models\base\modelBase
       public function scenarios()
     {
         $scenarios = parent::scenarios(); 
-        //$scenarios['basica'] = ['edificio_id','codtipo','imputable','npiso','numero','area','codpro'];
+        $scenarios['basica'] = ['edificio_id','codtipo','imputable','npiso','numero','area','codpro'];
         $scenarios[self::SCENARIO_HIJO] = ['edificio_id','codpadre','codtipo','imputable','numero','area','npiso'];
         //$scenarios[self::SCENARIO_COMPLETO] = ['edificio_id','parent_id','codtipo','imputable','numero','area','codpro','npiso','nombre','detalles','estreno'];
         $scenarios[self::SCENARIO_UPDATE_BASICO] = ['id','imputable','codpro'];
@@ -177,9 +182,11 @@ class SigiUnidades extends \common\models\base\modelBase
     public function beforeSave($insert) {
         if($insert){
             //Solo si es child
+           // $this->participacion=$this->participacionArea();
             $this->resolveChildBeforeSave();
             if(empty($this->nombre)){
               $this->nombre=substr(SigiTipoUnidades::findOne($this->codtipo)->desunidad.'-'.$this->numero,0,25); 
+              
             }
                 
         }
@@ -192,6 +199,8 @@ class SigiUnidades extends \common\models\base\modelBase
                 //$this->estreno=null;
                $this->insertPropietarioEmpresa() ;
             } */
+           //refresca el porcentaje de participacion  
+             $this->edificio->refreshPorcentaje();
           if($this->isChild()){
               $this->refresh();
               
@@ -242,9 +251,7 @@ class SigiUnidades extends \common\models\base\modelBase
     /*CALCULA LA PARTICIPACION */
     
     public function participacionArea($porcentaje=false){
-      if($this->isNewRecord){
-          return 0;
-      }else{
+      
          $areaTotal=$this->edificio->area();
          /*if(!$porcentaje){
               $areaTotal=$areaTotal*100;
@@ -253,11 +260,11 @@ class SigiUnidades extends \common\models\base\modelBase
           */
          
         if($areaTotal>0){
-            return round(($this->area*(($porcentaje)?100:1))/$areaTotal,4);
+            return round(($this->area*(($porcentaje)?100:1))/$areaTotal,8);
         }else{
            return 0; 
         }  
-      }
+      
        
         
     }
@@ -513,18 +520,59 @@ class SigiUnidades extends \common\models\base\modelBase
          $Sparent=$this->padre->area;
          $St=$Sparent+$Schilds;
          
-         return round($this->area/$St,4);
+         return round($this->area/$St,6);
      }elseif($this->hasChildunits()){ //Es un padre
          yii::error('tiene hijitos ');
          $Schilds=self::find()->select('sum(area)')->where(['parent_id'=>$this->id])->scalar();
           $Smio=$this->area;
           $St=$Smio+$Schilds;
-          return round($Smio/$St,4);
+          return round($Smio/$St,8);
      }else{//Es un departamento solo
          yii::error('el departametno esta solo');
          return 1;
      }
  }
  
+ 
+ public function arrayParticipaciones(){
+     $areatotal=$this->edificio->area();
+     
+     $areasHijos=$this->find()->select(['nombre','numero','area','participacion'])->where(['parent_id'=>$this->id])->asArray()->all();
+     if(count($areasHijos)>0){
+         $datosAreas=$areasHijos;
+         $datosAreas[]=['nombre'=>$this->nombre,'numero'=>$this->numero,'area'=>$this->area+0,'participacion'=>$this->participacion+0];
+         
+         
+     }else{
+         $datosAreas=[['nombre'=>$this->nombre,'numero'=>$this->numero,'area'=>$this->area+0,'participacion'=>$this->participacion+0]];
+     }
+     //var_dump($datosAreas);die(); 
+     return ['aareas'=>$datosAreas,'atotal'=>$areatotal];
+    
+ }
+ 
+ public function arrayPropietarios(){    
+    $arrayProp=$this->getSigiPropietarios()->select(['tipo','nombre','dni'])->where(['activo'=>'1'])->asArray()->all();
+     return $arrayProp;
+ }
+ 
+ 
+ public function porcWithChilds($porcentaje=false){
+     $areaEdificio=$this->edificio->area();
+        if($areaEdificio>0){
+            return round(($this->areaTotal()*(($porcentaje)?100:1))/$areaEdificio,12);
+        }else{
+           return 0; 
+        }  
+ }
+ 
+ private function areaTotal(){
+    return $this->area+$this->find()->select('sum(area)')->where(['edificio_id'=>$this->edificio_id,'parent_id'=>$this->id])->scalar();
+ }
+ 
+ public function mailsPropietarios(){
+    return $this->getSigiPropietarios()->select(['correo1'])->
+      where(['recibemail'=>'1'])->column();
+ }
  
 }

@@ -118,8 +118,14 @@ class SiteController extends Controller
  //Yii::info(" paracopmrobar   ", __METHOD__);  
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
-                 $this->redirect(['index']);      
-		// $this->redirect(['sta/default/view-profile','iduser'=>h::userId()]);           // return $this->goBack();
+            //$this->redirect(['/sta/programas']);
+            //echo Yii::$app->user->resolveUrlAfterLogin();die();
+            //
+            $this->redirect([Yii::$app->user->resolveUrlAfterLogin()]);
+                 //$this->redirect(['index']); 
+            //var_dump(Yii::$app->request->referrer);die();
+              //return $this->redirect(is_null(Url::previous('intentona'))?Yii::$app->homeUrl:Url::previous('intentona'));
+	// $this->redirect(['sta/default/view-profile','iduser'=>h::userId()]);           // return $this->goBack();
         } else {
           
             $model->password = '';
@@ -412,4 +418,18 @@ public function actionCookies(){
   
    }
 
+  public function actionPutUrlDefault(){
+     if(h::request()->isAjax){
+           h::response()->format = \yii\web\Response::FORMAT_JSON;
+           $cambio= h::user()->putUrlDefault(Yii::$app->request->referrer);
+          if($cambio){
+              return ['success'=>yii::t('sta.labels','Se estableció la ruta sin problemas')];
+          }else{
+              return ['error'=>yii::t('sta.labels','Hubo un error')]; 
+          }
+        }  
+     
+  }  
+   
+   
 }

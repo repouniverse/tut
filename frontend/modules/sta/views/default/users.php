@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <p>
     <div class="box box-success">
         <div class="box-body">
-        <?= Html::a(Yii::t('base.verbs', 'Crear Usuario'), ['create-user'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a(Yii::t('base.verbs', 'Crear Usuario'), ['/site/create-user'], ['class' => 'btn btn-success']) ?>
     </p>
     <?php $url= Url::to('view-users') ;?>
     <?=

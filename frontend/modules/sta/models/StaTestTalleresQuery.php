@@ -7,7 +7,7 @@ namespace frontend\modules\sta\models;
  *
  * @see StaTestTalleres
  */
-class StaTestTalleresQuery extends \yii\db\ActiveQuery
+class StaTestTalleresQuery extends  \frontend\modules\sta\components\ActiveQueryScope
 {
     /*public function active()
     {

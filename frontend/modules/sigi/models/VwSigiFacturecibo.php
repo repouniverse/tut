@@ -1,8 +1,10 @@
 <?php
 
 namespace frontend\modules\sigi\models;
-
+USE common\models\masters\Monedas;
+use frontend\modules\sigi\models\SigiUnidades;
 use Yii;
+use frontend\modules\report\components\NumeroAletras;
 
 /**
  * This is the model class for table "{{%vw_sigi_facturecibo}}".
@@ -42,6 +44,9 @@ use Yii;
  */
 class VwSigiFacturecibo extends \common\models\base\modelBase
 {
+    public $extraMethodsToReport=['reportMontoLetras','reportGrafico','reportAreas','reportLecturaAnt','reportPropietarios'];
+    
+    
     /**
      * {@inheritdoc}
      */
@@ -59,7 +64,7 @@ class VwSigiFacturecibo extends \common\models\base\modelBase
             [['id', 'cuentaspor_id', 'edificio_id', 'unidad_id', 'colector_id', 'grupo_id', 'facturacion_id', 'mes', 'identidad'], 'integer'],
             [['cuentaspor_id', 'edificio_id', 'unidad_id', 'colector_id', 'grupo_id', 'monto', 'igv', 'grupounidad', 'grupofacturacion', 'facturacion_id', 'mes', 'anio', 'descripcion', 'nombreedificio', 'direccion', 'numero', 'nombre', 'descargo', 'codcargo', 'codgrupo', 'numerodepa', 'nombredepa'], 'required'],
             [['monto', 'igv', 'area', 'participacion', 'areadepa', 'participaciondepa'], 'number'],
-            [['detalles'], 'string'],
+            //[['particiapcion','codsuministro',''], 'string'],
             [['grupounidad', 'grupofacturacion', 'numero', 'numerodepa'], 'string', 'max' => 12],
             [['anio', 'codcargo'], 'string', 'max' => 4],
             [['fecha'], 'string', 'max' => 10],
@@ -121,4 +126,65 @@ class VwSigiFacturecibo extends \common\models\base\modelBase
     {
         return new VwSigiFactureciboQuery(get_called_class());
     }
+    
+    public function getReportAreas(){        
+        
+      $controller=Yii::$app->controller;
+        $nameView= \common\helpers\FileHelper::getShortName($this::className());
+        $pathView='/'.$controller->id.'/reports/'.$nameView.'/detalleAreas';
+       return  $controller->getView()->render($pathView,['areas'=>$this->unidad->arrayParticipaciones()]);
+    }
+   public function getReportPropietarios(){        
+        
+      $controller=Yii::$app->controller;
+        $nameView= \common\helpers\FileHelper::getShortName($this::className());
+        $pathView='/'.$controller->id.'/reports/'.$nameView.'/propietarios';
+       return  $controller->getView()->render($pathView,['propietarios'=>$this->unidad->arrayPropietarios()]);
+    }
+   public function getReportGrafico(){ 
+       
+       $suministro=SigiSuministros::findOne(['unidad_id'=>$this->unidad_id]);
+      if(!is_null($suministro)) {
+        if(!$suministro->hasAfiliados()){
+           $lecturas=$suministro->lastReads(); 
+        $controller=Yii::$app->controller;
+        $nameView= \common\helpers\FileHelper::getShortName($this::className());
+        $pathView='/'.$controller->id.'/reports/'.$nameView.'/_grafico';
+       
+          return  $controller->getView()->render($pathView,['lecturas'=>$lecturas ]);
+        
+        }
+        
+      } else{
+          return 'No hay Medidores';
+      }
+      }
+    
+     public function getReportLecturaAnt(){        
+      return $this->lectura-$this->delta;
+    }
+    public function getUnidad()
+    {
+         
+        return $this->hasOne(SigiUnidades::className(), ['id' => 'unidad_id']);
+    }
+    public function getSuministro()
+    {
+         
+        
+    }
+    
+    public function getReportMontoLetras(){  
+        //var_dump($this->subtotal()+0);die();
+      return NumeroAletras::convert(              
+              round($this->subtotal()+0,2),
+               Monedas::findOne($this->codmon)->desmon,
+              true);
+    }
+   
+  private function subtotal(){
+      //var_dump(self::find()->select('sum(monto)')->where(['identidad'=>$this->identidad])->scalar());die();
+     return self::find()->select('sum(monto)')->where(['identidad'=>$this->identidad])->scalar();
+  }  
+    
 }

@@ -12,7 +12,7 @@ use common\widgets\selectwidget\selectWidget;
 
 <div class="box box-success">
     <br>
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin(['fieldClass'=>'\common\components\MyActiveField']); ?>
       <div class="box-header">
         <div class="col-md-12">
             <div class="form-group no-margin">
@@ -59,8 +59,21 @@ use common\widgets\selectwidget\selectWidget;
      <?= $form->field($model, 'version')->textInput(['maxlength' => true]) ?>
 
  </div>
-  
-         
+<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+     <?= $form->field($model, 'orden')->textInput(['maxlength' => true]) ?>
+
+ </div>
+ <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">   
+   <?= $form->field($model, 'codbateria')->
+            dropDownList(\frontend\modules\sta\helpers\comboHelper::baterias(),
+                    ['prompt'=>'--'.yii::t('base.verbs','Seleccione un Valor')."--",
+                     
+                       ]
+                    ) ?>
+ </div>  
+ <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+     <?= $form->field($model, 'detalles')->textArea(['rows' => 3]) ?>              
+</div>        
     <?php ActiveForm::end(); ?>
      
               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">

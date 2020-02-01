@@ -29,12 +29,11 @@ use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
                 'template' => '{delete}{view}',
                 'buttons' => [
                    
-                          'view' => function($url, $model) {                        
-                        $options = [
-                            'title' => Yii::t('base.verbs', 'View'),                            
-                        ];
-                        return Html::a('<span class="btn btn-warning btn-sm glyphicon glyphicon-search"></span>', $url, $options/*$options*/);
-                         },
+                         'view' => function ($url,$model) {
+			    $url= Url::to(['cambio-psicologo','id'=>$model->id,'gridName'=>'grilla-staff','idModal'=>'buscarvalor']);
+                             //echo  Html::button(yii::t('base.verbs','Modificar Rangos'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Tutor'),'id'=>'btn_contacts', 'class' => 'botonAbre btn btn-success']); 
+                            return Html::a('<span class="btn btn-danger btn-sm glyphicon glyphicon-pencil"></span>', $url, ['class'=>'botonAbre']);
+                            },
                          'delete' => function ($url,$model) {
 			    $url = Url::toRoute($this->context->id.'/ajax-detach-psico',['id'=>$model->id]);
                              return Html::a('<span class="btn btn-danger btn-sm glyphicon glyphicon-trash"></span>', '#', ['title'=>$url,/*'id'=>$model->codparam,*/'family'=>'holas','id'=> \yii\helpers\Json::encode(['id'=>$model->id,'modelito'=> str_replace('@','\\',get_class($model))]),/*'title' => 'Borrar'*/]);
@@ -56,6 +55,14 @@ use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
                 'format'=>'raw',
                 'value' => function ($model, $key, $index, $column) {
                     return '<span class="badge badge-success" >'.$model->nalumnos.'</span>';
+                        },
+                ],
+                                [
+                'attribute'=>'reporte',
+                'format'=>'raw',
+                'value' => function ($model, $key, $index, $column) {
+                    $url=\yii\helpers\Url::to(['/report/make/creareporte/','id'=>8, 'idfiltro'=>\yii\helpers\Json::encode(['codtra'=>$model->codtra,'talleres_id'=>$model->talleres_id])]);
+                   return Html::a('<span class="fa fa-clock" ></span>',$url,['target'=>'_blank','data-pjax'=>'0']);
                         },
                 ],
                                 [

@@ -1,5 +1,5 @@
 <?php
-
+use kartik\export\ExportMenu;
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\helpers\Url;
@@ -19,14 +19,8 @@ use frontend\modules\sigi\models\SigiSuministrosSearch;
          
     <?php Pjax::begin(['id'=>'grilla-medidores']); ?>
     
-   <?php //var_dump((new SigiApoderadosSearch())->searchByEdificio($model->id)); die(); ?>
-    <?= GridView::widget([
-        'id'=>'grilla-grid-medidores',
-        'dataProvider' =>$dataProvider,
-         'summary' => '',
-        'filterModel' => $searchModel,
-         'tableOptions'=>['class'=>'table table-condensed table-hover table-bordered table-striped'],
-        'columns' => [
+   <?php 
+    $gridColums=[
                  [
                 'class' => 'yii\grid\ActionColumn',
                 //'template' => Helper::filterActionColumn(['view', 'activate', 'delete']),
@@ -67,6 +61,13 @@ use frontend\modules\sigi\models\SigiSuministrosSearch;
                              return $model->edificio->nombre;
                             }
                    ],
+           ['attribute'=>'Unidad',
+                    'filter'=>comboHelper::getCboEdificios(),
+                   'value'=> function ($model) {
+			   //$url = \yii\helpers\Url::toRoute($this->context->id.'/deletemodel-for-ajax');
+                             return $model->unidad->numero;
+                            }
+                   ],
            ['attribute'=>'tipo',
                     'filter'=>$searchModel::comboDataField('tipo'),
                    'value'=> function ($model) {
@@ -74,6 +75,7 @@ use frontend\modules\sigi\models\SigiSuministrosSearch;
                              return $model->comboValueField('tipo');
                             }
                    ],
+                  'id',
             'numerocliente',
               'codsuministro',              
             'clipro.despro',
@@ -86,7 +88,24 @@ use frontend\modules\sigi\models\SigiSuministrosSearch;
              },
 
           ],
-        ],
+        ];
+   
+   
+   ?>
+ <?php echo ExportMenu::widget([
+    'dataProvider' => $dataProvider,
+    'columns' => $gridColumns,
+    'dropdownOptions' => [
+        'label' => yii::t('sta.labels','Exportar'),
+        'class' => 'btn btn-success'
+    ]
+]) . "<hr>\n".GridView::widget([
+        'id'=>'grilla-grid-medidores',
+        'dataProvider' =>$dataProvider,
+         'summary' => '',
+        'filterModel' => $searchModel,
+         'tableOptions'=>['class'=>'table table-condensed table-hover table-bordered table-striped'],
+        'columns' =>$gridColums,
     ]); ?>
          <?php 
    echo linkAjaxGridWidget::widget([

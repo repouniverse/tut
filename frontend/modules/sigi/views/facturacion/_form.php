@@ -1,6 +1,6 @@
 <?php
  use kartik\date\DatePicker;
-
+use kartik\export\ExportMenu;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
@@ -8,10 +8,10 @@ use frontend\modules\sigi\helpers\comboHelper;
 use common\helpers\timeHelper;
 use common\helpers\h;
 use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
-
-use yii\grid\GridView;
+use kartik\grid\GridView;
 use yii\widgets\Pjax;
-/* @var $this yii\web\View */
+use common\widgets\selectwidget\selectWidget;
+
 /* @var $model frontend\modules\sigi\models\SigiFacturacion */
 /* @var $form yii\widgets\ActiveForm */
 ?>
@@ -19,6 +19,7 @@ use yii\widgets\Pjax;
 <div class="sigi-facturacion-form">
 
     <?php $form = ActiveForm::begin([
+        'enableAjaxValidation'=>true,
     'fieldClass'=>'\common\components\MyActiveField'
     ]); ?>
       <div class="box-header">
@@ -28,6 +29,8 @@ use yii\widgets\Pjax;
         <?= Html::submitButton('<span class="fa fa-save"></span>   '.Yii::t('sigi.labels', 'Grabar'), ['class' => 'btn btn-success']) ?>
            <?=Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Facturar'), ['id'=>'boton_facturacion','class' => 'btn btn-warning'])?>    
         <?=Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Resetear'), ['id'=>'boton_resetear','class' => 'btn btn-warning'])?>    
+            <?=Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Generar Recibos'), ['id'=>'boton_recibos','class' => 'btn btn-warning'])?>    
+         <?=Html::a('<span class="fa fa-file-pdf" ></span>'.'  '.yii::t('sta.labels','Ver Recibos'),Url::to(['/report/make/multi-report','id'=>2,'idsToReport'=> \yii\helpers\Json::encode($model->idsToFacturacion())]),['target'=>'_blank','class'=>"btn btn-success"])?>
             </div>
         </div>
     </div>
@@ -65,6 +68,43 @@ use yii\widgets\Pjax;
                         ]
                     ) ?>
  </div>
+    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12"> 
+       <?Php  if($model->hasCobranzaMasiva() && !$model->isNewRecord){ ?>
+           <?php echo $form->field($model, 'unidad_id')->
+            dropDownList(comboHelper::getCboUnitsNotImputables($model->edificio_id),
+                  ['prompt'=>'--'.yii::t('base.verbs','Seleccione un valor')."--",
+                    // 'class'=>'probandoSelect2',
+                      //'disabled'=>($model->isBlockedField('codpuesto'))?'disabled':null,
+                        ]
+                    ) ?>
+        <?PHP  } ?>
+ </div>   
+       <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12"> 
+      
+           <?php echo $form->field($model, 'reporte_id')->
+            dropDownList(comboHelper::getCboReportes(),
+                  ['prompt'=>'--'.yii::t('base.verbs','Seleccione un valor')."--",
+                    // 'class'=>'probandoSelect2',
+                      //'disabled'=>($model->isBlockedField('codpuesto'))?'disabled':null,
+                        ]
+                    ) ?>
+      
+ </div>   
+          
+<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+      <?= $form->field($model, 'fvencimiento')->widget(DatePicker::class, [
+                            'language' => h::app()->language,
+                           'pluginOptions'=>[
+                                     'format' => h::gsetting('timeUser', 'date')  , 
+                                   'changeMonth'=>true,
+                                  'changeYear'=>true,
+                                 'yearRange'=>'2014:'.date('Y'),
+                               ],
+                          
+                            //'dateFormat' => h::getFormatShowDate(),
+                            'options'=>['class'=>'form-control']
+                            ]) ?>
+ </div>
   <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
       <?= $form->field($model, 'fecha')->widget(DatePicker::class, [
                             'language' => h::app()->language,
@@ -79,18 +119,33 @@ use yii\widgets\Pjax;
                             'options'=>['class'=>'form-control']
                             ]) ?>
  </div>
-  <?php echo Html::a('reporte', Url::to(['/report/make/multi-report','id'=>2,'idsToReport'=> \yii\helpers\Json::encode($model->idsToFacturacion())]), $options); ?>
+
+  <?php echo Html::a('reporte', Url::to(['/report/make/multi-report','id'=>2,'idsToReport'=> \yii\helpers\Json::encode($model->idsToFacturacion())]), ['target'=>'_blank']); ?>
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
      <?= $form->field($model, 'detalles')->textarea(['rows' => 6]) ?>
 
  </div>
+          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+     <?= $form->field($model, 'detalleinterno')->textarea(['rows' => 6]) ?>
+
+ </div>
      
     <?php ActiveForm::end(); ?>
+          
        <?php if(!$model->isNewRecord) {?>
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
       <?php Pjax::begin(['id'=>'grilla_cargospor']); ?>
-    <?php echo GridView::widget([
+    <?=ExportMenu::widget([
+    'dataProvider' => $dataProviderCuentasPor,
+    'columns' => $gridColumns,
+    'dropdownOptions' => [
+        'label' => yii::t('sta.labels','Exportar'),
+        'class' => 'btn btn-success'
+    ]
+]) . "<br><hr>\n".GridView::widget([
         'dataProvider' =>$dataProviderCuentasPor,
          'summary' => '',
+         'showPageSummary' => true,
          'tableOptions'=>['class'=>'table table-condensed table-hover table-bordered table-striped'],
         //'filterModel' => $searchModel,
         'columns' => [
@@ -181,7 +236,7 @@ use yii\widgets\Pjax;
                   //'filter'=> frontend\modules\sigi\helpers\comboHelper::getCboColectores($model->edificio_id),
                   'value'=>'colector.cargo.descargo'
                   ],  */             
-           // 'codocu',
+            'colector.cargo.descargo',
             'descripcion',
            // 'colector.id',
           
@@ -191,7 +246,10 @@ use yii\widgets\Pjax;
             //'anio',
             //'detalle:ntext',
             //'fevenc',
-            'monto',
+            ['attribute'=>'monto',
+                            'format' => ['decimal', 2],
+                            'pageSummary' => true,
+                            ]    ,
             //'igv',
             //'codestado',
 
@@ -206,16 +264,15 @@ use yii\widgets\Pjax;
             'family'=>'holas',
           'type'=>'POST',
            'evento'=>'click',
+           'posicion'=> \yii\web\View::POS_END,
             //'foreignskeys'=>[1,2,3],
         ]); 
    ?> 
         
           
     <?php Pjax::end(); ?>
-</div>       
-       <?php }?>  
-    
-</div>
+      
+     
 <?php
  $url= Url::to(['/sigi/cuentaspor/create-as-child','id'=>$model->id,'gridName'=>'grilla_cargospor','idModal'=>'buscarvalor']);
    echo  Html::button(yii::t('base.verbs','Cobranza masiva'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Elemento'),'id'=>'btn_apoderado', 'class' => 'botonAbre btn btn-success']); 
@@ -263,7 +320,43 @@ use yii\widgets\Pjax;
   
   $this->registerJs($string, \yii\web\View::POS_END);
 ?>
+<?php 
+  $string="$('#boton_recibos').on( 'click', function(){      
+       $.ajax({
+              url: '".Url::to(['/report/make/multi-report','id'=>2,'idsToReport'=>\yii\helpers\Json::encode($model->idsToFacturacion())])."', 
+              type: 'get',
+              data:{},
+              dataType: 'json', 
+              error:  function(xhr, textStatus, error){               
+                            var n = Noty('id');                      
+                              $.noty.setText(n.options.id, error);
+                              $.noty.setType(n.options.id, 'error');       
+                                }, 
+              success: function(json) {
+              var n = Noty('id');
+                      
+                       if ( !(typeof json['error']==='undefined') ) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['error']);
+                              $.noty.setType(n.options.id, 'error');  
+                          }    
 
+                             if ( !(typeof json['warning']==='undefined' )) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['warning']);
+                              $.noty.setType(n.options.id, 'warning');  
+                             } 
+                          if ( !(typeof json['success']==='undefined' )) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['success']);
+                              $.noty.setType(n.options.id, 'success');  
+                             }      
+                   
+                        }
+                        });
+
+
+             })";
+  
+  $this->registerJs($string, \yii\web\View::POS_END);
+?>
  <?php 
   $string="$('#boton_resetear').on( 'click', function(){      
        $.ajax({
@@ -300,4 +393,42 @@ use yii\widgets\Pjax;
              })";
   
   $this->registerJs($string, \yii\web\View::POS_END);
-?>
+?> 
+   
+      
+</div>   
+          
+       <?php }else{?>  
+    <?php 
+  $string="$('#sigifacturacion-edificio_id').on( 'change', function(){ 
+       var identidad=$('#sigifacturacion-edificio_id').val();
+       //alert(identidad);
+       var Vurl='".Url::to(['/sigi/facturacion/ajax-recomendacion','id'=>'parex456'])."';
+       Vurl=Vurl.replace('parex456',identidad);
+       $.ajax({
+              url:Vurl, 
+              type: 'get',
+              data:{},
+              //dataType: 'json', 
+              error:  function(xhr, textStatus, error){               
+                            var n = Noty('id');                      
+                              $.noty.setText(n.options.id, error);
+                              $.noty.setType(n.options.id, 'error');       
+                                }, 
+              success: function(data) {
+              alert(data);
+              $('#sigifacturacion-detalles').val(data);
+             
+                           
+                   
+                        }
+                        });
+
+
+             })";
+  
+  $this->registerJs($string, \yii\web\View::POS_END);
+       }?>    
+
+</div>
+    </div>

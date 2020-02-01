@@ -29,10 +29,10 @@ use frontend\modules\sta\helpers\comboHelper;
    $gridColumns = [
             [
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{edit}',
+                'template' => '{view}{edit}',
                 'buttons' => [
                    
-                         'edit' => function ($url,$model) {
+                         'view' => function ($url,$model) {
                             $status=$model->statusContact();
                             if($status== frontend\modules\sta\models\Talleresdet::CONTACTO_CON_CITA) {
                               //$url= Url::to(['convoca-alumno','id'=>$model->id,'gridName'=>'convocatorias_'.$model->id,'idModal'=>'buscarvalor']);
@@ -43,7 +43,13 @@ use frontend\modules\sta\helpers\comboHelper;
                                $url= Url::to(['convoca-alumno','id'=>$model->id,'gridName'=>'convocatorias_'.$model->id,'idModal'=>'buscarvalor']);
                               return Html::a('<span class="btn btn-'.$status.' btn-sm fa fa-phone"></span>', $url, ['class'=>'botonAbre']);  
                              }
-			    }
+			    },
+                            
+                            'edit' => function ($url,$model) {
+			    $url= Url::to(['cambio-psicologo-alumno','id'=>$model->id,'gridName'=>'grilla-staff','idModal'=>'buscarvalor']);
+                             //echo  Html::button(yii::t('base.verbs','Modificar Rangos'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Tutor'),'id'=>'btn_contacts', 'class' => 'botonAbre btn btn-success']); 
+                            return Html::a('<span class="btn btn-danger btn-sm glyphicon glyphicon-pencil"></span>', $url, ['class'=>'botonAbre']);
+                            },
                     ]
                 ],
         [
@@ -90,7 +96,12 @@ use frontend\modules\sta\helpers\comboHelper;
                                 'target'=>'_blank'
                                ];
                     $url=\yii\helpers\Url::to(['programas/trata-alumno','id'=>$model->id,'idalumno'=>$model->idalumno,'codperiodo'=>$model->codperiodo,'codalu'=>$model->codalu]);
-                    return Html::a($model->codalu,$url, $options);
+                    if(!empty($model->codtra)){
+                        return Html::a($model->codalu,$url, $options);
+                    }else{
+                        return $model->codalu;
+                    }
+                    
                         },
 ],
 [ 

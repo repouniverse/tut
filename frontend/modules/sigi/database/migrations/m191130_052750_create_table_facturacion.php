@@ -18,9 +18,13 @@ if(!$this->existsTable($table)) {
         'mes'=>$this->char(2)->notNull()->append($this->collateColumn()),       
         'ejercicio'=>$this->char(4)->append($this->collateColumn()),
         'fecha'=>$this->char(10)->append($this->collateColumn()),
+         'fvencimiento'=>$this->char(10)->append($this->collateColumn()),
+         'reporte_id'=>integer(11),
+         'unidad_id'=>integer(11)->comment('Unidad PARA AGRUPAR LA COBRANZA DE LA INMOILIARIA , NO SE APLICA EN MUCHOS EDIFICIOS, SOLO EN EDIFICOIS MIXTOS EN PROESO DE VENTAS DE DEPAS para agrupar un solo reporte de cobranza'),
         //'periodo'=>$this->char(4)->append($this->collateColumn()),
         'descripcion'=>$this->string(40)->notNull()->append($this->collateColumn()),        
         'detalles'=>$this->text()->append($this->collateColumn()),
+        'detalleinterno'=>$this->text()->append($this->collateColumn()),
         ],$this->collateTable());
   
     $this->addForeignKey($this->generateNameFk($table), $table,

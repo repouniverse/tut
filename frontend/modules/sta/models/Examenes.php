@@ -107,6 +107,11 @@ class Examenes extends modelSensibleAccess
         return new ExamenesQuery(get_called_class());
     }
     
+    public static function findFree()
+    {
+        return new ExamenesQueryFree(get_called_class());
+    }
+    
       //yii:error('creando token');
   public function notificaMail(){
       $token=  \common\components\token\Token::create('citas', 'token_examen', null, time()+60*2);

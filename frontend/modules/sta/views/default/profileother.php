@@ -9,15 +9,14 @@ use yii\helpers\Html;
 use common\helpers\h;
 use frontend\modules\sta\helpers\comboHelper;
 use yii\bootstrap\ActiveForm;
-
+use common\widgets\selectwidget\selectWidget;
 $this->title = 'Profile';
 //$this->params['breadcrumbs'][] = $this->title;
 ?>
 
     <br>
     <div class="row">
-        <div class="col-lg-5">
-             
+         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">              
             <?php /*h::user()->switchIdentity($identidad);*/ ?>
             
              
@@ -49,8 +48,18 @@ $this->title = 'Profile';
                <?= Html::label(yii::t('base.names','Created at'),'fdtt5656',['class' => 'control-label']) ?>
                 <?=  Html::input('text', 'username', $model->getSince(),['disabled'=>'disabled','class' => 'form-control']) ?>
              </diV>
-           
-           
+            <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+               <?php echo selectWidget::widget([
+           // 'id'=>'mipapa',
+            'model'=>$profile,
+            'form'=>$form,
+            'campo'=>'codtra',
+         'ordenCampo'=>2,
+         'addCampos'=>[3,4,5],
+        'inputOptions'=>[/*'enableAjaxValidation'=>true*/],
+        ]);
+           ?>
+         </diV>       
             <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
                <?= Html::label(yii::t('base.names','E-mail'),'fd56t56',['class' => 'control-label']) ?>
                 <?=  Html::input('text', 'username', $model->email,['disabled'=>'disabled','class' => 'form-control']) ?>

@@ -2,8 +2,12 @@
 
 namespace frontend\modules\sigi\models;
 use frontend\modules\sigi\models\SigiCuentaspor;
+use frontend\modules\sigi\models\SigiDetfacturacion;
+use frontend\modules\sigi\models\SigiKardexdepa;
 use Yii;
+use  yii\web\ServerErrorHttpException;
 USE yii\data\ActiveDataProvider;
+use frontend\modules\report\models\Reporte;
 /**
  * This is the model class for table "{{%sigi_facturacion}}".
  *
@@ -20,8 +24,9 @@ USE yii\data\ActiveDataProvider;
  */
 class SigiFacturacion extends \common\models\base\modelBase
 {
-   
+   //public static $varsToReplace=['$cuenta'=>'','$dias'=>'','$banco'=>'','$correo_cobranza'=>''];
     public $hardFields=['edificio_id','mes','ejercicio'];
+     public $dateorTimeFields=['fvencimiento'=>self::_FDATE,'fecha'=>self::_FDATE];
     /**
      * {@inheritdoc}
      */
@@ -36,8 +41,10 @@ class SigiFacturacion extends \common\models\base\modelBase
     public function rules()
     {
         return [
-            [['edificio_id', 'mes', 'descripcion'], 'required'],
+            [['edificio_id', 'mes', 'descripcion','fecha','fvencimiento','reporte_id'], 'required'],
             [['edificio_id'], 'integer'],
+              [['fvencimiento','detalleinterno','unidad_id','reporte_id'], 'safe'],
+            ['fvencimiento', 'validateFechas'],
             [['detalles'], 'string'],
             [['mes'], 'string', 'max' => 2],
             [['ejercicio'], 'string', 'max' => 4],
@@ -86,6 +93,11 @@ class SigiFacturacion extends \common\models\base\modelBase
         return $this->hasOne(Edificios::className(), ['id' => 'edificio_id']);
     }
     
+    
+    public function getReporte(){
+       return $this->hasOne(Reporte::className(), ['id' => 'reporte_id']);
+   
+    }
     
 
     /**
@@ -176,19 +188,51 @@ class SigiFacturacion extends \common\models\base\modelBase
         ];
     }
     
+    /*Verifica que todosl los coelctores del 
+     * rpesupesto 
+     * esten en el detalle 
+     */
+    public function isCompleteColectores(){
+       $dif= array_diff($this->idsColectoresInBudget(),$this->idsColectores());
+       //VAR_DUMP($this->idsColectoresInBudget(),$this->idsColectores(),$dif);die();
+       return (count($dif)>0)?false:true;
+    }
+    
+    
+    
     public function generateFacturacionMes(){
         $errores=[];
-        
-        if($this->isCompleteReadsSuministros()){
-          foreach($this->sigiCuentaspor as $cuentapor){
-            $errores['error']=$cuentapor->generateFacturacion();
-          }  
+        yii::error('generando facturacion');
+        if(count($this->getSigiCuentaspor()->select('codmon')->distinct()->column())==1){
+             
+      
+       if($this->isCompleteColectores()){
+          if($this->isCompleteReadsSuministros()){
+        /* foreach($this->sigiCuentaspor as $cuentapor){
+            $err=$cuentapor->generateFacturacion();
+            if(count($err)>0){
+                $errores['error']=yii::t('sigi.errors','Se presentaron algunos incovenientes'); 
+            }else{
+               $errores['success']=yii::t('sigi.errors','Se ha generado la facturacion sin problemas '.$this->balanceMontos());  
+            }
+          }*/
+           $this->shortFactu();
+           $this->asignaIdentidad();//Importante  
+           $this->asignaNumero();
         }else{
             
            $errores['error']=yii::t('sigi.errors','Hay suministros que aun no tienen lectura verifique por favor'); 
+        } 
+       }else{
+           $errores['error']=yii::t('sigi.errors','Falta agregar recibos o conceptos en la facturación');  
+       }
+       
+       //Verificando que todos los recibos tengan la misma moneda 
+        }else{
+            $errores['error']=yii::t('sigi.errors','Existe más de una moneda verifique los detalles');
         }
-       $this->asignaIdentidad();//Importante
-        
+       
+       
         return $errores;
     }
     /*
@@ -226,17 +270,38 @@ class SigiFacturacion extends \common\models\base\modelBase
         
     }
     
+    public function idsColectores(){
+       return  array_column($this->getSigiCuentaspor()->
+                select('colector_id')->distinct()
+                ->all(),'colector_id');
+        
+    }
+    
+    public function idsColectoresInBudget(){
+       return  array_column(SigiBasePresupuesto::find()->
+                select('cargosedificio_id')->distinct()->
+               where([
+                   'edificio_id'=>$this->edificio_id,
+                     'ejercicio'=>$this->ejercicio,
+                   ])->all(),'cargosedificio_id');
+        
+    }
+    
     public function idsToCuentasPor(){
        return  array_column($this->getSigiCuentaspor()->
                 select('id')->distinct()
                 ->all(),'id');
         
     }
+    
+    
+    
     /*Verifica que todos los medidores tengan su lectura*/
     public function isCompleteReadsSuministros(){
         $iscomplete=true;
         $tipomedidores=$this->edificio->typeMedidores();
-    foreach($tipomedidores as $key=>$type){
+   IF(count($tipomedidores)>0){
+        foreach($tipomedidores as $key=>$type){
         $nlecturas=SigiLecturas::find()->where(
                 ['edificio_id'=>$this->edificio_id,
                     'mes'=>$this->mes,
@@ -249,13 +314,17 @@ class SigiFacturacion extends \common\models\base\modelBase
         break;   
       }
       $nmedidores=$this->edificio->nMedidores($type); 
-       // var_dump($nmedidores,$nlecturas,$nlecturas % $nmedidores);die();
+       //var_dump($nmedidores,$nlecturas,$nlecturas % $nmedidores);die();
           if(($nlecturas % $nmedidores) <> 0) //Si las cantidades SON multiplos de la cantidad de medidores entonces OK           
           {
              $iscomplete=false; 
            break;     
           }
            }
+   }else{
+       return false;
+   }
+   
     return $iscomplete;      
           }
     
@@ -274,7 +343,16 @@ class SigiFacturacion extends \common\models\base\modelBase
                         ])->asArray()->all(),'suministro_id');
              
                 $idsTotales=$this->edificio->idsMedidores($type);
+                
                 $idsFaltan= array_diff($idsTotales,  $idsConLecturas);
+               /* print_r($idsTotales);
+                echo "<br><br><br><br><br>";
+                 print_r($idsConLecturas);
+                 echo "<br><br><br><br><br>";
+                  print_r($idsFaltan);
+               //var_dump($idsTotales,$idsConLecturas,$idsFaltan);
+               
+               die();*/
               $query= SigiSuministros::find()->where(['in','id',$idsFaltan]);        
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -283,7 +361,8 @@ class SigiFacturacion extends \common\models\base\modelBase
     }
     
     public function resetFacturacion(){
-      \frontend\modules\sigi\models\SigiDetfacturacion::deleteAll(['facturacion_id'=>$model->id]);
+      $borrados= \frontend\modules\sigi\models\SigiDetfacturacion::deleteAll(['facturacion_id'=>$this->id]);
+      yii::error('borrados '.$borrados.'  Registros');
       \frontend\modules\sigi\models\SigiLecturas::updateAll(['cuentaspor_id'=>null],
               [ 
                  'mes'=>$this->mes,
@@ -294,5 +373,246 @@ class SigiFacturacion extends \common\models\base\modelBase
             
   public function generateTempReads(){
       
-  }        
+  } 
+  /*
+   * Verifica que la suma de los notos de cuentas por
+   * DEBE DE SER IGUAL A La Suma de los valores
+   * de detfacturacion
+   * Es un balance 
+   */
+   public function balanceMontos(){
+      return $this->montoFacturado()-$this->montoTotal();
+   }
+   
+   public function montoFacturado(){
+      return  $this->detfacturacionQuery()->select('sum(monto)')->scalar();
+   }
+   public function detfacturacionQuery(){
+      return SigiDetfacturacion::find()->where(['facturacion_id'=>$this->id]); 
+   }
+   /*
+    * Citeriop de filtro del mes anterior*/
+    
+   private function previousQuery(){
+      
+        $mesprev=($this->mes=='1')?'12':(($this->mes-1).'');
+        $anioPrev=($this->mes=='1')?(($this->ejercicio-1).''):$this->ejercicio;
+      return $this->getSigiDetfacturacion()->where(['mes'=>$mesprev,'anio'=>$anioPrev]);
+   }
+   //nUMERO MAXIMO ANTEIROR DEL RECIBO , DONDE SE QUEDO
+   private function numeroAnterior(){
+       RETURN $this->previousQuery()->max(numero);
+   }
+   
+   private function asignaNumero(){
+       $mes= str_pad( $this->mes , 2,  "0",STR_PAD_LEFT);       
+      $depas=array_column($this->getSigiDetfacturacion()->select('grupofacturacion')->distinct()->orderBy('grupofacturacion ASC')->asArray()->all(),'grupofacturacion');
+     $contador=1;
+      foreach($depas as $key=>$depa){
+          $numero=$this->ejercicio.'-'.$mes.'-'.str_pad( $contador.'' , 3,  "0",STR_PAD_LEFT);      
+          SigiDetfacturacion::updateAll(['numerorecibo'=>$numero],['grupofacturacion'=>$depa,'facturacion_id'=>$this->id]);
+          $contador++;
+      }
+   }
+   
+   
+    public function validateFechas($attribute, $params)
+    {
+      // $this->toCarbon('fecingreso');
+       //$this->toCarbon('cumple');
+       //self::CarbonNow();
+       //var_dump(self::CarbonNow());
+        
+       if($this->toCarbon('fecha')->greaterThan($this->toCarbon('fvencimiento'))){
+            $this->addError('fvencimiento', yii::t('base.errors','La fecha  {campo} es una fecha anterior a la fecha emisión',
+                    ['campo'=>$this->getAttributeLabel('fvencimiento')]));
+       }
+     
+    }
+ 
+    
+  public function beforeSave($insert){
+      if($insert){
+          
+      }
+      return parent::beforeSave($insert);
+  }
+  
+  /*
+   * Funcio que obtiene el registro unico para 
+   * recolectar las cobranzas de los departamenteos
+   * afiliados de la inmobiliaria 
+   */
+  private function hasKardexDepaComun(){
+      if(empty($this->unidad_id))
+      throw new ServerErrorHttpException(Yii::t('base.errors', 'No ha especificado la unidad general para  cobranza masiva'));
+ return SigiKardexdepa::find()->where([
+      'edificio_id'=>$this->edificio,
+      'unidad_id'=>$this->unidad_id,
+      'facturacion_id'=>$this->id,
+      ])->one();
+      
+  }
+  
+  private function hasKardexDepa($unidad_id){
+      return SigiKardexdepa::find()->where([
+      'edificio_id'=>$this->edificio,
+      'unidad_id'=>$unidad_id,
+      'facturacion_id'=>$this->id,
+      ])->one();
+      
+  }
+  
+  private function kardexDepaComun(){
+      $registro=$this->hasKardexDepaComun();
+    if(is_null($registro)){
+        $attributes=[
+        'edificio_id'=>$this->edificio_id,
+        'unidad_id'=>$this->unidad_id,
+        'facturacion_id'=>$this->id,
+        'mes'=>$this->mes,
+        'anio'=>$this->ejercicio,
+        'fecha'=>$this->fecha, ];
+     $modelo=New SigiKardexdepa();
+     $modelo->setAttributes($attributes);
+      if($modelo->save()){
+          //var_dump('0k');die();
+      }else{
+        var_dump($modelo->getErrors());die();  
+      }
+      return $modelo;
+    }else{
+      return $registro;  
+    }
+    
+  }
+  
+    private function kardexDepa($unidad_id){  
+         $registro=$this->hasKardexDepa($unidad_id);
+    if(is_null($registro)){
+        $attributes=[
+        'edificio_id'=>$this->edificio_id,
+        'unidad_id'=>$unidad_id,
+        'facturacion_id'=>$this->id,
+        'mes'=>$this->mes,
+        'anio'=>$this->ejercicio,
+        'fecha'=>$this->fecha, ];
+     $modelo=New SigiKardexdepa();
+     $modelo->setAttributes($attributes);
+      if($modelo->save()){
+          //var_dump('0k');die();
+      }else{
+        var_dump($modelo->getErrors());die();  
+      }
+      return $modelo;
+    }else{
+      return $registro;  
+    }
+  }
+  
+  public function hasCobranzaMasiva(){
+      $valor=false;
+     foreach($this->edificio->apoderados as $apoderado){
+         if(!$apoderado->cobranzaindividual && $apoderado->hasDepasImputables()){
+            $valor=true; break; 
+         }
+    }
+    return $valor;
+  }
+  
+  /*Facturacion sin nmucho detalle */
+  public function shortFactu(){
+     $unidades= $this->edificio->unidadesImputablesPadres();
+     $hasCobranzaMasiva=$this->hasCobranzaMasiva();
+     
+
+     if($hasCobranzaMasiva){
+       //Obteniendo la unidad Grupal
+        
+      $kardexGrupal=$this->kardexDepaComun();
+       $kardexGrupal->refresh();  
+     }
+      
+     foreach($unidades as $unidad){
+       
+         if($hasCobranzaMasiva){
+                  if($unidad->miApoderado()->cobranzaindividual){
+                      $modeltemp=$this->kardexDepa($unidad->id);
+                       $identidad=$modeltemp->id; unset($modeltemp);
+          
+                     }else{
+                        $identidad=$kardexGrupal->id;  
+                  } 
+         }else{
+                     $modeltemp=$this->kardexDepa($unidad->id);
+                     $identidad=$modeltemp->id; unset($modeltemp);
+         }
+         
+       
+       
+        foreach($this->sigiCuentaspor as $cuenta){
+            $colector=$cuenta->colector;
+           if($colector->isMassive()){
+             if($colector->isMedidor()){
+                 //yii::error('esta es la unidad ------'.$unidad->numero);
+                 $medidor=$unidad->firstMedidor($colector->tipomedidor);
+                 if(!is_null($medidor)){
+                     
+                     $participacion=$medidor->participacionRead($cuenta->mes,$cuenta->anio);
+                    //yii::error('partici medidor  '.$participacion);
+                    $monto=round($participacion*$cuenta->monto,6);
+                     /***insertar un registrio****/
+                    if(!$cuenta->existsDetalleFacturacion($unidad,$colector,false))
+                        $cuenta->insertaRegistro($identidad,$unidad,$medidor,$monto,'0',$participacion);
+                    /*****************************/
+                 }
+                 
+                 // yii::error('partici unidada  '.$unidad->porcWithChilds());
+                     $monto=0;
+                     /******Recorreidno los medidores de aareas comunes*/
+                         foreach($this->edificio->medidoresAaCc() as $medidorAACC){
+                             $participacionAACC=$medidorAACC->participacionRead($cuenta->mes,$cuenta->anio);
+                             $monto=$monto+round($participacionAACC //el porc d ecomsumo
+                                     *$unidad->porcWithChilds() //por la participacion 
+                                     *$cuenta->monto,10); ///el monto totañl
+                         }
+                 
+                 /***insertar un registrio  por todfas las sumas de las lecturas****/
+                  if(!$cuenta->existsDetalleFacturacion($unidad,$colector,true) && $monto > 0)
+                  $cuenta->insertaRegistro($identidad,$unidad,null,$monto,'1',$participacionAACC //el porc d ecomsumo
+                                     *$unidad->porcWithChilds());
+                 /*****************************/
+                 
+                 
+                 
+                }else{
+                   
+                $monto=round($unidad->porcWithChilds()*$cuenta->monto,10);
+                
+                /***insertar un registrio****/
+                if(!$cuenta->existsDetalleFacturacion($unidad,$colector,false))
+                  $cuenta->insertaRegistro($identidad,$unidad,null,$monto,'0',$unidad->porcWithChilds());
+                 /*****************************/
+                 
+                   }
+                }else{
+                   /*Si es un cobro uindividual aplicar aqui*/
+                   if($cuenta->unidad_id>0 && $cuenta->unidad_id==$unidad->id) {
+                       /***insertar un registrio****/
+                       if(!$cuenta->existsDetalleFacturacion($unidad,$colector,false))
+                    $cuenta->insertaRegistro($identidad,$unidad,null,$monto,'1',1);
+                      /*****************************/
+                 
+                 
+                        }
+                 }
+            
+        } 
+     }         
+  }
+  
+  
+  
+  
+   
 }

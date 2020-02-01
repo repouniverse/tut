@@ -97,6 +97,9 @@ $gridColumns = [
 [    
     'attribute' => 'area',
 ],
+                 [    
+    'attribute' => 'codpro',
+],
          [    
     'attribute' => 'tipo',
              'value'=>'tipo.desunidad',
@@ -106,7 +109,7 @@ $gridColumns = [
              'attribute'=>'participacion',
              'format'=>'raw',
              'value'=>function($model){
-                   return $model->participacion();
+                   return $model->participacionArea();
              }
          ],                
                  

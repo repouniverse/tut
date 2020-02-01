@@ -14,14 +14,14 @@ $this->title = Yii::t('sta.labels', 'Edita Cita: {name}', [
     'name' => $model->fechaprog,
 ]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('sta.labels', 'Citas'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = Yii::t('sta.labels', 'Update');
+$this->params['breadcrumbs'][] = ['label' =>yii::t('sta.labels', 'Ir a programa').' '.$model->taller->numero, 'url' => ['/sta/programas/update', 'id' => $model->talleres_id]];
+$this->params['breadcrumbs'][] = Yii::t('sta.labels', 'Editar');
 ?>
 
+ <h4> <i class="fa fa-edit"></i><?= Html::encode($this->title) ?>-<?=$model->tallerdet->alumno->fullName().Html::a(Html::img($model->tallerdet->alumno->getUrlImage(),['width'=>60,'height'=>65, 'class'=>"img-thumbnail cuaizquierdo"])) ?></h4>
 
-<h4></h4>
     <div class="box box-body">
-        <div class="alert alert-info"> <i class="fa fa-edit"></i><?= Html::encode($this->title) ?>-<?=$model->tallerdet->alumno->fullName().Html::a(Html::img($model->tallerdet->alumno->getUrlImage(),['width'=>60,'height'=>65, 'class'=>"img-thumbnail cuaizquierdo"])) ?></div>
+     
     <?php echo TabsX::widget([
     'position' => TabsX::POS_ABOVE,
      'bordered'=>true,

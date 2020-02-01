@@ -46,6 +46,7 @@ class SigiSuministrosSearch extends SigiSuministros
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination'=>['pageSize'=>200],
         ]);
 
        /* $this->load($params);
@@ -94,6 +95,7 @@ $query->andFilterWhere([
          $query = SigiSuministros::find();
     $dataProvider = new ActiveDataProvider([
             'query' => $query,
+        'pagination'=>['pageSize'=>200],
         ]);
 
        $this->load($params);

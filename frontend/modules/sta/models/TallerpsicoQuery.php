@@ -1,13 +1,13 @@
 <?php
 
 namespace frontend\modules\sta\models;
-
+use frontend\modules\sta\components\ActiveQueryScope;
 /**
  * This is the ActiveQuery class for [[Tallerpsico]].
  *
  * @see Tallerpsico
  */
-class TallerpsicoQuery extends \yii\db\ActiveQuery
+class TallerpsicoQuery extends ActiveQueryScope
 {
     /*public function active()
     {

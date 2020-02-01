@@ -24,7 +24,7 @@ class SigiApoderados extends \common\models\base\modelBase
     /**
      * {@inheritdoc}
      */
-   public $booleanFields=['tienejunta','emisordefault','facturaigv','permiteventa' ];
+   public $booleanFields=['cobranzaindividual','facturindividual','tienejunta','emisordefault','facturaigv','permiteventa' ];
     public static function tableName()
     {
         return '{{%sigi_apoderados}}';
@@ -41,7 +41,7 @@ class SigiApoderados extends \common\models\base\modelBase
             [['edificio_id', 'codpro'], 'required'],
             [['edificio_id'], 'integer'],
             [['detalles'], 'string'],
-             [['tienejunta','emisordefault','facturaigv','permiteventa'], 'safe'],
+             [['tienejunta','emisordefault','facturaigv','permiteventa','cobranzaindividual','facturindividual'], 'safe'],
             [['codpro'], 'string', 'max' => 6],
             //[['facturaigv', 'permite1', 'permite2', 'permiteventa', 'permitealquiler'], 'string', 'max' => 1],
             [['codpro'], 'exist', 'skipOnError' => true, 'targetClass' => Clipro::className(), 'targetAttribute' => ['codpro' => 'codpro']],
@@ -58,6 +58,8 @@ class SigiApoderados extends \common\models\base\modelBase
             'edificio_id' => Yii::t('sigi.labels', 'Edificio ID'),
             'codpro' => Yii::t('sigi.labels', 'Codpro'),
             'facturaigv' => Yii::t('sigi.labels', 'Facturaigv'),
+             'facturindividual' => Yii::t('sigi.labels', 'Fact Individual'),
+            'cobranzaindividual' => Yii::t('sigi.labels', 'Cobranza individual'),
             'permite1' => Yii::t('sigi.labels', 'Permite1'),
             'permite2' => Yii::t('sigi.labels', 'Permite2'),
             'detalles' => Yii::t('sigi.labels', 'Detalles'),
@@ -84,5 +86,13 @@ class SigiApoderados extends \common\models\base\modelBase
     public static function find()
     {
         return new SigiApoderadosQuery(get_called_class());
+    }
+    
+    public function hasDepasImputables(){
+        return SigiUnidades::find()->where([
+            'edificio_id'=>$this->edificio_id,
+             'codpro'=>$this->codpro,
+             'imputable'=>'1',
+            ])->exists();
     }
 }

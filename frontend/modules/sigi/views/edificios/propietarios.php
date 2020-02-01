@@ -77,7 +77,7 @@ $this->title = Yii::t('base.names', 'Propietarios');
 ]) . "<br><hr>\n".GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
-         'summary' => '',
+         //'summary' => '',
         //'tableOptions'=>['class'=>".thead-dark table table-condensed table-hover table-bordered table-striped"],
         'columns' => $gridColumns,
     ]); ?>

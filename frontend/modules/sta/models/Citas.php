@@ -123,6 +123,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
             [['detalles'], 'string'],
              [['duracion','codfac','asistio','activo'], 'safe'],
             [['fechaprog', 'finicio', 'ftermino'], 'string', 'max' => 19],
+            ['fechaprog', 'validateDispo'],
             [['codtra'], 'string', 'max' => 6],
             [['fingreso', 'codaula'], 'string', 'max' => 10],
             [['fechaprog','duracion','finicio','ftermino'],'safe','on'=>self::SCENARIO_REPROGRAMA],
@@ -142,10 +143,10 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
             'id' => Yii::t('sta.labels', 'ID'),
             'talleresdet_id' => Yii::t('sta.labels', 'Talleresdet ID'),
             'talleres_id' => Yii::t('sta.labels', 'Talleres ID'),
-            'fechaprog' => Yii::t('sta.labels', 'Fechaprog'),
-            'codtra' => Yii::t('sta.labels', 'Codtra'),
-            'finicio' => Yii::t('sta.labels', 'Finicio'),
-            'ftermino' => Yii::t('sta.labels', 'Ftermino'),
+            'fechaprog' => Yii::t('sta.labels', 'F Prog'),
+            'codtra' => Yii::t('sta.labels', 'Psicólogo'),
+            'finicio' => Yii::t('sta.labels', 'F inic'),
+            'ftermino' => Yii::t('sta.labels', 'F term'),
             'fingreso' => Yii::t('sta.labels', 'Fingreso'),
             'detalles' => Yii::t('sta.labels', 'Detalles'),
             'codaula' => Yii::t('sta.labels', 'Codaula'),
@@ -574,13 +575,27 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
         foreach($this->codExamenes() as $codexamen){
             $proveedores[$codexamen]= VwStaExamenesSearch::searchByExamenCode($this->id,$codexamen);
         }
+        
         return $proveedores;
     }
     
     public function codExamenes(){
-       return array_column(Examenes::find()->select(['codtest'])
+       return array_column(Examenes::findFree()->select(['codtest'])
                 ->where(['citas_id'=>$this->id])->asArray()->all(),'codtest'); 
     }
+    
+    public function numeroPreguntas(){
+        $ids=(new \yii\db\Query())
+    ->select('id')
+    ->from('{{%sta_examenes}}')
+    ->where(['citas_id'=>$this->id])->column();
+      
+         return (new \yii\db\Query())
+    ->select('count(*)')
+    ->from('{{%sta_examenesdet}}')
+    ->where(['examenes_id'=>$ids])->scalar();
+    }
+    
     
     
     public function canInactivate(){
@@ -636,7 +651,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
   }  
   
   public function isInPast(){
-     return $this->toCarbon('fechaprog')->lessThanOrEqualTo(self::CarbonNow());
+     return $this->toCarbon('fechaprog')->lessThanOrEqualTo(self::CarbonNow()->subHours(4));
   }
   /*
    * Reporgarma la cita 
@@ -672,10 +687,32 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
   public function validateDispo($attribute, $params)
     {
       $this->esFeriado();
-      $this->isInJourney();
-      if($this->inPast())
-      $this->addError('fechaprog',yii::t('sta.errors','La fecha de inicio se encuentra en el pasado'));
+      //$this->isInJourney();
+      //if($this->isInPast())
+     // $this->addError('fechaprog',yii::t('sta.errors','La fecha de inicio se encuentra en el pasado'));
       
     }
   
+    
+    public function agregaBateria($codbateria){
+       $pruebas= Test::find()->where(['codbateria'=>$codbateria])->orderBy('orden asc')->all();
+       foreach($pruebas as $prueba){
+           $this->addTest($prueba->codtest);
+       }
+       $this->generaExamenes();
+    }
+    
+    private function addTest($codtest){
+        $attributes=[
+            'citas_id'=>$this->id,
+            'codtest'=>$codtest,
+            'codfac'=>$this->codfac,
+            'user_id'=>h::userId(),
+            'virtual'=>'1'
+        ];
+        $verifyAttributes=[ 'citas_id'=>$this->id,
+            'codtest'=>$codtest,];
+        Examenes::firstOrCreateStatic($attributes, null, $verifyAttributes);
+    }
+    
 }

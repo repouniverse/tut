@@ -12,10 +12,7 @@ use yii\widgets\Pjax;
     <?php Pjax::begin(['id'=>'grilla-rangos']); ?>
    
     <?php 
-    //var_dump($dataProviderRangos->getCount());die();
-    echo "hola";
-   
-    echo GridView::widget([
+     echo GridView::widget([
         'dataProvider' => $dataProviderRangos,
          'summary' => '',
          'tableOptions'=>['class'=>'table table-condensed table-hover table-bordered table-striped'],

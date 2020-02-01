@@ -28,7 +28,7 @@ class SigiBasePresupuesto extends \common\models\base\modelBase
             [['mensual', 'anual', 'acumulado'], 'number'],
             [['codgrupo', 'ejercicio'], 'string', 'max' => 4],
             [['codigo'], 'string', 'max' => 10],
-            [['descripcion'], 'string', 'max' => 40],
+            [['descripcion'], 'string', 'max' => 100],
             //[['activo', 'restringir'], 'string', 'max' => 1],
             //[['codgrupo'], 'exist', 'skipOnError' => true, 'targetClass' => SigiGrupoPresupuesto::className(), 'targetAttribute' => ['codgrupo' => 'codigo']],
             

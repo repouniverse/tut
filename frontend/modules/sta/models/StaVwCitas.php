@@ -54,6 +54,7 @@ editableViewInterface
     {
         return [
             'aptutor' => Yii::t('app', 'Aptutor'),
+            'codtra' => Yii::t('app', 'Psicólogo'),
             'amtutor' => Yii::t('app', 'Amtutor'),
             'nombrestutor' => Yii::t('app', 'Nombrestutor'),
             'codperiodo' => Yii::t('app', 'Codperiodo'),

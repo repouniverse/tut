@@ -192,7 +192,10 @@ use common\widgets\selectwidget\selectWidget;
      <?= $form->field($model, 'detalles')->textarea(['rows' => 6]) ?>
 
  </div>
-  
+   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+     <?= $form->field($model, 'facturacion')->textarea(['rows' => 6]) ?>
+
+ </div>
   
       
           

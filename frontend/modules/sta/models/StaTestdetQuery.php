@@ -7,7 +7,7 @@ namespace frontend\modules\sta\models;
  *
  * @see StaTestdet
  */
-class StaTestdetQuery extends \yii\db\ActiveQuery
+class StaTestdetQuery extends  \yii\db\ActiveQuery
 {
    CONST SCENARIO_MIN='minimo';
     

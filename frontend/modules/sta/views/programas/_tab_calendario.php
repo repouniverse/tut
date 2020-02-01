@@ -81,12 +81,12 @@ echo CalendarScheduleWidget::widget([
                     delay: 250,
                         data: {id:'.$model->id.', fecha:fechainicio,codalu:event.title  },
              error:  function(xhr, textStatus, error){               
-                            revertFunc();
+                           // revertFunc();
                                 }, 
               success: function(json) {  
                         var n = Noty("id");
                        if ( !(typeof json["error"]==="undefined") ) {
-                       revertFunc();
+                       //revertFunc();
                    $.noty.setText(n.options.id,"<span class=\'glyphicon glyphicon-remove-sign\'></span>      "+ json["error"]);
                               $.noty.setType(n.options.id, "error"); 
                               }
@@ -104,7 +104,7 @@ echo CalendarScheduleWidget::widget([
    cache: true
   })
         }else{
-      revertFunc();
+      //revertFunc();
       }
                              
                                     }'),
@@ -117,12 +117,12 @@ echo CalendarScheduleWidget::widget([
                     delay: 250,
                         data: {idcita:event.id, finicio:fechainicio },
              error:  function(xhr, textStatus, error){               
-                           revertFunc();
+                           //revertFunc();
                                 }, 
               success: function(json) {  
                         var n = Noty("id");
                        if ( !(typeof json["error"]==="undefined") ) {
-                      revertFunc();
+                      //revertFunc();
                    $.noty.setText(n.options.id,"<span class=\'glyphicon glyphicon-remove-sign\'></span>      "+ json["error"]);
                               $.noty.setType(n.options.id, "error"); 
                               }
@@ -140,7 +140,7 @@ echo CalendarScheduleWidget::widget([
    cache: true
   })
         }else{
-      revertFunc();
+     // revertFunc();
       }
                              
                                     }'),
@@ -153,17 +153,17 @@ echo CalendarScheduleWidget::widget([
                                var fechatermino=event.end.format("YYYY-MM-DD HH:mm:ss");
                               // alert(event.id);
         $.ajax({ 
-                    method:"get",    
+                    method:"post",    
                     url: "'.\yii\helpers\Url::toRoute(['/sta/citas/reprograma-cita']).'",
                     delay: 250,
                         data: {idcita:event.id, finicio:fechainicio ,ftermino:fechatermino},
              error:  function(xhr, textStatus, error){               
-                           revertFunc();
+                           //revertFunc();
                                 }, 
               success: function(json) {  
                         var n = Noty("id");
                        if ( !(typeof json["error"]==="undefined") ) {
-                      revertFunc();
+                      //revertFunc();
                    $.noty.setText(n.options.id,"<span class=\'glyphicon glyphicon-remove-sign\'></span>      "+ json["error"]);
                               $.noty.setType(n.options.id, "error"); 
                               }
@@ -181,7 +181,7 @@ echo CalendarScheduleWidget::widget([
    cache: true
   })
         }else{
-      revertFunc();
+      //revertFunc();
 
                             }
                   }'),
@@ -197,7 +197,7 @@ echo CalendarScheduleWidget::widget([
                     delay: 250,
                         data: {idalu:'.$idalu.',id:'.$model->id.',idcita:event.id, psicoid:'.$modelPsico->id.',codalu:event.title  },
              error:  function(xhr, textStatus, error){               
-                            revertFunc();
+                            //revertFunc();
                                 }, 
               success: function(json) {  
                         var n = Noty("id");

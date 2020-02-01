@@ -9,7 +9,7 @@ echo \yii\grid\GridView::widget([
         'id'=>'detallerepoGrid',
     'summary' => '',
     'emptyCell'=>'',
-    
+     'showFooter' => true,
           'tableOptions'=>[/*'class'=>'table table-responsive no-margin'*/],
                'dataProvider' => $dataProvider,        
         'columns' =>$columnas ,

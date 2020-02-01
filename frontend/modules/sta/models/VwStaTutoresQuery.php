@@ -1,13 +1,13 @@
 <?php
 
 namespace frontend\modules\sta\models;
-
+use frontend\modules\sta\components\ActiveQueryScope;
 /**
  * This is the ActiveQuery class for [[VwStaTutores]].
  *
  * @see VwStaTutores
  */
-class VwStaTutoresQuery extends \yii\db\ActiveQuery
+class VwStaTutoresQuery extends ActiveQueryScope
 {
     /*public function active()
     {

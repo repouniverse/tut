@@ -29,9 +29,12 @@ if(!$this->existsTable($table)) {
         'detalles'=>$this->text()->append($this->collateColumn()),
         'permiteventa'=>$this->char(1)->append($this->collateColumn()),
          'permitealquiler'=>$this->char(1)->append($this->collateColumn()),
-         'emisordefault'=>$this->char(1)->append($this->collateColumn()),
+         'cobranzaindividual'=>$this->char(1)->append($this->collateColumn()),
+        'tienejunta'=>$this->char(1)->append($this->collateColumn()),
+        'facturindividual'=>$this->char(1)->append($this->collateColumn()),
+        'emisordefault'=>$this->char(1)->append($this->collateColumn()),
         ],$this->collateTable());
-  
+
   /*  $this->addForeignKey($this->generateNameFk($table), $table,
               'codalu', static::NAME_TABLE_ALUMNO,'codalu');*/
     $this->addForeignKey($this->generateNameFk($table), $table,

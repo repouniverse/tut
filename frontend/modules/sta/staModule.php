@@ -31,10 +31,10 @@ class staModule extends \yii\base\Module
      */
     public function behaviors(){
         return[
-            [
-            'class' => FilterAccess::className(), 
-             // 'except' => ['default/complete'],
-            ],
+           // [
+            //'class' => FilterAccess::className(), 
+              //'except' => ['sta/citas/examen-banco'],
+           // ],
         ];
     }
     
@@ -155,5 +155,6 @@ class staModule extends \yii\base\Module
  public static function docCodes(){
      return ['104','105','106'];
  } 
-  
+ 
+
 }

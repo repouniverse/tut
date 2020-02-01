@@ -32,7 +32,7 @@ class Test extends \common\models\base\modelBase
         return '{{%sta_test}}';
     }
 public $booleanFields=['opcional'];
-    
+  public $hardFields=['codtest'];  
      public function behaviors()
 {
 	return [
@@ -49,11 +49,12 @@ public $booleanFields=['opcional'];
     public function rules()
     {
         return [
-            [['codtest', 'descripcion', 'opcional', 'version'], 'required'],
+            [['codtest', 'descripcion', 'opcional', 'version','codbateria'], 'required'],
             [['nveces', 'id', 'reporte_id'], 'integer'],
+              [['codbateria', 'reporte_id','orden','detalles'], 'safe'],
             [['codtest'], 'string', 'max' => 8],
             [['descripcion'], 'string', 'max' => 40],
-            [['opcional'], 'string', 'max' => 1],
+            //[['opcional'], 'string', 'max' => 1],
             [['version'], 'string', 'max' => 5],
             [['codocu'], 'string', 'max' => 3],
             [['codtest'], 'unique'],
@@ -123,7 +124,7 @@ public $booleanFields=['opcional'];
        return array_column( $this->getCalificiones()->select(['valor','descripcion'])->asArray()->all(),'descripcion','valor');
     }
     
-    public function beforeSaveSave($insert){
+    public function beforeSave($insert){
         $this->codocu=self::DOCUMENTO_TEST;
         return parent::beforeSave($insert);
     }

@@ -134,6 +134,8 @@ class EdificiosController extends baseController
      */
     public function actionUpdate($id)
     {
+      //Edificios::findOne(8)->refreshPorcentaje();
+        //die();
         $model = $this->findModel($id);
          //var_dump($model->hasApoderados());die();
         if (h::request()->isAjax && $model->load(h::request()->post())) {

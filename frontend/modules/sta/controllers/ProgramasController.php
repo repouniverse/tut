@@ -17,6 +17,7 @@ use frontend\modules\sta\models\VwAluriesgoSearch;
 use frontend\modules\sta\models\TallerpsicoSearch;
 use frontend\modules\sta\models\StaTestTalleres;
 use frontend\modules\sta\models\VwStaTutoresSearch;
+use frontend\modules\sta\models\StaIpslab;
 use frontend\modules\sta\models\Rangos;
 use frontend\modules\sta\models\Test;
 use frontend\modules\sta\models\Citas;
@@ -161,6 +162,7 @@ on a.talleresdet_id=b.id)  left join
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+       // VAR_DUMP(\frontend\modules\sta\helpers\comboHelper::getCboTutoresByProg($id));DIE();
         
         //$range=$model->range('12/12/2019');
         //var_dump($range->getInitialDate(),$range->getFinalDate());die();
@@ -404,14 +406,9 @@ on a.talleresdet_id=b.id)  left join
     * y devuelve los mensajes acecidos
     */
      public function actionAjaxDetachPsico($id){
-         if(h::request()->isAjax){
-             
-             
-             
-               h::response()->format = \yii\web\Response::FORMAT_JSON;
-           
-             $modelo= Tallerpsico::findOne($id);
-            
+         if(h::request()->isAjax){             
+               h::response()->format = \yii\web\Response::FORMAT_JSON;           
+             $modelo= Tallerpsico::findOne($id);            
               $modelo->dettachTutor();
               return $modelo->messages();
          }
@@ -544,6 +541,7 @@ public function actionProgramarCitas($id){
  */
 public function actionMakeCitaByStudent(){
     if(h::request()->isAjax){
+        h::response()->format = \yii\web\Response::FORMAT_JSON;
         $id=h::request()->get('id');
         $codalu=h::request()->get('codalu');
         $fecha=h::request()->get('fecha');
@@ -562,16 +560,18 @@ public function actionMakeCitaByStudent(){
             ];
            // var_dump($fecha,$model::_FDATETIME,$model::SwichtFormatDate($fecha,$model::_FDATETIME,true));die();
        
-             h::response()->format = \yii\web\Response::FORMAT_JSON;
+             
             if(Citas::firstOrCreateStatic($attributes,Citas::SCE_CREACION_BASICA)){
               $datos['success']=yii::t('sta.errors','Se ha creado la cita satisfactoriamente');
                 
             }else{
-                $mod=new Citas(Citas::SCE_CREACION_BASICA);
+                $mod=new Citas();
+                $mod->setScenario(Citas::SCE_CREACION_BASICA);
                 $mod->setAttributes($attributes);
                 $mod->validate();
-              $datos['error']=yii::t('sta.errors','Hubo un problema interno al grabar el registro de las citas : '.$mod->getFirstErrors());
+              $datos['error']=yii::t('sta.errors','Hubo un problema interno al grabar el registro de las citas : '.$mod->getFirstError());
                 UNSET($mod);
+               // RETURN $datos;
             }
                 
            return $datos; 
@@ -772,6 +772,7 @@ public function actionEditaDocu($id){
                return ['success'=>2,'msg'=>$datos];  
             }else{
                 $model->save();
+                
                 //$model->assignStudentsByRandom();
                   return ['success'=>1,'id'=>$model->id];
             }
@@ -779,6 +780,94 @@ public function actionEditaDocu($id){
            return $this->renderAjax('_modal_docu_alu', [
                         'model' => $model,
                          'modeldet' => $model->talleresdet,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                       // 'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+
+    }
+
+ public function actionRegistraLab($id){
+     $modelTaller=$this->findModel($id);
+     $model=new StaIpslab();
+     $model->ip=h::request()->getUserIP();
+     $model->activo=true;
+     $model->taller_id=$id;
+      if (h::request()->isAjax && $model->load(h::request()->post())) {
+                h::response()->format = \yii\web\Response::FORMAT_JSON;
+                return \yii\widgets\ActiveForm::validate($model);
+        }
+        if ($model->load(h::request()->post()) && $model->save()) {
+            return $this->redirect(['complete-matricula']);
+        }
+        return $this->render('_matricula_pc', [
+            'model' => $model,
+            'modelTaller'=>$modelTaller,
+        ]);
+   } 
+   
+   public function actionCompleteMatricula(){    
+        return $this->render('_complete_matricula', [            
+        ]);
+   }  
+   
+   
+   public function actionCambioPsicologo($id){        
+         $this->layout = "install";
+         $model= \frontend\modules\sta\models\Tallerpsico::findOne($id);
+         $model->setScenario($model::SCENARIO_CAMBIO);
+        $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+               // $model->save();
+                //var_dump($model->talleres_id,$model->getOldAttribute('codtra'),$model->codtra);die();
+                $model->transfiereAlus($model->getOldAttribute('codtra'),$model->codtra,$model->cantidad_transferir);
+                  $model->taller->sincronizeCant();
+                return ['success'=>1,'id'=>$model->id];
+            }
+        }else{
+           return $this->renderAjax('_modal_cambio_psico', [
+                        'modelTaller' => $model->taller,
+                         'model' => $model,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                       // 'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+
+    }
+ public function actionCambioPsicologoAlumno($id){        
+         $this->layout = "install";
+         $model= \frontend\modules\sta\models\Talleresdet::findOne($id);
+         
+        $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+               // $model->save();
+                //var_dump($model->talleres_id,$model->getOldAttribute('codtra'),$model->codtra);die();
+                $model->cambiaPsicologo($model->codtra);
+                  //$model->taller->sincronizeCant();
+                return ['success'=>1,'id'=>$model->id];
+            }
+        }else{
+           return $this->renderAjax('_modal_cambio_psico_alu', [
+                        'modelTaller' => $model->talleres,
+                         'model' => $model,
                         'id' => $id,
                         'gridName'=>h::request()->get('gridName'),
                         'idModal'=>h::request()->get('idModal'),

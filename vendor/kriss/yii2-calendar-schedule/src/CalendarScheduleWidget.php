@@ -112,7 +112,7 @@ class CalendarScheduleWidget extends Widget
         ], $this->draggableEvents);
 
         $this->createEvents = array_merge([
-            'title' => 'eVENTOS',
+            'title' => 'EVENTOS',
             'colors' => ['#286090', '#5cb85c', '#5bc0de', '#f0ad4e', '#d9534f'],
         ], $this->createEvents);
 
@@ -177,7 +177,7 @@ class CalendarScheduleWidget extends Widget
 
         $removeAfterDrop = '';
         if ($draggableEvents['canSetRemoveAfterDrop']) {
-            $removeAfterDrop = '<div class="checkbox"> <label for="drop-remove"><input type="checkbox" id="drop-remove">eLIMINAR</label></div>';
+            $removeAfterDrop = '<div class="checkbox"> <label for="drop-remove"><input type="checkbox" id="drop-remove">ELIMINAR</label></div>';
         }
 
         $dropToTrash = '';

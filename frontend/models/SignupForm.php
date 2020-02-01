@@ -64,12 +64,19 @@ class SignupForm extends Model
               $user->status = ArrayHelper::getValue(Yii::$app->params, 'user.defaultStatus', UserStatus::ACTIVE);
              
             }
-            //var_dump($user->status);die();
-             
+           
            
             $user->setPassword($this->password);
             $user->generateAuthKey();
             if ($user->save()) {
+                
+                 $auth = Yii::$app->authManager;
+        $authorRole = $auth->getRole('r_visitas');
+        $auth->assign($authorRole, $user->getId());
+            //var_dump($user->status);die();
+             
+                
+                
                 return $user;
             }
         }

@@ -21,6 +21,8 @@ return [
         'formatter' => [
         'class' => 'yii\i18n\Formatter',
         'nullDisplay' => '',
+            'decimalSeparator' => '.',
+            'thousandSeparator' => ', ',
           ],
     ],
     
@@ -87,9 +89,9 @@ return [
          'reportico' => [
             'class' => 'reportico\reportico\Module' ,
             'controllerMap' => [
-                            'reportico' => 'reportico\reportico\controllers\ReporticoController',
-                            'mode' => 'reportico\reportico\controllers\ModeController',
-                            'ajax' => 'reportico\reportico\controllers\AjaxController',
+                           // 'reportico' => 'reportico\reportico\controllers\ReporticoController',
+                           // 'mode' => 'reportico\reportico\controllers\ModeController',
+                            //'ajax' => 'reportico\reportico\controllers\AjaxController',
                         ]
             ],
         
@@ -309,7 +311,20 @@ return [
         
         
            ],
-    
-    
+    'as access' => [
+        'class' => 'mdm\admin\components\AccessControl',
+        'allowActions' => [
+            'site/login/',
+            'site/clear-cache/',
+            'site/signup',
+             'site/request-password-reset',
+            'site/reset-password', 
+           'site/logout',
+            'sta/citas/examen-banco',
+            'sta/citas/arregla-for-ajax',
+            'sta/citas/respuesta-examen',
+            'sta/citas/termina-examen',
+        ]
+    ]
     
 ];

@@ -27,7 +27,7 @@ if(!$this->existsTable($table)) {
         'numero'=>$this->string(12)->notNull()->append($this->collateColumn()),
         'nombre'=>$this->string(25)->notNull()->append($this->collateColumn()),
         'area'=>$this->decimal(10,3),
-        'participacion'=>$this->decimal(10,4),
+        'participacion'=>$this->decimal(10,6),
         'parent_id'=>$this->integer(11),
         'codpro'=>$this->char(6)->notNull(),
         'detalles'=>$this->text()->append($this->collateColumn()),

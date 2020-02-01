@@ -20,6 +20,8 @@ use frontend\modules\sta\models\StaTestTalleres;
         <button id="boton-agregar-test" type="button" class="btn btn-warning btn-sm">
             <span class="glyphicon glyphicon-arrow-right  "></span>    <?=yii::t('sta.labels','  Agregar')?>
         </button>
+        <?=Html::a('<span class="fa fa-laptop" ></span>'.'  '.yii::t('sta.labels','Registrar PC'),Url::to(['/sta/programas/registra-lab','id'=>$model->id]),['target'=>'_blank','class'=>"btn btn-success"])?>
+         
       </div>
   
     

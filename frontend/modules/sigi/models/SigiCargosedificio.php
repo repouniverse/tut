@@ -53,7 +53,7 @@ class SigiCargosedificio extends \common\models\base\modelBase implements
             [[ 'regular',
         'individual',
         'montofijo',
-        'emisorexterno'],'safe'],
+        'emisorexterno','tipomedidor'],'safe'],
             //[['regular', 'montofijo'], 'string', 'max' => 1],
             [['edificio_id'], 'exist', 'skipOnError' => true, 'targetClass' => Edificios::className(), 'targetAttribute' => ['edificio_id' => 'id']],
             //[['codgrupo'], 'exist', 'skipOnError' => true, 'targetClass' => SigiCargosgrupoedificio::className(), 'targetAttribute' => ['grupo_id' => 'id']],
@@ -161,10 +161,10 @@ class SigiCargosedificio extends \common\models\base\modelBase implements
     
     public function montoTotal($mes,$anio){
      if($this->isBudget()){
-          /* yii::error(SigiBasePresupuesto::find()->
+           yii::error(SigiBasePresupuesto::find()->
                  select('sum(mensual) as monto')->where(
                     ['cargosedificio_id'=>$this->id,'ejercicio'=>$anio]
-            )->createCommand()->getRawSql());*/
+            )->createCommand()->getRawSql());
          $valor=SigiBasePresupuesto::find()->
                  select('sum(mensual) as monto')->where(
                     ['cargosedificio_id'=>$this->id,'ejercicio'=>$anio]

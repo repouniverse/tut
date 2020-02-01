@@ -20,9 +20,9 @@ class m191123_160840_create_view_citas extends viewMigration
          'd.ap as aptutor',
          'd.am as amtutor',
          'd.nombres as nombrestutor',
-        's.codperiodo',
+        's.codperiodo','s.descripcion','s.numero',
         'b.codalu',
-         'c.ap','c.am','c.nombres','c.codcar',
+         'c.ap','c.am','c.nombres','c.codcar','c.id as idalumno',
          'a.*',
         ])
     ->from(['b'=>'{{%sta_talleresdet}}'])->

@@ -39,17 +39,26 @@ class comboHelper extends Combito
     /*
      * Dvel todos los piscologos dentro de una programa
      */
-     public static function getCboTutoresByProg($id){
+     public static function getCboTutoresByProg($id,$except=[]){
          $psicologos= \frontend\modules\sta\models\Tallerpsico::find()
                  ->select(['codtra'])
                  ->where(['talleres_id'=>$id])->asArray()->all();
  $codigos=ArrayHelper::getColumn($psicologos, 'codtra');
-        return ArrayHelper::map(
-                \common\models\masters\Trabajadores::find()->
+ //var_dump($id,$codigos,'o');die();
+ $codigos=array_diff($codigos,$except);
+ $trabajadores=\common\models\masters\Trabajadores::find()->select(['codigotra','ap','am','nombres'])->
                 where(['in',
               'codigotra', $codigos
-               ])->all(),
-                'codigotra','ap');
+               ])->asArray()->all();
+ $compilado=[];
+//var_dump($trabajadores);die();
+ foreach($trabajadores as $trabajador){
+    // $compilado[]=[$trabajador['codigotra']=>$trabajador['ap'].$trabajador['am'].$trabajador['nombres']];
+     $compilado[$trabajador['codigotra']]=$trabajador['codigotra'].'-'.$trabajador['ap'].'-'.$trabajador['am'].'-'.$trabajador['nombres'];
+ }
+  
+ return $compilado;
+        
     }
     
     /*
@@ -91,6 +100,13 @@ class comboHelper extends Combito
                  'B'=>'Buen Rendimiento e Inasistencias',
                  'C'=>'Con inasistencias'];
     }
+    
+   public static function baterias(){
+     return [
+         'F17'=>'BATERIA DE EVALUACION PSICOLOGICA F17',
+     ];
+ }
+   
     
 }
 

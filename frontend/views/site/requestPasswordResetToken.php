@@ -11,11 +11,7 @@ $this->title = yii::t('base.verbs','Request password reset');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <br><br>
-<div style=" width: 400px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: auto;
-  ">
+ <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
 <div class="box box-success">
 <div class="site-request-password-reset">
     <h3><?= Html::encode($this->title) ?></h3>
@@ -38,7 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 <?php endif; ?>
     <div class="row">
-        <div class="col-lg-5">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
             <?php $form = ActiveForm::begin(['id' => 'request-password-reset-form']); ?>
                   <?= Html::a(yii::t('base.verbs','Back to Home'), \yii\helpers\Url::to('index')) ?>
             <br>
