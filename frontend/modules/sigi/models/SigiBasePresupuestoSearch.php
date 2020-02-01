@@ -47,6 +47,7 @@ class SigiBasePresupuestoSearch extends SigiBasePresupuesto
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination'=>['pageSize'=>100]
         ]);
 
         $this->load($params);
@@ -84,6 +85,10 @@ class SigiBasePresupuestoSearch extends SigiBasePresupuesto
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+<<<<<<< HEAD
+=======
+            'pagination'=>['pageSize'=>100]
+>>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
         ]);
 
         $this->load($params);

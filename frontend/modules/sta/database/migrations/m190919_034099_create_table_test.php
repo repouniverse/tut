@@ -22,9 +22,14 @@ if(!$this->existsTable($table)) {
          'codocu'=>$this->string(3)->append($this->collateColumn()),
          'version'=>$this->string(5)->append($this->collateColumn())->notNull(),
         'nveces'=>$this->integer(2),
+        'reporte_id'=>$this->integer(11),
+        'codbateria'=>$this->string(4)->append($this->collateColumn()),
+         'orden'=>$this->integer(2),
+         'detalles'=>$this->text()->append($this->collateColumn()),
          //'electivo'=>$this->char(1)->append($this->collateColumn()),
          //'ciclo'=>$this->integer(2),
         //'version'=>$this->char(1)->append($this->collateColumn()),
+        
         
         ],$this->collateTable());
    $this->addPrimaryKey('pk_codmeval',$table, 'codtest');

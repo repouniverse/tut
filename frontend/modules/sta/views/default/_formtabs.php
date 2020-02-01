@@ -13,7 +13,7 @@ use yii\widgets\ActiveForm
 <div class="box box-success">
 <?php
 
-   $form = ActiveForm::begin(['id' => 'profile-form','options' => ['enctype' => 'multipart/form-data']]);
+   $form = ActiveForm::begin(['enableAjaxValidation'=>true,   'id' => 'profile-form','options' => ['enctype' => 'multipart/form-data']]);
 echo TabsX::widget([
     'position' => TabsX::POS_ABOVE,
     'align' => TabsX::ALIGN_LEFT,

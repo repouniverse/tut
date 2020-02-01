@@ -121,7 +121,8 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
             [['talleresdet_id', 'talleres_id', 'codtra'], 'required'],
             [['talleresdet_id', 'talleres_id', 'duracion'], 'integer'],
             [['detalles'], 'string'],
-             [['duracion','codfac','asistio','activo'], 'safe'],
+             [['detalles_secre','detalles_tareas_pend','detalles_indicadores','duracion','codfac','asistio','activo'], 'safe'],
+            
             [['fechaprog', 'finicio', 'ftermino'], 'string', 'max' => 19],
             ['fechaprog', 'validateDispo'],
             [['codtra'], 'string', 'max' => 6],
@@ -150,8 +151,10 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
             'fingreso' => Yii::t('sta.labels', 'Fingreso'),
             'detalles' => Yii::t('sta.labels', 'Detalles'),
             'codaula' => Yii::t('sta.labels', 'Codaula'),
-            //'nalumnos' => Yii::t('sta.labels', 'Nalumnos'),
-            //'fregistro' => Yii::t('sta.labels', 'Fregistro'),
+            'detalles_indicadores' => Yii::t('sta.labels', 'Indicador trabajado'),
+            'detalles_tareas_pend' => Yii::t('sta.labels', 'Pendientes'),
+            'detalles_secre' => Yii::t('sta.labels', 'Observaciones'),
+            'detalles' => Yii::t('sta.labels', 'Actividades realizadas'),
             //'calificacion' => Yii::t('sta.labels', 'Calificacion'),
         ];
     }
@@ -575,13 +578,27 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
         foreach($this->codExamenes() as $codexamen){
             $proveedores[$codexamen]= VwStaExamenesSearch::searchByExamenCode($this->id,$codexamen);
         }
+        
         return $proveedores;
     }
     
     public function codExamenes(){
-       return array_column(Examenes::find()->select(['codtest'])
+       return array_column(Examenes::findFree()->select(['codtest'])
                 ->where(['citas_id'=>$this->id])->asArray()->all(),'codtest'); 
     }
+    
+    public function numeroPreguntas(){
+        $ids=(new \yii\db\Query())
+    ->select('id')
+    ->from('{{%sta_examenes}}')
+    ->where(['citas_id'=>$this->id])->column();
+      
+         return (new \yii\db\Query())
+    ->select('count(*)')
+    ->from('{{%sta_examenesdet}}')
+    ->where(['examenes_id'=>$ids])->scalar();
+    }
+    
     
     
     public function canInactivate(){
@@ -673,10 +690,35 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
   public function validateDispo($attribute, $params)
     {
       $this->esFeriado();
-      $this->isInJourney();
-      if($this->isInPast())
-      $this->addError('fechaprog',yii::t('sta.errors','La fecha de inicio se encuentra en el pasado'));
+
+     
+      //$this->isInJourney();
+      //if($this->isInPast())
+     // $this->addError('fechaprog',yii::t('sta.errors','La fecha de inicio se encuentra en el pasado'));
+
       
     }
   
+    
+    public function agregaBateria($codbateria){
+       $pruebas= Test::find()->where(['codbateria'=>$codbateria])->orderBy('orden asc')->all();
+       foreach($pruebas as $prueba){
+           $this->addTest($prueba->codtest);
+       }
+       $this->generaExamenes();
+    }
+    
+    private function addTest($codtest){
+        $attributes=[
+            'citas_id'=>$this->id,
+            'codtest'=>$codtest,
+            'codfac'=>$this->codfac,
+            'user_id'=>h::userId(),
+            'virtual'=>'1'
+        ];
+        $verifyAttributes=[ 'citas_id'=>$this->id,
+            'codtest'=>$codtest,];
+        Examenes::firstOrCreateStatic($attributes, null, $verifyAttributes);
+    }
+    
 }

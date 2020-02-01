@@ -89,7 +89,10 @@ class TestController extends baseController
        //print_r($model->arrayCalificaciones());die();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            
             return $this->redirect(['view', 'id' => $model->codtest]);
+        }else{
+           // var_dump($model->getErrors());die();
         }
 
         return $this->render('update', [

@@ -29,6 +29,7 @@ class SigiSuministros extends \common\models\base\modelBase
      */
     CONST COD_TYPE_SUMINISTRO_DEFAULT='101'; //medidor tipo agua 
     const SCENARIO_IMPORTACION='importacion_simple';
+     const SCENARIO_CODSUMINISTRO='cod_suministro';
     public static function tableName()
     {
         return '{{%sigi_suministros}}';
@@ -46,7 +47,7 @@ class SigiSuministros extends \common\models\base\modelBase
             [['detalles'], 'string'],
             [['tipo'], 'string', 'max' => 3],
             
-            
+             [['id','codsuministro'], 'safe','on'=>self::SCENARIO_CODSUMINISTRO],
             /*Escenario imortacion*/
              [['codepa'], 'valida_depa','on'=>self::SCENARIO_IMPORTACION],
              [['codepa','codedificio','tipo','codum','codpro'], 'required','on'=>self::SCENARIO_IMPORTACION],
@@ -70,6 +71,7 @@ public function scenarios()
     {
         $scenarios = parent::scenarios(); 
        $scenarios[self::SCENARIO_IMPORTACION] = ['codepa','codedificio','tipo','codum','codpro'];
+        $scenarios[self::SCENARIO_CODSUMINISTRO] = ['id','codsuministro'];
         return $scenarios;
     }
     

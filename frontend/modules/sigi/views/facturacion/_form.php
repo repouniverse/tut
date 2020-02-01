@@ -11,7 +11,11 @@ use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
 use kartik\grid\GridView;
 use yii\widgets\Pjax;
 use common\widgets\selectwidget\selectWidget;
+<<<<<<< HEAD
 /* @var $this yii\web\View */
+=======
+
+>>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
 /* @var $model frontend\modules\sigi\models\SigiFacturacion */
 /* @var $form yii\widgets\ActiveForm */
 ?>
@@ -78,7 +82,23 @@ use common\widgets\selectwidget\selectWidget;
                         ]
                     ) ?>
         <?PHP  } ?>
+<<<<<<< HEAD
  </div>                  
+=======
+ </div>   
+       <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12"> 
+      
+           <?php echo $form->field($model, 'reporte_id')->
+            dropDownList(comboHelper::getCboReportes(),
+                  ['prompt'=>'--'.yii::t('base.verbs','Seleccione un valor')."--",
+                    // 'class'=>'probandoSelect2',
+                      //'disabled'=>($model->isBlockedField('codpuesto'))?'disabled':null,
+                        ]
+                    ) ?>
+      
+ </div>   
+          
+>>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
 <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
       <?= $form->field($model, 'fvencimiento')->widget(DatePicker::class, [
                             'language' => h::app()->language,

@@ -2,6 +2,7 @@
 
 namespace common\models;
 use common\helpers\h;
+use common\models\masters\Trabajadores;
 use common\helpers\FileHelper;
 use common\behaviors\FileBehavior;
 use frontend\modules\sta\helpers\comboHelper;
@@ -72,9 +73,14 @@ class Profile extends \common\models\base\modelBase implements \common\interface
         return [
             [['user_id'], 'integer'],
             [['url'], 'safe'],
+<<<<<<< HEAD
+=======
+            // ['codtra', 'unique', 'targetAttribute' => ['user_id','codtra']],
+            [['user_id','codtra'], 'unique', 'targetAttribute' =>'codtra' ],
+>>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
             [['photo', 'detalle'], 'string'],
             [['names'], 'string', 'max' => 60],
-             [['names','duration','durationabsolute'], 'safe'],
+             [['names','duration','durationabsolute','url','codtra'], 'safe'],
             [['tipo'],'required','on'=>self::SCENARIO_INTERLOCUTOR],
             [['tipo'],'safe','on'=>self::SCENARIO_INTERLOCUTOR],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
@@ -84,7 +90,7 @@ class Profile extends \common\models\base\modelBase implements \common\interface
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios[self::SCENARIO_INTERLOCUTOR] = ['tipo'];
+        $scenarios[self::SCENARIO_INTERLOCUTOR] = ['tipo','codtra','user_id'];
         //$scenarios[self::SCENARIO_UPDATE_TABULAR] = ['codigo','coditem'];
        // $scenarios[self::SCENARIO_REGISTER] = ['username', 'email', 'password'];
         return $scenarios;
@@ -254,6 +260,14 @@ class Profile extends \common\models\base\modelBase implements \common\interface
       $this->url=$url;
       $this->save();
   }   
+<<<<<<< HEAD
+=======
+  
+   public function getTrabajador()
+    {
+        return $this->hasOne(Trabajadores::className(), ['codigotra' => 'codtra']);
+    }
+>>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
   
   
              }

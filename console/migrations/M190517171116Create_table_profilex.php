@@ -23,6 +23,8 @@ if (!$this->existsTable($table)) {
             'duration'=>$this->integer(11),
              'durationabsolute'=>$this->integer(11),
             'names' => $this->string(60)->append($this->collateColumn()),
+             'url' => $this->string(180)->append($this->collateColumn()),
+             'codtra' => $this->string(6)->append($this->collateColumn()),
             'photo' => $this->text()->append($this->collateColumn()),
             'detalle'=>$this->text()->append($this->collateColumn()),
             

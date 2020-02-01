@@ -31,6 +31,8 @@ use Yii;
  */
 class VwStaExamenes extends \common\models\base\modelBase
 {
+   public $extraMethodsToReport=['reportCalificaciones'];
+    
     /**
      * {@inheritdoc}
      */
@@ -97,8 +99,20 @@ class VwStaExamenes extends \common\models\base\modelBase
     {
         return new VwStaExamenesQuery(get_called_class());
     }
+     public static function findFree()
+    {
+        return new VwStaExamenesQueryFree(get_called_class());
+    }
+    
     public function getTest(){
         return Test::findOne($this->codtest);
+    }
+    
+    public function getReportCalificaciones(){  
+       $controller=Yii::$app->controller;
+        $nameView= \common\helpers\FileHelper::getShortName($this::className());
+        $pathView='/'.$controller->id.'/reports/'.$nameView.'/calificaciones';
+      return  $controller->getView()->render($pathView,['model'=>$this]);
     }
     
 }

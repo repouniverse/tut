@@ -36,7 +36,10 @@ if(!$this->existsTable($table)) {
         'fingreso'=>$this->char(10)->append($this->collateColumn()),
         'detalles'=>$this->text()->append($this->collateColumn()),
         'detalles_secre'=>$this->text()->append($this->collateColumn()),
-         //'detalles_psico'=>$this->text()->append($this->collateColumn()),
+         'detalles_indicadores'=>$this->text()->append($this->collateColumn()),
+         'detalles_tareas_pend'=>$this->text()->append($this->collateColumn()),
+         
+//'detalles_psico'=>$this->text()->append($this->collateColumn()),
          'codaula'=>$this->string(10)->append($this->collateColumn()),
         'activo'=>$this->char(1)->notNull()->append($this->collateColumn()),
           'duracion'=>$this->integer(3)->notNull(),

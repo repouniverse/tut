@@ -10,19 +10,15 @@ use yii\bootstrap\ActiveForm;
 $this->title =yii::t('base.verbs','Request password reset');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div style=" width: 400px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: auto;
-  ">
+ <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
 <div class="box box-success">
 <div class="site-reset-password">
     <h3><?= Html::encode($this->title) ?></h3>
 
-    <p>Please choose your new password:</p>
+    <p><?=yii::t('base.verbs','Por favor escriba su nueva contrasena')?></p>
 
     <div class="row">
-        <div class="col-lg-5">
+         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
             <?php $form = ActiveForm::begin(['id' => 'reset-password-form']); ?>
 
                 <?= $form->field($model, 'password')->passwordInput(['autofocus' => true]) ?>

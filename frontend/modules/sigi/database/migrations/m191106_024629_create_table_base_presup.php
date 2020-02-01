@@ -36,7 +36,7 @@ if(!$this->existsTable($table)) {
         'codcargo'=>$this->char(4)->notNull()->append($this->collateColumn()),
         'codgrupo'=>$this->char(3)->notNull()->append($this->collateColumn()),
         'codigo'=>$this->string(10)->notNull()->append($this->collateColumn()),
-        'descripcion'=>$this->string(40)->append($this->collateColumn()),
+        'descripcion'=>$this->string(100)->append($this->collateColumn()),
          'activo'=>$this->char(1)->append($this->collateColumn()),
         'ejercicio'=>$this->char(4)->append($this->collateColumn()),
         //'periodo'=>$this->char(4)->append($this->collateColumn()),

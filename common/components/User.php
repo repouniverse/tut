@@ -151,7 +151,11 @@ class User extends UserOriginal {
               return $url;
           } else{
               yii::error('NO s encontro nad aen l settinfs ');
+<<<<<<< HEAD
                $url=is_null(\yii\helpers\Url::previous('intentona'))?Yii::$app->homeUrl:Url::previous('intentona');
+=======
+               $url=is_null(\yii\helpers\Url::previous('intentona'))?Yii::$app->homeUrl:\yii\helpers\Url::previous('intentona');
+>>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
            yii::error('de la intenot a');
            yii::error($url);
                return $url;
@@ -195,5 +199,11 @@ public function isTheFirstLogin(){
     return (is_null($this->lastLogin()))?true:false;
 }
 
+public function getFirstFacultad(){
+   $registro= \frontend\modules\sta\models\UserFacultades::find()->where(['user_id'=>'1','activa'=>'1'])->one();
+   if(!is_null($registro))
+   return $registro->codfac;
+   return null;
+}
    
 }

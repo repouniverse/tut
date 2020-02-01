@@ -4,6 +4,7 @@ use common\models\base\modelBase;
 use yii\base\Widget;
 use yii\web\View;
 use yii\helpers\Url;
+use yii;
 use yii\base\InvalidConfigException;
 class selectWidget extends \yii\base\Widget
 {
@@ -61,7 +62,11 @@ class selectWidget extends \yii\base\Widget
           $this->value=$this->model->{$this->campo};
        }
         $this->_foreignClass=$this->model->obtenerForeignClass($this->campo);
+<<<<<<< HEAD
        // var_dump($this->campo,$this->model->obtenerForeignClass($this->campo));die();
+=======
+        //var_dump($this->campo,$this->_foreignClass);die();
+>>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
         $this->_foreignField=$this->model->obtenerForeignField($this->campo);
         //var_dump($this->getAditionalFields());die();
            //var_dump( $this->_foreignClass);die();
@@ -150,10 +155,14 @@ class selectWidget extends \yii\base\Widget
                         }     
         
      private function getModelForeign(){
+          $foreignClass=$this->_foreignClass;
+          yii::error('inicinado ');
      if(is_null($this->_modelForeign)){
-        if($this->model->isNewRecord){
+        if($this->model->isNewRecord or empty($this->model->{$this->campo} )  ){
+            // yii::error('---nueov record ---');
                if(!empty($this->model->{$this->campo})){
-                   $modelForeign=$this->_foreignClass::find()->where([
+                  
+                   $modelForeign=$foreignClass::find()->where([
                     $this->_foreignField=>
                     $this->model->{$this->campo}
                                                             ])->one();
@@ -162,10 +171,16 @@ class selectWidget extends \yii\base\Widget
                }
                 
             }else{
-            $modelForeign=$this->_foreignClass::find()->where([
+               /* yii::error('---else---');
+                yii::error($foreignClass::find()->where([
                 $this->_foreignField=>
                 $this->model->{$this->campo}
-                                                            ])->one();                                                        
+                                                            ])->createCommand()->getRawSql());*/
+            $modelForeign=$foreignClass::find()->where([
+                $this->_foreignField=>
+                $this->model->{$this->campo}
+                                                            ])->one(); 
+          // yii::error($modelForeign);                                                 
         }
         $this->_modelForeign=$modelForeign; unset($modelForeign);       
      }

@@ -10,13 +10,25 @@
      <div class="box-header">
         <div class="col-md-12">
             <div class="form-group no-margin">
-            <div class="row">     
-         <?php $url= \yii\helpers\Url::to(['agrega-examen','id'=>$model->id,'gridName'=>'grilla-examenes','idModal'=>'buscarvalor']);
-      ?>
-       <?=($model->asistio)?\yii\helpers\Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Agregar evaluacion'), ['href' => $url,'id'=>'btn-add-test','class' => 'botonAbre btn btn-warning']):''?>
-         <?=($model->asistio)?\yii\helpers\Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Refrescar Preguntas'), ['id'=>'boton_bateria','class' => 'btn btn-warning']):''?> 
+            <div class="row">
+               <div class="btn-group">
+                   <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+        <?= Html::dropDownList("combo_test_bateria",null,
+          frontend\modules\sta\helpers\comboHelper::baterias(),
+            ['prompt'=>'--Seleccione un Valor--',
+             'class'=>'form-group form-control',
+                'id'=>'combo_test_bateria'])  ?>
+                </div>
+             <?=($model->asistio)?\yii\helpers\Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Agregar batería'), ['class' => 'btn btn-warning','href' => '#','id'=>'btn-add-bateria']):''?>
+          
+               
+                
+         <?php /*$url= \yii\helpers\Url::to(['agrega-examen','id'=>$model->id,'gridName'=>'grilla-examenes','idModal'=>'buscarvalor']);*/?>
+       <?php /* echo ($model->asistio)?\yii\helpers\Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Agregar evaluacion'), ['href' => $url,'id'=>'btn-add-test','class' => 'botonAbre btn btn-warning']):''*/?>
+         <?php /*echo ($model->asistio)?\yii\helpers\Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Refrescar Preguntas'), ['id'=>'boton_bateria','class' => 'btn btn-warning']):''*/?> 
                 <?=($model->asistio)?\yii\helpers\Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Notificar'), ['id'=>'boton_notifica','class' => 'btn btn-warning']):''?>  
              </div>
+                </div>
             </div>
         </div>
     </div> 
@@ -93,6 +105,20 @@
                        }
                     },
                     ],
+                             [
+              'attribute' => '',
+               'format'=>'raw',
+                'value' => function ($model) {
+                        $porc= $model->porcentajeAvance();
+                       IF($porc <100){
+                           return '<span class="label label-danger">'.$porc.'%</span>';
+                       }else{
+                           return '<i style="color:green;"><span class="fa fa-check"></span></i>';
+                       }
+                    },
+                    ],
+                  ['class' => 'frontend\modules\report\components\columnGridReport',
+                   'attribute'=>'report_id']           
         ],
     ]); ?>
     
@@ -181,8 +207,46 @@ $string2="$('#boton_notifica').on( 'click', function(){
 
 
              })";
+
+$string3="$('#btn-add-bateria').on( 'click', function(){ 
+     var vbateria=$('#combo_test_bateria').val();
+     
+       $.ajax({
+              url: '".Url::to(['/sta/citas/agrega-bateria','id'=>$model->id])."', 
+              type: 'get',
+              data:{bateria:vbateria},
+              dataType: 'json', 
+              error:  function(xhr, textStatus, error){               
+                            var n = Noty('id');                      
+                              $.noty.setText(n.options.id, error);
+                              $.noty.setType(n.options.id, 'error');       
+                                }, 
+              success: function(json) {
+              var n = Noty('id');
+                      
+                       if ( !(typeof json['error']==='undefined') ) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['error']);
+                              $.noty.setType(n.options.id, 'error');  
+                          }    
+
+                             if ( !(typeof json['warning']==='undefined' )) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['warning']);
+                              $.noty.setType(n.options.id, 'warning');  
+                             } 
+                          if ( !(typeof json['success']==='undefined' )) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['success']);
+                              $.noty.setType(n.options.id, 'success');  
+                             }      
+                   
+                        }
+                        });
+
+
+             })";
+
   $this->registerJs($string, \yii\web\View::POS_END);
   $this->registerJs($string2, \yii\web\View::POS_END);
+   $this->registerJs($string3, \yii\web\View::POS_END);
 ?>
     
     

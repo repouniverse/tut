@@ -7,7 +7,7 @@ namespace frontend\modules\sta\models;
  *
  * @see Citas
  */
-class CitasQueryFree extends  \yii\db\ActiveQuery
+class CitasQueryFree extends \yii\db\ActiveQuery
 {
     /*public function active()
     {

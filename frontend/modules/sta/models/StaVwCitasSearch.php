@@ -2,7 +2,9 @@
 
 namespace frontend\modules\sta\models;
 use yii\data\ActiveDataProvider;
+use common\helpers\h;
 use frontend\modules\sta\models\Alumnos;
+use frontend\modules\sta\staModule;
 use common\models\masters\Trabajadores;
 use yii\base\Model;
 /**
@@ -127,5 +129,28 @@ class StaVwCitasSearch extends StaVwCitas
         // echo $query->createCommand()->getRawSql();die();
         return $dataProvider;
     }
-    
+   public function searchByPsicoToday($codtra)
+    {
+      $codperiodo=  staModule::getCurrentPeriod();
+      
+        $query = StaVwCitas::find();
+        
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+
+         $query->andWhere(['codtra'=> $codtra])->   
+             andWhere([
+             'between',
+             'fechaprog',
+             self::CarbonNow()->endOfDay()->subDay()->format(
+               h::gsetting('timeBD','datetime')
+               ),
+             self::CarbonNow()->endOfDay()->format(
+               h::gsetting('timeBD','datetime')
+               )
+                        ]);     
+        // echo $query->createCommand()->getRawSql();die();
+        return $dataProvider;
+    } 
 }

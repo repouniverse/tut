@@ -43,6 +43,8 @@ class CitasController extends baseController
      */
     public function actionIndex()
     {
+     
+        
         $searchModel = new StaVwCitasSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -397,13 +399,78 @@ public function getUser(){
         
 
 public function actionExamenBanco($id){
-    //User::findByUsername($this->username)
-    //var_dump($this->getUser());DIE();
+    $this->layout="install";
      $cita=Citas::findFree()->where(['id'=>$id])->one();
-      Yii::$app->user->login($this->getUser(),3600 * 24 * 30 );
-  if(staModule::isPcRegistered($cita->taller->id)){
+     $numeroPreguntas=$cita->numeroPreguntas();
+       $cadenatoken=h::request()->get('token');
+         yii::error('cadena token :'.$cadenatoken);
+         yii::error('Comparando el token');
+         $token=\common\components\token\Token::compare('citas', 'token_'.$cita->id, $cadenatoken);
+                     if(is_null($token)){
+                         yii::error('Token es nulo pucha maquina , n coidide ');
+                                    
+                                     return  $this->render('_error_token',['model'=>$cita,'numeroPreguntas'=>$numeroPreguntas]); 
+                            }else{
+                                yii::error('Ya leyo la comparacion del token, ahora lo borramos');
+                                  $token->delete();
+                                   //  yii::error('Crenado el detalle ');
+                                    // $cita->generaExamenes();
+                                     yii::error('creando la cookie');
+                                     //echo "hay  ".$cookiesRead->count()." cookies <br> ";
+                                     $cookiesSend = Yii::$app->response->cookies;
+                                     $cookiesSend->add(new \yii\web\Cookie([
+                                        'name' => 'calamaro'.$id,
+                                        'value' => 'este es el valor de la cookie paloma',
+                                                    ]));
+                                     
+                                     $session = Yii::$app->session;
+                                     $session->open();
+                                 if($session->has('repuestasExamen')){
+                                    $session->remove('repuestasExamen');
+                                    }
+                                     
+                                     
+                                     
+                                     $steps=$this->prepareDataToRenderExamen($cita);
+                                    return  $this->render('_examen_virtual',['id'=>$id,'model'=>$cita,'steps'=>$steps,'numeroPreguntas'=>$numeroPreguntas]); 
+                                     //Yii::$app->session->setFlash('success',yii::t('sta.messages','Bienvenido al Examen Virtual'));
+                                     //$this->redirect($this->action->id);
+                                 }
      
-    $cookiesRead = Yii::$app->request->cookies;
+     die();
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+      $cookiesRead = Yii::$app->request->cookies;
     $cookiesSend = Yii::$app->response->cookies;
     $nombrecookie='calamaro_'.$id;
      $this->layout="install";
@@ -412,7 +479,12 @@ public function actionExamenBanco($id){
     if($cookiesRead->has($nombrecookie)){
         yii::error('Ya tiene  cookie '.$nombrecookie);
         $steps=$this->prepareDataToRenderExamen($cita);
-       return  $this->render('_examen_virtual',['model'=>$cita,'steps'=>$steps]); 
+          $session = Yii::$app->session;
+                                     $session->open();
+                                 if($session->has('repuestasExamen')){
+                                    $session->remove('repuestasExamen');
+                                    }
+       return  $this->render('_examen_virtual',['model'=>$cita,'steps'=>$steps,'numeroPreguntas'=>$numeroPreguntas]); 
         
     }else{
         yii::error('No  tiene  cookie '.$nombrecookie);
@@ -427,28 +499,35 @@ public function actionExamenBanco($id){
                             }else{
                                 yii::error('Ya leyo la comparacion del token, ahora lo borramos');
                                   $token->delete();
-                                     yii::error('Crenado el detalle ');
-                                     $cita->generaExamenes();
+                                   //  yii::error('Crenado el detalle ');
+                                    // $cita->generaExamenes();
                                      yii::error('creando la cookie');
                                      //echo "hay  ".$cookiesRead->count()." cookies <br> ";
                                      $cookiesSend->add(new \yii\web\Cookie([
                                         'name' => $nombrecookie,
                                         'value' => 'este es el valor de la cookie paloma',
                                                     ]));
+                                     
+                                     $session = Yii::$app->session;
+                                     $session->open();
+                                 if($session->has('repuestasExamen')){
+                                    $session->remove('repuestasExamen');
+                                    }
+                                     
+                                     
+                                     
                                      $steps=$this->prepareDataToRenderExamen($cita);
-                                    return  $this->render('_examen_virtual',['model'=>$cita,'steps'=>$steps]); 
+                                    return  $this->render('_examen_virtual',['id'=>$id,'model'=>$cita,'steps'=>$steps,'numeroPreguntas'=>$numeroPreguntas]); 
                                      //Yii::$app->session->setFlash('success',yii::t('sta.messages','Bienvenido al Examen Virtual'));
                                      //$this->redirect($this->action->id);
                                  }
-  }
-  }else{
-      $this->render('mensaje_no_pc_registrada');
-  }
+  
+  
     
          
     }
     
-    
+}
     
     
     
@@ -527,21 +606,72 @@ function actionBancoPreguntas($id){
 
  public function actionRespuestaExamen(){
      if(h::request()->isAjax){
-         $mensajes=[];
-      // h::response()->format = \yii\web\Response::FORMAT_JSON;
-         $identidad=h::request()->get('identidad');
-         $valor=h::request()->get('valor');
+          $identidad=h::request()->get('identidad');
+          $valor=h::request()->get('valor');
+          $numeroPreguntas=h::request()->get('npreg');
+        if(false){
+          $mensajes=[];
+      
          $examendet=\frontend\modules\sta\models\StaExamenesdet::findOne($identidad);
          $porcentaje=$examendet->examen->porcentajeAvance();unset($examendet);         
          $exito=\frontend\modules\sta\models\StaExamenesdet::respuesta($identidad, $valor);
-         if($exito){
-            return $this->renderPartial('_progress',['porcentaje'=>$porcentaje]);
-         }else{
-            
-         }
+                if($exito){
+                     return $this->renderAjax('_progress',['porcentaje'=>$porcentaje]);
+                        }else{
+                        }  
+        } else{
+           $session = Yii::$app->session;
+           $session->open();
+           $arrayRespuestas=[];
+           if(!$session->has('repuestasExamen')){
+             $arrayRespuestas[$identidad]=$valor;
+             $session['repuestasExamen']=$arrayRespuestas;
+           }else{
+               $arrayRespuestas=$session['repuestasExamen']; 
+               $arrayRespuestas[$identidad]=$valor;
+               $session['repuestasExamen']=$arrayRespuestas;
+           }
+         
+          $porcentaje=((integer)$numeroPreguntas>0)?round((100*count($session['repuestasExamen'])/$numeroPreguntas),3):0;
+     yii::error($session['repuestasExamen']);
+     yii::error(count($session['repuestasExamen']));
+     yii::error($numeroPreguntas);
+            return $this->renderAjax('_progress',['porcentaje'=>$porcentaje]);
+           
+        }
+         
          
      }
  }
+ 
+ public function actionTerminaExamen($id){
+      $cookiesRead = Yii::$app->request->cookies;
+   // $cookiesSend = Yii::$app->response->cookies;
+    $nombrecookie='calamaro_'.$id;
+     $this->layout="install";
+     yii::error($cookiesRead->has($nombrecookie));
+     yii::error(Yii::$app->session->has('repuestasExamen'));
+      if(/*$cookiesRead->has($nombrecookie) &&*/Yii::$app->session->has('repuestasExamen')){
+          $arrayRespuestas=Yii::$app->session['repuestasExamen']; 
+          
+             foreach($arrayRespuestas as $clave=>$valor){
+                 Yii::$app->db->createCommand()
+             ->update('{{%sta_examenesdet}}', ['valor' => $valor], 'id=:clave',[':clave'=>$clave])
+             ->execute();
+                   }
+           Yii::$app->session->remove('repuestasExamen');
+           $cookies = Yii::$app->response->cookies;
+        // remueve una cookie
+           // $cookies->remove($nombrecookie);
+           return $this->render('finalizacion_examen');
+      }else{
+          return $this->render('finalizacion_examen_error'); 
+      }
+     
+                                    
+ }
+ 
+ 
 
  public function actionCookies(){
      $cookiesRead = Yii::$app->request->cookies;
@@ -560,16 +690,18 @@ function actionBancoPreguntas($id){
  
  private function prepareDataToRenderExamen($cita){
      $proveedores=$cita->providersExamenes(); 
+     $numeroPreguntas=$cita->numeroPreguntas();
       $steps=[];
       $i=1;
       foreach($proveedores as $code=>$proveedor){
+          //var_dump($proveedor->models);die();
           $modeloMuestra=$proveedor->models[0];
           $calificaciones=$modeloMuestra->test->arrayCalificaciones();
           $steps[$i]=[
               'title' => $modeloMuestra->descripcion,
                'icon' => 'glyphicon glyphicon-cloud-upload',
               'content' => $this->renderPartial('_examen_step',
-                                ['modeloMuestra'=>$modeloMuestra,'model'=>$cita,'calificaciones'=>$calificaciones,'proveedor'=>$proveedor,'codexamen'=>$code]
+                                ['modeloMuestra'=>$modeloMuestra,'model'=>$cita,'calificaciones'=>$calificaciones,'proveedor'=>$proveedor,'codexamen'=>$code,'numeroPreguntas'=>$numeroPreguntas]
                       ),
           ];
           $i++;
@@ -601,6 +733,22 @@ function actionBancoPreguntas($id){
      
      //$mensajes=[];
     }   
+    echo "hi"; 
+ }
+ 
+ public function actionAgregaBateria($id){
+     if(h::request()->isAjax){
+          h::response()->format = \yii\web\Response::FORMAT_JSON;
+         $model=$this->findModel($id);
+        $codbateria=h::request()->get('bateria');
+        if(in_array($codbateria, array_keys(\frontend\modules\sta\helpers\comboHelper::baterias()))){
+           $model->agregaBateria($codbateria); 
+           return ['success'=>yii::t('sta.errors','Se agregaron las pruebas de la batería')];
+        }else{
+          return ['error'=>yii::t('sta.errors','Código de batería no válido')];   
+        }
+        
+     }
      
  }
 }

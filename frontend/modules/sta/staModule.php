@@ -21,11 +21,6 @@ class staModule extends \yii\base\Module
     const USER_ALUMNO='10';
     const USER_OTROS='20';
     const RESPONSE_SUCCESS_CODE=200;
-    
-    CONST COD_INFORME_DEPARA='104';
-    CONST COD_INFORME_TUTORIA_ACADEMICA='105';
-    CONST COD_INFORME_TUTORIA_PSICOLOGICA='106';
-     CONST COD_TRABAJADOR_PSICOLOGO='200';
     /**
      * {@inheritdoc}
      */
@@ -36,10 +31,10 @@ class staModule extends \yii\base\Module
      */
     public function behaviors(){
         return[
-            [
-            'class' => FilterAccess::className(), 
-             // 'except' => ['default/complete'],
-            ],
+           // [
+            //'class' => FilterAccess::className(), 
+              //'except' => ['sta/citas/examen-banco'],
+           // ],
         ];
     }
     
@@ -160,14 +155,5 @@ class staModule extends \yii\base\Module
  public static function docCodes(){
      return ['104','105','106'];
  } 
- 
- public function isPcRegistered($taller_id){
-     return models\StaIpslab::find()->
-             where([
-                 'taller_id'=>$taller_id,
-                 'ip'=>h::request()->getUserIP()
-                     ])->exists();
-     
- }
   
 }

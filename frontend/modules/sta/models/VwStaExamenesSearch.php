@@ -88,9 +88,10 @@ class VwStaExamenesSearch extends VwStaExamenes
     }
     public function searchByExamenCode($idcita,$codexamen)
     {
-        $query = VwStaExamenes::find();
+        $query = VwStaExamenes::findFree();
  $dataProvider = new ActiveDataProvider([
             'query' => $query,
+      'pagination' => [ 'pageSize' =>100]
         ]);
 
         $query->andWhere(['citas_id'=>$idcita,'codtest'=> $codexamen]);

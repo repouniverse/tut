@@ -47,7 +47,7 @@ class Examenes extends modelSensibleAccess
         return [
             [['citas_id', 'codtest'], 'required'],
             [['citas_id'], 'integer'],
-             [['fnotificacion','virtual','codfac'],'safe'],
+             [['fnotificacion','virtual','codfac','report_id'],'safe'],
             [['detalles'], 'string'],
             [['codtest'], 'string', 'max' => 8],
             [['codtest'], 'exist', 'skipOnError' => true, 'targetClass' => Test::className(), 'targetAttribute' => ['codtest' => 'codtest']],
@@ -107,6 +107,11 @@ class Examenes extends modelSensibleAccess
         return new ExamenesQuery(get_called_class());
     }
     
+    public static function findFree()
+    {
+        return new ExamenesQueryFree(get_called_class());
+    }
+    
       //yii:error('creando token');
   public function notificaMail(){
       $token=  \common\components\token\Token::create('citas', 'token_examen', null, time()+60*2);
@@ -156,7 +161,7 @@ class Examenes extends modelSensibleAccess
      $totales=$this->npreguntas();
      //return random_int(20, 99);
      if($totales>0){
-        return round((100*$respondidas/$totales),3); 
+        return round((100*$respondidas/$totales),1); 
      }
      return 0;
  }

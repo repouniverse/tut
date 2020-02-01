@@ -11,9 +11,13 @@
 ?>
 <div class='alert alert-info'><?=$modeloMuestra->descripcion?></div>
 
+
+
+<?php echo $this->render('calificaciones',['codexamen'=>$codexamen]); ?>
 <div class="progress"></div>
+
 <?php Pjax::begin(['id'=>'grilla-examen_'.$codexamen]); ?>
-    
+   
  <div style='overflow:auto;'>
    <?php //var_dump((new SigiApoderadosSearch())->searchByEdificio($model->id)); die(); ?>
     <?= GridView::widget([
@@ -48,13 +52,13 @@
               'attribute' => 'valor',
                'format'=>'raw',
                 'value' => function ($model)use($codexamen,$calificaciones) {
-                    $url = \yii\helpers\Url::toRoute([$this->context->id.'/arregla-for-ajax']);                       
+                    //$url = \yii\helpers\Url::toRoute([$this->context->id.'/arregla-for-ajax']);                       
                     //return \yii\helpers\Html::a($model->id,'#',['id'=>$model->id,'title'=>$url,'family'=>'holas']);
                    return \yii\helpers\Html::radioList('radio_'.$codexamen.'_'.$model->id,
                            null,
                            /*['1'=>'Uno','2'=>'Dos','3'=>'Tres'],*/
-                           $calificaciones,
-                           ['id'=>'radio_'.$codexamen.'_'.$model->id,'title'=>$url,'family'=>'holas']
+                          array_combine(array_keys($calificaciones),array_keys($calificaciones)),
+                           ['separator'=>'.......','id'=>'radio_'.$codexamen.'_'.$model->id,'title'=>$url,'family'=>'holas']
                            );
                    },
                     ],
@@ -89,7 +93,7 @@ var myidentidad=myarr[2];
  $.ajax({
               url: '".$url."',
               type: 'get',
-              data:{identidad:myidentidad,valor:this.value} ,
+              data:{identidad:myidentidad,valor:this.value,npreg:".$numeroPreguntas."} ,
               dataType: 'html',
                error:  function(xhr, textStatus, error){               
                             var n = Noty('id');                      
@@ -99,6 +103,14 @@ var myidentidad=myarr[2];
               
                success: function(html) {
               $('.progress').html( html );
+             // alert($('.progress').html());
+            // alert($('.progress-bar-danger').attr('aria-valuenow'));
+             var porcentaje=$('.progress-bar-danger').attr('aria-valuenow');
+             if(porcentaje >= 100){
+             $('#btn-conf-examen').removeAttr('disabled');
+               
+             }
+
                         }
                    
                        

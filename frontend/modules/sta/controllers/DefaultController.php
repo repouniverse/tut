@@ -9,6 +9,7 @@ use common\models\User;
 use frontend\modules\sta\models\UserFacultades;
 use frontend\modules\sta\models\Facultades;
 use frontend\modules\sta\models\Aluriesgo;
+use frontend\modules\sta\models\Tallerpsico;
 use mdm\admin\models\searchs\User as UserSearch;
 use yii\web\NotFoundHttpException;
 use yii\helpers\ArrayHelper;
@@ -60,10 +61,15 @@ class DefaultController extends Controller
         $profile->setScenario($profile::SCENARIO_INTERLOCUTOR);
         if(h::request()->isPost){
             $arrpost=h::request()->post();
-              echo "fallo"; die();
+              
             $profile->tipo=$arrpost[$profile->getShortNameClass()]['tipo'];
-            $newIdentity->status=$arrpost[$newIdentity->getShortNameClass()]['tipo'];
-           if ($profile->save() &&  $newIdentity->save()) {
+            $profile->codtra=$arrpost[$profile->getShortNameClass()]['codtra'];
+            //var_dump(get_class($profile),$profile->validate());die();
+            if (h::request()->isAjax) {
+                h::response()->format = \yii\web\Response::FORMAT_JSON;
+                return \yii\widgets\ActiveForm::validate($profile);
+             }
+           if ($profile->save()) {
             $this->updateUserFacultades($arrpost[UserFacultades::getShortNameClass()]);
             yii::$app->session->setFlash('success',yii::t('sta.messages','Se grabaron los datos '));
             return $this->redirect(['view-users']);
@@ -135,5 +141,33 @@ class DefaultController extends Controller
 
     } 
     
-    
+  public function actionPanelPrograma(){
+      $codfac=h::user()->getFirstFacultad();
+       $nalumnos=Aluriesgo::studentsInRiskByFacQuery($codfac)->count();
+       $taller=\frontend\modules\sta\models\Talleres::findOne(['codfac'=>$codfac,'codperiodo'=> \frontend\modules\sta\staModule::getCurrentPeriod()]);
+       
+     return $this->render('secretaria',[
+         'codfac'=> $codfac,
+          'nalumnos'=> $nalumnos,
+        'kpiContacto'=>(!is_null($taller))?$taller->kp_contactados():\frontend\modules\sta\models\Talleres::kp_contactadosEmpty(),
+                    
+     ]);
+  }  
+  
+  public function actionPanelPsicologo(){
+      
+      $codfac=h::user()->getFirstFacultad();
+      $codtra=h::user()->profile->codtra;
+      $provider = \frontend\modules\sta\models\StaVwCitasSearch::searchByPsicoToday($codtra);
+      $tallerPsico=New Tallerpsico();
+      $tallerPsico->codtra=$codtra;
+      $eventosPendientes=$tallerPsico->eventosPendientes();
+      
+     return $this->render('psicologo',[
+         'provider' =>$provider,
+          'citasPendientes'=> $eventosPendientes,
+          'codperiodo'=>  \frontend\modules\sta\staModule::getCurrentPeriod(),
+                  
+     ]);
+  }  
 }

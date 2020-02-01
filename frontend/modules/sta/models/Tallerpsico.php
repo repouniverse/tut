@@ -109,12 +109,38 @@ class Tallerpsico extends \common\models\base\modelBase
      */
     public function citasPendientesQuery()
     {
+         /*var_dump(Citas::find()->where( 
+                [
+                    'codtra'=>$this->codtra,
+                    'asistio'=> '0',
+                    
+                    ])->andWhere([
+             'between',
+             'fechaprog',
+             $this->CarbonNow()->endOfDay()->subWeek()->format(
+               h::gsetting('timeBD','datetime')
+               ),
+             $this->CarbonNow()->addWeek()->format(
+               h::gsetting('timeBD','datetime')
+               )
+                        ])->createCommand()->getRawSql());die();*/
         return Citas::find()->where( 
                 [ /* 'talleres_id'=>$this->talleres_id,*/
                     'codtra'=>$this->codtra,
                     'asistio'=> '0',
                     
-                    ]);
+                    ])->andWhere([
+             'between',
+             'fechaprog',
+             $this->CarbonNow()->endOfDay()->subWeek()->subWeek()->subWeek()->format(
+               h::gsetting('timeBD','datetime')
+               ),
+             $this->CarbonNow()->addWeek()->addWeek()->addWeek()->format(
+               h::gsetting('timeBD','datetime')
+               )
+                        ])/*->andWhere(['>','fechaprog', $this->CarbonNow()->endOfDay()->subDay()->format(
+               h::gsetting('timeBD','datetime'))])*/;
+       
     }
     
     

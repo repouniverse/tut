@@ -180,12 +180,20 @@ die();*/
         $model = $this->findModel($id);
        /* $model->obtenerForeignClass('reporte_id');
          var_dump($model->obtenerForeignClass('reporte_id'),$model->fieldsLink(false));die();*/
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
           $searchModel = new SigiCuentasporSearch();
          $dataProviderCuentasPor = $searchModel->searchByFactu($model->id); 
          
          
          
+<<<<<<< HEAD
+=======
+         
+>>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
          $searchModelPartidas = new \frontend\modules\sigi\models\SigiBasePresupuestoSearch();
          $dataProviderPartidas = $searchModelPartidas->searchByEdificio($model->edificio_id,Yii::$app->request->queryParams); 
         // $searchModelLecturas = new VwSigiTempLecturasSearch();
@@ -199,6 +207,7 @@ die();*/
          
           $dataProviderLecturasFaltan =$model->providerFaltaLecturas('101');
          if (h::request()->isAjax && $model->load(h::request()->post())) {
+             
                 h::response()->format = Response::FORMAT_JSON;
                 return ActiveForm::validate($model);
         }

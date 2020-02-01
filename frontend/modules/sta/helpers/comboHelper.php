@@ -101,6 +101,13 @@ class comboHelper extends Combito
                  'C'=>'Con inasistencias'];
     }
     
+   public static function baterias(){
+     return [
+         'F17'=>'BATERIA DE EVALUACION PSICOLOGICA F17',
+     ];
+ }
+   
+    
 }
 
 

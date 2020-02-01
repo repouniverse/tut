@@ -19,6 +19,10 @@ class FilterAccess extends ActionFilter
          //header('location: http://www.neotegnia.com');
         //echo "hola"; die();
       //var_dump(h::response()->content); die();
+<<<<<<< HEAD
+=======
+         Url::remember(Url::current(),'intentona');
+>>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
         header('location: http://case.itekron.com/frontend/web/site/login');
          //var_dump(yii::$app->controller->redirect(['/sitryyr8686e/login']));die();
           return yii::$app->controller->redirect(['/site/login']); 

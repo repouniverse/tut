@@ -311,14 +311,19 @@ return [
         
         
            ],
-    /*'as access' => [
+   /* 'as access' => [
         'class' => 'mdm\admin\components\AccessControl',
         'allowActions' => [
             'site/login/',
             'site/clear-cache/',
             'site/signup',
              'site/request-password-reset',
-          
+            'site/reset-password', 
+           'site/logout',
+            'sta/citas/examen-banco',
+            'sta/citas/arregla-for-ajax',
+            'sta/citas/respuesta-examen',
+            'sta/citas/termina-examen',
         ]
     ]*/
     

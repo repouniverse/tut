@@ -97,6 +97,11 @@ class SigiFacturacion extends \common\models\base\modelBase
    
     }
     
+    public function getReporte(){
+       return $this->hasOne(Reporte::className(), ['id' => 'reporte_id']);
+   
+    }
+    
 
     /**
      * {@inheritdoc}
@@ -343,7 +348,18 @@ class SigiFacturacion extends \common\models\base\modelBase
                 $idsTotales=$this->edificio->idsMedidores($type);
                 
                 $idsFaltan= array_diff($idsTotales,  $idsConLecturas);
+<<<<<<< HEAD
                // var_dump($idsTotales,$idsConLecturas,$idsFaltan);die();
+=======
+               /* print_r($idsTotales);
+                echo "<br><br><br><br><br>";
+                 print_r($idsConLecturas);
+                 echo "<br><br><br><br><br>";
+                  print_r($idsFaltan);
+               //var_dump($idsTotales,$idsConLecturas,$idsFaltan);
+               
+               die();*/
+>>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
               $query= SigiSuministros::find()->where(['in','id',$idsFaltan]);        
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -545,6 +561,7 @@ class SigiFacturacion extends \common\models\base\modelBase
             $colector=$cuenta->colector;
            if($colector->isMassive()){
              if($colector->isMedidor()){
+<<<<<<< HEAD
                  $medidor=$unidad->firstMedidor($colector->tipomedidor);
                  $participacion=$medidor->participacionRead($cuenta->mes,$cuenta->anio);
                  //yii::error('partici medidor  '.$participacion);
@@ -553,6 +570,21 @@ class SigiFacturacion extends \common\models\base\modelBase
                 if(!$cuenta->existsDetalleFacturacion($unidad,$colector,false))
                  $cuenta->insertaRegistro($identidad,$unidad,$medidor,$monto,'0',$participacion);
                  /*****************************/
+=======
+                 //yii::error('esta es la unidad ------'.$unidad->numero);
+                 $medidor=$unidad->firstMedidor($colector->tipomedidor);
+                 if(!is_null($medidor)){
+                     
+                     $participacion=$medidor->participacionRead($cuenta->mes,$cuenta->anio);
+                    //yii::error('partici medidor  '.$participacion);
+                    $monto=round($participacion*$cuenta->monto,6);
+                     /***insertar un registrio****/
+                    if(!$cuenta->existsDetalleFacturacion($unidad,$colector,false))
+                        $cuenta->insertaRegistro($identidad,$unidad,$medidor,$monto,'0',$participacion);
+                    /*****************************/
+                 }
+                 
+>>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
                  // yii::error('partici unidada  '.$unidad->porcWithChilds());
                      $monto=0;
                      /******Recorreidno los medidores de aareas comunes*/
@@ -564,7 +596,11 @@ class SigiFacturacion extends \common\models\base\modelBase
                          }
                  
                  /***insertar un registrio  por todfas las sumas de las lecturas****/
+<<<<<<< HEAD
                   if(!$cuenta->existsDetalleFacturacion($unidad,$colector,true))
+=======
+                  if(!$cuenta->existsDetalleFacturacion($unidad,$colector,true) && $monto > 0)
+>>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
                   $cuenta->insertaRegistro($identidad,$unidad,null,$monto,'1',$participacionAACC //el porc d ecomsumo
                                      *$unidad->porcWithChilds());
                  /*****************************/

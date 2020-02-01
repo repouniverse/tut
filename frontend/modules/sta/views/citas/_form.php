@@ -85,7 +85,7 @@ use common\helpers\h;
                <?= $form->field($model->tallerdet, 'codalu')->textInput(['disabled'=>'disabled']) ?>
 
         </div>
-          <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
+          <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                <?= $form->field($model->tallerdet->alumno, 'nombres')->textInput(['value'=>$model->tallerdet->alumno->fullName(),'disabled'=>'disabled']) ?>
 
         </div>
@@ -156,11 +156,23 @@ use common\helpers\h;
                 ?>
   </div>
  
-  
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-     <?= $form->field($model, 'detalles')->textArea(['rows' => 8]) ?>
+     <?= $form->field($model, 'detalles_secre')->textArea(['rows' => 4]) ?>
 
  </div>
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+     <?= $form->field($model, 'detalles')->textArea(['rows' => 4]) ?>
+
+ </div>
+ 
+ <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+     <?= $form->field($model, 'detalles_indicadores')->textArea(['rows' => 4]) ?>
+
+ </div>
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+     <?= $form->field($model, 'detalles_tareas_pend')->textArea(['rows' => 4]) ?>
+
+ </div> 
   
      
     <?php ActiveForm::end(); ?>

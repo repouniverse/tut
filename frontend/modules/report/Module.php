@@ -57,7 +57,7 @@ $mpdf = new \Mpdf\Mpdf([
         ];*/
            $mpdf->simpleTables = true;
                  $mpdf->packTableData = true;
-           $mpdf->showImageErrors = true;
+           //$mpdf->showImageErrors = true;
            $mpdf->curlAllowUnsafeSslRequests = true; //Permite imagenes de url externas
          return $mpdf;
     }
