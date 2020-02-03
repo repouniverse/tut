@@ -180,6 +180,8 @@ class Reporte extends baseReporte
           //echo $clase::find()->where([$model->getTableSchema()->primaryKey()=>$idfiltro])->createCommand()->getRawSql();die();
           $modelo= $clase::find()->where([(new $clase())->getTableSchema()->primaryKey()=>$idfiltro])->one();  
       }else{
+         if(is_array($idfiltro))
+             $modelo= $clase::find()->where($idfiltro)->one(); 
         // echo $clase::find()->where([$campofiltro=>$idfiltro])->createCommand()->getRawSql();die(); 
           $modelo= $clase::find()->where([$campofiltro=>$idfiltro])->one();  
       }

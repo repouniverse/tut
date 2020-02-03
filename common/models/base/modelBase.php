@@ -501,13 +501,9 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
       yii::error($this->fieldsLink(true),__FUNCTION__);
     yii::error('----nomrecampo ----'.$nombrecampo,__FUNCTION__);*/
      $nombrecalseforanea= $this->fieldsLink(false)[$nombrecampo];
-<<<<<<< HEAD
       //yii::error('----nomnreclase foranea ----'.$nombrecampo,__FUNCTION__);
      //var_dump($this->fieldsLink(true),get_class($this),$this->fieldsLink(true),$nombrecalseforanea);
      //echo "nombre clase ".$nombrecalseforanea;die();
-=======
-     
->>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
      if(strpos($nombrecalseforanea,'_xxx_')) 
       return substr($nombrecalseforanea,0,strpos($nombrecalseforanea,'_xxx_'));
      

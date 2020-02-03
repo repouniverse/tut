@@ -25,6 +25,7 @@ if(!$this->existsTable($table)) {
          'id'=>$this->primaryKey(),
        // 'aluriesgo_id'=>$this->integer(11)->notNull(),
         'citas_id'=>$this->integer(11)->notNull(),
+        'reporte_id'=>$this->integer(11)->notNull(),
         'codtest'=>$this->string(8)->notNull(),
         'user_id'=>$this->integer(6),//campo propietarios 
          'codfac'=>$this->string(8)->notNull()->append($this->collateColumn()),

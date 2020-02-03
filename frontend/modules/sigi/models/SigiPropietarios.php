@@ -58,7 +58,7 @@ class SigiPropietarios extends \common\models\base\modelBase
             [['participacion'], 'number'],
              [['recibemail','nombre','espropietario','user_id'], 'safe'],
             [['detalle'], 'string'],
-             [['codepa','edificio_id','activo'], 'safe'],
+             [['codepa','edificio_id','activo','dni','correo'], 'safe'],
             [['dni'], 'valida_dni'],
             [['codepa'], 'valida_codepa'],
             [['codepa'], 'required', 'on'=>self::SCENARIO_EMPRESA],

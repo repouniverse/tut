@@ -26,6 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php echo ExportMenu::widget([
     'dataProvider' => $dataProvider,
     'columns' => $gridColumns,
+        'batchSize'=>20,
     'dropdownOptions' => [
         'label' => yii::t('sta.labels','Exportar'),
         'class' => 'btn btn-success'

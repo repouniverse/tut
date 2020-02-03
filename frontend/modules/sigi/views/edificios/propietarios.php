@@ -1,7 +1,7 @@
 <?php
 use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
 use yii\helpers\Html;
-use kartik\grid\GridView;
+use yii\grid\GridView;
 use yii\widgets\Pjax;
 use kartik\export\ExportMenu;
 /* @var $this yii\web\View */
@@ -49,21 +49,17 @@ $this->title = Yii::t('base.names', 'Propietarios');
                 ],
            
             ['attribute'=>'nombre',
-             'group'=>true],
+             //'group'=>true
+             ],
             'codepa',
-            'dni',
+            'correo',
             [
     'attribute' => 'edificio_id',
     'value' => 'edificio.nombre',
     'filter' => frontend\modules\sigi\helpers\comboHelper::getCboEdificios(),
-  'group'=>true,
+  //'group'=>true,
                 ],
-             ['attribute'=>'id',
-                 'visible'=>true
-                 ]
-            //'deslarga:ntext',
-
-              
+            
         ];
    ?>
 

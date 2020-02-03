@@ -6,7 +6,7 @@ use yii\helpers\Html;
 class columnGridReport extends DataColumn 
 {
   public $format='raw';
-  public $linkOptions=['target'=>'_blank'];
+  public $linkOptions=['target'=>'_blank','data-pjax'=>'0'];
   protected function renderDataCellContent($model, $key, $index)
     {
       //$options=[];  

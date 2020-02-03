@@ -92,10 +92,7 @@ class SigiFacturacion extends \common\models\base\modelBase
     {
         return $this->hasOne(Edificios::className(), ['id' => 'edificio_id']);
     }
-    public function getReporte(){
-       return $this->hasOne(Reporte::className(), ['id' => 'reporte_id']);
-   
-    }
+    
     
     public function getReporte(){
        return $this->hasOne(Reporte::className(), ['id' => 'reporte_id']);
@@ -348,9 +345,6 @@ class SigiFacturacion extends \common\models\base\modelBase
                 $idsTotales=$this->edificio->idsMedidores($type);
                 
                 $idsFaltan= array_diff($idsTotales,  $idsConLecturas);
-<<<<<<< HEAD
-               // var_dump($idsTotales,$idsConLecturas,$idsFaltan);die();
-=======
                /* print_r($idsTotales);
                 echo "<br><br><br><br><br>";
                  print_r($idsConLecturas);
@@ -359,7 +353,6 @@ class SigiFacturacion extends \common\models\base\modelBase
                //var_dump($idsTotales,$idsConLecturas,$idsFaltan);
                
                die();*/
->>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
               $query= SigiSuministros::find()->where(['in','id',$idsFaltan]);        
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -529,13 +522,17 @@ class SigiFacturacion extends \common\models\base\modelBase
   
   /*Facturacion sin nmucho detalle */
   public function shortFactu(){
+      
+      /*Solo unidades padres que sean imputables*/
      $unidades= $this->edificio->unidadesImputablesPadres();
+     
+     /*Si debe de cobrar masivamente, verifica que el apoderado
+      * exiga facturacion masiva, por ejemplo la inmobiliaria 
+      * quiere pagar de todos los recibos de un solo cocacho */
      $hasCobranzaMasiva=$this->hasCobranzaMasiva();
      
-
      if($hasCobranzaMasiva){
-       //Obteniendo la unidad Grupal
-        
+       //Obteniendo la unidad Grupal        
       $kardexGrupal=$this->kardexDepaComun();
        $kardexGrupal->refresh();  
      }
@@ -561,16 +558,6 @@ class SigiFacturacion extends \common\models\base\modelBase
             $colector=$cuenta->colector;
            if($colector->isMassive()){
              if($colector->isMedidor()){
-<<<<<<< HEAD
-                 $medidor=$unidad->firstMedidor($colector->tipomedidor);
-                 $participacion=$medidor->participacionRead($cuenta->mes,$cuenta->anio);
-                 //yii::error('partici medidor  '.$participacion);
-                $monto=round($participacion*$cuenta->monto,6);
-                 /***insertar un registrio****/
-                if(!$cuenta->existsDetalleFacturacion($unidad,$colector,false))
-                 $cuenta->insertaRegistro($identidad,$unidad,$medidor,$monto,'0',$participacion);
-                 /*****************************/
-=======
                  //yii::error('esta es la unidad ------'.$unidad->numero);
                  $medidor=$unidad->firstMedidor($colector->tipomedidor);
                  if(!is_null($medidor)){
@@ -584,7 +571,6 @@ class SigiFacturacion extends \common\models\base\modelBase
                     /*****************************/
                  }
                  
->>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
                  // yii::error('partici unidada  '.$unidad->porcWithChilds());
                      $monto=0;
                      /******Recorreidno los medidores de aareas comunes*/
@@ -596,11 +582,7 @@ class SigiFacturacion extends \common\models\base\modelBase
                          }
                  
                  /***insertar un registrio  por todfas las sumas de las lecturas****/
-<<<<<<< HEAD
-                  if(!$cuenta->existsDetalleFacturacion($unidad,$colector,true))
-=======
                   if(!$cuenta->existsDetalleFacturacion($unidad,$colector,true) && $monto > 0)
->>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
                   $cuenta->insertaRegistro($identidad,$unidad,null,$monto,'1',$participacionAACC //el porc d ecomsumo
                                      *$unidad->porcWithChilds());
                  /*****************************/
@@ -633,6 +615,68 @@ class SigiFacturacion extends \common\models\base\modelBase
      }         
   }
   
+  
+  /*
+   * Devuelve las transferencias de departamentos 
+   * acaecidas durante el mes de la facturacion 
+   * 
+   */
+  public function transfEsteMes(){
+      $bordes=$this->fechasBordes();
+     return  SigiTransferencias::find()->select(['unidad_id','fecha'])->where([
+             'between',
+             'fecha',
+             $bordes[0],
+             $bordes[1],
+                        ])->column();
+     
+  }
+  
+  private function fechasBordes(){
+      $inicio=$this->toCarbon($fecha)->subMonth()->startOfMonth()->subDay();
+      $final=$inicio->copy()->endOfMonth()->addDay();
+      return [$inicio->toDateString(),$final->toDateString()];
+  }
+  /*
+   * PARTICIONA UN RECIBO si ha habido 
+   * una transferenia durantre el mes de
+   * la facturacion, proporcionalmente a los 
+   * días nenter uno y otor propietario
+   */
+  public function particionarRecibo($identidad,$day,$grupocobranza,$grupofacturacion){
+     $rows=$this->getSigiDetfacturacion()->where(['identidad'=>$identidad]);
+     $nuevaIdentidad= SigiDetfacturacion::maxIdentidad();
+     foreach($rows as $row ){
+         $model=New SigidetFacturacion();
+         $model->attributes=$row->attributes;
+         $model->setAttributes([
+             'id'=>null,
+             'identidad'=>$nuevaIdentidad,
+             'grupocobranza'=>$grupocobranza,
+              'grupofacturacion'=>$grupofacturacion,
+             'monto'=>round($row->monto*$day/30,3),
+         ]);
+         $model->save();
+         
+     }
+     $factor=1-$day/30;
+     $expresion='monto*(1-'.$factor.')';
+     SigiDetfacturacion::updateAll(['monto'=>NEW yii\db\Expression($expresion)],['identidad'=>$identidad]);
+      
+  }
+  
+  
+  
+  public function resolveRecibosPartidos(){
+     foreach($this->transfEsteMes() as $row) {        
+        $unidad= SigiUnidades::findOne($row['unidad_id']);
+         $grupocobranza=(!$unidad->miApoderado()->cobranzaindividual)?$unidad->codpro:$unidad->numero;
+         $grupofacturacion=(!$unidad->miApoderado()->facturindividual)?$unidad->codpro:$unidad->numero;
+         $identidad=$this->getSigiDetfacturacion()->where(['unidad_id'=>$row['unidad_id']])->one()->id;    
+         $day = date('j', strtotime($row['fecha']));
+         $this->particionarRecibo($identidad, $day, $grupocobranza, $grupofacturacion);
+     }
+  }
   
   
   

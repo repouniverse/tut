@@ -43,7 +43,8 @@ class ActionCombodependiente extends \yii\base\Action
                $datos=$source;
              
            }
-           yii::error( $datos);
+           
+           //yii::error( $datos);
           return $this->generateHtml($datos);   
         }
         

@@ -11,11 +11,7 @@ use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
 use kartik\grid\GridView;
 use yii\widgets\Pjax;
 use common\widgets\selectwidget\selectWidget;
-<<<<<<< HEAD
-/* @var $this yii\web\View */
-=======
 
->>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
 /* @var $model frontend\modules\sigi\models\SigiFacturacion */
 /* @var $form yii\widgets\ActiveForm */
 ?>
@@ -35,6 +31,8 @@ use common\widgets\selectwidget\selectWidget;
         <?=Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Resetear'), ['id'=>'boton_resetear','class' => 'btn btn-warning'])?>    
             <?=Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Generar Recibos'), ['id'=>'boton_recibos','class' => 'btn btn-warning'])?>    
          <?=Html::a('<span class="fa fa-file-pdf" ></span>'.'  '.yii::t('sta.labels','Ver Recibos'),Url::to(['/report/make/multi-report','id'=>2,'idsToReport'=> \yii\helpers\Json::encode($model->idsToFacturacion())]),['target'=>'_blank','class'=>"btn btn-success"])?>
+            <?=Html::a('<span class="fa fa-file-pdf" ></span>'.'  '.yii::t('sta.labels','Ver detalle'),Url::to(['detalle-facturacion','id'=>$model->id]),['target'=>'_blank','data-pjax'=>'0','class'=>"btn btn-success"])?>
+        
             </div>
         </div>
     </div>
@@ -82,9 +80,6 @@ use common\widgets\selectwidget\selectWidget;
                         ]
                     ) ?>
         <?PHP  } ?>
-<<<<<<< HEAD
- </div>                  
-=======
  </div>   
        <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12"> 
       
@@ -98,7 +93,6 @@ use common\widgets\selectwidget\selectWidget;
       
  </div>   
           
->>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
 <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
       <?= $form->field($model, 'fvencimiento')->widget(DatePicker::class, [
                             'language' => h::app()->language,
@@ -228,8 +222,8 @@ use common\widgets\selectwidget\selectWidget;
                          
                     ]
                 ],
-           ['class' => 'frontend\modules\report\components\columnGridReport',
-                   'attribute'=>'report_id'],
+          /* ['class' => 'frontend\modules\report\components\columnGridReport',
+                   'attribute'=>'report_id'],*/
            // 'id',
               /*['attribute'=>'edificio_id',
                   'filter'=> frontend\modules\sigi\helpers\comboHelper::getCboEdificios(),
@@ -245,7 +239,7 @@ use common\widgets\selectwidget\selectWidget;
                   'value'=>'colector.cargo.descargo'
                   ],  */             
             'colector.cargo.descargo',
-            'descripcion',
+            //'descripcion',
            // 'colector.id',
           
            // 'fedoc',

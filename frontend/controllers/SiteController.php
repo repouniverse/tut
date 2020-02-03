@@ -121,7 +121,7 @@ class SiteController extends Controller
             //$this->redirect(['/sta/programas']);
             //echo Yii::$app->user->resolveUrlAfterLogin();die();
             //
-            $this->redirect([Yii::$app->user->resolveUrlAfterLogin()]);
+            $this->redirect(Url::to(Yii::$app->user->resolveUrlAfterLogin()));
                  //$this->redirect(['index']); 
             //var_dump(Yii::$app->request->referrer);die();
               //return $this->redirect(is_null(Url::previous('intentona'))?Yii::$app->homeUrl:Url::previous('intentona'));

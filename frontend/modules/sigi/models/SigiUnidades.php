@@ -34,6 +34,7 @@ class SigiUnidades extends \common\models\base\modelBase
     //const SCENARIO_EDIFICIO='edificio';
     //const SCENARIO_COMPLETO='import_completo';
     const SCENARIO_BASICO='basica';
+    const SCENARIO_PARENT='parent';
     const SCENARIO_UPDATE_BASICO='update_basico';
     public $booleanFields=['esnuevo','imputable'];
     public $hardFields=['edificio_id','numero'];
@@ -76,7 +77,7 @@ class SigiUnidades extends \common\models\base\modelBase
             
            // [['codpro'], 'validateApoderado'],
             [['detalles'], 'string'],
-            [['codpro','esnuevo','codpadre','imputable','estreno'], 'safe'],
+            [['codpro','esnuevo','codpadre','parent_id','imputable','estreno'], 'safe'],
            // [['estreno','imputable'], 'safe'],
             [['codtipo'], 'string', 'max' => 4],
             [['numero'], 'string', 'max' => 12],
@@ -99,6 +100,7 @@ class SigiUnidades extends \common\models\base\modelBase
         $scenarios[self::SCENARIO_HIJO] = ['edificio_id','codpadre','codtipo','imputable','numero','area','npiso'];
         //$scenarios[self::SCENARIO_COMPLETO] = ['edificio_id','parent_id','codtipo','imputable','numero','area','codpro','npiso','nombre','detalles','estreno'];
         $scenarios[self::SCENARIO_UPDATE_BASICO] = ['id','imputable','codpro'];
+           $scenarios[self::SCENARIO_PARENT] = ['parent_id'];
         return $scenarios;
     }
     /**
@@ -571,8 +573,22 @@ class SigiUnidades extends \common\models\base\modelBase
  }
  
  public function mailsPropietarios(){
-    return $this->getSigiPropietarios()->select(['correo1'])->
+    return $this->getSigiPropietarios()->select(['correo'])->
       where(['recibemail'=>'1'])->column();
+ }
+ 
+ /*Devuel mve le residente inmediato anteiror*
+  *Si no encuentra ninguno devuelve el actual no mas 
+  */
+ public function oldPropietario($tipoResidente){
+     $propietarioAnterior=$this->getSigiPropietarios()->where([
+         'tipo'=>$tipoResidente,
+         'activo'=>'0',
+       ])->orderBy('id desc')->one();
+     if(is_null($propietarioAnterior)){
+       $propietarioAnterior=$this->currentPropietario();
+     }
+     return $propietarioAnterior;
  }
  
 }

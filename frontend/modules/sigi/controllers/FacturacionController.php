@@ -180,20 +180,13 @@ die();*/
         $model = $this->findModel($id);
        /* $model->obtenerForeignClass('reporte_id');
          var_dump($model->obtenerForeignClass('reporte_id'),$model->fieldsLink(false));die();*/
-<<<<<<< HEAD
-        
-=======
 
->>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
           $searchModel = new SigiCuentasporSearch();
          $dataProviderCuentasPor = $searchModel->searchByFactu($model->id); 
          
          
          
-<<<<<<< HEAD
-=======
          
->>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
          $searchModelPartidas = new \frontend\modules\sigi\models\SigiBasePresupuestoSearch();
          $dataProviderPartidas = $searchModelPartidas->searchByEdificio($model->edificio_id,Yii::$app->request->queryParams); 
         // $searchModelLecturas = new VwSigiTempLecturasSearch();
@@ -308,7 +301,7 @@ die();*/
          $searchModel = new  VwSigiFactureciboSearch();
         $dataProvider = $searchModel->search($id,Yii::$app->request->queryParams);
 
-        return $this->render('detalle', [
+        return $this->render('detalle', ['id'=>$id,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);

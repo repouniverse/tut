@@ -463,6 +463,12 @@ class MakeController extends baseController
       }else{
           $disco=false;
       }
+      
+      if(is_array($idfiltro)){
+          
+      }
+      
+      
        $model=$this->findModel($id); 
        $this->layout='blank';
       $pageContents=$this->contentReport($id, $idfiltro,$model);

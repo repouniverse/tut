@@ -47,7 +47,7 @@ class Examenes extends modelSensibleAccess
         return [
             [['citas_id', 'codtest'], 'required'],
             [['citas_id'], 'integer'],
-             [['fnotificacion','virtual','codfac','report_id'],'safe'],
+             [['fnotificacion','virtual','codfac','reporte_id'],'safe'],
             [['detalles'], 'string'],
             [['codtest'], 'string', 'max' => 8],
             [['codtest'], 'exist', 'skipOnError' => true, 'targetClass' => Test::className(), 'targetAttribute' => ['codtest' => 'codtest']],

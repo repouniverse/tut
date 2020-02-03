@@ -151,11 +151,7 @@ class User extends UserOriginal {
               return $url;
           } else{
               yii::error('NO s encontro nad aen l settinfs ');
-<<<<<<< HEAD
-               $url=is_null(\yii\helpers\Url::previous('intentona'))?Yii::$app->homeUrl:Url::previous('intentona');
-=======
-               $url=is_null(\yii\helpers\Url::previous('intentona'))?Yii::$app->homeUrl:\yii\helpers\Url::previous('intentona');
->>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
+               $url=is_null(\yii\helpers\Url::previous('intentona'))?'':\yii\helpers\Url::previous('intentona');
            yii::error('de la intenot a');
            yii::error($url);
                return $url;
