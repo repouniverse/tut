@@ -62,11 +62,7 @@ class selectWidget extends \yii\base\Widget
           $this->value=$this->model->{$this->campo};
        }
         $this->_foreignClass=$this->model->obtenerForeignClass($this->campo);
-<<<<<<< HEAD
-       // var_dump($this->campo,$this->model->obtenerForeignClass($this->campo));die();
-=======
         //var_dump($this->campo,$this->_foreignClass);die();
->>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
         $this->_foreignField=$this->model->obtenerForeignField($this->campo);
         //var_dump($this->getAditionalFields());die();
            //var_dump( $this->_foreignClass);die();

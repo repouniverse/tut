@@ -714,6 +714,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
             'codtest'=>$codtest,
             'codfac'=>$this->codfac,
             'user_id'=>h::userId(),
+            'reporte_id'=> staModule::REPORTE_TEST,
             'virtual'=>'1'
         ];
         $verifyAttributes=[ 'citas_id'=>$this->id,

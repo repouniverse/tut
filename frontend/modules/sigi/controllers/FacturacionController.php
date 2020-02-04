@@ -42,6 +42,11 @@ class FacturacionController extends baseController
      */
     public function actionIndex()
     {
+        $model=$this->findModel(66);
+        $model->resolveRecibosPartidos();
+        die();
+        
+       
           /*\Yii::$app->session->open();
         $userDirPath = Yii::$app->session->id;
         echo "Primer intento<br>";

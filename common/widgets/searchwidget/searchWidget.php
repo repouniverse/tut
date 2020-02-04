@@ -81,14 +81,18 @@ class searchWidget extends Widget
        
          
  private function getModelForeign(){
+    //var_dump($this->campo,$this->_foreignClass,$this->model->isNewRecord);DIE();
      if($this->model->isNewRecord){
              $modelForeign=new $this->_foreignClass;
+             //var_dump($this->_foreignClass);die();
             }else{
+                 //var_dump(34,$this->_foreignClass);die();
             $modelForeign=$this->_foreignClass::find()->where([
                 $this->_foreignField=>
                 $this->model->{$this->campo}
                                                             ])->one();                                                        
         }
+        
      return $modelForeign;
  }       
         

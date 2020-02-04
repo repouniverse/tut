@@ -119,9 +119,9 @@ class SiteController extends Controller
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
             //$this->redirect(['/sta/programas']);
-            //echo Yii::$app->user->resolveUrlAfterLogin();die();
+            //echo Url::to(Yii::$app->user->resolveUrlAfterLogin());die();
             //
-            $this->redirect(Url::to(Yii::$app->user->resolveUrlAfterLogin()));
+            $this->redirect(Url::toRoute([Yii::$app->user->resolveUrlAfterLogin()]));
                  //$this->redirect(['index']); 
             //var_dump(Yii::$app->request->referrer);die();
               //return $this->redirect(is_null(Url::previous('intentona'))?Yii::$app->homeUrl:Url::previous('intentona'));
@@ -312,11 +312,10 @@ class SiteController extends Controller
     public function actionClearCache(){
        
        $datos=[];
-       if(h::request()->isAjax){
-           
+       if(h::request()->isAjax){           
               h::settings()->invalidateCache();
-              \console\components\Command::execute('cache/flush-all', ['interactive' => false]);
-              \console\components\Command::execute('cache/flush-schema', ['interactive' => false]);
+              //\console\components\Command::execute('cache/flush-all', ['interactive' => false]);
+              //\console\components\Command::execute('cache/flush-schema', ['interactive' => false]);
            $datos['success']=yii::t('base.actions','
 Datos de caché de configuración han sido borrados');
            

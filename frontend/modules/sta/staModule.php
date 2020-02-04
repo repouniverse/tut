@@ -21,6 +21,7 @@ class staModule extends \yii\base\Module
     const USER_ALUMNO='10';
     const USER_OTROS='20';
     const RESPONSE_SUCCESS_CODE=200;
+    const REPORTE_TEST=9;
     /**
      * {@inheritdoc}
      */

@@ -217,8 +217,10 @@ class SigiFacturacion extends \common\models\base\modelBase
             }
           }*/
            $this->shortFactu();
+           
            $this->asignaIdentidad();//Importante  
            $this->asignaNumero();
+           
         }else{
             
            $errores['error']=yii::t('sigi.errors','Hay suministros que aun no tienen lectura verifique por favor'); 
@@ -628,13 +630,13 @@ class SigiFacturacion extends \common\models\base\modelBase
              'fecha',
              $bordes[0],
              $bordes[1],
-                        ])->column();
+                        ])->asArray()->all();
      
   }
   
   private function fechasBordes(){
-      $inicio=$this->toCarbon($fecha)->subMonth()->startOfMonth()->subDay();
-      $final=$inicio->copy()->endOfMonth()->addDay();
+      $inicio=$this->toCarbon('fecha')->subMonth()->startOfMonth()->subDay();
+      $final=$inicio->copy()->endOfMonth()->addDay()->addMonth();
       return [$inicio->toDateString(),$final->toDateString()];
   }
   /*
@@ -644,16 +646,18 @@ class SigiFacturacion extends \common\models\base\modelBase
    * días nenter uno y otor propietario
    */
   public function particionarRecibo($identidad,$day,$grupocobranza,$grupofacturacion){
-     $rows=$this->getSigiDetfacturacion()->where(['identidad'=>$identidad]);
+     //var_dump($identidad);die();
+      $rows=$this->getSigiDetfacturacion()->where(['identidad'=>$identidad])->all();
      $nuevaIdentidad= SigiDetfacturacion::maxIdentidad();
      foreach($rows as $row ){
+        
          $model=New SigidetFacturacion();
          $model->attributes=$row->attributes;
          $model->setAttributes([
              'id'=>null,
              'identidad'=>$nuevaIdentidad,
              'grupocobranza'=>$grupocobranza,
-              'grupofacturacion'=>$grupofacturacion,
+              'grupofacturacion'=>$grupofacturacion,             
              'monto'=>round($row->monto*$day/30,3),
          ]);
          $model->save();
@@ -661,7 +665,7 @@ class SigiFacturacion extends \common\models\base\modelBase
      }
      $factor=1-$day/30;
      $expresion='monto*(1-'.$factor.')';
-     SigiDetfacturacion::updateAll(['monto'=>NEW yii\db\Expression($expresion)],['identidad'=>$identidad]);
+     SigiDetfacturacion::updateAll(['monto'=>NEW \yii\db\Expression($expresion)],['identidad'=>$identidad]);
       
   }
   
@@ -670,12 +674,15 @@ class SigiFacturacion extends \common\models\base\modelBase
   public function resolveRecibosPartidos(){
      foreach($this->transfEsteMes() as $row) {        
         $unidad= SigiUnidades::findOne($row['unidad_id']);
+        //var_dump($unidad->numero);
          $grupocobranza=(!$unidad->miApoderado()->cobranzaindividual)?$unidad->codpro:$unidad->numero;
          $grupofacturacion=(!$unidad->miApoderado()->facturindividual)?$unidad->codpro:$unidad->numero;
-         $identidad=$this->getSigiDetfacturacion()->where(['unidad_id'=>$row['unidad_id']])->one()->id;    
+         $identidad=$this->getSigiDetfacturacion()->where(['unidad_id'=>$row['unidad_id']])->one()->identidad;    
+        // var_dump($this->getSigiDetfacturacion()->where(['unidad_id'=>$row['unidad_id']])->createCommand()->getRawSql());
          $day = date('j', strtotime($row['fecha']));
          $this->particionarRecibo($identidad, $day, $grupocobranza, $grupofacturacion);
      }
+  
   }
   
   

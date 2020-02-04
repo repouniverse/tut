@@ -1,4 +1,5 @@
 <?php
+
 namespace frontend\modules\sta\models;
 use yii\db\Query;
 use common\helpers\h;
@@ -35,7 +36,7 @@ class UserFacultades extends \common\models\base\modelBase
         return [
             [['user_id'], 'integer'],
             [['codfac'], 'string', 'max' => 6],
-            [['activa'], 'string', 'max' => 1],
+           // [['activa'], 'string', 'max' => 1],
             [['codfac'], 'exist', 'skipOnError' => true, 'targetClass' => Facultades::className(), 'targetAttribute' => ['codfac' => 'codfac']],
         ];
     }
@@ -91,6 +92,7 @@ class UserFacultades extends \common\models\base\modelBase
                      //rr'activa'=>'0',
                     ]);
       }
+      
       return $facultades;
     }
     
@@ -147,5 +149,3 @@ class UserFacultades extends \common\models\base\modelBase
    }     
         
 }
-
-?>

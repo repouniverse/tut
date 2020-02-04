@@ -52,13 +52,13 @@
               'attribute' => 'valor',
                'format'=>'raw',
                 'value' => function ($model)use($codexamen,$calificaciones) {
-                    //$url = \yii\helpers\Url::toRoute([$this->context->id.'/arregla-for-ajax']);                       
+                    $url = \yii\helpers\Url::toRoute([$this->context->id.'/arregla-for-ajax']);                       
                     //return \yii\helpers\Html::a($model->id,'#',['id'=>$model->id,'title'=>$url,'family'=>'holas']);
                    return \yii\helpers\Html::radioList('radio_'.$codexamen.'_'.$model->id,
                            null,
                            /*['1'=>'Uno','2'=>'Dos','3'=>'Tres'],*/
                           array_combine(array_keys($calificaciones),array_keys($calificaciones)),
-                           ['separator'=>'.......','id'=>'radio_'.$codexamen.'_'.$model->id,'title'=>$url,'family'=>'holas']
+                           ['separator'=>'.......','id'=>'radio_'.$codexamen.'_'.$model->id,'title'=>'','family'=>'holas']
                            );
                    },
                     ],

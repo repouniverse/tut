@@ -49,11 +49,7 @@ public $booleanFields=['opcional'];
     public function rules()
     {
         return [
-<<<<<<< HEAD
-            [['codtest', 'descripcion', 'opcional', 'version','reporte_id'], 'required'],
-=======
             [['codtest', 'descripcion', 'opcional', 'version','codbateria'], 'required'],
->>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
             [['nveces', 'id', 'reporte_id'], 'integer'],
               [['codbateria', 'reporte_id','orden','detalles'], 'safe'],
             [['codtest'], 'string', 'max' => 8],

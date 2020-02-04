@@ -196,7 +196,8 @@ public function isTheFirstLogin(){
 }
 
 public function getFirstFacultad(){
-   $registro= \frontend\modules\sta\models\UserFacultades::find()->where(['user_id'=>'1','activa'=>'1'])->one();
+   $registro= \frontend\modules\sta\models\UserFacultades::find()->where(['user_id'=>$this->id,'activa'=>'1'])->one();
+  // var_dump(\frontend\modules\sta\models\UserFacultades::find()->where(['user_id'=>'1','activa'=>'1'])->createCommand()->getRawSql());die();
    if(!is_null($registro))
    return $registro->codfac;
    return null;

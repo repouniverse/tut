@@ -28,43 +28,13 @@ use frontend\modules\sigi\models\SigiUnidades;
         </div>
     </div>
       <div class="box-body">
-  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12"> 
-    <?= ComboDep::widget([
-               'model'=>$model,               
-               'form'=>$form,
-               'data'=> ComboHelper::getCboEdificios(),
-               'campo'=>'edificio_id',
-               'idcombodep'=>'sigiunidades-parent_id',
-               /* 'source'=>[ //fuente de donde se sacarn lso datos 
-                    /*Si quiere colocar los datos directamente 
-                     * para llenar el combo aqui , hagalo coloque la matriz de los datos
-                     * aqui:  'id1'=>'valor1', 
-                     *        'id2'=>'valor2,
-                     *         'id3'=>'valor3,
-                     *        ...
-                     * En otro caso 
-                     * de la BD mediante un modelo  
-                     */
-                        /*Docbotellas::className()=>[ //NOmbre del modelo fuente de datos
-                                        'campoclave'=>'id' , //columna clave del modelo ; se almacena en el value del option del select 
-                                        'camporef'=>'descripcion',//columna a mostrar 
-                                        'campofiltro'=>'codenvio'/* //cpolumna 
-                                         * columna que sirve como criterio para filtrar los datos 
-                                         * si no quiere filtrar nada colocwue : false | '' | null
-                                         *
-                        
-                         ]*/
-                   'source'=>[SigiUnidades::className()=>
-                                [
-                                        'campoclave'=>'id' , //columna clave del modelo ; se almacena en el value del option del select 
-                                        'camporef'=>'nombre',//columna a mostrar 
-                                        'campofiltro'=>'edificio_id'  
-                                ]
-                                ],
-                            ]
-               
-               
-        )  ?>
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"> 
+    <?=       \common\widgets\searchwidget\searchWidget::widget([
+        'form'=>$form,
+         'model'=>$model,
+        'campo'=>'edificio_id',
+        'foreignskeys'=>[2,1,3],
+    ]) ?>
  </div>       
  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12"> 
      

@@ -280,13 +280,14 @@ class SigiUnidades extends \common\models\base\modelBase
     public function validateApoderado($attribute, $params)
     {
       /*verificar que el edificio a asignar tiene apoderadoso*/
-      if($this->isNewRecord){
+      //if($this->isNewRecord){
          $edificio=Edificios::find()->where(['id'=>$this->edificio_id])->one(); 
+         //var_dump($edificio);die();
          if(is_null($edificio)){
               $this->addError ('edificio_id',yii::t('sigi.errors','El edificio no Existe'));
               return; 
          }
-      }
+      //}
      /*Solo si no es hijo importa validar 
       * el codpro, si no lo es, se agregara de mnera automatica en
       * el before save, heredando este valor del padre

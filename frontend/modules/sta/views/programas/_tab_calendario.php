@@ -2,7 +2,6 @@
 use kriss\calendarSchedule\CalendarScheduleWidget;
 use yii\web\JsExpression;
 use yii\helpers\Html;
-use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use common\helpers\h;
 use yii\grid\GridView;
@@ -73,7 +72,7 @@ echo CalendarScheduleWidget::widget([
         
         
         
-        'eventReceive' => new JsExpression('function(event, delta, revertFunc) {
+        'eventReceive' => new JsExpression('function(event, delta,minuteDelta, revertFunc) {
        if (confirm("'.yii::t('sta.labels','¿Confirmar que desea crear esta Cita ?').'")) {
                   var fechainicio=event.start.format("YYYY-MM-DD HH:mm:ss");
         $.ajax({ 
@@ -87,11 +86,6 @@ echo CalendarScheduleWidget::widget([
               success: function(json) {  
                         var n = Noty("id");
                        if ( !(typeof json["error"]==="undefined") ) {
-<<<<<<< HEAD
-                      // event.remove();
-                        //revert();
-=======
->>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
                        //revertFunc();
                    $.noty.setText(n.options.id,"<span class=\'glyphicon glyphicon-remove-sign\'></span>      "+ json["error"]);
                               $.noty.setType(n.options.id, "error"); 
@@ -192,19 +186,9 @@ echo CalendarScheduleWidget::widget([
                             }
                   }'),
         /*fin del veno resize*/
-
-        
-         //'eventClick' => new JsExpression('function(event) { alert("dobleclick");  }'),
-        
         
         
         /*evento Click*/
-<<<<<<< HEAD
-        'eventClick' => new JsExpression('function(event) { '
-                . ' var url="'.Url::to(['citas/update','id'=>'secretkey']).'";  '
-                . '  url=url.replace("secretkey",event.id); '
-                . ' window.location.href = url;     }'),
-=======
         'eventClick' => new JsExpression('function(event) {'
                 . 'if (confirm("'.yii::t('sta.labels','¿Confirmar que desea notificar ?').'")) {
                  $.ajax({ 
@@ -237,7 +221,6 @@ echo CalendarScheduleWidget::widget([
   })
                 }'
                 . '}'),
->>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
     ]
 ]);?>
  </div>  

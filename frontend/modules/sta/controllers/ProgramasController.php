@@ -695,6 +695,9 @@ public function actionCalificaAlumno($id){
         
         $this->layout = "install";
         $model = \frontend\modules\sta\models\Talleresdet::findOne($id);
+        if($model===null)
+         throw new NotFoundHttpException(Yii::t('sta.labels', 'The requested page does not exist.'));
+  
        // var_dump($modeltallerdet);die();
         $model->setScenario($model::SCENARIO_TUTOR);        
        $datos=[];

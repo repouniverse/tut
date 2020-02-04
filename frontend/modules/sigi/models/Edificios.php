@@ -427,21 +427,12 @@ class Edificios extends \common\models\base\modelBase
   }
   
   public function messageFacturacion(){
-<<<<<<< HEAD
-      $variables=['$cuenta'=>$this->cuentaActiva()->numero,
-          '$dias'=>h::gsetting('sigi','numeroDiasVencimiento'),
-          '$banco'=>$this->cuentaActiva()->banco->nombre,
-          '$propietario_cuenta'=>$this->cuentaActiva()->clipro->despro,
-           '$moneda'=>$this->cuentaActiva()->moneda->desmon,
-          '$correo_cobranza'=>h::gsetting('sigi','correoCobranza1')
-=======
       $variables=['[[cuenta]]'=>$this->cuentaActiva()->numero,
           '[[dias]]'=>h::gsetting('sigi','numeroDiasVencimiento'),
           '[[propietario_cuenta]]'=>$this->cuentaActiva()->clipro->despro,
            '[[banco]]'=>$this->cuentaActiva()->banco->nombre,
            '[[moneda]]'=>$this->cuentaActiva()->moneda->desmon,
           '[[correo_cobranza]]-'=>h::gsetting('sigi','correoCobranza1')
->>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
           ];
       return str_replace(array_keys($variables), array_values($variables), $this->facturacion);
           
