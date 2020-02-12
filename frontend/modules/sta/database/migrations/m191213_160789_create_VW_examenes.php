@@ -19,11 +19,11 @@ class m191213_160789_create_VW_examenes extends viewMigration
                 (new \yii\db\Query())
     ->select([ 
         'x.ap as appsico','x.am as ampsico','x.nombres as nombrespsico','x.codigotra',
-        'm.finicio','m.fechaprog',
+        'm.numero as numerocita','m.finicio','m.fechaprog',
         't.numero','t.codperiodo','t.descripcionprograma',
         'c.desdocu',
           's.id as idexamen','s.citas_id','s.detalles','s.codfac','s.user_id','s.virtual','s.fnotificacion',
-          'k.id','k.test_id','k.examenes_id','k.valor',
+          'k.puntaje','k.id','k.test_id','k.examenes_id','k.valor',
          'b.item','b.pregunta','b.grupo',
         'c.desdocu',
         'al.ap','al.am','al.nombres','al.correo','al.codcar','al.dni','al.celulares','al.fijos',
@@ -35,7 +35,7 @@ class m191213_160789_create_VW_examenes extends viewMigration
      innerJoin('{{%sta_test}} a', 'a.codtest=b.codtest')-> 
       innerJoin('{{%sta_citas}} m', 's.citas_id=m.id')->  
        innerJoin('{{%sta_talleresdet}} td', 'td.id=m.talleres_id')->
-        innerJoin('{{%sta_talleres}} t', 'td.talleres_id=t.id')-> 
+        innerJoin('{{%sta_talleres}} t', 'td.talleresdet_id=t.id')-> 
          innerJoin('{{%trabajadores}} x', 'x.codigotra=m.codtra')-> 
          innerJoin('{{%sta_alu}} al', 'al.codalu=td.codalu')-> 
          innerJoin('{{%documentos}} c', 'a.codocu=c.codocu')

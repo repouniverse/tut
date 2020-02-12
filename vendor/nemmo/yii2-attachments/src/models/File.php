@@ -69,4 +69,24 @@ class File extends ActiveRecord
     {
         return $this->getModule()->getFilesDirPath($this->hash) . DIRECTORY_SEPARATOR . $this->hash . '.' . $this->type;
     }
+    
+   
+        /*
+     * Esta funcion 
+     * Obtiene el model Asociado
+     */
+    public function modelAsociado(){
+        $modelos= array_flip(\common\helpers\ComboHelper::getCboModels());
+        if(array_key_exists(trim($this->model), $modelos)){
+            $clase=$modelos[trim($this->model)];
+          // var_dump($clase::findOne($this->itemId));die();
+            return $clase::findOne($this->itemId);
+            
+        }else{
+            return null;
+        }
+       
+    }
+    
+    
 }

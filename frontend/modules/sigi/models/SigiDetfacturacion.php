@@ -47,7 +47,7 @@ class SigiDetfacturacion extends \common\models\base\modelBase
             [['cuentaspor_id', 'edificio_id', 'unidad_id', 'colector_id', 'grupo_id', 'facturacion_id', 'mes'], 'integer'],
             [['monto', 'igv'], 'number'],
              [['unidades','codmon','grupounidad_id','grupocobranza','kardex_id','numerorecibo'], 'safe'],
-             [['aacc','participacion','codsuministro','lectura','delta','consumototal','montototal'], 'safe'],
+             [['aacc','participacion','codsuministro','lectura','delta','consumototal','montototal','dias','nuevoprop'], 'safe'],
             [['grupounidad', 'grupofacturacion'], 'string', 'max' => 12],
             [['anio'], 'string', 'max' => 4],
             [['unidad_id'], 'exist', 'skipOnError' => true, 'targetClass' => SigiUnidades::className(), 'targetAttribute' => ['unidad_id' => 'id']],
@@ -134,13 +134,14 @@ class SigiDetfacturacion extends \common\models\base\modelBase
        return (is_null($maximo))?1:$maximo+1;
     }
     
-    public static function criteriaDepa($grupo,$mes,$anio,$facturacion_id){
+    public static function criteriaDepa($grupo,$mes,$anio,$facturacion_id,$dias){
         return [
             //'edificio_id'=>$this->edificio_id,
             'facturacion_id'=>$facturacion_id,
             'mes'=>$mes,
             'anio'=>$anio,
              'grupofacturacion'=>$grupo,
+            'dias'=>$dias,
             ];
     }
     

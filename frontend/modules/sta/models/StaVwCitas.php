@@ -22,6 +22,7 @@ editableViewInterface
     
     public $dateorTimeFields=['fechaprog'=>self::_FDATETIME,
         'fechaprog1'=>self::_FDATETIME];
+   // public $booleanFields=['asistio'];
     public $fechaprog1;
      public $finicio1;
       public $ftermino1;
@@ -53,28 +54,29 @@ editableViewInterface
     public function attributeLabels()
     {
         return [
-            'aptutor' => Yii::t('app', 'Aptutor'),
-            'codtra' => Yii::t('app', 'Psicólogo'),
-            'amtutor' => Yii::t('app', 'Amtutor'),
-            'nombrestutor' => Yii::t('app', 'Nombrestutor'),
-            'codperiodo' => Yii::t('app', 'Codperiodo'),
-            'codalu' => Yii::t('app', 'Codalu'),
-            'ap' => Yii::t('app', 'Ap'),
-            'am' => Yii::t('app', 'Am'),
-            'nombres' => Yii::t('app', 'Nombres'),
-            'codfac' => Yii::t('app', 'Codfac'),
-            'codcar' => Yii::t('app', 'Codcar'),
-            'id' => Yii::t('app', 'ID'),
-            'talleresdet_id' => Yii::t('app', 'Talleresdet ID'),
-            'talleres_id' => Yii::t('app', 'Talleres ID'),
-            'fechaprog' => Yii::t('app', 'Fechaprog'),
-            'codtra' => Yii::t('app', 'Codtra'),
-            'finicio' => Yii::t('app', 'Finicio'),
-            'ftermino' => Yii::t('app', 'Ftermino'),
-            'fingreso' => Yii::t('app', 'Fingreso'),
-            'detalles' => Yii::t('app', 'Detalles'),
-            'codaula' => Yii::t('app', 'Codaula'),
-            'duracion' => Yii::t('app', 'Duracion'),
+            'aptutor' => Yii::t('sta.labels', 'Ap Psicólogo'),
+            'codtra' => Yii::t('sta.labels', 'Psicólogo'),
+            'amtutor' => Yii::t('sta.labels', 'Am Psicólogo'),
+            'nombrestutor' => Yii::t('sta.labels', 'Nombre Psicólogo'),
+            'codperiodo' => Yii::t('sta.labels', 'Periodo'),
+            'codalu' => Yii::t('sta.labels', 'Código Alumno'),
+            'ap' => Yii::t('sta.labels', 'Ap Alumno'),
+            'am' => Yii::t('sta.labels', 'Am Alumno'),
+            'nombres' => Yii::t('sta.labels', 'Nombres'),
+            'codfac' => Yii::t('sta.labels', 'Facultad'),
+            'codcar' => Yii::t('sta.labels', 'Especialidad'),
+            'id' => Yii::t('sta.labels', 'ID'),
+            'talleresdet_id' => Yii::t('sta.labels', 'Talleresdet ID'),
+            'talleres_id' => Yii::t('sta.labels', 'Talleres ID'),
+            'fechaprog' => Yii::t('sta.labels', 'Fecha Ini'),
+            'fechaprog1' => Yii::t('sta.labels', 'Fecha Fin'),
+            //'codtra' => Yii::t('sta.labels', 'Codtra'),
+            'finicio' => Yii::t('sta.labels', 'Finicio'),
+            'ftermino' => Yii::t('sta.labels', 'Ftermino'),
+            'fingreso' => Yii::t('sta.labels', 'Fingreso'),
+            'detalles' => Yii::t('sta.labels', 'Detalles'),
+            'codaula' => Yii::t('sta.labels', 'Codaula'),
+            'duracion' => Yii::t('sta.labels', 'Duracion'),
         ];
     }
 
@@ -99,6 +101,10 @@ editableViewInterface
    public function getReportFotoAlu()
     {
       return \yii\helpers\Html::img(staModule::getPathImage($this->codalu),['width'=>90, 'height'=>120]) ; 
+    } 
+     public function fotoAluSmall()
+    {
+      return \yii\helpers\Html::img(staModule::getPathImage($this->codalu),['width'=>45, 'height'=>60]) ; 
     } 
     
     public function getCita(){

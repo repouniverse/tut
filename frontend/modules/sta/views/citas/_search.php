@@ -29,12 +29,12 @@ use common\helpers\h;
          <?php // Html::resetButton("<span class='fa fa-eye'></span>     ".Yii::t('sta.labels', 'Limpiar'), ['class' => 'btn btn-success']) ?>
        <?php // Html::button("<span class='fa fa-eye'></span>     ".Yii::t('sta.labels', 'Ver'), ['onClick'=>"$('#buscador').toggle()",  'class' => 'btn btn-success']) ?>
    
-        <?= Html::a(Yii::t('sta.labels', 'Crear Cita'), ['create'], ['class' => 'btn btn-success']) ?>
-    
+        
     </div>
      </div>
   <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
       <?php 
+      
         echo $form->field($model, 'fechaprog')->widget(
         DateTimePicker::classname(), [
          'name' => 'fechaprog',
@@ -78,19 +78,23 @@ use common\helpers\h;
         ]);  ?>
 
  </div>
+     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <?= 
+            $form->field($model, 'asistio')->
+            dropDownList(['0'=>yii::t('sta.labels','Asistió'),'1'=>yii::t('sta.labels','Ausente')] ,
+                    ['prompt'=>'--'.yii::t('base.verbs','Todas')."--",
+                        //'enableAjaxValidation' => true,
+                    // 'class'=>'probandoSelect2',
+                      //'disabled'=>($model->isBlockedField('codpuesto'))?'disabled':null,
+                        ]
+                    )  ?>
+     <?php //echo cboperiodos::widget(['model'=>$model,'attribute'=>'codperiodo', 'form'=>$form]) ?>
+  </div>
+  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+ </div>
+<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
     
-     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
-     <?php 
-  // $necesi=new Parametros;
-    echo selectWidget::widget([
-           // 'id'=>'mipapa',
-            'model'=>$model,
-            'form'=>$form,
-            'campo'=>'codalu',
-         'ordenCampo'=>3,
-         'addCampos'=>[4,5],
-        ]);  ?>
-
+ <?=$form->field($model, 'codalu')->textInput()?>
  </div>
  
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
@@ -124,10 +128,10 @@ use common\helpers\h;
     </div> 
     
      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-        <?= $form->field($model, 'aptutor') ?>
+        <?= $form->field($model, 'numerocita') ?>
     </div> 
-
-    
+ 
+   
 
     <?php ActiveForm::end(); ?>
 

@@ -56,6 +56,11 @@ class FinderController extends  \common\controllers\base\baseController
                         'class' => 'common\actions\ActionRenderParam',
                         //'property1' => 'value1',
                         //'property2' => 'value2',
+                            ],
+          'audit'=> [
+                        'class' => 'common\actions\ActionAudit',
+                        //'property1' => 'value1',
+                        //'property2' => 'value2',
                             ]
       ];
       

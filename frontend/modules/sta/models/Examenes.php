@@ -97,6 +97,10 @@ class Examenes extends modelSensibleAccess
     {
         return $this->hasMany(StaExamenesdet::className(), ['examenes_id' => 'id']);
     }
+    public function getResultados()
+    {
+        return $this->hasMany(StaResultados::className(), ['examenes_id' => 'id']);
+    }
 
     /**
      * {@inheritdoc}
@@ -133,7 +137,8 @@ class Examenes extends modelSensibleAccess
            $attributos=[
           'examenes_id'=>$this->id,
            'codfac'=>$this->codfac,
-          'test_id'=>$detalle->id
+          'test_id'=>$detalle->id,
+          'indicador_id'=>$detalle->indicadorId(),
                    ];
       $valor=StaExamenesdet::firstOrCreateStatic($attributos, StaExamenesdet::SCENARIO_MIN );
        if($valor===false){
@@ -166,4 +171,89 @@ class Examenes extends modelSensibleAccess
      return 0;
  }
   
+ public function puntaje(){
+     return $this->getExamenesDet()->select('sum(puntaje)')->scalar();
+ }
+ 
+ 
+ 
+ 
+ /*
+  * rellena los puntajes de todas las respuestas
+  * hijas
+  */
+ public function makePuntaje(){
+     $test=$this->test;
+     $arrayCalificaciones=$test->arrayRawCalificaciones();unset($test);
+    // print_r($arrayCalificaciones);die();
+     //echo count($this->examenesDet); die();
+     foreach($this->examenesDet as $detalle){
+         $detalle->setPuntaje($arrayCalificaciones);
+     }
+   return true;  
+     
+ }
+ 
+ public function makeResultados(){
+     $valor=true;
+  if($this->porcentajeAvance() >=100){
+       $this->makePuntaje();
+   $detalles=$this->getExamenesDet()
+    ->select(['examenes_id','indicador_id','sum(puntaje) as puntajetotal'])
+    ->groupBy(['examenes_id','indicador_id'])->asArray()->all();
+   yii::error('Sql del RESUMEN');
+     yii::error($this->getExamenesDet()
+    ->select(['examenes_id','indicador_id','sum(puntaje) as puntajetotal'])
+    ->groupBy(['examenes_id','indicador_id'])->createCommand()->getRawSql());
+   foreach($detalles as $detalle){
+       //$indicador= StaTestindicadores::findOne($detalle['indicador_id']);
+       $percentil= StaPercentiles::find()->where([
+         'indicador_id'=> $detalle['indicador_id'],
+          'puntaje'=>$detalle['puntajetotal']
+       ])->one();
+       yii::error('Sql del percentil');
+       yii::error(StaPercentiles::find()->where([
+         'indicador_id'=> $detalle['indicador_id'],
+          'puntaje'=>$detalle['puntajetotal']
+       ])->createCommand()->getRawSql());
+       if(is_null($percentil)){
+       // yi::error();   
+       }
+       //yii::error($detalle['puntajetotal']);
+        $attributos=[
+          'examen_id'=>$detalle['examenes_id'],
+           'indicador_id'=>$detalle['indicador_id'],
+           'codfac'=>$this->codfac,
+          'puntaje_total'=>$detalle['puntajetotal'],
+          'percentil'=>$percentil->percentil,
+           'categoria'=>$percentil->categoria, 
+           'interpretacion'=>$percentil->indicador->interpretacion(trim($percentil->categoria)),
+                   ];
+        
+        $valor= StaResultados::firstOrCreateStatic(
+                $attributos,
+                null,
+                [ 'examen_id'=>$detalle['examenes_id'],'indicador_id'=>$detalle['indicador_id']]
+                );
+       if($valor===false){
+           yii::error('fallo');
+           $mimodelo=new StaResultados();
+           //$mimodelo->setScenario(StaResultados::SCENARIO_MIN);
+           $mimodelo->setAttributes($attributos);
+           $mimodelo->validate();
+           yii::error($mimodelo->getErrors());
+           break;
+       }
+        
+   }
+   return $valor;
+      
+  }else{
+      return false;
+  }
+  
+ }
+ 
+
+ 
 }

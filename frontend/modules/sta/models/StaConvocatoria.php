@@ -41,10 +41,10 @@ class StaConvocatoria extends \common\models\base\modelBase
             [['talleresdet_id'], 'integer'],
             [['codfac', 'canal'], 'required'],
             [['detalle'], 'string'],
-             [['canal','fecha'], 'safe'],
+             [['canal','fecha','resultado'], 'safe'], 
             [['codfac'], 'string', 'max' => 8],
             [['canal'], 'string', 'max' => 3],
-            [['resultado'], 'string', 'max' => 1],
+           // [['resultado'], 'string', 'max' => 1],
             [['codfac'], 'exist', 'skipOnError' => true, 'targetClass' => Facultades::className(), 'targetAttribute' => ['codfac' => 'codfac']],
             [['talleresdet_id'], 'exist', 'skipOnError' => true, 'targetClass' => Talleresdet::className(), 'targetAttribute' => ['talleresdet_id' => 'id']],
         ];

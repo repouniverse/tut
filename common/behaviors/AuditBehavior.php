@@ -28,17 +28,17 @@ class AuditBehavior extends Behavior
      
    public function events()
     {
-        if($this->owner->hasProperty('withaudit'))
-          if($this->owner->withAudit)
+        
+         
        return  [
-           ActiveRecord::EVENT_BEFORE_INSERT => 'doBeforeSave',
+         //  ActiveRecord::EVENT_BEFORE_INSERT => 'doBeforeSave',
             ActiveRecord::EVENT_BEFORE_UPDATE => 'doBeforeSave',
             ActiveRecord::EVENT_BEFORE_DELETE => 'doBeforeDelete',
-            //ActiveRecord::EVENT_AFTER_INSERT => 'doAfterSave',
-           // ActiveRecord::EVENT_AFTER_UPDATE => 'doAfterSave',
+            ActiveRecord::EVENT_AFTER_INSERT => 'doAfterInsert',
+            //ActiveRecord::EVENT_AFTER_UPDATE => 'doAfterSave',
            // ActiveRecord::EVENT_AFTER_DELETE => 'doAfterDelete'
         ];
-       return [];
+      
        return parent::events();
     }
     
@@ -52,18 +52,38 @@ class AuditBehavior extends Behavior
       }
    }
     
+     * 
+     * 
+     * 
+     * 
+     */
     /*
      * Se ejecuta previamente a un evento de insertar o modificar
      * SI NO ESTA DENTRO DE UNA TRANSACCION:: NO HACE NADA 
      */
     
     public function doBeforeSave(){
-     if($this->isInTransaction())
-       foreach($this->owner->attributes as $attribute=>$value){
+     //if($this->isInTransaction())
+       $owner=$this->owner;     
+          $ip=yii::$app->request->getRemoteIP();
+       $username=yii::$app->user->identity->username;
+       $controllerId=yii::$app->controller->id;
+       $currentUrl=Yii::$app->request->getUrl();
+       foreach($owner->attributes as $attribute=>$value){
+           yii::error($attribute);
           if($this->hasChanged($attribute)){ 
+               yii::error('este atributo ha cambiado');
              // ECHO '<br><br>'.$attribute;DIE();
               $model=New Activerecordlog();
-               $model=$this->setLogValues($model, $attribute);
+               $model=$this->setLogValues($model,$attribute,
+            false,
+            $owner,
+            $username,
+            false,
+            $ip,
+            $controllerId,
+            $currentUrl  
+                       );
               if(!$model->save()){
                   throw new ServerErrorHttpException(Yii::t('models.errors', 'NO SE PUDO GRABAR  '.serialize($model->geterrors())));
               }
@@ -71,37 +91,98 @@ class AuditBehavior extends Behavior
        } 
     }
     
-    public function doBeforeDelete(){
-        if($this->isInTransaction()){
+    
+    public function doAfterInsert(){
+     //if($this->isInTransaction())
+       $owner=$this->owner;
+         $owner=$this->owner;
+          $ip=yii::$app->request->getRemoteIP();
+       $username=yii::$app->user->identity->username;
+       $controllerId=yii::$app->controller->id;
+       $currentUrl=Yii::$app->request->getUrl();
+       $arrttribute=array_keys($owner->getPrimaryKey(true));
+       $attribute= $arrttribute[0];
          $model=New Activerecordlog();
+          $model=$this->setLogValues($model,$attribute,
+            false,
+            $owner,
+            $username,
+            true,
+            $ip,
+            $controllerId,
+            $currentUrl );
+        if(!$model->save()){
+         throw new ServerErrorHttpException(Yii::t('models.errors', 'NO SE PUDO GRABAR  '.serialize($model->geterrors())));
+         }
+    }
+    
+    
+    
+    
+    public function doBeforeDelete(){
+       // if($this->isInTransaction()){
+         $model=New Activerecordlog();
+           $owner=$this->owner;
+          $ip=yii::$app->request->getRemoteIP();
+       $username=yii::$app->user->identity->username;
+       $controllerId=yii::$app->controller->id;
+       $currentUrl=Yii::$app->request->getUrl();
        foreach($this->owner->attributes as $attribute=>$value){
           
-              $model=$this->setLogValues($model, $attribute,true);              
+              $model=$this->setLogValues($model,$attribute,
+            true,
+            $owner,
+            $username,
+            false,
+            $ip,
+            $controllerId,
+            $currentUrl  );              
               $model->save();
                 }
-            }
+           
          RETURN TRUE;
        }
     
     
-    private function setLogValues(&$model,$attribute,$delete=false){
+    private function setLogValues(&$model,
+            $attribute,
+            $delete=false,
+            $owner,
+            $username,
+            $insert=false,
+            $ip,
+            $controllerId,
+            $currentUrl 
+            ){
+        //$owner=$this->owner;
+        //$username=yii::$app->user->identity->username;
+        $identidad=$owner->getPrimaryKey().'';
+        $oldValue=$owner->getOldAttribute($attribute).'';
+        if(strlen($oldValue)>80){
+          $oldValue=substr($oldValue,0,8).'... texto largo';  
+        }
+        $newValue=$owner->{$attribute}.'';
+        if(strlen($newValue)>80){
+          $newValue=substr($newValue,0,8).'... texto largo'; 
+        }
         $model->setAttributes([
-            'model'=>get_class($this->owner),
-            'clave'=>Json::encode($this->owner->getPrimaryKey(true)),
+            'model'=>$owner::className(),
+            'clave'=>$identidad/*Json::encode($this->owner->getPrimaryKey(true))*/,
             'field'=>$attribute,
-            'ip'=>trim(yii::$app->request->getRemoteIP()),
+            'ip'=>trim($ip),
             'creationdate'=>date('Y-m-d H:i:s'),
             //'ip'=>yii::$app->request->getUrl(),
-            'controlador'=>Yii::$app->controller->id,
-            'description'=>Yii::$app->request->getUrl(),
-            'nombrecampo'=>$this->owner->getAttributeLabel($attribute),
-            'oldvalue'=>$this->owner->getOldAttribute($attribute),
-            'newvalue'=>$this->owner->{$attribute}.'',
-             'username'=>yii::$app->user->identity->username, 
+            'controlador'=>$controllerId,
+            'description'=>substr($currentUrl,0,105),
+            'nombrecampo'=>$owner->getAttributeLabel($attribute),
+            'oldvalue'=>$oldValue,
+            'newvalue'=>$newValue,
+             'username'=>$username, 
               'metodo'=> $this->getTypeRequest(),
                ]);
            if(!$delete){
-               $model->action=($this->owner->isNewRecord)?static::ES_NUEVO:static::NO_ES_NUEVO;
+               
+               $model->action=($insert)?static::ES_NUEVO:static::NO_ES_NUEVO;
            }else{
                $model->action=static::ES_BORRADO;
            }          
@@ -118,10 +199,14 @@ class AuditBehavior extends Behavior
     
     
     private function hasChanged($attribute){
-     if($this->owner->hasMethod('hasChanged'))      
-       return $this->owner->hasChanged($attribute);     
+     if($this->owner->hasMethod('hasChanged')){
+         yii::error('tiene metodo has cange  '.$attribute);
+        return $this->owner->hasChanged($attribute);       
+     } else{
        return (!($this->owner->{$attribute}==$this->owner->getOldAttribute($attribute)));
-    }
+     
+     } 
+        }
 
     
     private function isInTransaction(){

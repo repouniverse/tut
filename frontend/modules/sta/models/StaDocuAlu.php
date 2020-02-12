@@ -3,6 +3,7 @@
 namespace frontend\modules\sta\models;
 use common\models\masters\Documentos;
 use common\behaviors\FileBehavior;
+use common\behaviors\AccessDownloadBehavior;
 use frontend\modules\access\models\modelSensibleAccess;
 use Yii;
 
@@ -32,6 +33,10 @@ public function behaviors()
 		
 		'fileBehavior' => [
 			'class' => FileBehavior::className()
+		],
+            
+            'AccessDownloadBehavior' => [
+			'class' => AccessDownloadBehavior::className()
 		]
 		
                 ];

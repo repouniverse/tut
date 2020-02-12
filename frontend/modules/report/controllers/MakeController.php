@@ -457,20 +457,38 @@ class MakeController extends baseController
   }
   
   
-  public function actionCreareporte($id, $idfiltro/*,$campofiltro=null*/){
+  public function actionCreareporte($id, $idfiltro,$campofiltro=null){
+      
+      
+      
+      
+      
+      
      if(h::request()->get('disk')=='1'){
         $disco=true;  
       }else{
           $disco=false;
       }
-      
-      if(is_array($idfiltro)){
-          
-      }
-      
-      
        $model=$this->findModel($id); 
        $this->layout='blank';
+       
+       if(is_null($campofiltro)){
+        $campofiltro=$model->campofiltro;   
+       }
+       
+       
+       /*Filtro de acceso*/
+       $modeloAsociado=$model->modelToRepor($idfiltro,$campofiltro);
+       if(!is_null($modeloAsociado) ){
+             if($modeloAsociado->hasMethod('canDownload')){
+                 if(!$modeloAsociado->canDownload()){
+                     return "no puedes descargar este documento"; 
+                 }
+             }
+        }
+       /*Fin del filtro */
+       
+       
       $pageContents=$this->contentReport($id, $idfiltro,$model);
        return $this->prepareFormat($pageContents, $model,$disco);
      

@@ -23,6 +23,10 @@ if(!$this->existsTable($table)) {
         'examenes_id'=>$this->integer(11)->notNull(), 
         'test_id'=>$this->integer(11)->notNull(), 
          'valor'=>$this->integer(4), 
+         'indicador_id'=>$this->integer(11)->notNull(),
+        'puntaje'=>$this->integer(3), 
+        'percentil'=>$this->integer(3), 
+        'categoria'=>$this->string(10)->append($this->collateColumn()),
          'codfac'=>$this->string(8)->notNull()->append($this->collateColumn()),
          'detalles'=>$this->text()->append($this->collateColumn()),
         ],$this->collateTable());

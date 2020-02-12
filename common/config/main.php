@@ -235,6 +235,10 @@ return [
                              'base.names'=>[
                                  'class' => 'yii\i18n\PhpMessageSource',
                                  'basePath' => '@messages',                                          
+                                            ],
+                'base.labels'=>[
+                                 'class' => 'yii\i18n\PhpMessageSource',
+                                 'basePath' => '@messages',                                          
                                             ], 
                 'base.forms'=>[
                                  'class' => 'yii\i18n\PhpMessageSource',

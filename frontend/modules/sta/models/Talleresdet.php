@@ -228,4 +228,13 @@ public function getTrabajador()
       $this->setScenario($oldScenario);
       
   }
+  
+  public function examenesTomados(){
+      $citasId=$this->getCitas()->select(['id'])->column();
+      $examenesCods=Examenes::find()->select(['codtest'])->distinct()->where(
+              ['citas_id'=>$citasId
+                  ]);
+     return Test::find()->where(['codtest'=>$examenesCods])->asArray()->all();
+      
+  }
 }

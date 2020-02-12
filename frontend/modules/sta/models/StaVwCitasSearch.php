@@ -7,6 +7,7 @@ use frontend\modules\sta\models\Alumnos;
 use frontend\modules\sta\staModule;
 use common\models\masters\Trabajadores;
 use yii\base\Model;
+use yii;
 /**
  * This is the ActiveQuery class for [[StaVwCitas]].
  *
@@ -23,18 +24,20 @@ class StaVwCitasSearch extends StaVwCitas
            [[
              'aptutor',
          'amtutor',
-         'nombrestutor',
+         'nombrestutor','asistio',
         'codperiodo',
         'codalu',
          'ap','am','nombres','codfac','codcar',
          'id','talleres_id','talleresdet_id','fechaprog','codtra',
            'finicio','ftermino','fingreso','codaula',    
-             'fechaprog1','finicio1','ftermino1','codaula'      
+             'fechaprog1','finicio1','ftermino1','numerocita'     
            ], 'safe'],
      
         ];
     }
 
+   
+    
     /**
      * {@inheritdoc}
      */
@@ -72,10 +75,12 @@ class StaVwCitasSearch extends StaVwCitas
                  ->andFilterWhere(['like', 'amtutor', $this->amtutor])
             ->andFilterWhere(['like', 'nombrestutor', $this->nombrestutor])
            ->andFilterWhere(['codperiodo'=>$this->codperiodo])
+            ->andFilterWhere(['asistio'=>$this->asistio])
                 ->andFilterWhere(['codalu'=>$this->codalu])
            ->andFilterWhere(['like', 'ap', $this->ap])
       ->andFilterWhere(['like', 'am', $this->am])
             ->andFilterWhere(['like', 'nombres', $this->nombres])
+             ->andFilterWhere(['like', 'numerocita', $this->numerocita])
           ->andFilterWhere(['codfac'=>$this->codfac])
                 ->andFilterWhere(['codcar'=>$this->codcar])
                    ->andFilterWhere(['codtra'=>$this->codtra])
@@ -143,14 +148,15 @@ class StaVwCitasSearch extends StaVwCitas
              andWhere([
              'between',
              'fechaprog',
-             self::CarbonNow()->endOfDay()->subDay()->format(
+             self::CarbonNow()->endOfDay()->subDay(1)->format(
                h::gsetting('timeBD','datetime')
                ),
              self::CarbonNow()->endOfDay()->format(
                h::gsetting('timeBD','datetime')
                )
-                        ]);     
-        // echo $query->createCommand()->getRawSql();die();
+                        ]); 
+         //echo date('Y-m-d H:i:s');die();
+        //echo $query->createCommand()->getRawSql();die();
         return $dataProvider;
     } 
 }

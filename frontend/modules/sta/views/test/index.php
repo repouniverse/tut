@@ -63,7 +63,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'codtest',
             'descripcion',
-            'opcional',
+            'orden',
             'version',
             'nveces',
                  ['class' => 'frontend\modules\report\components\columnGridReport',

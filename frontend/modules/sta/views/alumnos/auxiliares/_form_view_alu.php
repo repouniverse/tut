@@ -21,6 +21,8 @@ use common\helpers\h;
    if(count($dataProviders)>0){
        echo $this->render('_tabs',['model'=>$model,
                 'dataProviders'=>$dataProviders,
+            'examenes'=>$examenes,
+           'citasArray'=> $citasArray,
                 'modelTallerdet'=>$modelTallerdet,
                 'codperiodo'=>$codperiodo]);
    }else{

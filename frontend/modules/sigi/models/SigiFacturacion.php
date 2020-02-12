@@ -216,10 +216,10 @@ class SigiFacturacion extends \common\models\base\modelBase
                $errores['success']=yii::t('sigi.errors','Se ha generado la facturacion sin problemas '.$this->balanceMontos());  
             }
           }*/
-           $this->shortFactu();
-           
+           $this->shortFactu();           
            $this->asignaIdentidad();//Importante  
            $this->asignaNumero();
+           $this->resolveTransferencias();
            
         }else{
             
@@ -237,6 +237,20 @@ class SigiFacturacion extends \common\models\base\modelBase
        
         return $errores;
     }
+    
+    private function resolveTransferencias(){
+        yii::error('--resolve transferencias---');
+          yii::error(count($this->transfEsteMesModels()));
+        foreach($this->transfEsteMesModels() as $model){
+            $model->resolveParent();
+        }
+    }
+    
+    private function unResolveTransferencias(){
+        foreach($this->transfEsteMesModels() as $model){
+            $model->unResolveParent();
+        }
+    }
     /*
      * Esta funcion revisa la columna identidad de
      * la tabla facturaciondetalle y la catualiza
@@ -249,7 +263,8 @@ class SigiFacturacion extends \common\models\base\modelBase
                   $filaGrupo->grupofacturacion,
                   $filaGrupo->mes,
                   $filaGrupo->anio,
-                  $filaGrupo->facturacion_id
+                  $filaGrupo->facturacion_id,
+                  $filaGrupo->dias
                   );
           $identidad= SigiDetfacturacion::maxIdentidad();
             SigiDetfacturacion::updateAll(['identidad'=>$identidad], $criterio);
@@ -260,7 +275,7 @@ class SigiFacturacion extends \common\models\base\modelBase
     
     public function grupos(){
        return  $this->getSigiDetfacturacion()->
-                select(['grupofacturacion','mes','anio','facturacion_id'])->
+                select(['grupofacturacion','mes','anio','facturacion_id','dias'])->
                 distinct()->all();
         
     }
@@ -364,13 +379,17 @@ class SigiFacturacion extends \common\models\base\modelBase
     
     public function resetFacturacion(){
       $borrados= \frontend\modules\sigi\models\SigiDetfacturacion::deleteAll(['facturacion_id'=>$this->id]);
-      yii::error('borrados '.$borrados.'  Registros');
+         yii::error('borrados '.$borrados.'  Registros de detalle facturacion');
+      $borrados= \frontend\modules\sigi\models\SigiKardexdepa::deleteAll(['facturacion_id'=>$this->id]);
+       yii::error('borrados '.$borrados.'  kardex depa');
       \frontend\modules\sigi\models\SigiLecturas::updateAll(['cuentaspor_id'=>null],
               [ 
                  'mes'=>$this->mes,
                   'anio'=>$this->ejercicio,
                   'cuentaspor_id'=>$this->idsToCuentasPor()
             ]);
+      $this->unResolveTransferencias();
+      
     }
             
   public function generateTempReads(){
@@ -408,11 +427,11 @@ class SigiFacturacion extends \common\models\base\modelBase
    
    private function asignaNumero(){
        $mes= str_pad( $this->mes , 2,  "0",STR_PAD_LEFT);       
-      $depas=array_column($this->getSigiDetfacturacion()->select('grupofacturacion')->distinct()->orderBy('grupofacturacion ASC')->asArray()->all(),'grupofacturacion');
+   $depas=$this->getSigiDetfacturacion()->select(['grupofacturacion','dias'])->distinct()->orderBy('grupofacturacion ASC')->asArray()->all();
      $contador=1;
       foreach($depas as $key=>$depa){
           $numero=$this->ejercicio.'-'.$mes.'-'.str_pad( $contador.'' , 3,  "0",STR_PAD_LEFT);      
-          SigiDetfacturacion::updateAll(['numerorecibo'=>$numero],['grupofacturacion'=>$depa,'facturacion_id'=>$this->id]);
+          SigiDetfacturacion::updateAll(['numerorecibo'=>$numero],['dias'=>$depa['dias'],'grupofacturacion'=>$depa['grupofacturacion'],'facturacion_id'=>$this->id]);
           $contador++;
       }
    }
@@ -527,6 +546,7 @@ class SigiFacturacion extends \common\models\base\modelBase
       
       /*Solo unidades padres que sean imputables*/
      $unidades= $this->edificio->unidadesImputablesPadres();
+     $unidadesTransferidas=array_combine(array_column($this->transfEsteMes(),'unidad_id'),array_column($this->transfEsteMes(),'fecha'));
      
      /*Si debe de cobrar masivamente, verifica que el apoderado
       * exiga facturacion masiva, por ejemplo la inmobiliaria 
@@ -540,14 +560,28 @@ class SigiFacturacion extends \common\models\base\modelBase
      }
       
      foreach($unidades as $unidad){
-       
-         if($hasCobranzaMasiva){
+         
+         ///verficando primero si la unidad ha sido transferida 
+        $diasEnEsteMes=date('t',$this->swichtDate('fecha',false));
+        
+        if(in_array($unidad->id,array_keys($unidadesTransferidas))){
+            $dias=date('j',strtotime($unidadesTransferidas[$unidad->id])); 
+        }else{
+           $dias=$diasEnEsteMes;  
+        }
+       //var_dump($unidadesTransferidas);die();
+        if($hasCobranzaMasiva){
                   if($unidad->miApoderado()->cobranzaindividual){
                       $modeltemp=$this->kardexDepa($unidad->id);
                        $identidad=$modeltemp->id; unset($modeltemp);
           
                      }else{
-                        $identidad=$kardexGrupal->id;  
+                         if($dias==$diasEnEsteMes){
+                             $identidad=$kardexGrupal->id; 
+                         }else{
+                              
+                         }
+                        
                   } 
          }else{
                      $modeltemp=$this->kardexDepa($unidad->id);
@@ -568,8 +602,8 @@ class SigiFacturacion extends \common\models\base\modelBase
                     //yii::error('partici medidor  '.$participacion);
                     $monto=round($participacion*$cuenta->monto,6);
                      /***insertar un registrio****/
-                    if(!$cuenta->existsDetalleFacturacion($unidad,$colector,false))
-                        $cuenta->insertaRegistro($identidad,$unidad,$medidor,$monto,'0',$participacion);
+                    if(!$cuenta->existsDetalleFacturacion($unidad,$colector,false,$dias))
+                        $cuenta->insertaRegistro($identidad,$unidad,$medidor,$monto,'0',$participacion,$dias);
                     /*****************************/
                  }
                  
@@ -584,9 +618,9 @@ class SigiFacturacion extends \common\models\base\modelBase
                          }
                  
                  /***insertar un registrio  por todfas las sumas de las lecturas****/
-                  if(!$cuenta->existsDetalleFacturacion($unidad,$colector,true) && $monto > 0)
+                  if(!$cuenta->existsDetalleFacturacion($unidad,$colector,true,$dias) && $monto > 0)
                   $cuenta->insertaRegistro($identidad,$unidad,null,$monto,'1',$participacionAACC //el porc d ecomsumo
-                                     *$unidad->porcWithChilds());
+                                     *$unidad->porcWithChilds(),$dias);
                  /*****************************/
                  
                  
@@ -596,8 +630,8 @@ class SigiFacturacion extends \common\models\base\modelBase
                 $monto=round($unidad->porcWithChilds()*$cuenta->monto,10);
                 
                 /***insertar un registrio****/
-                if(!$cuenta->existsDetalleFacturacion($unidad,$colector,false))
-                  $cuenta->insertaRegistro($identidad,$unidad,null,$monto,'0',$unidad->porcWithChilds());
+                if(!$cuenta->existsDetalleFacturacion($unidad,$colector,false,$dias))
+                  $cuenta->insertaRegistro($identidad,$unidad,null,$monto,'0',$unidad->porcWithChilds(),$dias);
                  /*****************************/
                  
                    }
@@ -605,8 +639,8 @@ class SigiFacturacion extends \common\models\base\modelBase
                    /*Si es un cobro uindividual aplicar aqui*/
                    if($cuenta->unidad_id>0 && $cuenta->unidad_id==$unidad->id) {
                        /***insertar un registrio****/
-                       if(!$cuenta->existsDetalleFacturacion($unidad,$colector,false))
-                    $cuenta->insertaRegistro($identidad,$unidad,null,$monto,'1',1);
+                       if(!$cuenta->existsDetalleFacturacion($unidad,$colector,false,$dias))
+                    $cuenta->insertaRegistro($identidad,$unidad,null,$cuenta->monto,'1',1,$dias);
                       /*****************************/
                  
                  
@@ -631,6 +665,28 @@ class SigiFacturacion extends \common\models\base\modelBase
              $bordes[0],
              $bordes[1],
                         ])->asArray()->all();
+     yii::error(SigiTransferencias::find()->select(['unidad_id','fecha'])->where([
+             'between',
+             'fecha',
+             $bordes[0],
+             $bordes[1],
+                        ])->createCommand()->getRawSql());
+  }
+  
+  /*
+   * Devuelve las transferencias de departamentos 
+   * acaecidas durante el mes de la facturacion 
+   * 
+   */
+  public function transfEsteMesModels(){
+      $bordes=$this->fechasBordes();
+     
+     return  SigiTransferencias::find()->where([
+             'between',
+             'fecha',
+             $bordes[0],
+             $bordes[1],
+                        ])->all();
      
   }
   

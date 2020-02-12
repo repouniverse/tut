@@ -403,7 +403,7 @@ class SigiCuentaspor extends \common\models\base\modelBase
             ];
  }  
 
-public function existsDetalleFacturacion($unidad,$colector,$prorateo=false){    
+public function existsDetalleFacturacion($unidad,$colector,$prorateo=false,$dias){    
     return SigiDetfacturacion::find()->
                 where([
                     'cuentaspor_id'=>$this->id,
@@ -415,6 +415,7 @@ public function existsDetalleFacturacion($unidad,$colector,$prorateo=false){
                 'mes'=>$this->mes,
                 'anio'=>$this->anio,
                     'aacc'=>($prorateo)?'1':'0',
+                    'dias'=>$dias
                 //'prorateo'=>
                    
                         ])
@@ -424,16 +425,40 @@ public function existsDetalleFacturacion($unidad,$colector,$prorateo=false){
 /*
  * Funcion corta 
  */
-public function insertaRegistro($identidad,$unidad,$medidor,$monto,$aacc,$participacion){
-     $model=New SigiDetfacturacion();
+public function insertaRegistro($identidad,$unidad,$medidor,$monto,$aacc,$participacion,$dias){
+    $maxDias=date('t',$this->facturacion->swichtDate('fecha',false));
+    
+    if($dias==$maxDias){
+      $this->insertaRegistroRaw($identidad,$unidad,$medidor,$monto,$aacc,$participacion,$dias,1,'1');  
+    }else{
+        $factor=$dias/$maxDias;
+      $this->insertaRegistroRaw($identidad,$unidad,$medidor,$monto,$aacc,$participacion,$dias,$factor,'0'); 
+      $this->insertaRegistroRaw($identidad,$unidad,$medidor,$monto,$aacc,$participacion,$maxDias-$dias,1-$factor,'1'); 
+    }
+}
+
+private function insertaRegistroRaw($identidad,$unidad,$medidor,$monto,$aacc,$participacion,$dias,$factor,$nuevoProp){
+    if($factor==1){
+        $grupocobranza=(!$unidad->miApoderado()->cobranzaindividual)?$unidad->codpro:$unidad->numero;
+    }else{
+       if($nuevoProp=='0') { ///Si es registro con propietario antiguo es necesario obtener el apoderado antiguo  para mantener el grupo de cobranza original
+            $codproant=$unidad->lastTransferencia()->codproant;
+            $apoderadoant= SigiApoderados::find()->where(['edificio_id'=>$this->edificio_id,'codpro'=>$codproant])->one();
+           $grupocobranza=($apoderadoant->facturindividual)?$codproant:$unidad->numero;  
+       }else{ ///si es registro con propiestario nuevo , puede haber cambiado de apoderado pero no importa 
+          $grupocobranza=(!$unidad->miApoderado()->facturindividual)?$unidad->codpro:$unidad->numero;    
+       }
+    }
+   
+        $model=New SigiDetfacturacion();
          $attributes=[ 'cuentaspor_id'=>$this->id,
                 'edificio_id'=>$this->edificio_id,
          'facturacion_id'=>$this->facturacion_id,
                 'unidad_id'=>$unidad->id,
                 'colector_id'=>$this->colector->id,
                 'grupo_id'=>$this->colector->grupo_id,
-                'monto'=>$monto,
-                'igv'=>$monto*h::gsetting('general', 'igv'),
+                'monto'=>$monto*$factor,
+                'igv'=>$monto*$factor*h::gsetting('general', 'igv'),
                 //'cuentaspor_id'=>$this->id,
                 'mes'=>$this->mes,
                 'anio'=>$this->anio,
@@ -443,18 +468,20 @@ public function insertaRegistro($identidad,$unidad,$medidor,$monto,$aacc,$partic
          'grupounidad'=>$unidad->numero,
            'grupounidad_id'=>$unidad->id,
             'grupofacturacion'=>(!$unidad->miApoderado()->facturindividual)?$unidad->codpro:$unidad->numero,
-             'grupocobranza'=>(!$unidad->miApoderado()->cobranzaindividual)?$unidad->codpro:$unidad->numero,
+             'grupocobranza'=>$grupocobranza,
             'participacion'=>$participacion,
           'codsuministro'=>(is_null($medidor))?null:$medidor->codsuministro,
             'lectura'=>(is_null($medidor))?null:$medidor->LastReadFacturable($this->mes,$this->anio)->lectura,
              'delta'=>(is_null($medidor))?null:$medidor->LastReadFacturable($this->mes,$this->anio)->delta,
             'consumototal'=>(is_null($medidor))?null:$medidor->consumoTotal($this->mes,$this->anio,true),
              'unidades'=>(is_null($medidor))?null:$medidor->codum,
-             'codmon'=>$this->codmon,];
+             'codmon'=>$this->codmon,
+             'dias'=>$dias,
+             'nuevoprop'=>$nuevoProp,
+             ];
          $model->setAttributes($attributes);
         return $model->save();
- 
-    
+  
 }
 
 

@@ -151,9 +151,11 @@ echo CalendarScheduleWidget::widget([
                     if (confirm("'.yii::t('sta.labels','¿Confirmar que desea cambiar la duración de esta cita ?').'")) {
                                var fechainicio=event.start.format("YYYY-MM-DD HH:mm:ss");
                                var fechatermino=event.end.format("YYYY-MM-DD HH:mm:ss");
-                              // alert(event.id);
+                               // alert(event.start.format("YYYY-MM-DD HH:mm:ss"));
+                                // alert(event.end.format("YYYY-MM-DD HH:mm:ss"));
+                               //alert(event.id);
         $.ajax({ 
-                    method:"post",    
+                    method:"get",    
                     url: "'.\yii\helpers\Url::toRoute(['/sta/citas/reprograma-cita']).'",
                     delay: 250,
                         data: {idcita:event.id, finicio:fechainicio ,ftermino:fechatermino},
@@ -190,35 +192,8 @@ echo CalendarScheduleWidget::widget([
         
         /*evento Click*/
         'eventClick' => new JsExpression('function(event) {'
-                . 'if (confirm("'.yii::t('sta.labels','¿Confirmar que desea notificar ?').'")) {
-                 $.ajax({ 
-                    method:"get",    
-                    url: "'.\yii\helpers\Url::toRoute('/sta/programas/notifica-cita').'",
-                    delay: 250,
-                        data: {idalu:'.$idalu.',id:'.$model->id.',idcita:event.id, psicoid:'.$modelPsico->id.',codalu:event.title  },
-             error:  function(xhr, textStatus, error){               
-                            //revertFunc();
-                                }, 
-              success: function(json) {  
-                        var n = Noty("id");
-                       if ( !(typeof json["error"]==="undefined") ) {
-                      // revertFunc();
-                   $.noty.setText(n.options.id,"<span class=\'glyphicon glyphicon-remove-sign\'></span>      "+ json["error"]);
-                              $.noty.setType(n.options.id, "error"); 
-                              }
-                         if ( !(typeof json["success"]==="undefined") ) {
-                                        $.noty.setText(n.options.id,"<span class=\'glyphicon glyphicon-ok-sign\'></span>" + json["success"]);
-                             $.noty.setType(n.options.id, "success");
-                              } 
-                               if ( !(typeof json["warning"]==="undefined") ) {
-                                        $.noty.setText(n.options.id,"<span class=\'glyphicon glyphicon-info-sign\'></span>" +json["warning"]);
-                             $.noty.setType(n.options.id, "warning");
-                              } 
-                              
-                      
-                        },
-   cache: true
-  })
+                . 'if (confirm("'.yii::t('sta.labels','¿Confirmar que desea visualizar la cita ?').'")) {
+                
                 }'
                 . '}'),
     ]

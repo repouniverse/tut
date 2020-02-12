@@ -34,6 +34,8 @@ $this->params['breadcrumbs'][] = $this->title;
                      }else{
                           $url= \yii\helpers\Url::toRoute(['update','id'=>$model->id]);
                         $options = [
+                            'data-pjax'=>'0',
+                            'target'=>'_blank',
                             'title' => Yii::t('base.verbs', 'Editar'),                            
                         ];
                         return Html::a('<span class="btn btn-danger btn-sm glyphicon glyphicon-pencil"></span>', $url, $options/*$options*/);
@@ -56,20 +58,15 @@ $this->params['breadcrumbs'][] = $this->title;
                          
                     ]
                 ],
-         
+         [ 'attribute' => 'numero',
+             'format'=>'raw',
+             'value'=>function($model){
+                 return '<span style="font-size:14px; color:#ad5eb7; font-weight:700;">'.$model->numerocita.'</span>';           
+             }
+             ],
          [
                'attribute' => 'fechaprog',
-                 'format'=>'raw',
-                 'value' => function ($model, $key, $index, $column) {
-                     if(strtotime($model->swichtDate('fechaprog',false))==0){
-                         return '  <i style="color:#3ead05;font-size:12px"><span class="glyphicon glyphicon-calendar"></span></i>';
-                     }
-                            /*$formato=($model->isEntregado())?'  <i style="color:#3ead05;font-size:12px"><span class="glyphicon glyphicon-check"></span></i>':
-                                '  <i style="color:red;font-size:12px"><span class="glyphicon glyphicon-pushpin"></span></i>';
-                            return $model->numero.$formato;*/
-                        return substr($model->fechaprog,0,16);
-                        },
-   
+           
                     ],  
          
          

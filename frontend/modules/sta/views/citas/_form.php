@@ -12,7 +12,7 @@ use common\helpers\h;
 ?>
 
 <div class="citas-form">
-
+  <div class="box-body">
     <?php $form = ActiveForm::begin([
        'enableAjaxValidation'=>true,
     'fieldClass'=>'\common\components\MyActiveField'
@@ -20,75 +20,20 @@ use common\helpers\h;
       <div class="box-header">
         <div class="col-md-12">
             <div class="form-group no-margin">
-            <div class="row">     
+            <div class="btn-group">   
         <?= Html::submitButton('<span class="fa fa-save"></span>   '.Yii::t('sta.labels', 'Grabar'), ['class' => 'btn btn-success']) ?>
-          <?php if(!$model->asistio){
-              echo Html::button('<span class="fa fa-check"></span>   '.Yii::t('sta.labels', 'Confirmar asistencia'), ['id'=>'btn-conf-asistencia','class' => 'btn btn-warning']);
-          }else{?>
-              <div class="checkbox checkbox-info">
-                         <?=\yii\helpers\Html::checkbox('sfsf',true,['id'=>'mycv','class'=>'styled'])?>
-                        <label for="mycv">
-                            Asistió
-                        </label>
-           </div>
-          <?php } ?>
-            
-                <?php 
-                $id=$model->firstCitaByStudent();
-                $url=Url::to(['update','id'=>$id]);
-                echo ($id && $id <> $model->id)?Html::a('<span class="glyphicon glyphicon-step-backward"></span>',$url):'';
-                ?>
-                <?php 
-                $id=$model->previousCitaByStudent();
-                $url=Url::to(['update','id'=>$id]);
-                echo ($id)?Html::a('<span class="glyphicon glyphicon-arrow-left"></span>', $url):'';
-                ?> 
-                <?php 
-                $id=$model->nextCitaByStudent();
-                $url=Url::to(['update','id'=>$id]);
-                echo ($id)?Html::a('<span class="glyphicon glyphicon-arrow-right"></span>',$url):'';
-                ?>
-                 <?php 
-                $id=$model->lastCitaByStudent();
-                $url=Url::to(['update','id'=>$id]);
-                echo ($id && $id <> $model->id)?Html::a('<span class="glyphicon glyphicon-step-forward"></span>', $url):'';
-                ?>
-                
-             </div>
+                <br>
             </div>
         </div>
     </div>
-      <div class="box-body">
     
+        
           
-              
+
+        
+           
           
-  <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-     <?= $form->field($model->taller, 'numero')->textInput(['disabled'=>'disabled']) ?>
-
- </div>
- <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-     <?= $form->field($model->taller, 'descripcion')->textInput(['disabled'=>'disabled']) ?>
-
- </div>
-<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-               <?= $form->field($model->taller, 'codperiodo')->textInput(['disabled'=>'disabled']) ?>
-
-</div>         
-<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-               <?= $form->field($model->taller->facultad, 'desfac')->label(yii::t('sigi.labels','Facultad'))->textInput(['disabled'=>'disabled']) ?>
-
-</div>
-          
-     
-          <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
-               <?= $form->field($model->tallerdet, 'codalu')->textInput(['disabled'=>'disabled']) ?>
-
-        </div>
-          <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-               <?= $form->field($model->tallerdet->alumno, 'nombres')->textInput(['value'=>$model->tallerdet->alumno->fullName(),'disabled'=>'disabled']) ?>
-
-        </div>
+ 
           
           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
      <?php 
@@ -214,3 +159,4 @@ use common\helpers\h;
                         });
              })", View::POS_READY);
 ?>
+</diV>

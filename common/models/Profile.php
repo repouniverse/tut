@@ -73,11 +73,10 @@ class Profile extends \common\models\base\modelBase implements \common\interface
         return [
             [['user_id'], 'integer'],
             [['url'], 'safe'],
-<<<<<<< HEAD
-=======
+
             // ['codtra', 'unique', 'targetAttribute' => ['user_id','codtra']],
             [['user_id','codtra'], 'unique', 'targetAttribute' =>'codtra' ],
->>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
+
             [['photo', 'detalle'], 'string'],
             [['names'], 'string', 'max' => 60],
              [['names','duration','durationabsolute','url','codtra'], 'safe'],
@@ -260,14 +259,13 @@ class Profile extends \common\models\base\modelBase implements \common\interface
       $this->url=$url;
       $this->save();
   }   
-<<<<<<< HEAD
-=======
+
   
    public function getTrabajador()
     {
         return $this->hasOne(Trabajadores::className(), ['codigotra' => 'codtra']);
     }
->>>>>>> e4b47ce01ec1bf57231883a79bf995c89c46af44
+
   
   
              }

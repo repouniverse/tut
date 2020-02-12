@@ -26,7 +26,13 @@ use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
                         
                     ]
                 ],
-            'fechaprog',
+            [ 'attribute' => 'numero',
+             'format'=>'raw',
+             'value'=>function($model){
+                 return '<span style="font-size:14px; color:#ad5eb7; font-weight:700;">'.$model->numerocita.'</span>';           
+             }
+             ],
+            
             [  'attribute'=>'fechaprog',
                 'format'=>'raw',
                  'value' => function ($model, $key, $index, $column) {

@@ -44,7 +44,8 @@ class EdificiosController extends baseController
      */
     public function actionIndex()
     {
-        
+       //$model=Edificios::findOne(4)->generateUsers();
+      // die();
         /*$model= \frontend\modules\sigi\models\SigiFacturacion::findOne(50);
         $model->providerFaltaLecturas('101');
         var_dump($model->isCompleteReadsSuministros('101'));

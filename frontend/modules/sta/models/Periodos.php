@@ -34,7 +34,7 @@ class Periodos extends \common\models\base\modelBase
              ['codperiodo', 'unique'],
             [['codperiodo'], 'string', 'max' => 7],
             [['periodo'], 'string', 'max' => 40],
-            [['activa'], 'string', 'max' => 1],
+           // [['activa'], 'string', 'max' => 1],
         ];
     }
 

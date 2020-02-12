@@ -22,17 +22,7 @@ $this->title = Yii::t('base.names', 'Clipros');
    
    
     <?php
- echo ExportMenu::widget([
-    'dataProvider' => $dataProvider,    
-    'columns' => $gridColumns,
-    'dropdownOptions' => [
-        'label' => yii::t('sta.labels','Exportar'),
-        'class' => 'btn btn-success'
-    ]
-]).' 
-    </div>
- <hr>
-         '.GridView::widget([
+ echo GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         // 'summary' => '',
@@ -67,6 +57,7 @@ $this->title = Yii::t('base.names', 'Clipros');
             'codpro',
             'despro',
             'rucpro',
+            ['class' => 'common\components\columnGridAudit',]
            
             //'deslarga:ntext',
 

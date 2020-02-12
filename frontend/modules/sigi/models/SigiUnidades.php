@@ -141,6 +141,10 @@ class SigiUnidades extends \common\models\base\modelBase
         return $this->hasMany(SigiSuministros::className(), ['unidad_id' => 'id']);
     }
 
+     public function getTransferencias()
+    {
+        return $this->hasMany(SigiTransferencias::className(), ['unidad_id' => 'id']);
+    }
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -554,8 +558,26 @@ class SigiUnidades extends \common\models\base\modelBase
     
  }
  
- public function arrayPropietarios(){    
-    $arrayProp=$this->getSigiPropietarios()->select(['tipo','nombre','dni'])->where(['activo'=>'1'])->asArray()->all();
+ public function arrayPropietarios($nuevo=false){    
+    if($nuevo){
+      
+     $arrayProp=$this->getSigiPropietarios()->select(['tipo','nombre','dni'])->where(['activo'=>'1'])->asArray()->all();
+      
+    }ELSE{
+        
+      $arrayProp=[];
+    
+     $propAntiguo=$this->getSigiPropietarios()->select(['tipo','nombre','dni'])->where(['activo'=>'0','tipo'=>self::TYP_PROPIETARIO])->
+             orderBy('id desc')->limit(1)->asArray()->all();
+    
+     if(count($propAntiguo)==0)
+      $propAntiguo=$this->getSigiPropietarios()->select(['tipo','nombre','dni'])->where(['activo'=>'1'])->limit(1)->asArray()->all();   
+     $inquilinos=$this->getSigiPropietarios()->select(['tipo','nombre','dni'])->where(['activo'=>'1','tipo'=>self::TYP_INQUILINO])->asArray()->all();
+     $arrayProp= array_merge($propAntiguo,$inquilinos);
+      
+    }
+     
+    
      return $arrayProp;
  }
  
@@ -592,4 +614,8 @@ class SigiUnidades extends \common\models\base\modelBase
      return $propietarioAnterior;
  }
  
+ 
+public function lastTransferencia(){
+  return  $this->getTransferencias()->orderBy('id desc')->limit(1)->one();
+}
 }

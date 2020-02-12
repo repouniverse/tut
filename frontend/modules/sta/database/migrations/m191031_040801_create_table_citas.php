@@ -30,6 +30,7 @@ if(!$this->existsTable($table)) {
          'talleres_id'=>$this->integer(11)->notNull(),//Rompiendo la normalizacion 
         'fechaprog'=>$this->string(19)->append($this->collateColumn()),
         'codtra'=>$this->string(14)->notNull()->append($this->collateColumn()),
+         'numero'=>$this->char(8)->append($this->collateColumn()),
         'finicio'=>$this->string(19)->append($this->collateColumn()),
         'asistio'=>$this->char(1)->append($this->collateColumn()),
          'ftermino'=>$this->string(19)->append($this->collateColumn()),

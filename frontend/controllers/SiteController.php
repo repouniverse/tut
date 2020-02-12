@@ -249,6 +249,7 @@ class SiteController extends Controller
           $this->redirect(\yii\helpers\Url::toRoute('/sta/default/profile'));
       }*/
         $model =Yii::$app->user->getProfile() ;
+        
         $identidad=Yii::$app->user->identity;
         $identidad->setScenario($identidad::SCENARIO_MAIL);
        // var_dump($model);die();

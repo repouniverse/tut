@@ -5,6 +5,12 @@ use miloschuman\highcharts\Highcharts;
 
 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12"> 
     <?php
+  $inasistencias=$modelTallerdet->inasistencias();
+  $asistencias=$modelTallerdet->asistencias();
+  $total=$inasistencias+$asistencias;
+  $inasistencias=($total>0)?$inasistencias/$total:0;
+  $asistencias=($total>0)?$asistencias/$total:0;
+  
 echo Highcharts::widget([
    'options' => [
       
@@ -40,8 +46,8 @@ echo Highcharts::widget([
           
          ['name' => 'Citas', 
              'data' => [                 
-                 ['name'=>'Asistencias','y'=>90,'color'=>'#e822d0'],
-                 ['name'=>'Inasistencias','y'=>10,'color'=>'#00c0ef'],
+                 ['name'=>'Asistencias','y'=>$asistencias,'color'=>'#e822d0'],
+                 ['name'=>'Inasistencias','y'=>$inasistencias,'color'=>'#00c0ef'],
                  ]
              
          ],
@@ -55,31 +61,18 @@ echo Highcharts::widget([
 ?>
 </div>
        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12"> 
-                  <div class="checkbox checkbox-info">
-                         <?=\yii\helpers\Html::checkbox('sfsf',true,['id'=>'mycv','class'=>'styled'])?>
+         <?php 
+           foreach($examenes as $examen){ ?>
+              <div class="checkbox checkbox-info">  
+                       <?=\yii\helpers\Html::checkbox('sfsf'.$examen['codtest'] ,true,['id'=>'mycv'.$examen['codtest'],'class'=>'styled'])?>
                         <label for="mycv">
-                            Examen psicotecnico
+                          <?= ucwords(strtolower(substr($examen['descripcion'],0,25))) ?>
                         </label>
-                    </div>
-           <div class="checkbox checkbox-info">
-                         <?=\yii\helpers\Html::checkbox('sfsf',true,['id'=>'mycv','class'=>'styled'])?>
-                        <label for="mycv">
-                            Examen psicotecnico
-                        </label>
-                    </div>
-           <div class="checkbox checkbox-info">
-                         <?=\yii\helpers\Html::checkbox('sfsf',true,['checked' => false,'id'=>'mycv','class'=>'styled'])?>
-                        <label for="mycv">
-                            Examen Habilidades Soci
-                        </label>
-                    </div>
-           <div class="checkbox checkbox-info">
-                         <?=\yii\helpers\Html::checkbox('sfsf',true,['id'=>'mycv','class'=>'styled'])?>
-                        <label for="mycv">
-                            Examen Big Five
-                        </label>
-                    </div>
-          
+              </div> 
+           <?php } ?>
+         
+         
+                  
       
     
      <div class="info-box bg-yellow">
@@ -115,46 +108,23 @@ echo Highcharts::widget([
                   </tr>
                   </thead>
                   <tbody>
-                  <tr>
-                    <td><a href="pages/examples/invoice.html">OR9842</a></td>
-                   
-                    <td><span class="label label-success">Efectuada</span></td>
+                      
+                   <?php 
+           foreach($citasArray as $cita){ 
+               $marcador=$cita->marcadorStatus();
+               $color=array_keys($marcador)[0];
+               $estado=array_values($marcador)[0];
+               ?>
+              <tr>  
+                  <td><?= \yii\helpers\Html::a($cita->numero,\yii\helpers\Url::toRoute(['/sta/citas/view','id'=>$cita->id]))?></td>
+                    <td><span class="label label-<?=$color?>"><?=$estado?></span></td>
                     <td>
-                      <div class="sparkbar" data-color="#00a65a" data-height="20">15/03/2020</div>
+                      <div class="sparkbar" data-color="#00a65a" data-height="20"><?=substr($cita->fechaprog,0,10)?></div>
                     </td>
-                  </tr>
-                  <tr>
-                    <td><a href="pages/examples/invoice.html">OR1848</a></td>
-                    
-                    <td><span class="label label-warning">Pendiente</span></td>
-                    <td>
-                      <div class="sparkbar" data-color="#f39c12" data-height="20">25/02/2020</div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><a href="pages/examples/invoice.html">OR7429</a></td>
-                   
-                    <td><span class="label label-danger">Ausente</span></td>
-                    <td>
-                      <div class="sparkbar" data-color="#f56954" data-height="20">18/03/2020</div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><a href="pages/examples/invoice.html">OR7429</a></td>
-                    
-                    <td><span class="label label-info">Evaluacion</span></td>
-                    <td>
-                      <div class="sparkbar" data-color="#00c0ef" data-height="20">14/02/2020</div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><a href="pages/examples/invoice.html">OR1848</a></td>
-                   
-                    <td><span class="label label-warning">Pendiente</span></td>
-                    <td>
-                      <div class="sparkbar" data-color="#f39c12" data-height="20">15/03/2020</div>
-                    </td>
-                  </tr>
+              </tr> 
+           <?php } ?>   
+                      
+               
                   
                   </tbody>
                 </table>

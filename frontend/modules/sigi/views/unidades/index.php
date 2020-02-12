@@ -45,7 +45,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 
           ],
           [
-                'attribute'=>'edificio',
+                'attribute'=>'edificio_id',
                 'filter'=>frontend\modules\sigi\helpers\comboHelper::getCboEdificios(),
                 'value' => function($model) { 
                         //var_dump($model);die();
@@ -53,7 +53,9 @@ $this->params['breadcrumbs'][] = $this->title;
                          },
                  'group'=>true,   
             ],
-           ['attribute'=>'tipo',
+           ['attribute'=>'codtipo',
+               'filter'=>frontend\modules\sigi\helpers\comboHelper::getCboTipoUnidades(),
+                
                                  'value'=>'tipo.desunidad',
                                  //'filter'=>comboHelper::getCboEdificios(),
              'group'=>true,
@@ -102,7 +104,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             
             'nombre',
-              
+             'codpro' 
              
             ]
             //'participacion',

@@ -48,8 +48,25 @@ class FileController extends Controller
     }
 
     public function actionDownload($id)
-    {
+    { 
         $file = File::findOne(['id' => $id]);
+        /*Codigo añadido por Jramirez  para filtrar los accesos 
+       * a las descargas de documentos sensibles 
+       */
+       //Primero si encuentra el modelo asociado(En teoria deberia enconrtalo)
+       //Luego verifica que este modelo tenga la funcion candownload(), esto implica que tiene el behavior AccessDownloadBehavior anexado
+        $model=$file->modelAsociado();        
+        if(!is_null($model) ){
+             if($model->hasMethod('canDownload')){
+                 if(!$model->canDownload()){
+                     return "no puedes descargar este documento"; 
+                 }
+             }
+        }
+        
+        
+        
+        
         $filePath = $this->getModule()->getFilesDirPath($file->hash) . DIRECTORY_SEPARATOR . $file->hash . '.' . $file->type;
         return Yii::$app->response->sendFile($filePath, "$file->name.$file->type");
         return Yii::$app->response->xSendFile($filePath, "$file->name.$file->type");
@@ -57,6 +74,22 @@ class FileController extends Controller
 
     public function actionDelete($id)
     {
+        $file = File::findOne(['id' => $id]);
+        /*Codigo añadido por Jramirez  para filtrar los accesos 
+       * a las descargas de documentos sensibles 
+       */
+       //Primero si encuentra el modelo asociado(En teoria deberia enconrtalo)
+       //Luego verifica que este modelo tenga la funcion candownload(), esto implica que tiene el behavior AccessDownloadBehavior anexado
+        $model=$file->modelAsociado();        
+        if(!is_null($model) ){
+             if($model->hasMethod('canDelete')){
+                 if(!$model->canDownload()){
+                     return "no puedes borrar este documento"; 
+                 }
+             }
+        }
+        
+        
         if ($this->getModule()->detachFile($id)) {
             return true;
         } else {

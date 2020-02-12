@@ -22,7 +22,13 @@
             'active' => false,
              'options' => ['id' => 'myy6nID4'],
         ],
-        
+        [
+            'label' =>'<i class="glyphicon glyphicon-education"></i> '. yii::t('base.names','Indicadores'), //$this->context->countDetail() obtiene el contador del detalle
+            'content'=> $this->render('_indicadores',['model'=>$model]),
+//'content' => $this->render('detalle',['form'=>$form,'orden'=>$this->context->countDetail(),'modelDetail'=>$modelDetail]),
+            'active' => false,
+             'options' => ['id' => 'myy6nIt6D4'],
+        ],
     ],
 ]); 
     ?> 

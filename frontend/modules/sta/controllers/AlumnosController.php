@@ -39,7 +39,30 @@ class AlumnosController extends baseController
      */
     public function actionIndex()
     {
-          
+      
+       /* \frontend\modules\sta\models\Examenes::findOne(161)->makeResultados();
+        \frontend\modules\sta\models\Examenes::findOne(162)->makeResultados();
+        \frontend\modules\sta\models\Examenes::findOne(163)->makeResultados();
+        \frontend\modules\sta\models\Examenes::findOne(164)->makeResultados();
+        \frontend\modules\sta\models\Examenes::findOne(165)->makeResultados();
+        \frontend\modules\sta\models\Examenes::findOne(166)->makeResultados();
+       \frontend\modules\sta\models\Examenes::findOne(167)->makeResultados();
+        die();
+        */
+        /*print_r(\frontend\modules\sta\models\Test::findOne('T0021')->arrayRawCalificaciones()) ;
+        die();*/
+       // $model= \frontend\modules\sta\models\StaDocuAlu::findOne(79);
+       // $model->hasBehavior
+       // var_dump($model->hasMethod('canDownload'),$model->getBehavior('AccessDownloadBehavior'));
+       /* $valores=[0,1,2,3,4,5,6];
+        $valoresInv=[6,5,4,3,2,1,0];
+        var_dump(array_search(2, $valores));
+       
+        var_dump(array_search(2, $valoresInv));
+        die();
+        
+        
+        die();*/
          
         //var_dump(\frontend\modules\sta\models\Facultades::find()->select('codfac')->asArray()->all());die();
         $searchModel = new AlumnosSearch();
@@ -173,6 +196,11 @@ class AlumnosController extends baseController
                 return $this->render('_nohayprograma',['model'=>$model,'codperiodo'=>$codperiodo]);
        
             }ELSE{
+                /*
+                 * Sacando los examenes que se han tomado 
+                 */
+                $examenes=$modelTallerdet->examenesTomados();
+                $citasArray=$modelTallerdet->getCitas()->orderby('fechaprog asc')/*->asArray()*/->all();
                
                $dataProviders=$this->generateProviders($model->codalu,$model->periodsInRisk());
                 
@@ -180,6 +208,8 @@ class AlumnosController extends baseController
                ['model'=>$model,
                 'dataProviders'=>$dataProviders,
                 'modelTallerdet'=>$modelTallerdet,
+                 'citasArray'=> $citasArray,
+                 'examenes'=>$examenes,  
                 'codperiodo'=>$codperiodo]);    
             }
        }

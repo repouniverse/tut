@@ -10,6 +10,7 @@ use frontend\modules\sigi\filters\FilterAccess;
 class Module extends \yii\base\Module
 {
   const CODIGOPERSONA_NATURAL='100000';
+  const PROFILE_RESIDENTE='40';
     /**
      * {@inheritdoc}
      */

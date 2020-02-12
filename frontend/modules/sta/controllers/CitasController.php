@@ -312,16 +312,21 @@ public function  actionNotificaExamenDigital(){
  public function  actionNotificaBancoDigital($id){
 
     if(h::request()->isAjax){
+      
        //echo  h::request()->get('id')
         $mensajes=[];
          h::response()->format = \yii\web\Response::FORMAT_JSON;
         $alumno= \frontend\modules\sta\models\Alumnos::findOne(h::request()->get('idalu'));
            $cita= $this->findModel($id);
+      
         if(is_null($alumno))
             return ['error'=>yii::t('sta.errors','Error : NO se encontró el registro alumno')];
          if(is_null($cita))
             return ['error'=>yii::t('sta.errors','Error : NO se encontró el registro cita')];
-       if(!$cita->asistio)
+       if($cita->isBateriaCompleta())
+           return ['error'=>yii::t('sta.errors','Error: No puede notificar porque no hay preguntas activas ó las preguntas ya están contestadas')];
+      
+         if(!$cita->asistio)
             return ['error'=>yii::t('sta.errors','NO puede completar esta operación mientras la cita no tenga asistencia')];
        if(!$cita->hasCompletePreguntas())
             return ['error'=>yii::t('sta.errors','El banco de preguntas aun no esta completo, refresque preguntas')];
@@ -651,7 +656,7 @@ function actionBancoPreguntas($id){
      $this->layout="install";
      yii::error($cookiesRead->has($nombrecookie));
      yii::error(Yii::$app->session->has('repuestasExamen'));
-      if(/*$cookiesRead->has($nombrecookie) &&*/Yii::$app->session->has('repuestasExamen')){
+      if(Yii::$app->session->has('repuestasExamen')){
           $arrayRespuestas=Yii::$app->session['repuestasExamen']; 
           
              foreach($arrayRespuestas as $clave=>$valor){
@@ -720,6 +725,7 @@ function actionBancoPreguntas($id){
      }else{
          $verifiFtem=timeHelper::IsFormatMysqlDateTime($fechaTermino);
      }
+     //VAR_DUMP(timeHelper::IsFormatMysqlDateTime($fechaInicio) ,$verifiFtem);DIE();
      if (timeHelper::IsFormatMysqlDateTime($fechaInicio) && 
          $verifiFtem) {
     if($model->reprograma($fechaInicio, $fechaTermino)){
@@ -751,4 +757,28 @@ function actionBancoPreguntas($id){
      }
      
  }
+ 
+ 
+  public function  actionResultados($id){
+
+    if(h::request()->isAjax){
+         h::response()->format = \yii\web\Response::FORMAT_JSON;
+         $cita= $this->findModel($id);
+      if(is_null($cita))
+            return ['error'=>yii::t('sta.errors','Error : NO se encontró el registro cita')];
+       if(!$cita->asistio)
+            return ['error'=>yii::t('sta.errors','NO puede completar esta operación mientras la cita no tenga asistencia')];
+      if(!$cita->hasCompletePreguntas())
+            return ['error'=>yii::t('sta.errors','El banco de preguntas aun no esta completo, refresque preguntas')];
+      if(!$cita->isBateriaCompleta())
+           return ['error'=>yii::t('sta.errors','Error: Hya preguntas sin contestar')];
+      $cita->makeResultados();
+       return ['success'=>yii::t('sta.errors','Se han procesado las pruebas, con éxito')];
+     
+    }
+
+}
+ 
+ 
+ 
 }

@@ -22,6 +22,13 @@ class staModule extends \yii\base\Module
     const USER_OTROS='20';
     const RESPONSE_SUCCESS_CODE=200;
     const REPORTE_TEST=9;
+    
+    const PROFILE_INVITADO='10';
+     const PROFILE_TUTOR_ACADEMICO='20';
+       const PROFILE_PSICOLOGO='30';
+     const PROFILE_ASISTENTE='40';
+       const PROFILE_AUTORIDAD='50';
+      const PROFILE_ADMIN='60';
     /**
      * {@inheritdoc}
      */
@@ -154,7 +161,7 @@ class staModule extends \yii\base\Module
   }
 
  public static function docCodes(){
-     return ['104','105','106'];
+     return ['104','105','106','107'];
  } 
   
 }

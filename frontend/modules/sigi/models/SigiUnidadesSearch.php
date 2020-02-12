@@ -18,7 +18,7 @@ class SigiUnidadesSearch extends SigiUnidades
     {
         return [
             [['id', 'npiso', 'edificio_id', 'parent_id'], 'integer'],
-            [['codtipo', 'numero', 'nombre', 'detalles', 'estreno'], 'safe'],
+            [['codtipo','edificio_id', 'numero', 'nombre', 'detalles', 'estreno','codpro'], 'safe'],
             [['area', 'participacion'], 'number'],
         ];
     }

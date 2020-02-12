@@ -45,7 +45,7 @@ use frontend\modules\report\components\NumeroAletras;
 class VwSigiFacturecibo extends \common\models\base\modelBase
 {
     public $extraMethodsToReport=['reportMontoLetras','reportGrafico','reportAreas','reportLecturaAnt','reportPropietarios'];
-    
+    public $booleanFields=['nuevoprop'];
     
     /**
      * {@inheritdoc}
@@ -139,7 +139,7 @@ class VwSigiFacturecibo extends \common\models\base\modelBase
       $controller=Yii::$app->controller;
         $nameView= \common\helpers\FileHelper::getShortName($this::className());
         $pathView='/'.$controller->id.'/reports/'.$nameView.'/propietarios';
-       return  $controller->getView()->render($pathView,['propietarios'=>$this->unidad->arrayPropietarios()]);
+       return  $controller->getView()->render($pathView,['propietarios'=>$this->unidad->arrayPropietarios($this->nuevoprop)]);
     }
    public function getReportGrafico(){ 
        

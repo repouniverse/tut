@@ -9,16 +9,9 @@ use Carbon\Carbon;
 use common\helpers\RangeDates;
 trait timeTrait
 {
-    private $_holyDays=[
-        '2019-01-01',
-        '2019-10-08',
-        '2019-05-01',
-        '2019-06-29',
-        '2019-07-28',
-        '2019-07-29',
-        '2019-08-30',
-        '2019-11-01',
-        '2019-12-25',
+    private $_holyDays=[       
+        '2020-11-01',
+        '2020-12-25',
         '2020-01-01',
         '2020-10-08',
         '2020-05-01',
@@ -26,18 +19,8 @@ trait timeTrait
         '2020-07-28',
         '2020-07-29',
         '2020-08-30',
-        '2020-03-24',
-        '2020-11-01',
-        '2020-12-25',
-        '2021-01-01',
-        '2021-10-08',
-        '2021-05-01',
-        '2021-06-29',
-        '2021-07-28',
-        '2021-07-29',
-        '2021-08-30',
         '2021-11-01',
-        '2021-12-25',
+        '2020-12-25',
              ];
 
     private function holyDays(){
@@ -45,7 +28,10 @@ trait timeTrait
     }
     
     public function isHolyDay(Carbon $fecha){
-        return (in_array($fecha->format('Y-m-d'),$this->holyDays()))?true:false;
+        
+        return ($fecha->isSunday() /*or $fecha->isSaturday()*/ or
+                in_array($fecha->format('Y-m-d'),$this->holyDays())
+                )?true:false;
     }
     
     /*

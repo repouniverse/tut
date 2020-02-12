@@ -94,4 +94,26 @@ class ActiverecordlogSearch extends Activerecordlog
 
         return $dataProvider;
     }
+    
+     public function searchByModel($model)
+    {
+        $query = Activerecordlog::find();
+
+        // add conditions that should always apply here
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+
+        
+
+        // grid filtering conditions
+        
+        $query->andFilterWhere(['model'=>$model,
+            'model'=>$model::className(),
+            'clave'=>$model->getPrimaryKey(),
+            ]);
+
+        return $dataProvider;
+    }
 }

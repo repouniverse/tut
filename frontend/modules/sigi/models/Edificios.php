@@ -402,11 +402,7 @@ class Edificios extends \common\models\base\modelBase
              
    }
    
-   public function generateUsers(){
-       /*foreach($this->pr){
-           
-       }*/
-   }
+  
    
   public function suministrosByTypeQuery($tipo){
       return SigiSuministros::find()->where([
@@ -440,4 +436,27 @@ class Edificios extends \common\models\base\modelBase
  public function cuentaActiva(){
      return $this->getCuentas()->where(['activa'=>'1'])->one();
  } 
+ 
+ public function generateUsers(){
+     $unidades=$this->unidadesImputablesPadres();
+    //echo count($unidades);die();
+     
+    foreach($unidades as $unidad){ 
+        $usuario= new \frontend\modules\sigi\models\users\SignupForm();
+       $correo=$unidad->currentPropietario()->correo;
+       if(empty($correo)){
+         $correo= \common\helpers\MailHelper::fakeMail();  
+       }
+       $usuario->email=$correo;
+       $usuario->username=$unidad->numero.'_'.$this->id;
+       $usuario->password=$unidad->numero;
+        yii::error($usuario->signup());
+       unset($usuario);
+    }
+    
+ }
+ 
+ 
+ 
+ 
 }

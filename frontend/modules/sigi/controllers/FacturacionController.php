@@ -42,9 +42,11 @@ class FacturacionController extends baseController
      */
     public function actionIndex()
     {
-        $model=$this->findModel(66);
-        $model->resolveRecibosPartidos();
-        die();
+        //$model= \frontend\modules\sigi\models\SigiUnidades::findOne(1950);
+       // print_r($model->arrayPropietarios(false));die();
+        //echo date('t',$model->swichtDate('fecha',false));
+        //$model->resolveRecibosPartidos();
+        //die();
         
        
           /*\Yii::$app->session->open();

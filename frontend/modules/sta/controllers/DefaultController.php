@@ -169,5 +169,40 @@ class DefaultController extends Controller
           'codperiodo'=>  \frontend\modules\sta\staModule::getCurrentPeriod(),
                   
      ]);
-  }  
+  }
+  
+  public function actionAcurricular(){
+     
+       $wsdl = "https://serviciosfim.uni.edu.pe/nuevo_webservices/webservice-server.php";
+        $id = "20114052D";
+            $client = new \SoapClient($wsdl);
+            $client->setCredentials("NUEVO_USER","A%2020_NUEVO_USER");
+            $err = $client->getError();
+            if ($err) {
+                echo '<h2>error</h2>'.$err;
+                exit();
+            }
+            try {
+                //utilize la variable $action  para solicitar el pdf "avance curricular" o "ficha academica"
+                $action = "avance_curricular";
+                // $action = "ficha_academica";
+               
+                $pdf = $action."_".$id.".pdf";
+                   $result = $client->call($action,array('id'=>$id));
+                    $err = $client->getError();
+                    $byteArr = json_decode($result);
+                    $fp = fopen($pdf, 'wb');
+                    while (!empty($byteArr)) {
+                        $byte = array_shift($byteArr);
+                        fwrite($fp, pack('c',$byte));
+                    }
+                    fclose($fp);
+                    header('Content-type: application/pdf');
+                    readfile($pdf);
+            }catch (Exception $e) {
+                echo 'Error: ',  $e->getMessage(), "\n";
+            }
+           
+  }
+  
 }

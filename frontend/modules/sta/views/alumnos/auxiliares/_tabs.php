@@ -31,7 +31,7 @@
         ],
       [
             'label' =>'<i class="glyphicon glyphicon-calendar"></i> '. yii::t('base.names','Programa '.$codperiodo), //$this->context->countDetail() obtiene el contador del detalle
-            'content'=> $this->render('_programa',[]),
+            'content'=> $this->render('_programa',['modelTallerdet'=>$modelTallerdet,'examenes'=>$examenes,'citasArray'=> $citasArray,]),
 //'content' => $this->render('detalle',['form'=>$form,'orden'=>$this->context->countDetail(),'modelDetail'=>$modelDetail]),
             'active' => false,
              'options' => ['id' => 'myoyvf577dID4'],

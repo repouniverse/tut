@@ -23,11 +23,11 @@ if(!$this->existsTable($table)) {
          'grupo'=>$this->char(2)->notNull()->append($this->collateColumn()), 
         'pregunta'=>$this->string(300)->notNull(), 
          'detalles'=>$this->text()->append($this->collateColumn()),
+        'inversa'=>$this->char(1)->append($this->collateColumn()),
         //'tiporespuesta'=>char(2)->notNull()->append($this->collateColumn()),
         ],$this->collateTable());
    $this->addForeignKey($this->generateNameFk($table), $table,
-              'codtest', static::NAME_TABLE_TESTS,'codtest');
- 
+              'codtest', static::NAME_TABLE_TESTS,'codtest'); 
     
             } 
  }

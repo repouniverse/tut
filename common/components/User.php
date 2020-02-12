@@ -155,6 +155,7 @@ class User extends UserOriginal {
            yii::error('de la intenot a');
            yii::error($url);
                return $url;
+               
           }
        }
    }

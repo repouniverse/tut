@@ -41,6 +41,9 @@ if(!$this->existsTable($table)) {
         'montototal'=>$this->decimal(15,5)->comment('MOnto total del recibo o del prepuesto emnsual, cuentas por '),
          'numerorecibo'=>$this->string(12)->comment('Numero recibo '),
         'unidades'=>$this->string(6)->comment('Unidades de medida '),
+         'dias'=>$this->integer(2)->comment('numero de dias de facturacion puede ser 30 mes completo o una  numero d edias segun la transferencia  '),
+        'nuevoprop'=>$this->char(1)->comment('flag para indicar si es prpietario antiguo o nuevo cuando hay transferencia '),
+       
         ],$this->collateTable());
   
    /* $this->addForeignKey($this->generateNameFk($table), $table,

@@ -56,7 +56,16 @@ use frontend\modules\sta\helpers\comboHelper;
 [  'attribute' => 'item',
 ],
 [  'attribute' => 'grupo', 
-], 
+],
+[
+    'attribute' => 'inversa',
+    'format' => 'raw',
+    'value' => function ($model) {
+        return \yii\helpers\Html::checkbox('inversa[]', $model->inversa, [ 'disabled' => true]);
+
+             },
+
+          ],
 [ 
     'attribute' => 'pregunta', 
     'value'=>function($model){

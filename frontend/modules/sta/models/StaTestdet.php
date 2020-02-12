@@ -21,6 +21,7 @@ class StaTestdet extends \common\models\base\modelBase
     /**
      * {@inheritdoc}
      */
+    public $booleanFields=['inversa'];
     
     public static function tableName()
     {
@@ -35,6 +36,7 @@ class StaTestdet extends \common\models\base\modelBase
         return [
             [['codtest', 'item', 'grupo', 'pregunta'], 'required'],
             [['detalles'], 'string'],
+             [['inversa'], 'safe'],
             [['codtest'], 'string', 'max' => 8],
             [['item'], 'string', 'max' => 3],
             [['grupo'], 'string', 'max' => 2],
@@ -61,7 +63,7 @@ class StaTestdet extends \common\models\base\modelBase
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCodtest0()
+    public function getTest()
     {
         return $this->hasOne(Test::className(), ['codtest' => 'codtest']);
     }
@@ -74,6 +76,33 @@ class StaTestdet extends \common\models\base\modelBase
     {
         return new StaTestdetQuery(get_called_class());
     }
+    /*
+     * Calcula el puntaje de la pregunta 
+     * recibe como parametros  la respueta y el 
+     * array unidimensional de calificaciones [0,1,2,3,4,5,6,7]
+     * del examen
+     */
+    public function puntaje($respuesta,$arrayCalificaciones){
+        if($this->inversa){
+           // echo "fue inversa<br>";
+            $array2=$arrayCalificaciones;
+            rsort($array2);
+            $arrayTotal= array_combine($arrayCalificaciones, $array2);
+          return  $arrayTotal[$respuesta];
+          
+        }else{
+            return $respuesta;
+        }
+        /*echo "respuesta ".$respuesta."<br>";
+            echo "ID ".$this->id."<br>";
+            echo "INDICE ".array_search($respuesta,$arrayCalificaciones)."<br>";
+            echo "RESULTADO ".$arrayCalificaciones[array_search($respuesta,$arrayCalificaciones)]."<br>";
+         */   
+       
+        
+    }
     
-    
+    public function indicadorId(){
+       return $this->test->indicadorId($this->grupo);
+    }
 }

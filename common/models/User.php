@@ -200,9 +200,12 @@ const USUARIO_PERMANENTE='guest';
         $this->password_reset_token = null;
     }
     
-     public function getProfile($id=null){
+     public function getProfile($id=null,$tipo=null){
       // var_dump($this->id);
        Profile::firstOrCreateStatic(['user_id'=>(!is_null($id))?$id:$this->id]);
+       if(!is_null($tipo)){
+          Profile::updateAll(['tipo'=>$tipo],['user_id'=>$this->id]); 
+       }
        return Profile::find()->where(['user_id'=>(!is_null($id))?$id:$this->id])->one();
        
    }

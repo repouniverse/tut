@@ -5,7 +5,7 @@ use common\behaviors\FileBehavior;
 use Yii;
 use frontend\modules\sta\traits\testTrait;
 use frontend\modules\report\models\Reporte;
-
+use frontend\modules\sta\models\StaTestindicadores;
 
 /**
  * This is the model class for table "{{%sta_test}}".
@@ -85,6 +85,11 @@ public $booleanFields=['opcional'];
     {
         return $this->hasMany(Examenes::className(), ['codtest' => 'codtest']);
     }
+    
+    public function getIndicadores()
+    {
+        return $this->hasMany(StaTestindicadores::className(), ['codtest' => 'codtest']);
+    }
 
     /**
      * @return \yii\db\ActiveQuery
@@ -128,4 +133,18 @@ public $booleanFields=['opcional'];
         $this->codocu=self::DOCUMENTO_TEST;
         return parent::beforeSave($insert);
     }
+    
+    public function arrayRawCalificaciones(){
+       return $this->getCalificiones()->select(['valor'])->column();
+    }
+    
+    public function indicadorId($grupo){
+        $valor= $this->getIndicadores()->select(['id'])->where(['grupo'=>$grupo])->limit(1)->scalar();
+       if(is_null($valor)){
+          throw new \yii\base\Exception(yii::t('base.errors',' No existe indicador para el grupo de pregunta  \'{grupo}\' Revise datos maestros de la tabla test, tesdet y testindicadores  ',['grupo'=>$grupo]));      
+             
+       }
+        return $valor;
+    }
+    
 }

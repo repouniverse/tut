@@ -69,9 +69,13 @@ $this->params['breadcrumbs'][] = $this->title;
          
 
             'numero',
-            'codfac',
+            ['attribute' => 'codfac',
+              'filter'=> \frontend\modules\sta\helpers\comboHelper::getCboFacultades(),  
+                ],
             [ 'attribute' => 'descripcion', 'headerOptions' => ['style' => 'width:30%'], ],
-            'codperiodo',
+           ['attribute' => 'codperiodo',
+              'filter'=> \frontend\modules\sta\helpers\comboHelper::getCboPeriodos(),  
+                ],
             'fopen',
             //'fclose',
             //'codcur',

@@ -49,7 +49,28 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
          'finicio'=>self::_FDATETIME,
         'ftermino'=>self::_FDATETIME
     ];
+    
+    
+    
    public $booleanFields=['asistio','activo'];
+   
+   public function behaviors()
+         {
+                return [
+		
+		/*'fileBehavior' => [
+			'class' => '\frontend\modules\attachments\behaviors\FileBehaviorAdvanced' 
+                               ],*/
+                    'auditoriaBehavior' => [
+			'class' => '\common\behaviors\AuditBehavior' ,
+                               ],
+		
+                    ];
+        }
+    
+   
+   
+   
     public function scenarios()
     {
         $scenarios = parent::scenarios(); 
@@ -118,10 +139,10 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
     public function rules()
     {
         return [
-            [['talleresdet_id', 'talleres_id', 'codtra'], 'required'],
+            [['talleresdet_id', 'talleres_id', 'codtra','fechaprog', 'finicio', 'ftermino'], 'required'],
             [['talleresdet_id', 'talleres_id', 'duracion'], 'integer'],
             [['detalles'], 'string'],
-             [['detalles_secre','detalles_tareas_pend','detalles_indicadores','duracion','codfac','asistio','activo'], 'safe'],
+             [['detalles_secre','detalles_tareas_pend','detalles_indicadores','duracion','codfac','asistio','activo','numero'], 'safe'],
             
             [['fechaprog', 'finicio', 'ftermino'], 'string', 'max' => 19],
             ['fechaprog', 'validateDispo'],
@@ -211,6 +232,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
           $this->resolveDuration();
           $this->asistio=false;
           $this->activo=true;
+         $this->numero=$this->correlativo('numero', 8);
          
        }
            
@@ -219,7 +241,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
        
     } 
    
-    
+  
     private function validateFieldTalleres(){
          if(empty($this->talleres_id))
             throw new \yii\base\Exception(Yii::t('base.errors', 'El campo \'talleres_id\' está vacío'));
@@ -381,9 +403,14 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
    * ademas valida si es sferiado feriado 
    */
     public function esFeriado(){
+        ///ECHO "AQUI";DIE();
+        
         if($this->isHolyDay($this->toCarbon('fechaprog'))){
+           // ECHO "Sie s feriado ";DIE();
           $this->addError('fechaprog',yii::t('sta.errors','El día programado es no laborable'));
           return true;
+        }else{
+         // ECHO "NO es hliday ";DIE(); 
         }
        return false;
         
@@ -459,13 +486,14 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
     
      public function citasPendientes()
     {
-        return Citas::find()->where(
-                [ 'talleres_id'=>$this->talleres_id,
+        return Citas::find()->where( 
+                [ /* 'talleres_id'=>$this->talleres_id,*/
                     'codtra'=>$this->codtra,
-                    'asistio'=>'0',
-                   // 'finicio'=> timeHelper::getDateTimeInitial(),
+                    //'asistio'=> '0',
                     
-                    ])->all(); 
+                    ])->andWhere(['>','fechaprog', $this->CarbonNow()->endOfDay()->subWeek()->subWeek()->format(
+               h::gsetting('timeBD','datetime')
+               )])->all();
     }
     
     public function eventosPendientes()
@@ -628,6 +656,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
            }
          return $completo;  
         }
+       //return $this->isBateriaCompleta();
     }
     
     
@@ -654,7 +683,12 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
   }  
   
   public function isInPast(){
-     return $this->toCarbon('fechaprog')->lessThanOrEqualTo(self::CarbonNow()->subHours(4));
+     return $this->toCarbon('fechaprog')->lessThanOrEqualTo(self::CarbonNow());
+  }
+  
+  public function isVencida(){
+     $horas=h::gsetting('sta', 'nhorasreprogramacion');
+     return $this->toCarbon('fechaprog')->lessThanOrEqualTo(self::CarbonNow()->subHours($horas));
   }
   /*
    * Reporgarma la cita 
@@ -662,9 +696,8 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
    * fechainicio : cadena en formato Y-m-d
    */
   public function reprograma($fechaInicio,$fechaTermino=null){
-    if(!$this->asistio && !$this->isInPast()){
+    if(!$this->asistio && !$this->isVencida()){
         $CfechaInicio= \Carbon\Carbon::createFromFormat(\common\helpers\timeHelper::formatMysql(),$fechaInicio);
-        
         if(!is_null($fechaTermino)){
           $CfechaTermino= \Carbon\Carbon::createFromFormat(\common\helpers\timeHelper::formatMysql(),$fechaTermino);        
           $this->duracion=$CfechaTermino->diffInMinutes($CfechaInicio); 
@@ -676,10 +709,18 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
                     $oldScenario=$this->getScenario();
                         $this->setScenario(self::SCENARIO_REPROGRAMA);
                             $grabo=$this->save();
+                      if(!$grabo){
+                          $this->addError('fechaprog',yii::t('sta.errors',$this->getFirstError()));                          
+                          return false;
+                      }                       
                             $this->setScenario($oldScenario);
                 return $grabo;
     }else{
+      if($this->isVencida())
        $this->addError('fechaprog',yii::t('sta.errors','La cita se encuentra en el pasado, es mejor que cree una nueva')); 
+     if($this->asistio)
+       $this->addError('fechaprog',yii::t('sta.errors','Esta cita ya tiene asistencia')); 
+     
       return false;
        
     }
@@ -689,8 +730,24 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
   
   public function validateDispo($attribute, $params)
     {
-      $this->esFeriado();
-
+       IF($this->esFeriado()){
+        $this->addError('fechaprog',yii::t('sta.errors','La fecha se encuentra en un día no laborable'));
+          }
+       if(!$this->isNewRecord){
+           if($this->toCarbon('finicio')->greaterThan($this->toCarbon('ftermino'))){
+           $this->addError('finicio',yii::t('sta.errors','La fecha de inicio es mayor que la fecha de termino '));
+          
+       if($this->isVencida())
+       $this->addError('fechaprog',yii::t('sta.errors','La cita se encuentra en el pasado, es mejor que cree una nueva')); 
+     if($this->asistio)
+       $this->addError('fechaprog',yii::t('sta.errors','Esta cita ya tiene asistencia')); 
+     
+           
+           } 
+          
+          
+       }
+      
      
       //$this->isInJourney();
       //if($this->isInPast())
@@ -721,5 +778,52 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
             'codtest'=>$codtest,];
         Examenes::firstOrCreateStatic($attributes, null, $verifyAttributes);
     }
+  
     
+    public function examenesId(){        
+       return Examenes::find()->select(['id'])
+                ->where(['citas_id'=>$this->id])->column(); 
+    
+    }
+    
+    
+    
+    /*
+     * Verifiac que todas las preguntas de los 
+     * examens ya han sido contestadas
+     * YA NO HAY NECEISDAD DE NOTIFICAR
+     * por correo */
+    
+  public function isBateriaCompleta(){
+    /*yii::error(StaExamenesdet::find()->andWhere(['valor'=>null])->
+      andWhere(['examenes_id'=>$this->examenesId()])->createCommand()->getRawSql());
+    */return  !StaExamenesdet::find()->andWhere(['valor'=>null])->
+      andWhere(['examenes_id'=>$this->examenesId()])->exists();
+  } 
+  
+  /*
+   * Ejecuta los resultados 
+   * segun las respuestas
+   */
+  public function makeResultados(){
+      foreach($this->examenes as $examen){
+          $examen->makeResultados();
+      }
+     return true;
+  }
+  
+  
+ public function marcadorStatus(){
+     if($this->toCarbon('fechaprog')->greaterThan(self::CarbonNow())){ //futuro
+         return ['warning'=>Yii::t('sta.labels','PROGRAMADA')];
+     }else{ //presenet y pasado
+         if($this->asistio){
+             return ['success'=>Yii::t('sta.labels','EFECTUADA')]; 
+         }else{
+            return ['danger'=>Yii::t('sta.labels','VENCIDA')];  
+         }
+        
+     }
+ } 
+  
 }
