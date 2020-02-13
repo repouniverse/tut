@@ -6,9 +6,13 @@ use yii\widgets\ActiveForm;
 use common\widgets\selectwidget\selectWidget;
 use kartik\datetime\DateTimePicker;
 use common\helpers\h;
+use frontend\modules\sta\staModule;
 /* @var $this yii\web\View */
 /* @var $model frontend\modules\sta\models\Citas */
 /* @var $form yii\widgets\ActiveForm */
+$tipo=h::user()->profile->tipo;
+$isPsicologo=($tipo==staModule::PROFILE_PSICOLOGO)?true:false;
+$isSecre=($tipo==staModule::PROFILE_PSICOLOGO)?true:false;
 ?>
 
 <div class="citas-form">
@@ -102,20 +106,21 @@ use common\helpers\h;
   </div>
  
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-     <?= $form->field($model, 'detalles_secre')->textArea(['rows' => 4]) ?>
+     <?= $form->field($model, 'detalles_secre')->textArea(['rows' => 4,/*'disabled'=>!$isSecre*/]) ?>
 
  </div>
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+     <?php if($isPsicologo){  ?>
      <?= $form->field($model, 'detalles')->textArea(['rows' => 4]) ?>
-
+     <?php }  ?>
  </div>
  
  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-     <?= $form->field($model, 'detalles_indicadores')->textArea(['rows' => 4]) ?>
+     <?= $form->field($model, 'detalles_indicadores')->textArea(['rows' => 4,'disabled'=>!$isPsicologo]) ?> 
 
  </div>
 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-     <?= $form->field($model, 'detalles_tareas_pend')->textArea(['rows' => 4]) ?>
+     <?= $form->field($model, 'detalles_tareas_pend')->textArea(['rows' => 4,'disabled'=>!$isPsicologo]) ?>
 
  </div> 
   

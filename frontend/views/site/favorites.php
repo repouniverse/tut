@@ -39,7 +39,7 @@ $this->title = 'Profile';
                 
 
                 <div class="form-group">
-                    <?= Html::submitButton('Save', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+                    <?= Html::submitButton(yii::t('base.verbs','Grabar'), ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
                 </div>
                 
             <?php ActiveForm::end(); ?>

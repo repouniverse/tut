@@ -77,13 +77,13 @@
               'attribute' => '',
                'format'=>'raw',
                 'value' => function ($model) {
-                    if($model->testTalleres->hasAttachments()){
+                   // if($model->testTalleres->hasAttachments()){
                         //var_dump($model->testTalleres);
-                        return Html::a($model->test->descripcion, $model->testTalleres->files[0]->getUrl(), ['data-pjax'=>'0']);      
+                       // return Html::a($model->test->descripcion, $model->testTalleres->files[0]->getUrl(), ['data-pjax'=>'0']);      
                      
-                    }else{
+                    //}else{
                        return $model->test->descripcion ;
-                    }
+                    //}
                    },
                     ],
                 [

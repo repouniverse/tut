@@ -10,21 +10,17 @@ use yii\bootstrap\ActiveForm;
 $this->title = yii::t('base.verbs','Registrar');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div style=" width: 400px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: auto;
-  ">
+
     <br>
-    <div class="box box-success">
-        <div class="box-body">
+    
+        <div class="box box-body"> 
 <div class="site-signup">
     <h3><?= Html::encode($this->title) ?></h3>
 
     <p><?=yii::t('base.actions','Por favor llene los siguientes campos para Registrar :')?></p>
 
-    <div class="row">
-        <div class="col-lg-5">
+  
+       <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
             <?php $form = ActiveForm::begin(['id' => 'form-signup']); ?>
       
                 <?= $form->field($model, 'username')->textInput(['autofocus' => true])->label(yii::t('base.names','Nombre de Usuario')) ?>
@@ -42,16 +38,16 @@ $this->params['breadcrumbs'][] = $this->title;
                     ) ?>
             
 
-                <div class="col-md-4 col-md-offset-8 text-right">
+                 <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
                                  <?= Html::submitButton(Yii::t('base.verbs', 'Registrar'), ['id' => 'next-button','class' => 'btn btn-success']) ?>
                                 
-                            </div>
+                </div>
 
             <?php ActiveForm::end(); ?>
         </div>
     </div>
 </div>
-    </div>
-       </div> 
-    </div>
+    
+       
+    
 

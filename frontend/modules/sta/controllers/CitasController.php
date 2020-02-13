@@ -779,6 +779,18 @@ function actionBancoPreguntas($id){
 
 }
  
- 
+public function actionEliminaCita($id){
+    $model=$this->findModel($id);
+    $errores=$model->eliminaCita();
+    
+    if(count($errores)>0){
+        Yii::$app->session->setFlash('error', 'No se pudo eliminar la cita '.$model->getFirstError());
+         return $this->redirect(['view', 'id' => $model->id]);
+    }else{
+         Yii::$app->session->setFlash('success', 'La cita ha sido eliminada');
+        return $this->redirect('index');
+         
+    }
+} 
  
 }

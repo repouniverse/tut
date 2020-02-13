@@ -7,7 +7,7 @@ namespace frontend\modules\sta\models;
  *
  * @see Citas
  */
-class CitasQuery extends  \frontend\modules\sta\components\ActiveQueryScope
+class CitasQuery extends  \frontend\modules\sta\components\ActiveQueryCitas
 {
     /*public function active()
     {

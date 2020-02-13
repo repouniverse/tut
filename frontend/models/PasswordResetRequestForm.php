@@ -60,9 +60,9 @@ class PasswordResetRequestForm extends Model
                 ['html' => 'passwordResetToken-html', 'text' => 'passwordResetToken-text'],
                 ['user' => $user]
             )
-            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' robot'])
+            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' -Automático'])
             ->setTo($this->email)
-            ->setSubject(yii::t('base.verbs','Request password reset') .'  '. Yii::$app->name)
+            ->setSubject(yii::t('base.verbs','Solicitud de cambio de contrasena') .'  '. Yii::$app->name)
             ->send();
     }
 }

@@ -185,6 +185,8 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
      */
     public function getTallerdet()
     {
+      /* echo  $this->hasOne(Talleresdet::className(), ['id' => 'talleresdet_id'])->createCommand()
+          ->getRawSql();die();*/
         return $this->hasOne(Talleresdet::className(), ['id' => 'talleresdet_id']);
     }
 
@@ -220,7 +222,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
      */
     public static function find()
     {
-        return new CitasQuery(get_called_class());
+        return new \frontend\modules\sta\components\ActiveQueryCitas(get_called_class());
     }
     public static function findFree()
     {
@@ -282,7 +284,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
     /*ActiveQuery para filtrar 
      * las citas del dia */
     public  function citasActiveQueryForDay(){
-       return  $this->find()->where(['>','fechaprog',$this->beginDay()])->
+       return  $this->find()->andWhere(['>','fechaprog',$this->beginDay()])->
                andWhere(['<=','fechaprog',$this->endDay()]);
     } 
     
@@ -473,10 +475,17 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
      * com los datos del mismo registro
      */
     public function evento(){
+        $tallerdet=$this->tallerdet;
+        if(is_object($tallerdet)){
+         $title=$tallerdet->codalu;  
+    }else{
+       $title='------';  
+    }
+        //echo $this->id;die();
         $formatDB=h::gsetting(self::_FORMATBD, self::_FDATETIME); // = "Y-m-d H:i:s"
         return [
             'id'=>$this->id,
-            'title'=>$this->tallerdet->codalu,
+            'title'=>$title,
             'start'=>$this->swichtDate('fechaprog', false),
             'end'=>date($formatDB, strtotime($this->swichtDate('fechaprog', false))+60*$this->duracion),
             'color'=>'#5cb85c',
@@ -486,7 +495,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
     
      public function citasPendientes()
     {
-        return Citas::find()->where( 
+        return Citas::find()->andWhere( 
                 [ /* 'talleres_id'=>$this->talleres_id,*/
                     'codtra'=>$this->codtra,
                     //'asistio'=> '0',
@@ -521,12 +530,12 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
      * Return : id de la siguiente cita
      */
     public function nextCitaByStudent(){
-       /*echo $this->find()->select('id')->where([
+       /*echo $this->find()->select('id')->andWhere([
         'talleresdet_id'=>$this->talleresdet_id,        
       ])->andWhere(['>','fechaprog',$this->fechaprog])->
            orderBy('fechaprog ASC')->createCommand()->getRawSql();
        die();*/
-   return  $this->find()->select('id')->where([
+   return  $this->find()->select('id')->andWhere([
         'talleresdet_id'=>$this->talleresdet_id,        
       ])->andWhere(['>','fechaprog',$this->swichtDate('fechaprog',false)])->
            orderBy('fechaprog ASC')->limit(1)->scalar();
@@ -540,7 +549,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
       ])->andWhere(['<','fechaprog',$this->fechaprog])->
            orderBy('fechaprog DESC')->createCommand()->getRawSql();
        die(); */
-   return  $this->find()->select('id')->where([
+   return  $this->find()->select('id')->andWhere([
         'talleresdet_id'=>$this->talleresdet_id,        
       ])->andWhere(['<','fechaprog',$this->swichtDate('fechaprog',false)])
            ->orderBy('fechaprog DESC')->limit(1)->
@@ -548,21 +557,21 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
     } 
     
      public function lastCitaByStudent(){
-     $maximafecha=  $this->find()->select('max(fechaprog)')->where([
+     $maximafecha=  $this->find()->select('max(fechaprog)')->andWhere([
         'talleresdet_id'=>$this->talleresdet_id,        
       ])->scalar();
      if($maximafecha===false)return $maximafecha;
-   return  $this->find()->select('id')->where([
+   return  $this->find()->select('id')->andWhere([
         'talleresdet_id'=>$this->talleresdet_id,        
       ])->andWhere(['fechaprog'=>$maximafecha])->scalar();
            
     }
      public function firstCitaByStudent(){
-     $minimafecha=  $this->find()->select('min(fechaprog)')->where([
+     $minimafecha=  $this->find()->select('min(fechaprog)')->andWhere([
         'talleresdet_id'=>$this->talleresdet_id,        
       ])->scalar();
      if($minimafecha===false)return $minimafecha;
-   return  $this->find()->select('id')->where([
+   return  $this->find()->select('id')->andWhere([
         'talleresdet_id'=>$this->talleresdet_id,        
       ])->andWhere(['fechaprog'=>$minimafecha])->scalar();
            
@@ -672,15 +681,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
     }
      
    
-  public function afterFind() {
-      parent::afterFind();
-     /* if($this->withoutFinicio()){
-          $this->finicio=$this->fechaprog;
-          $this->resolveDuration();
-          //$this->ftermino=$this->toCarbon('finicio')->
-      }*/
-      
-  }  
+  
   
   public function isInPast(){
      return $this->toCarbon('fechaprog')->lessThanOrEqualTo(self::CarbonNow());
@@ -782,7 +783,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
     
     public function examenesId(){        
        return Examenes::find()->select(['id'])
-                ->where(['citas_id'=>$this->id])->column(); 
+                ->andWhere(['citas_id'=>$this->id])->column(); 
     
     }
     
@@ -814,8 +815,12 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
   
   
  public function marcadorStatus(){
-     if($this->toCarbon('fechaprog')->greaterThan(self::CarbonNow())){ //futuro
-         return ['warning'=>Yii::t('sta.labels','PROGRAMADA')];
+     if(!$this->isVencida()){ //futuro
+          if($this->asistio){
+             return ['success'=>Yii::t('sta.labels','EFECTUADA')]; 
+         }else{
+            return ['warning'=>Yii::t('sta.labels','PROGRAMADA')];  
+         }
      }else{ //presenet y pasado
          if($this->asistio){
              return ['success'=>Yii::t('sta.labels','EFECTUADA')]; 
@@ -825,5 +830,21 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
         
      }
  } 
-  
+ 
+ public function eliminaCita(){
+     $this->clearErrors();
+     $this->setScenario(self::SCENARIO_ACTIVO);
+     $this->activo=false;
+     if($this->asistio){
+          $this->addError ('asistio',yii::t('sta.errors','Esta cita ya tiene asistencia'));
+         return $this->getErrors();;
+     }
+     if($this->isVencida()){
+          $this->addError ('fechaprog',yii::t('sta.errors','Esta cita ya está vencida'));
+         return $this->getErrors();;
+     }
+     $this->save();
+     return $this->getErrors();
+ }
+ 
 }

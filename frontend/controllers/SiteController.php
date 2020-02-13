@@ -232,7 +232,7 @@ class SiteController extends Controller
         }
 
         if ($model->load(Yii::$app->request->post()) && $model->validate() && $model->resetPassword()) {
-            Yii::$app->session->setFlash('success', yii::t('base.actions','New password saved.'));
+            Yii::$app->session->setFlash('success', yii::t('base.actions','Nueva contrasena grabada.'));
 
             return $this->goHome();
         }
@@ -334,7 +334,7 @@ Datos de caché de configuración han sido borrados');
             try{
                 set_time_limit(300); // 5 minutes   
                 $model->sendEmail();
-                Yii::$app->getSession()->setFlash('success',yii::t('base.actions','Check your email for further instructions.'));
+                Yii::$app->getSession()->setFlash('success',yii::t('base.actions','Revisa tu correo para ver las instrucciones.'));
                 return $this->goHome();
             } catch (\Swift_TransportException $Ste) { 
                 //echo "intenado"; die();

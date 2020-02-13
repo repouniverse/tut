@@ -95,7 +95,7 @@ $this->params['breadcrumbs'][] = Yii::t('sta.labels', 'Editar');
             </div>         
           
         
-         <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
+         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                <?= Html::activeLabel($alumno,'codalu')?>
               <?= Html::activeTextInput($alumno, 'codalu',['class'=>'form-control','disabled'=>'disabled']) /*   textInput($name, $value)  $form->field($model, 'numero')->textInput(['disabled'=>'disabled','style'=>'color:#ad5eb7; font-weight:700;'])*/ ?>
             
@@ -105,7 +105,11 @@ $this->params['breadcrumbs'][] = Yii::t('sta.labels', 'Editar');
               <?= Html::activeTextInput($alumno, 'nombres',['value'=>$nombre,'class'=>'form-control','disabled'=>'disabled']) /*   textInput($name, $value)  $form->field($model, 'numero')->textInput(['disabled'=>'disabled','style'=>'color:#ad5eb7; font-weight:700;'])*/ ?>
             
         </div> 
-        
+         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                
+        </div>
+         
+        <br>
         
         
         

@@ -66,22 +66,12 @@ use common\helpers\h;
   </div>   
     
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
-     <?php 
-  // $necesi=new Parametros;
-    echo selectWidget::widget([
-           // 'id'=>'mipapa',
-            'model'=>$model,
-            'form'=>$form,
-            'campo'=>'codtra',
-         'ordenCampo'=>2,
-         'addCampos'=>[3,4],
-        ]);  ?>
-
+    <?=$form->field($model, 'aptutor')->textInput()?>
  </div>
      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
         <?= 
             $form->field($model, 'asistio')->
-            dropDownList(['0'=>yii::t('sta.labels','Asistió'),'1'=>yii::t('sta.labels','Ausente')] ,
+            dropDownList(['1'=>yii::t('sta.labels','Asistió'),'0'=>yii::t('sta.labels','Ausente')] ,
                     ['prompt'=>'--'.yii::t('base.verbs','Todas')."--",
                         //'enableAjaxValidation' => true,
                     // 'class'=>'probandoSelect2',

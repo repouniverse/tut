@@ -28,14 +28,14 @@ use common\helpers\h;
       <div class="box-body">
         <?php //print_r($model->attributes);var_dump($model->facultad); die(); ?>
 <?php if(!$model->isNewRecord){ ?>
-  <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
      <?= Html::label(yii::t('base.names','Facultad'),'45545rret',['class' => 'control-label']) ?>
     <?=  Html::input('text', 'namefacu', $model->facultad->desfac,['disabled'=>'disabled','class' => 'form-control']) ?>
  </div>
 <?php } ?>          
 
 
-   <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">  
+   <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">  
    <?php 
    //$model->fillRelations();
    // print_r($model->_obRelations);die();
@@ -52,24 +52,24 @@ use common\helpers\h;
           
           
        
-          <div class="col-md-12">
-              <div class="col-lg-3 col-md-8 col-sm-6 col-xs-12">
-                   <div class="col-lg-3 col-md-12 col-sm-6 col-xs-12">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+              <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
+                   <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
                         <?= $form->field($model, 'ap')->textInput(['maxlength' => true]) ?>
 
                   </div>
 
-                     <div class="col-lg-3 col-md-12 col-sm-6 col-xs-12">
+                     <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
                        <?= $form->field($model, 'am')->textInput(['maxlength' => true]) ?>
 
                      </div>
-                                <div class="col-lg-3 col-md-12 col-sm-6 col-xs-12">
+                                <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
                            <?= $form->field($model, 'nombres')->textInput(['maxlength' => true]) ?>
 
                               </div>
                             
               </div>
-              <div class="col-md-4">
+               <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                   <img src="<?=$model->getUrlImage()?>" class="img-thumbnail">
                   
               </div>

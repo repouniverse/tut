@@ -57,7 +57,7 @@ use common\helpers\h;
                             <div class="pull-left">
 
 
-                                <?= Html::button(yii::t('base.verbs','Añadir Favoritos'), ['href' => Url::to(['/site/addfavorite']), 'title' => 'Add this page to Favorites...', 'class' => 'botonAbre btn btn-default']); ?>
+                                <?= Html::button(yii::t('base.verbs','Añadir Favoritos'), ['href' => Url::to(['/site/addfavorite']), 'title' => yii::t('base.verbs','Agregar a favoritos'), 'class' => 'botonAbre btn btn-default']); ?>
                             </div>
                             <div class="pull-right">
                                 <?= Html::a(

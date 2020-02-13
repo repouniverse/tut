@@ -36,7 +36,7 @@ use common\helpers\h;
   
  
 
-  <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12"> 
+  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12"> 
      <?php 
   //Deshabilitar cambio de psicologo cuando aun 
   //falta asinar alumnos, no puede haber cambios de pisologos 
@@ -58,12 +58,12 @@ use common\helpers\h;
 
  </div> 
  
-<div class="col-lg-3 col-md-6 col-sm-12 col-xs-12">
+<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
     
       <?= $form->field($model, 'nalumnos',[/*'enableAjaxValidation'=>true*/])->textInput(['maxlength' => 3]) ?>
 
   </div>
-   <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12"> 
+   <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12"> 
       <?= $form->field($model, 'fregistro')->widget(DatePicker::class, [
                             'language' => h::app()->language,
                            'pluginOptions'=>[

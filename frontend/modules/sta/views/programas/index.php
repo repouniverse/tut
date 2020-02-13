@@ -7,7 +7,7 @@ use yii\widgets\Pjax;
 /* @var $searchModel frontend\modules\sta\models\TalleresSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('sta.labels', 'Talleres');
+$this->title = Yii::t('sta.labels', 'Programas');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="talleres-index">

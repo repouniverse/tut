@@ -20,8 +20,8 @@ use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
             'template' => '{delete}',
                'buttons' => [                    
                         'delete' => function ($url,$model) {
-			   $url = \yii\helpers\Url::toRoute($this->context->id.'/deletemodel-for-ajax');
-                              return \yii\helpers\Html::a('<span class="btn btn-danger glyphicon glyphicon-trash"></span>', '#', ['title'=>$url,/*'id'=>$model->codparam,*/'family'=>'holas','id'=>\yii\helpers\Json::encode(['id'=>$model->id,'modelito'=> str_replace('@','\\',get_class($model))]),/*'title' => 'Borrar'*/]);
+			   $url = \yii\helpers\Url::toRoute(['/sta/citas/elimina-cita','id'=>$model->id]);
+                              return \yii\helpers\Html::a('<span class="btn btn-danger glyphicon glyphicon-trash"></span>', $url, []);
                             }
                         
                     ]
@@ -52,16 +52,6 @@ use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
             //'nveces'
         ],
     ]); ?>
- <?php 
-   echo linkAjaxGridWidget::widget([
-           'id'=>'widgetgruidBanuyucos',
-            'idGrilla'=>'palogay',
-            'family'=>'holas',
-          'type'=>'POST',
-           'evento'=>'click',
-        'posicion'=>\yii\web\View::POS_END
-            //'foreignskeys'=>[1,2,3],
-        ]); 
-   ?>
+ 
 
     <?php Pjax::end(); ?> 

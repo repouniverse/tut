@@ -1,7 +1,8 @@
 <?php
 
 use yii\helpers\Html;
-use yii\grid\GridView;
+use kartik\grid\GridView;
+//use yii\grid\GridView;
 use yii\widgets\Pjax;
     use kartik\export\ExportMenu;
 /* @var $this yii\web\View */
@@ -58,28 +59,49 @@ $this->params['breadcrumbs'][] = $this->title;
                          
                     ]
                 ],
-         [ 'attribute' => 'numero',
+         [ 'attribute' => 'numerocita',
              'format'=>'raw',
              'value'=>function($model){
                  return '<span style="font-size:14px; color:#ad5eb7; font-weight:700;">'.$model->numerocita.'</span>';           
              }
              ],
-         [
+                      [
                'attribute' => 'fechaprog',
            
+                    ], 
+               [
+               'attribute' => 'codfac',
+                    'group'=>TRUE,
                     ],  
+                   [
+               'attribute' => 'codperiodo',
+                    'group'=>TRUE,
+                    ],       
+                     
          
-         
-         
+                [
+               'attribute' => 'codalu',
+                    'group'=>TRUE,
+                    ],  
+                   [
+               'attribute' => 'ap',
+                    'group'=>TRUE,
+                    ], 
+                     [
+               'attribute' => 'am',
+                    'group'=>TRUE,
+                    ], 
+                    [  'attribute' => 'nombres',
+                    'group'=>TRUE,
+                    ],
+         [  'attribute' => 'aptutor',
+                    'group'=>TRUE,
+                    ],
            /* 'id',
             'talleres_id',
             'talleresdet_id',*/
-            'codalu',
-            'ap',
-            'am',
-            'nombres',
-            'codperiodo',
-            'codfac',
+           
+            
             //'codperiodo',
                        
             //'finicio',

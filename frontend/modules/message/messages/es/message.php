@@ -41,6 +41,8 @@ return [
     'Send' => 'Enviar',
     'Save' => 'Guardar',
     'Messages' => 'Mensajes',
+    'The message has been answered.'=>'El mensaje ha sido respondido',
+    'The message has been sent.'=>'El mensaje fue enviado',  
     'Message from' => 'Mensaje de',
     'Title of your automatically sent answer'=>'Título de su respuesta automática',
     'Referring to' => 'Referido a',

@@ -588,10 +588,13 @@ public function actionMakeCitaByStudent(){
 
 public function actionTrataAlumno($id){   
     //ENOCNTRADNO EL TALLER DET
+   // echo $id;die();
     $modelTallerdet = \frontend\modules\sta\models\Talleresdet::findOne($id);
     //print_r($modelTallerdet->listMailFromField($attribute, $condition));
     //ENCONTRANDO TALLER_PSICO
+    
     $modelPsico=$modelTallerdet->tallerPsico();
+    //echo $modelTallerdet->codalu;die();
      //ENCONTRANDO EL ALUMNO    
     $model=Alumnos::findOne(['codalu'=>$modelTallerdet->codalu]);
     

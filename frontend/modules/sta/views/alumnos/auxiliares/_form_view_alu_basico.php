@@ -9,7 +9,7 @@ use common\helpers\h;
 
         <?php //print_r($model->attributes);var_dump($model->facultad); die(); ?>
 
-  <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
      <?= Html::label(yii::t('base.names','Facultad'),'45545rret',['class' => 'control-label']) ?>
            <?php if( $model->hasProperty('facultad')){ ?>
             <?=  Html::input('text', 'namefacu', $model->facultad->desfac,['disabled'=>'disabled','class' => 'form-control']) ?>
@@ -18,7 +18,7 @@ use common\helpers\h;
            <?php }  ?>
  </div>
   
-   <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+   <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
      <?= Html::label(yii::t('base.names','Carrera'),'4u5545rret',['class' => 'control-label']) ?>
      <?php if( $model->hasProperty('carrera')){ ?>
             <?=  Html::input('text', 'namefacxu', $model->carrera->descar,['disabled'=>'disabled','class' => 'form-control']) ?>

@@ -46,7 +46,10 @@ use frontend\modules\sta\helpers\comboHelper;
 </div> 
 <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">     
     <?= $form->field($model, 'am') ?>
- </div>   
+ </div> 
+<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">     
+    <?= $form->field($model, 'nombres') ?>
+ </div>
  <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">    
  <?= $form->field($model, 'codfac')->
             dropDownList(comboHelper::getCboFacultades(),

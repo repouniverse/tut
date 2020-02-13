@@ -48,6 +48,9 @@ use common\widgets\selectwidget\selectWidget;
                     ) ?>
  </div>
 <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12"> 
+    <?= $form->field($model,'codalu') ?>
+</div> 
+<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12"> 
     <?= $form->field($model, 'nombres') ?>
 </div> 
  <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12"> 
