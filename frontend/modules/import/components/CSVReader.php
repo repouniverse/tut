@@ -7,6 +7,7 @@ namespace frontend\modules\import\components;
 USE ruskid\csvimporter\CSVReader AS MyReader;
 use yii;
 use yii\base\Exception;
+use common\helpers\h;
 
 /**
  * CSV Reader

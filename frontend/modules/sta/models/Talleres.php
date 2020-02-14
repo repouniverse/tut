@@ -557,6 +557,8 @@ public function codPsicologos($except=[]){
     return array_diff($codigos,$except);
 }
 
-     
+ public function codeStudents(){
+     return $this->getAlumnos()->select(['codalu'])->column();
+ }    
     }
 

@@ -139,11 +139,7 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
                  'filename' => $this->pathFileCsv(),
               'startFromLine' =>$this->firstLineTobegin(),
                  'fgetcsvOptions' => [ 
-                                     'delimiter' => h::settings()->
-                                            get(
-                                             Yii::$app->controller->module->id,
-                                             'delimiterCsv'
-                                             ),
+                                     'delimiter' => h::gsetting('import', 'delimiterCsv'),
                                        ] 
                                 ]);
           return $this->_csv;

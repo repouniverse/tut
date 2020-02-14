@@ -55,7 +55,7 @@ class baseController extends Controller
       
       //$model=$className::findOne( h::request()->post(static::EDIT_EDITABLE_KEY));
        
-var_dump(h::request()-> post());die();
+//var_dump(h::request()-> post());die();
 
 
 //var_dump(static::EDIT_EDITABLE_KEY);die();
@@ -72,7 +72,7 @@ var_dump(h::request()-> post());die();
                 post( static::EDIT_EDITABLE_INDEX  )][h::request()->post(static::EDIT_EDITABLE_ATTRIBUTE)];
      //print_r($_POST);die();
         // if ($model->load($_POST)) { 
-             print_r($model->attributes);
+            // print_r($model->attributes);
         if ($model->save()) {
             
              return  \yii\helpers\Json::encode(['output'=>'OK', 'message'=>'SE EDITO SIN PROBLEMAS']);

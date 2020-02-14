@@ -75,7 +75,7 @@ class linkAjaxGridWidget extends Widget
       $confirm=($this->confirm)?$cad:'';
      // $mesage=yii::t('base.verbs','Are you Sure to Delete this Record ?');
    $cadenaJs="$('div[id=\"".$this->idGrilla."\"] [family=\"".$this->family."\"]').on( '".$this->evento."', function() { 
-          
+        // alert(this.title);
 $.ajax({
               url: this.title,
               

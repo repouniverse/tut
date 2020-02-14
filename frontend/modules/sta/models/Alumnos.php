@@ -45,6 +45,7 @@ class Alumnos extends \common\models\base\modelBase implements PersonInterface ,
      * {@inheritdoc}
      */
     const SCENARIO_SOLO='solo';
+    const SCENARIO_CORREO='correo';
     const SCENARIO_BATCH='batch';//varios datos 
     const SCENARIO_BATCH_MEDIO='import_medio'; //datos pocos
     const SCENARIO_BATCH_MINIMO='import_minimo'; //datos pocos
@@ -100,6 +101,7 @@ class Alumnos extends \common\models\base\modelBase implements PersonInterface ,
     {
         $scenarios = parent::scenarios();
         $scenarios[self::SCENARIO_SOLO] = ['profile_id'];
+        $scenarios[self::SCENARIO_CORREO] = ['correo'];
         $scenarios[self::SCENARIO_BATCH] = [ 'codalu','codcar', 'ap', 'am', 'nombres', 'dni','domicilio','correo','celulares','fijos'];
          $scenarios[self::SCENARIO_BATCH_MEDIO] = ['codalu', 'codcar', 'ap', 'am', 'nombres', 'dni','domicilio','celulares'];
        // $scenarios[self::SCENARIO_REGISTER] = ['username', 'email', 'password'];

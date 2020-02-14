@@ -8,6 +8,7 @@ use common\helpers\RangeDates;
 use common\helpers\h;
 use common\models\masters\Trabajadores;
 use frontend\modules\sta\staModule;
+use yii\helpers\Url;
 /**
  * This is the model class for table "{{%sta_citas}}".
  *
@@ -52,7 +53,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
     
     
     
-   public $booleanFields=['asistio','activo'];
+   public $booleanFields=['asistio','activo','masivo'];
    
    public function behaviors()
          {
@@ -74,7 +75,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
     public function scenarios()
     {
         $scenarios = parent::scenarios(); 
-        $scenarios[self::SCE_CREACION_BASICA] = ['talleres_id','talleresdet_id','duracion','fechaprog','codfac','codtra'];
+        $scenarios[self::SCE_CREACION_BASICA] = ['talleres_id','talleresdet_id','duracion','fechaprog','codfac','codtra','asistio'];
         $scenarios[self::SCENARIO_ASISTIO] = ['asistio'];
          $scenarios[self::SCENARIO_ACTIVO] = ['activo'];
           $scenarios[self::SCENARIO_REPROGRAMA] = ['fechaprog','duracion','finicio','ftermino'];
@@ -146,6 +147,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
             
             [['fechaprog', 'finicio', 'ftermino'], 'string', 'max' => 19],
             ['fechaprog', 'validateDispo'],
+                [['masivo'], 'safe'],
             [['codtra'], 'string', 'max' => 6],
             [['fingreso', 'codaula'], 'string', 'max' => 10],
             [['fechaprog','duracion','finicio','ftermino'],'safe','on'=>self::SCENARIO_REPROGRAMA],
@@ -232,7 +234,8 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
     public function beforeSave($insert) {
        if($insert){            
           $this->resolveDuration();
-          $this->asistio=false;
+          if(is_null($this->asistio) or $this->asistio=='0')
+           $this->asistio=false;
           $this->activo=true;
          $this->numero=$this->correlativo('numero', 8);
          
@@ -846,5 +849,33 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
      $this->save();
      return $this->getErrors();
  }
+ 
+ public function notificaCorreoExamen(){
+     $mensajes=[];
+     $alumno=$this->tallerdet->alumno;
+      $token=  \common\components\token\Token::create('citas', 'token_'.$this->id, null, time());       
+     $link= Url::to(['/sta/citas/examen-banco','id'=>$this->id,'token'=>$token->token],true);
+        $mailer = new \common\components\Mailer();
+        $message =new  \yii\swiftmailer\Message();
+            $message->setSubject('Notificacion de Examen')
+            ->setFrom(['neotegnia@gmail.com'=>'Tutoría UNI'])
+            ->setTo($alumno->correo)
+            ->SetHtmlBody("Buenas Tardes".  $alumno->fullName()." <br>"
+                    . "La presente es para notificarle que tienes "
+                    . "una examen  programado. <br> Presiona el siguiente link "
+                    . "para acceder a la prueba: <br>"
+                    . "    <a  href=\"".$link."\" >Presiona aquí </a>");
+           
+    try {
+        
+           $result = $mailer->send($message);
+           return true;
+          $mensajes['success']='Se envió el correo, invitando al examen, el Alumno tiene que responder ';
+    } catch (\Swift_TransportException $Ste) {      
+         $mensajes['error']=$Ste->getMessage();
+    }
+    return $mensajes;
+    }
+ 
  
 }
