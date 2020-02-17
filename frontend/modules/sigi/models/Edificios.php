@@ -37,6 +37,23 @@ class Edificios extends \common\models\base\modelBase
     /**
      * {@inheritdoc}
      */
+    
+     public function behaviors()
+         {
+                return [
+		
+		/*'fileBehavior' => [
+			'class' => '\frontend\modules\attachments\behaviors\FileBehaviorAdvanced' 
+                               ],*/
+                    'auditoriaBehavior' => [
+			'class' => '\common\behaviors\AuditBehavior' ,
+                               ],
+		
+                    ];
+        }
+    
+    
+    
     public static function tableName()
     {
         return '{{%sigi_edificios}}';
@@ -450,6 +467,7 @@ class Edificios extends \common\models\base\modelBase
        $usuario->email=$correo;
        $usuario->username=$unidad->numero.'_'.$this->id;
        $usuario->password=$unidad->numero;
+       
         yii::error($usuario->signup());
        unset($usuario);
     }

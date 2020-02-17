@@ -70,9 +70,9 @@ class AuditBehavior extends Behavior
        $controllerId=yii::$app->controller->id;
        $currentUrl=Yii::$app->request->getUrl();
        foreach($owner->attributes as $attribute=>$value){
-           yii::error($attribute);
+           //yii::error($attribute);
           if($this->hasChanged($attribute)){ 
-               yii::error('este atributo ha cambiado');
+               //yii::error('este atributo ha cambiado');
              // ECHO '<br><br>'.$attribute;DIE();
               $model=New Activerecordlog();
                $model=$this->setLogValues($model,$attribute,
@@ -200,7 +200,7 @@ class AuditBehavior extends Behavior
     
     private function hasChanged($attribute){
      if($this->owner->hasMethod('hasChanged')){
-         yii::error('tiene metodo has cange  '.$attribute);
+        // yii::error('tiene metodo has cange  '.$attribute);
         return $this->owner->hasChanged($attribute);       
      } else{
        return (!($this->owner->{$attribute}==$this->owner->getOldAttribute($attribute)));

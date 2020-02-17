@@ -3,6 +3,7 @@ namespace frontend\modules\sigi\controllers;
 use yii\web\Controller;
 use yii\helpers\ArrayHelper;
 use yii;
+use frontend\modules\sigi\Module;
 use common\helpers\h;
 USE frontend\modules\sigi\models\SigiUserEdificios;
 use mdm\admin\models\searchs\User as UserSearch;
@@ -163,5 +164,31 @@ class DefaultController extends Controller
       /*
      * Visualiza otros perfiles 
      */
-     
+   
+    
+   public function actionPanelResidente(){
+       $user= h::user();
+       $profileTipo=$user->profile->tipo;
+       if(Module::PROFILE_RESIDENTE==$profileTipo){
+           $userName=$user->identity->username;
+           if(!(strpos($userName,'_')===false)){
+              $numeroDepa=substr($userName,0,strpos($userName,'_'));
+              $edificioId=substr($userName,strpos($userName,'_')+1);
+             // var_dump($edificioId,$numeroDepa);die();
+              $unidad= \frontend\modules\sigi\models\SigiUnidades::find()
+                      ->andWhere(['edificio_id'=>$edificioId,'numero'=>$numeroDepa])
+                      ->one();
+             $unidadId=$unidad->id;
+                    $medidor=$unidad->firstMedidor(\frontend\modules\sigi\models\SigiSuministros::COD_TYPE_SUMINISTRO_DEFAULT);
+                   return  $this->render('panel_residente',['unidadId'=>$unidadId,'medidor'=>$medidor]);
+              }else{
+               
+           }
+           
+       }else{
+           
+       }
+   } 
+    
+    
 }

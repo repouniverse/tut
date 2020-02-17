@@ -668,8 +668,12 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
          * Si no especifica nada, se verificar todo el registro 
          */        
         public function hasChanged($attribute=null){ 
+            //yii::error('haschanged');
             if( !is_null($attribute)){
-               if(in_array($attribute,array_keys($this->dateorTimeFields))){                   
+                // yii::error($attribute);
+                 //yii::error(array_keys($this->dateorTimeFields));
+               if(in_array($attribute,array_keys($this->dateorTimeFields))){ 
+                  // yii::error('es fecha');
                    return $this->hasChangeTimeField($attribute) ;
                 }
                  return (!($this->{$attribute}==$this->getOldAttribute($attribute)));
@@ -696,15 +700,25 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
          * estos campos con le evento afterfind();
          */
         private function hasChangeTimeField($attribute){  
-            
-                    $oldformat=Yii::$app->formatter->dateFormat;
-                    Yii::$app->formatter->dateFormat =
+          /*  yii::error(static::_FORMATBD);yii::error($this->dateorTimeFields[$attribute]);
+           yii::error($this->gsetting(static::_FORMATBD, $this->dateorTimeFields[$attribute]));
+          
+           $oldformat=Yii::$app->formatter->dateFormat;
+            yii::error($oldformat);
+         Yii::$app->formatter->dateFormat =
                      $this->gsetting(static::_FORMATBD, $this->dateorTimeFields[$attribute]);
-                   $currentValue= Yii::$app->formatter->format($this->{$attribute}, $this->dateorTimeFields[$attribute]);
+       yii::error(Yii::$app->formatter->dateFormat );
+       yii::error($this->{$attribute} ); yii::error($this->dateorTimeFields[$attribute] );
+         $currentValue= Yii::$app->formatter->format($this->{$attribute}, $this->dateorTimeFields[$attribute]);
                    $originalValue=$this->getOldAttribute($attribute);
-                   Yii::$app->formatter->dateFormat=$oldformat;
-                    return (!($currentValue==$originalValue));               
-              
+                  yii::error('valor actual'); yii::error($currentValue);
+                   yii::error('valor anterior');yii::error($originalValue);*/
+                   //Yii::$app->formatter->dateFormat=$oldformat;
+                    //return (!($currentValue==$originalValue));  
+            
+              $originalValue=$this->getOldAttribute($attribute);
+              $currentValue=$this->{$attribute};
+             return (!($currentValue==$originalValue)); 
         }
         
         

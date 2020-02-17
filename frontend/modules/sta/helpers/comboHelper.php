@@ -107,7 +107,11 @@ class comboHelper extends Combito
      ];
  }
    
-    
+  public static function geCboGruposTest($codtest){
+     return ArrayHelper::map( \frontend\modules\sta\models\StaTestdet::find()-> 
+      where(['codtest'=>$codtest])->all(),
+            'grupo','grupo'); 
+    }  
 }
 
 

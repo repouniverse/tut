@@ -50,7 +50,7 @@ public function behaviors()
             [['talleresdet_id'], 'integer'],
             [['codocu'], 'required'],
             [['detalle'], 'string'],
-            [['codfac'], 'safe'],
+            [['codfac','indi_altos','indi_riesgo1','obs_entrev','cuenta_buen','adecuado_nivel','indi_riesgo','metas','sugerencias'], 'safe'],
             [['codocu'], 'string', 'max' => 3],
             [['descripcion'], 'string', 'max' => 30],
             [['talleresdet_id'], 'exist', 'skipOnError' => true, 'targetClass' => Talleresdet::className(), 'targetAttribute' => ['talleresdet_id' => 'id']],
@@ -69,7 +69,15 @@ public function behaviors()
             'descripcion' => Yii::t('app', 'Descripcion'),
             'detalle' => Yii::t('app', 'Detalle'),
             'codestado' => Yii::t('app', 'Estado'),
-        ];
+            'indi_altos' => Yii::t('sta.labels', 'El estudiante de pregrado en condición de riesgo académico de la Universidad Nacional de Ingeniería, muestra indicadores altos para un buen desempeño académico tales como:'),
+             'indi_riesgo1' => Yii::t('sta.labels', 'Sin embargo se observa  indicadores de riesgo, lo que significa que posee bajos niveles de :'),
+       'obs_entrev' => Yii::t('sta.labels', 'Observaciones durante la entrevista:'),
+            'cuenta_buen' => Yii::t('sta.labels', 'Teniendo en cuenta los hallazgos durante la entrevista y en la evaluación psicológica se concluye que el estudiante cuenta con buen:'),
+            'adecuado_nivel' => Yii::t('sta.labels', 'Así tambien presenta adecuado nivel en:'),
+            'indi_riesgo' => Yii::t('sta.labels', 'Por otro lado presenta indicadores de riesgo como:'),
+            'metas' => Yii::t('sta.labels', 'El presente plan describe las metas de tutoría psicológica que se llevarán acabo con el referido(a) alumno(a), a partir de los resultados de la evaluación inicial de tutoría psicológica en el semestre 2020-I , la misma que brinda los siguientes indicadores prioritariamente:'),
+               'sugerencias' => Yii::t('sta.labels', 'Se sugiere trabajar los siguientes indicadores de riesgo :'),
+            ];
     }
 
     /**

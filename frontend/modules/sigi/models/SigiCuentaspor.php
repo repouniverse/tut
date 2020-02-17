@@ -96,7 +96,7 @@ class SigiCuentaspor extends \common\models\base\modelBase
             
            [ ['numerodoc','facturacion_id','edificio_id','codpro','colector_id','fedoc','descripcion','detalle','mes','anio','monto','codmon','codocu','mesconsumo','consumo'],'safe','on'=>self::SCENARIO_RECIBO_EXTERNO_MASIVO],
             [['ejercicio','mes'], 'validatePeriodo', 'on' => self::SCENARIO_RECIBO_EXTERNO_MASIVO], 
-           [['numerodoc','facturacion_id','edificio_id','codpro','colector_id','fedoc','mes','anio','monto','codmon','codocu','mesconsumo','consumo'],'required','on'=>self::SCENARIO_RECIBO_EXTERNO_MASIVO], 
+           [['facturacion_id','edificio_id','codpro','colector_id','fedoc','mes','anio','monto','codmon','codocu','mesconsumo','consumo'],'required','on'=>self::SCENARIO_RECIBO_EXTERNO_MASIVO], 
             
             
             [['monto'], 'number'],

@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = Yii::t('sta.labels', 'Update');
              'options' => ['id' => 'tabid2'],
         ],
        [
-            'label'=>'<i class="fa fa-map-o"></i> '.yii::t('sta.labels','Citas Vencidas'), //$this->context->countDetail() obtiene el contador del detalle
+            'label'=>'<i class="fa fa-calendar-day"></i> '.yii::t('sta.labels','Eventos'), //$this->context->countDetail() obtiene el contador del detalle
             'content'=> $this->render('_citas_vencidas',['model'=>$model ]),
            
            'active' => false,

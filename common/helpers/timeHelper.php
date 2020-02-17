@@ -67,6 +67,11 @@ class timeHelper {
        return $arr;
    }
    
+   public function mes($nmes){
+       $meses=static::cboMeses();
+       return $meses[$nmes];
+   }
+   
    public static function getDateTimeInitial(){
        return '1970-01-01 00:00:00';
    }
@@ -107,6 +112,9 @@ class timeHelper {
         else
          return yii::t('base.names','Buenas Noches');
   }
+  
+  
+  
 }  
   
    

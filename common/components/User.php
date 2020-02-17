@@ -136,24 +136,30 @@ class User extends UserOriginal {
    public function resolveUrlAfterLogin(){
        $url=$this->profile->url;
        if(!empty($url)){
-           yii::error('no esta vacio');
+           //yii::error('no esta vacio');
           return $url;  
        }else{
-            yii::error(' esta vacio y se leera de settings');
+           // yii::error(' esta vacio y se leera de settings');
            $tipo=$this->profile->tipo;
-           yii::error(' tipo '.$tipo);
+          // yii::error(' tipo '.$tipo);
            //yii::error(' tipo '.$tipo);
            $url=h::gsetting('general','url.profile.'.$tipo);
-           yii::error('url.profile.'.$tipo);
+           //yii::error('url.profile.'.$tipo);
           if(!is_null($url)){
-              yii::error('se leyo del settinds '.$url);
+              //yii::error('se leyo del settinds '.$url);
               
               return $url;
           } else{
-              yii::error('NO s encontro nad aen l settinfs ');
-               $url=is_null(\yii\helpers\Url::previous('intentona'))?'':\yii\helpers\Url::previous('intentona');
-           yii::error('de la intenot a');
-           yii::error($url);
+             
+           $url=is_null(\yii\helpers\Url::previous('intentona'))?'':\yii\helpers\Url::previous('intentona');
+          //Debemos de acortar la ruta para que en el action Site/Login  no arroje un 404
+           if(strlen($url)>0){
+           $quitar= yii::$app->urlManager->getBaseUrl();
+           $url= str_replace($quitar, '', $url);   
+          }   
+           
+                //yii::error('de la intenot a');
+           //yii::error($url);
                return $url;
                
           }

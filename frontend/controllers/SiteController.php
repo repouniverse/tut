@@ -88,7 +88,18 @@ class SiteController extends Controller
                   return  $this->redirect(['site/login']);
                     
                 }else{
-                    
+                     //$this->redirect(Url::toRoute([Yii::$app->user->resolveUrlAfterLogin()]));
+                      $profile=h::user()->profile;
+                    $url= $profile->url;
+                       $tipo=$profile->tipo;
+          // yii::error(' tipo '.$tipo);
+           //yii::error(' tipo '.$tipo);
+            if(empty($url))
+           $url=h::gsetting('general','url.profile.'.$tipo);                     
+           if(!empty($url))
+             $this->redirect(Url::to([$url]));
+                      
+                     //return h::user()->resolveUrlAfterLogin();
                      return $this->render('index');
                 }
                
@@ -121,6 +132,7 @@ class SiteController extends Controller
             //$this->redirect(['/sta/programas']);
             //echo Url::to(Yii::$app->user->resolveUrlAfterLogin());die();
             //
+            //echo Yii::$app->user->resolveUrlAfterLogin(); die();
             $this->redirect(Url::toRoute([Yii::$app->user->resolveUrlAfterLogin()]));
                  //$this->redirect(['index']); 
             //var_dump(Yii::$app->request->referrer);die();

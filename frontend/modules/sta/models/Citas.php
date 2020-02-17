@@ -75,7 +75,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
     public function scenarios()
     {
         $scenarios = parent::scenarios(); 
-        $scenarios[self::SCE_CREACION_BASICA] = ['talleres_id','talleresdet_id','duracion','fechaprog','codfac','codtra','asistio'];
+        $scenarios[self::SCE_CREACION_BASICA] = ['talleres_id','talleresdet_id','duracion','fechaprog','codfac','codtra','asistio','masivo'];
         $scenarios[self::SCENARIO_ASISTIO] = ['asistio'];
          $scenarios[self::SCENARIO_ACTIVO] = ['activo'];
           $scenarios[self::SCENARIO_REPROGRAMA] = ['fechaprog','duracion','finicio','ftermino'];
@@ -143,7 +143,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
             [['talleresdet_id', 'talleres_id', 'codtra','fechaprog', 'finicio', 'ftermino'], 'required'],
             [['talleresdet_id', 'talleres_id', 'duracion'], 'integer'],
             [['detalles'], 'string'],
-             [['detalles_secre','detalles_tareas_pend','detalles_indicadores','duracion','codfac','asistio','activo','numero'], 'safe'],
+             [['detalles_secre','detalles_tareas_pend','detalles_indicadores','duracion','codfac','asistio','activo','numero','masivo'], 'safe'],
             
             [['fechaprog', 'finicio', 'ftermino'], 'string', 'max' => 19],
             ['fechaprog', 'validateDispo'],

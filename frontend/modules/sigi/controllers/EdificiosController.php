@@ -641,5 +641,16 @@ $dataProvider = $searchModel->searchBySuministro($id,Yii::$app->request->queryPa
     
 }
 
+public function actionGenerateUsuarios($id){
+   if(h::request()->isAjax){
+     h::response()->format = \yii\web\Response::FORMAT_JSON;
+    $model=$this->findModel($id);
+    $model->generateUsers();
+    return ['success'=>yii::t('sta.errors','Se han generado los usuarios para este edificio')];
+   }
+     
+    
+}
+
 
 }

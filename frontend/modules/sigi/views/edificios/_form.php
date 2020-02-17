@@ -22,7 +22,10 @@ use common\widgets\selectwidget\selectWidget;
          <?php $url=Url::to(['/sigi/'.$this->context->id.'/verificar-datos','id'=>$model->id]);  ?>       
         <?= Html::submitButton('<span class="fa fa-save"></span>'.'  '.Yii::t('sigi.labels', 'Guardar'), ['class' => 'btn btn-success']) ?>
             <?=Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Verificar datos'), ['href' => $url, 'title' => yii::t('sta.labels','Verificar Datos'),'id'=>'btn-add-test','class' => 'botonAbre btn btn-warning'])?>
+            <?=Html::button('<span class="fa fa-users"></span>   '.Yii::t('sta.labels', 'Generar Usuarios'), ['class' => 'btn btn-success','href' => '#','id'=>'btn-add-usuarios'])?>
+           <?= common\widgets\auditwidget\auditWidget::widget(['model'=>$model])?>
            
+             
 
             </div>
         </div>
@@ -204,3 +207,41 @@ use common\widgets\selectwidget\selectWidget;
 
 </div>
     </div>
+ <?php 
+  $string="$('#btn-add-usuarios').on( 'click', function(){ 
+     
+       $.ajax({
+              url: '".Url::to(['/sigi/edificios/generate-usuarios','id'=>$model->id])."', 
+              type: 'get',
+              data:{id:".$model->id."  },
+              dataType: 'json', 
+              error:  function(xhr, textStatus, error){               
+                            var n = Noty('id');                      
+                              $.noty.setText(n.options.id, error);
+                              $.noty.setType(n.options.id, 'error');       
+                                }, 
+              success: function(json) {
+              var n = Noty('id');
+                      
+                       if ( !(typeof json['error']==='undefined') ) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['error']);
+                              $.noty.setType(n.options.id, 'error');  
+                          }    
+
+                             if ( !(typeof json['warning']==='undefined' )) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['warning']);
+                              $.noty.setType(n.options.id, 'warning');  
+                             } 
+                          if ( !(typeof json['success']==='undefined' )) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['success']);
+                              $.noty.setType(n.options.id, 'success');  
+                             }      
+                   
+                        }
+                        });
+
+
+             })";
+  
+   $this->registerJs($string, \yii\web\View::POS_END);
+  ?>

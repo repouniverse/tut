@@ -217,4 +217,35 @@ class TestController extends baseController
         }
  
     }
+    
+    public function actionAgregaIndicador($id){        
+         $this->layout = "install";
+        $modeltest = $this->findModel($id);
+       $model= new \frontend\modules\sta\models\StaTestindicadores();       
+       $model->codtest=$id;       
+       $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                $model->save();
+               // $model->assignStudentsByRandom();
+                  return ['success'=>1,'id'=>$model->codtest];
+            }
+        }else{
+           return $this->renderAjax('_modal_indicador', [
+                        'model' => $model,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                        //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+ 
+    }
+    
 }

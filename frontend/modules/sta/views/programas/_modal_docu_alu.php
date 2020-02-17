@@ -46,12 +46,61 @@ use common\helpers\h;
      echo $form->field($model, 'descripcion')->textInput();
       ?>
   </div>
-
-  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+     
+     
+     
+     
+     
+     
+     
+     
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
       <?PHP
-     echo $form->field($model, 'detalle')->textarea();
+     echo $form->field($model, 'indi_altos')->textarea();
       ?>
   </div>
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+      <?PHP
+     echo $form->field($model, 'indi_riesgo1')->textarea();
+      ?>
+  </div>
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+      <?PHP
+     echo $form->field($model, 'obs_entrev')->textarea();
+      ?>
+  </div>  
+     
+     
+     
+     
+   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+      <?PHP
+     echo $form->field($model, 'cuenta_buen')->textarea();
+      ?>
+  </div>   
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+      <?PHP
+     echo $form->field($model, 'adecuado_nivel')->textarea();
+      ?>
+  </div>  
+     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+      <?PHP
+     echo $form->field($model, 'indi_riesgo')->textarea();
+      ?>
+  </div> 
+     
+     
+     
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+      <?PHP
+     echo $form->field($model, 'sugerencias')->textarea();
+      ?>
+  </div>  
+     
+     
+     
+     
+ 
           
   <?php ActiveForm::end(); ?>
   
