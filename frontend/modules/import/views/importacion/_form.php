@@ -103,7 +103,12 @@ use common\widgets\cbodepwidget\cboDepWidget as ComboDep;
                     ) ?>
  </div> 
          <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12"> 
-    <?= $form->field($model, 'insercion')->checkBox() ?>
+          <?php /*var_dump($model->hasLoads()) ; die();*/ ?>
+          <?= $form->field($model, 'insercion')->checkBox(['disabled'=>($model->hasLoads())?true:false]) ?>
+
+ </div> 
+   <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12"> 
+    <?= $form->field($model, 'tienecabecera')->checkBox() ?>
 
  </div> 
  <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">  

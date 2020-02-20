@@ -132,7 +132,7 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
     
     public function getCsv(){
      //var_dump($this->firstLineTobegin());die();
-        yii::error('primera linea para importar:  '.$this->firstLineTobegin());
+        yii::error('primera linea para importar:  '.$this->firstLineTobegin(),__METHOD__);
       if(is_null($this->_csv)){
          
           $this->_csv= New MyCSVReader( [
@@ -149,9 +149,9 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
     }
     
     public function firstLineTobegin(){
-        if($this->current_linea==0 && $this->tienecabecera)
+        if($this->current_linea==0 && $this->cargamasiva->tienecabecera)
             return 2;
-         if($this->current_linea==0 && !$this->tienecabecera)
+         if($this->current_linea==0 && !$this->cargamasiva->tienecabecera)
             return 1;
          return $this->current_linea + 1 ;
         
@@ -197,11 +197,11 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
    * normalmente es la primera fila
    */
  public function verifyFirstRow(){
-     $oldErrors=$this->getErrors();
-     $this->clearErrors();
+     ///$oldErrors=$this->getErrors();
+    // $this->clearErrors();
      $row=$this->csv->getFirstRow();
-     yii::error('la primera fila es ');
-    yii::error($row);
+     yii::error('la primera fila es ',__METHOD__);
+    yii::error($row,__METHOD__);
      if(is_null($row) or $row===false)
      {
          $this->addError('activo',Yii::t('import.errors', 'Error; la primera fila  del archivo de carga no se ha encontrado, esto porque pued eque el archivo no tenga filas  o la propiedad firstLineToBegin(): {primera} llego al final del archivo ',['primera'=>$this->firstLineTobegin()]));
@@ -218,7 +218,9 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
      // $countFieldsInPrimaryKey=count($this->modelAsocc()->primaryKey(true));
       $validacion=true;
      // var_dump($filashijas,$row);die();
+      yii::error('comenzando  arecorrer los valores de row',__METHOD__);
       foreach($row as $index=>$valor){
+          yii::error($valor,__METHOD__);
           $valor=utf8_encode($valor);
           $tipo=$filashijas[$index]['tipo'];
           $longitud=$filashijas[$index]['sizecampo'];
@@ -241,35 +243,50 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
                           ));
          //yii::error(var_dump($tipo,$valor));
           /*Detectando inconsistencias*/
-           if($carga->isTypeChar($tipo)&&($longitud <> strlen($valor))){
-            $this->addError('activo',Yii::t('import.errors', 'Longitud ({longitud}) de la columna fija "{columna}", no coincide con la longitud del valor {valor}',['valor'=>$valor,'longitud'=>$longitud,'columna'=>$nombrecampo]));   
+          
+          $msgAdicional=yii::t('import.errors','Verifique que la fila validada no sea el encabezado del archivo');
+           
+          if($carga->isTypeChar($tipo)&&($longitud <> strlen($valor))){
+              yii::error('char: NO coindieorn las longitudes',__METHOD__);
+            $this->addError('activo',Yii::t('import.errors', 'Longitud ({longitud}) de la columna fija "{columna}", no coincide con la longitud del valor {valor}'.$msgAdicional,['valor'=>$valor,'longitud'=>$longitud,'columna'=>$nombrecampo]));   
+           $validacion=false;
+            
            }
            if ($carga->isTypeVarChar($tipo) &&($longitud < strlen($valor))){
-            $this->addError('activo',Yii::t('import.errors', 'Longitud máxima ({longitud}) de la columna  "{columna}",es menor que la longitud del valor {valor}',['valor'=>$valor,'longitud'=>$longitud,'columna'=>$nombrecampo]));   
+                yii::error('varchar: NO coindieorn las longitudes',__METHOD__);
+            $this->addError('activo',Yii::t('import.errors', 'Longitud máxima ({longitud}) de la columna  "{columna}",es menor que la longitud del valor {valor}'.$msgAdicional,['valor'=>$valor,'longitud'=>$longitud,'columna'=>$nombrecampo]));   
+           $validacion=false;
+            
            }
            if($carga->isNumeric($tipo)&& (!is_numeric($valor))){
-            $this->addError('activo',Yii::t('import.errors', 'Columna  "{columna}" es un valor numérico y  {valor} no lo es ',['valor'=>$valor,'columna'=>$nombrecampo]));   
+                yii::error('numerico : NO es el tipo',__METHOD__);
+            $this->addError('activo',Yii::t('import.errors', 'Columna  "{columna}" es un valor numérico y  "{valor}" no lo es '.$msgAdicional,['valor'=>$valor,'columna'=>$nombrecampo]));   
+           
+            $validacion=false;
            }
            
           if(                  
                    $carga->isDateorTime($tipo,$nombrecampo,$longitud)&& (
                             (strpos($valor,"-")===false) &&
                             (strpos($valor,"/")===false) &&
-                             (strpos($valor,".")===false)
+                             (strpos($valor,".")===false) 
                           )
-          )
-            $this->addError('activo',Yii::t('import.errors', 'Columna  "{columna}" no tiene el formato fecha, observe el valor {valor}',['valor'=>$valor,'columna'=>$nombrecampo]));   
-          
+          ){
+          $this->addError('activo',Yii::t('import.errors', 'Columna  "{columna}" no tiene el formato fecha, observe el valor {valor}'.$msgAdicional,['valor'=>$valor,'columna'=>$nombrecampo]));   
+          $validacion=false;    
+          }
+            
+         if($validacion===false){
+           break;
+         }
       }
       /*if(!$validacion){
           $this->addError('activo',Yii::t('import.errors', 'Error en el formato de la columna  "{columna}", los tipos no coinciden, revise el archivo de carga',['columna'=>$nombrecampo]));
         // throw new \yii\base\Exception(Yii::t('import.errors', 'The csv file has not the same type columns "{columna}" than type fields in this load data',['columna'=>$nombrecampo]));
            return false; 
               }*/
-      if($this->hasErrors()){
-          $validacion=false;  
-      }
-      $this->errors=$oldErrors;
+      
+      //$this->errors=$oldErrors;
       return $validacion;
  }
  
@@ -360,8 +377,7 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
     public function beforeSave($insert) {
         if($insert){
             $this->current_linea=0;
-             $this->current_linea_test=0;
-                 
+             $this->current_linea_test=0;                 
         }
         
         return parent::beforeSave($insert);
@@ -424,25 +440,27 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
             // VAR_DUMP($carga->pathFileCsv());die();
                         yii::error('Ya paso ..., Leyendo datos ',__METHOD__);  
                       $datos=$this->dataToImport(); //todo el array de datos para procesar, siempre empezara desde current_linea para adelante 
-                      
+                      yii::error('El archivo tenia  '.count($datos).' Filas ',__METHOD__);  
                       yii::error('Ya leyo  los datos estanb listos ',__METHOD__);  
                       $filashijas=$cargamasiva->ChildsAsArray();
-                    $linea=($cargamasiva->tienecabecera)?0:1;//si tiene cabecera comienza de 1 
+                   // $linea=($carmasiva->tienecabecera)?$linea:$linea-1;//
                     $oldScenario=$this->getScenario();
                     $this->setScenario(self::SCENARIO_RUNNING);
-                    yii::error('Iniciando Bucle For  Linea => '.$linea,__METHOD__);  
-                      
-                foreach ($datos as $fila){  
+                    //yii::error('Iniciando Buclede datos leidos del CSV desde la linea  Linea => '.$linea,__METHOD__);  
+                     yii::error('Iniciando Buclede datos leidos del CSV ',__METHOD__);   
+                foreach ($datos as $fila){ 
+                    yii::error('Esta es la fila a importar ');
+                    yii::error($fila,__METHOD__);
                      //Devuelve el modelo asociado a la importacion
                      //dependiendo si es insercion o actualizacion usa una u otra funcion
-                    yii::error('Esta es la linea => '.$linea,__METHOD__);  
-                    
+                    //yii::error('Esta es la linea => '.$linea,__METHOD__);   
+                     //yii::error($fila,__METHOD__);   
                    // yii::error($fila,__METHOD__);  
                     $model=($cargamasiva->insercion)?$cargamasiva->modelAsocc():$cargamasiva->findModelAsocc($fila);
                      yii::error('Colocando atributos => '.$linea,__METHOD__); 
                      $model->setAttributes($cargamasiva->AttributesForModel($fila,$filashijas));
                         if($verdadero){
-                            try{
+                            try{ 
                                  yii::error('Grabando registro  => '.$linea,__METHOD__); 
                     
                               if($model->save()){
@@ -515,6 +533,9 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
                         ) ;
                     die();*/
             $interrumpido=false;
+           $this->addError('activo',Yii::t('import.errors', 'No ha pasado la validación general '));
+        
+           return -1;
            
         }     
      ///$this->addError('activo',$camino);

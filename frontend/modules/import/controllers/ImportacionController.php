@@ -380,7 +380,7 @@ public function actionNewCarga(){
             'cargamasiva_id'=>$model->id,
              'descripcion'=>'CARGA MASIVA-'. uniqid(),
             'activo'=>'10',
-             'tienecabecera'=>'0',
+             'tienecabecera'=>$model->tienecabecera,
             ];
         $errores=[];
         if(ImportCargamasivaUser::firstOrCreateStatic($attributes,'minimo')){

@@ -14,7 +14,7 @@ use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
          'tableOptions'=>['class'=>'table table-condensed table-hover table-bordered table-striped'],
       //  'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+             'id',
              [
                 'class' => 'yii\grid\ActionColumn',
                 //'template' => Helper::filterActionColumn(['view', 'activate', 'delete']),
@@ -56,7 +56,9 @@ use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
                        
               },
             ],
-               'activo',   
+              
+                      
+                      'activo',   
             'descripcion',
            // 'fechacarga',
            [
