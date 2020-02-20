@@ -6,6 +6,14 @@ use yii\helpers\Html;
        role='progressbar' aria-valuenow='<?=$porcentaje?>'
   aria-valuemin='0' aria-valuemax='100' style='width:<?=$porcentaje?>%'>
     <?=$porcentaje?>% <?=\yii::t('sta.labels','Completado')?>
+  
+   <?php if(count( $itemsFaltantes)>0){?>
+    <?=\yii::t('sta.labels','Faltan responder : ')?>
+    <?php foreach($itemsFaltantes as $itemFaltante){
+         echo "Ítem ".$itemFaltante['item']." de prueba [".$itemFaltante['codtest']."]    ,  ";
+           }?>
+   <?php }?>
+
   </div>
     
     

@@ -1,6 +1,9 @@
 <?php
-
-
+$cadena="window.onbeforeunload = function(event)
+    {
+        return confirm('Esta acción eliminará el token y tendrá que solicitar uno nuevo');
+    };";
+ //$this->registerJs($cadena, \yii\web\View::POS_BEGIN);
 $wizard_config = [
 	'id' => 'stepwizard',
         'steps'=>$steps,

@@ -1,6 +1,6 @@
 <?php  
 use dosamigos\chartjs\ChartJs;
-
+use frontend\modules\sta\components\Indicadores;
 ?>
 <div class="box box-success">
     <section class="content">
@@ -99,7 +99,7 @@ use dosamigos\chartjs\ChartJs;
                  <div class="panel panel-success">
                <div class="panel-heading"><h3 class="panel-title" >FIEE</h3></div> 
                <div class="panel-body"> 
-                 <a href="<?=\yii\helpers\Url::to(["/sta/default/resumen-facultad",'codfac'=>'FIIE']) ?>"><span class="info-box-icon bg-blue-active"><i class="fa fa-microchip"></i></span></a>
+                 <a href="<?=\yii\helpers\Url::to(["/sta/default/resumen-facultad",'codfac'=>'FIEE']) ?>"><span class="info-box-icon bg-blue-active"><i class="fa fa-microchip"></i></span></a>
                  </div>  
                  </div> 
            </div>
@@ -133,7 +133,7 @@ use dosamigos\chartjs\ChartJs;
 
    
         <!-- /.row -->
- <h4 class="card-title"><?= yii::t('sta.labels','Inasistencias') ?></h4>
+ <h4 class="card-title"><?= yii::t('sta.labels','Asistencias') ?></h4>
 
         <div class="row">
           <div class="col-md-8">
@@ -151,7 +151,16 @@ use dosamigos\chartjs\ChartJs;
 
                     <div class="chart">
                       <!-- Sales Chart Canvas -->
-                      
+                     
+   <?php 
+   $indicador= Indicadores::IAsistenciasPorFacultad();
+   $arrayNcitas=array_column(array_values($indicador),'ncitas');
+   $arrayPcitas=array_column(array_values($indicador),'pasistencias');
+   $cienporciento=[];
+   foreach($arrayNcitas as $valor){
+     $cienporciento[]=100;  
+   }
+   ?>
                     <?= ChartJs::widget([
     'type' => 'bar',
     'options' => [
@@ -159,28 +168,53 @@ use dosamigos\chartjs\ChartJs;
         'width' => 400
     ],
     'data' => [
-        'labels' => ["FIIE", "FAUA", "FIM", "FIA", "FIC", "FIQ", "FIIS"],
+        'labels' => array_keys($indicador),
+        'datasets' => [
+           
+            [
+                'label' =>  yii::t('sta.labels',"% asistencia"),
+                'backgroundColor' => "rgba(220,69,191,1)",
+                'borderColor' => "rgba(220,69,191,1)",
+                'pointBackgroundColor' => "rgba(255,99,132,1)",
+                'pointBorderColor' => "#fff",
+                'pointHoverBackgroundColor' => "#fff",
+                'pointHoverBorderColor' => "rgba(255,99,132,1)",
+                'data' => $arrayPcitas
+            ],
+            [
+                'label' => yii::t('sta.labels',"% Ideal"),
+                'backgroundColor' => "rgba(226,228,225)",
+                'borderColor' => "rgba(226,228,225)",
+                'pointBackgroundColor' => "rgba(179,181,198,1)",
+                'pointBorderColor' => "#fff",
+                'pointHoverBackgroundColor' => "#fff",
+                'pointHoverBorderColor' => "rgba(179,181,198,1)",
+                'data' => $cienporciento,
+            ],
+        ]
+    ]
+]);
+?>
+                      <?= ChartJs::widget([
+    'type' => 'bar',
+    'options' => [
+        'height' => 180,
+        'width' => 400
+    ],
+    'data' => [
+        'labels' => array_keys($indicador),
         'datasets' => [
             [
-                'label' => yii::t('sta.labels',"Talleres"),
+                'label' => yii::t('sta.labels',"Citas"),
                 'backgroundColor' => "rgba(115,218,22,0.9)",
                 'borderColor' => "rgba(60,117,9,1)",
                 'pointBackgroundColor' => "rgba(179,181,198,1)",
                 'pointBorderColor' => "#fff",
                 'pointHoverBackgroundColor' => "#fff",
                 'pointHoverBorderColor' => "rgba(179,181,198,1)",
-                'data' => [65, 59, 90, 81, 56, 55, 40]
+                'data' => $arrayNcitas
             ],
-            [
-                'label' =>  yii::t('sta.labels',"Entrevistas"),
-                'backgroundColor' => "rgba(255,209,40,1)",
-                'borderColor' => "rgba(255,99,132,1)",
-                'pointBackgroundColor' => "rgba(255,99,132,1)",
-                'pointBorderColor' => "#fff",
-                'pointHoverBackgroundColor' => "#fff",
-                'pointHoverBorderColor' => "rgba(255,99,132,1)",
-                'data' => [28, 48, 40, 19, 96, 27, 100]
-            ]
+            
         ]
     ]
 ]);

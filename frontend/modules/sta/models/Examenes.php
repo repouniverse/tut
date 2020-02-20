@@ -217,7 +217,7 @@ class Examenes extends modelSensibleAccess
           'puntaje'=>$detalle['puntajetotal']
        ])->createCommand()->getRawSql());
        if(is_null($percentil)){
-       // yi::error();   
+        yii::error('No se encontró el percentil');   
        }
        //yii::error($detalle['puntajetotal']);
         $attributos=[
@@ -236,7 +236,7 @@ class Examenes extends modelSensibleAccess
                 [ 'examen_id'=>$detalle['examenes_id'],'indicador_id'=>$detalle['indicador_id']]
                 );
        if($valor===false){
-           yii::error('fallo');
+           yii::error('Fallo y estos son los errores : ');
            $mimodelo=new StaResultados();
            //$mimodelo->setScenario(StaResultados::SCENARIO_MIN);
            $mimodelo->setAttributes($attributos);

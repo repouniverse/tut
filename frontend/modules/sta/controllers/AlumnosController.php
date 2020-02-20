@@ -39,6 +39,7 @@ class AlumnosController extends baseController
      */
     public function actionIndex()
     {
+        print_r(\frontend\modules\sta\components\Indicadores::IAsistenciasPorFacultad());die();
       
        /* \frontend\modules\sta\models\Examenes::findOne(161)->makeResultados();
         \frontend\modules\sta\models\Examenes::findOne(162)->makeResultados();

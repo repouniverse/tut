@@ -47,7 +47,12 @@ use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
                 ],
             //'codfac',
             //'ftermino',
-            'detalles',
+           [  'attribute'=>'detalles',
+                'format'=>'raw',
+                 'value' => function ($model, $key, $index, $column) {
+                     return substr($model->detalles,0,20).'...';
+                        },
+                ],
            // 'materia.nomcur',
             //'nveces'
         ],

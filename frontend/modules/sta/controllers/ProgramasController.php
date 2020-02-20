@@ -783,7 +783,7 @@ public function actionEditaDocu($id){
                   return ['success'=>1,'id'=>$model->id];
             }
         }else{
-           return $this->renderAjax('_modal_docu_alu', [
+           return $this->renderAjax('_modal_docu_alu_'.$model->codocu, [
                         'model' => $model,
                          'modeldet' => $model->talleresdet,
                         'id' => $id,

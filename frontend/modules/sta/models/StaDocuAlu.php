@@ -50,6 +50,7 @@ public function behaviors()
             [['talleresdet_id'], 'integer'],
             [['codocu'], 'required'],
             [['detalle'], 'string'],
+            [['cita_id'], 'safe'],
             [['codfac','indi_altos','indi_riesgo1','obs_entrev','cuenta_buen','adecuado_nivel','indi_riesgo','metas','sugerencias'], 'safe'],
             [['codocu'], 'string', 'max' => 3],
             [['descripcion'], 'string', 'max' => 30],

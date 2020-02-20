@@ -28,8 +28,8 @@ use common\helpers\h;
                ?> 
                <?php require('alertperiod.php');   ?> 
              <?php require('notificaciones.php');   ?>
-             <?php require('tasks.php');   ?>
-              <?php require('historial.php');   ?>
+             <?php /*require('tasks.php'); */  ?>
+              <?php /*require('historial.php');*/   ?>
                 <!-- User Account: style can be found in dropdown.less -->
 
                 <li class="dropdown user user-menu">

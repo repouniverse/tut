@@ -700,6 +700,9 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
    * fechainicio : cadena en formato Y-m-d
    */
   public function reprograma($fechaInicio,$fechaTermino=null){
+      yii::error($this->asistio);
+      yii::error($this->isVencida());
+      
     if(!$this->asistio && !$this->isVencida()){
         $CfechaInicio= \Carbon\Carbon::createFromFormat(\common\helpers\timeHelper::formatMysql(),$fechaInicio);
         if(!is_null($fechaTermino)){

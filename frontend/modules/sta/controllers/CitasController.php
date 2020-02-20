@@ -433,6 +433,17 @@ public function actionExamenBanco($id){
                                  if($session->has('repuestasExamen')){
                                     $session->remove('repuestasExamen');
                                     }
+                                 if($session->has('IdsPreguntas')){
+                                    $session->remove('IdsPreguntas');
+                                    }
+                                  
+                                    //Creansdo  el array de la sesion de IdsPreguntas
+                                    $idsExamenes=(new \yii\db\Query())->select(['id'])
+                                    ->from(['a'=>'{{%sta_examenes}}'])->where(['citas_id'=>$cita->id])->column();
+                                    $idsPreguntas=(new \yii\db\Query())->select(['id'])
+                                    ->from(['a'=>'{{%sta_examenesdet}}'])->where(['examenes_id'=>$idsExamenes])->column();
+                                    $session['IdsPreguntas']=array_map('intval', $idsPreguntas);
+                                    
                                      
                                      
                                      
@@ -638,10 +649,29 @@ function actionBancoPreguntas($id){
            }
          
           $porcentaje=((integer)$numeroPreguntas>0)?round((100*count($session['repuestasExamen'])/$numeroPreguntas),3):0;
-     yii::error($session['repuestasExamen']);
-     yii::error(count($session['repuestasExamen']));
-     yii::error($numeroPreguntas);
-            return $this->renderAjax('_progress',['porcentaje'=>$porcentaje]);
+           $itemsFaltantes=[];
+          if($porcentaje>=90){
+             if($session->has('IdsPreguntas')){
+              $faltan=array_diff($session['IdsPreguntas'],array_keys($arrayRespuestas));
+              $testdetsIds=(new \yii\db\Query())->select(['test_id'])
+                                    ->from(['a'=>'{{%sta_examenesdet}}'])->where(['id'=>array_values($faltan)])->all();
+              $testdetsIds= array_map('intval',array_column($testdetsIds, 'test_id'));
+              //yii::error($testdetsIds);
+              $itemsFaltantes=(new \yii\db\Query())->select(['item','pregunta','codtest'])
+                                    ->from(['a'=>'{{%sta_testdet}}'])->where(['id'=>$testdetsIds])->all();
+              // yii::error($session['IdsPreguntas']); 
+              //yii::error(array_keys($arrayRespuestas));
+              //yii::error('preguntas faltante');
+              //yii::error($faltan);
+              //yii::error($itemsFaltantes);
+             }
+              
+              
+          }
+    // yii::error($session['repuestasExamen']);
+    // yii::error(count($session['repuestasExamen']));
+    // yii::error($numeroPreguntas);
+            return $this->renderAjax('_progress',[ 'itemsFaltantes'=> $itemsFaltantes,'porcentaje'=>$porcentaje]);
            
         }
          
@@ -650,27 +680,47 @@ function actionBancoPreguntas($id){
  }
  
  public function actionTerminaExamen($id){
-      $cookiesRead = Yii::$app->request->cookies;
-   // $cookiesSend = Yii::$app->response->cookies;
-    $nombrecookie='calamaro_'.$id;
-     $this->layout="install";
-     yii::error($cookiesRead->has($nombrecookie));
-     yii::error(Yii::$app->session->has('repuestasExamen'));
-      if(Yii::$app->session->has('repuestasExamen')){
-          $arrayRespuestas=Yii::$app->session['repuestasExamen']; 
-          
+      $this->layout="install";
+      $id=$id.'';
+    if(preg_match("/[^a-z\d]/i", $id)){
+      echo "cuidado, cuidado que travesuras estás haciendo..., ya te tengo registrado";die();
+    
+    }
+        
+     $model=Citas::findFree()->where(['id'=>$id])->one();
+  if(is_null($model)){
+    $mensaje=yii::t('sta.errors','¡ El enlace no es el correcto...!');
+    return $this->render('finalizacion_examen_error',['mensaje'=>$mensaje]);  
+  }
+   
+    $session=Yii::$app->session;
+    if($session->has('IdsPreguntas') && $session->has('repuestasExamen')){
+             
+      $npreguntas=count($session['IdsPreguntas']);
+       $nrespuestas=count($session['repuestasExamen']);
+       if($npreguntas > $nrespuestas){
+           echo " Ups .... Aquí ha pasado algo raro; no has completado la batería de preguntas, acércate a tutoría ";die();
+       }
+           
+     //yii::error($cookiesRead->has($nombrecookie));
+     //yii::error(Yii::$app->session->has('repuestasExamen'));
+      
+          $arrayRespuestas=$session['repuestasExamen'];           
              foreach($arrayRespuestas as $clave=>$valor){
                  Yii::$app->db->createCommand()
              ->update('{{%sta_examenesdet}}', ['valor' => $valor], 'id=:clave',[':clave'=>$clave])
              ->execute();
                    }
-           Yii::$app->session->remove('repuestasExamen');
-           $cookies = Yii::$app->response->cookies;
+            //$model->makeResultados();                   
+           $session->remove('repuestasExamen');
+           //$cookies = Yii::$app->response->cookies;
+          
         // remueve una cookie
            // $cookies->remove($nombrecookie);
            return $this->render('finalizacion_examen');
       }else{
-          return $this->render('finalizacion_examen_error'); 
+          $mensaje=yii::t('sta.errors','No, no ..., así no. Estás accediendo de una mala manera..., solicita un nuevo token');
+          return $this->render('finalizacion_examen_error',['mensaje'=>$mensaje]); 
       }
      
                                     
@@ -703,11 +753,32 @@ function actionBancoPreguntas($id){
           $modeloMuestra=$proveedor->models[0];
           $calificaciones=$modeloMuestra->test->arrayCalificaciones();
           $steps[$i]=[
-              'title' => $modeloMuestra->descripcion,
-               'icon' => 'glyphicon glyphicon-cloud-upload',
+              'title' => $modeloMuestra->codtest,
+               'icon' => 'glyphicon glyphicon-list-alt',
               'content' => $this->renderPartial('_examen_step',
-                                ['modeloMuestra'=>$modeloMuestra,'model'=>$cita,'calificaciones'=>$calificaciones,'proveedor'=>$proveedor,'codexamen'=>$code,'numeroPreguntas'=>$numeroPreguntas]
+                                ['mensaje'=>$modeloMuestra->detalletest,'modeloMuestra'=>$modeloMuestra,'model'=>$cita,'calificaciones'=>$calificaciones,'proveedor'=>$proveedor,'codexamen'=>$code,'numeroPreguntas'=>$numeroPreguntas]
+                     
                       ),
+              'buttons' => [
+				'next' => [
+					'title' => 'Siguiente', 
+					'options' => [
+						'class' => 'btn btn-success'
+					],
+				 ],
+                                 'prev' => [
+					'title' => 'Previo', 
+					'options' => [
+						'class' => 'btn btn-success'
+					],
+				 ],
+                                 'save' => [
+					'title' => 'Terminar', 
+					'options' => [
+						'class' => 'btn btn-warning'
+					],
+				 ],
+			 ],
           ];
           $i++;
       }
@@ -771,7 +842,7 @@ function actionBancoPreguntas($id){
       if(!$cita->hasCompletePreguntas())
             return ['error'=>yii::t('sta.errors','El banco de preguntas aun no esta completo, refresque preguntas')];
       if(!$cita->isBateriaCompleta())
-           return ['error'=>yii::t('sta.errors','Error: Hya preguntas sin contestar')];
+           return ['error'=>yii::t('sta.errors','Error: Hay preguntas sin contestar')];
       $cita->makeResultados();
        return ['success'=>yii::t('sta.errors','Se han procesado las pruebas, con éxito')];
      
@@ -793,4 +864,66 @@ public function actionEliminaCita($id){
     }
 } 
  
+public function actionReportInfPsicologico($id){
+    $this->layout="reportes";
+    $model= \frontend\modules\sta\models\StaDocuAlu::findOne($id);
+    if(is_null($model))
+   throw new NotFoundHttpException(Yii::t('sta.labels', 'No se encontro ningun registro con el id '.$id));
+   $codocu=$model->codocu;
+    if($codocu=='105'){
+       echo "En proceso de diseño";die(); 
+    }
+    
+    /*Filtro de acceso*/
+             /*if($model->hasMethod('canDownload')){
+                 if(!$model->canDownload()){
+                     return "no puedes Visualizar este documento"; 
+                 }
+             }*/
+       /*Fin del filtro */
+     $view="/citas/reportes/reporte_".$codocu;
+     $alumno=$model->talleresdet->alumno;    
+    if($codocu=='106'){
+         $cita=Citas::findOne($model->cita_id);
+            $examenesId=$cita->examenesId();
+            //var_dump($examenesId);die();
+            $resultados= \frontend\modules\sta\models\StaResultados::find()->andWhere(['examen_id'=>$examenesId])->all();
+         $pagina=$this->render($view,['model'=>$model,'alumno'=>$alumno,'resultados'=>$resultados]);
+    
+    }
+    if($codocu=='107'){
+         $cita=Citas::findOne($model->cita_id);
+            $examenesId=$cita->examenesId();
+            //var_dump($examenesId);die();
+            //$resultados= \frontend\modules\sta\models\StaResultados::find()->andWhere(['examen_id'=>$examenesId])->all();
+         $pagina=$this->render($view,['model'=>$model,'alumno'=>$alumno,'examenesId'=>$examenesId]);
+    
+    }
+   if($codocu=='104'){
+          //Solo ara el documento 104
+         $citas=Citas::find()->andWhere(['talleresdet_id'=>$model->talleresdet_id])->orderBy('fechaprog asc')->all();
+       $pagina=$this->render($view,['model'=>$model,'alumno'=>$alumno,'citas'=>$citas]);
+    
+    }
+     //return $this->render("/citas/reportes/cabecera");
+     
+  if($codocu=='107')
+  return $pagina;
+   $mpdf= \frontend\modules\report\Module::getPdf();
+   $mpdf->margin_header=1;
+    $mpdf->margin_footer=1;
+   $mpdf->setAutoTopMargin='stretch';
+   $mpdf->setAutoBottomMargin='stretch';
+   $mpdf->DefHTMLHeaderByName(
+  'Chapter2Header',$this->render("/citas/reportes/cabecera")
+);
+   $mpdf->DefHTMLFooterByName('pie',$this->render("/citas/reportes/footer"));
+   $mpdf->SetHTMLHeaderByName('pie');
+   $mpdf->WriteHTML($pagina);
+      return  $mpdf->output();
+            
+}
+
+
+
 }

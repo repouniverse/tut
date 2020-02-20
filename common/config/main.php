@@ -308,14 +308,15 @@ return [
         //'loginUrl' => ['admin/user/login'],
          'loginUrl' => ['site/login'],  
            'enableAutoLogin'=>false,
+           // authTimeout
             'enableSession' => true,
-           // 'authTimeout'=>1,
+            'authTimeout'=>60*500,
     ]
         
         
         
            ],
-   /* 'as access' => [
+    'as access' => [
         'class' => 'mdm\admin\components\AccessControl',
         'allowActions' => [
             'site/login/',
@@ -329,6 +330,6 @@ return [
             'sta/citas/respuesta-examen',
             'sta/citas/termina-examen',
         ]
-    ]*/
+    ]
     
 ];

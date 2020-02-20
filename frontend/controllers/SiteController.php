@@ -92,10 +92,15 @@ class SiteController extends Controller
                       $profile=h::user()->profile;
                     $url= $profile->url;
                        $tipo=$profile->tipo;
-          // yii::error(' tipo '.$tipo);
            //yii::error(' tipo '.$tipo);
-            if(empty($url))
-           $url=h::gsetting('general','url.profile.'.$tipo);                     
+           // yii::error(' url '.$url);
+           //yii::error(' tipo '.$tipo);
+            if(empty($url)){
+              //yii::error(' url empty sacando de settings ');   
+              $url=h::gsetting('general','url.profile.'.$tipo);   
+             // yii::error(' url  '.$url); 
+            }
+              //yii::error('LA URL ES  '.$url);                   
            if(!empty($url))
              $this->redirect(Url::to([$url]));
                       
@@ -204,6 +209,11 @@ class SiteController extends Controller
         $model = new SignupForm();
         if ($model->load(Yii::$app->request->post())) {
             if ($user = $model->signup()) {
+                /*Agregar el rol basico*/
+                
+                
+                
+                
                if($user->status== UserStatus::INACTIVE){
                   return $this->render('waitsignup', [
                     'model' => $model,
@@ -330,7 +340,7 @@ class SiteController extends Controller
               //\console\components\Command::execute('cache/flush-all', ['interactive' => false]);
               //\console\components\Command::execute('cache/flush-schema', ['interactive' => false]);
            $datos['success']=yii::t('base.actions','
-Datos de caché de configuración han sido borrados');
+Datos de caché de configuración se han actualizado');
            
            h::response()->format = \yii\web\Response::FORMAT_JSON;
            return $datos;

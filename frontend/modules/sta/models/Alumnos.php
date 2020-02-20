@@ -131,13 +131,7 @@ class Alumnos extends \common\models\base\modelBase implements PersonInterface ,
         ];
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCodcar()
-    {
-        return $this->hasOne(Carreras::className(), ['codcar' => 'codcar']);
-    }
+  
     
     public function getFacultad()
     {

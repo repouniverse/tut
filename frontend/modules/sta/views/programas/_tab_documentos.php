@@ -33,7 +33,7 @@
                  [
                 'class' => 'yii\grid\ActionColumn',
                 //'template' => Helper::filterActionColumn(['view', 'activate', 'delete']),
-            'template' => '{edit}{attach}{delete}',
+            'template' => '{edit}{attach}{delete}{pdf}',
                'buttons' => [
                    'delete' => function ($url,$model) {
 			   $url = \yii\helpers\Url::toRoute($this->context->id.'/deletemodel-for-ajax');
@@ -58,7 +58,13 @@
 			   $url = \yii\helpers\Url::toRoute([$this->context->id.'/edita-docu','id'=>$model->id,'gridName'=>'palogay_docu','idModal'=>'buscarvalor']);
 
                               return \yii\helpers\Html::a('<span class="btn btn-danger glyphicon glyphicon-pencil"></span>', $url, ['class'=>'botonAbre']);
-                            } 
+                            },
+                        'pdf' => function ($url,$model) {
+			   $url = \yii\helpers\Url::toRoute(['/sta/citas/report-inf-psicologico','id'=>$model->id,'gridName'=>'palogay_docu','idModal'=>'buscarvalor']);
+                              if($model->cita_id > 0 or $model->codocu=='104')
+                              return \yii\helpers\Html::a('<span class="btn btn-warning fa fa-file-pdf"></span>', $url, ['data-pjax'=>'0','target'=>'_blank']);
+                              return '';
+                             } 
                     ]
                 ],
             'codocu',

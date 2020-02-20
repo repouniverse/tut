@@ -112,6 +112,24 @@ class comboHelper extends Combito
       where(['codtest'=>$codtest])->all(),
             'grupo','grupo'); 
     }  
+  
+    /*
+     * Saca las citas que tienen evaluaciones para 
+     * ese alumno en ese programa
+     * $id: El id del la tala StaDocuAlu
+     */
+   public static function geCboCitasWithTests($talleresdet_id){
+        $query= (new \yii\db\Query())->select(['count(b.citas_id)','a.id','a.numero'])->
+    from(['{{%sta_citas}} a'])->
+      where([
+          'talleresdet_id'=>$talleresdet_id,
+          
+              ])->innerJoin('{{%sta_examenes}} b','a.id=b.citas_id')
+             ->groupBy(['id','numero']);
+          
+     return ArrayHelper::map($query->all(),
+            'id','numero');  
+    }
 }
 
 

@@ -82,6 +82,14 @@ class timeHelper {
    public static function formatMysql(){
     return h::gsetting('timeBD', 'datetime');
    } 
+   
+   public static function formatMysqlDate(){
+    return 'Y-m-d';
+   } 
+   public static function formatMysqlDateTime(){
+    return 'Y-m-d H:i:s';
+   } 
+   
    public static function regexMysqlDate(){
       return '/[0-9]{4}-[0-9]{1}[0-2]{1}-[0-3]{1}[0-9]{1}/';
   }

@@ -231,5 +231,9 @@ class h {
      return User::findIdentity($id)->username;
   }
    
+ public static function obQuery(){
+     return new \yii\db\Query();
+ } 
+  
 }
 ?>

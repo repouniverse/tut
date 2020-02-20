@@ -197,6 +197,8 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
    * normalmente es la primera fila
    */
  public function verifyFirstRow(){
+     $oldErrors=$this->getErrors();
+     $this->clearErrors();
      $row=$this->csv->getFirstRow();
      yii::error('la primera fila es ');
     yii::error($row);
@@ -239,24 +241,35 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
                           ));
          //yii::error(var_dump($tipo,$valor));
           /*Detectando inconsistencias*/
-          if(($carga->isTypeChar($tipo)&&($longitud <> strlen($valor))) or
-           ($carga->isTypeVarChar($tipo) &&($longitud < strlen($valor))) or                
-           ($carga->isNumeric($tipo)&& (!is_numeric($valor)) ) or                   
-         ( $carga->isDateorTime($tipo,$nombrecampo,$longitud)&& (
+           if($carga->isTypeChar($tipo)&&($longitud <> strlen($valor))){
+            $this->addError('activo',Yii::t('import.errors', 'Longitud ({longitud}) de la columna fija "{columna}", no coincide con la longitud del valor {valor}',['valor'=>$valor,'longitud'=>$longitud,'columna'=>$nombrecampo]));   
+           }
+           if ($carga->isTypeVarChar($tipo) &&($longitud < strlen($valor))){
+            $this->addError('activo',Yii::t('import.errors', 'Longitud máxima ({longitud}) de la columna  "{columna}",es menor que la longitud del valor {valor}',['valor'=>$valor,'longitud'=>$longitud,'columna'=>$nombrecampo]));   
+           }
+           if($carga->isNumeric($tipo)&& (!is_numeric($valor))){
+            $this->addError('activo',Yii::t('import.errors', 'Columna  "{columna}" es un valor numérico y  {valor} no lo es ',['valor'=>$valor,'columna'=>$nombrecampo]));   
+           }
+           
+          if(                  
+                   $carga->isDateorTime($tipo,$nombrecampo,$longitud)&& (
                             (strpos($valor,"-")===false) &&
                             (strpos($valor,"/")===false) &&
                              (strpos($valor,".")===false)
-                          ))
+                          )
           )
-            $validacion=false;
-          break;
+            $this->addError('activo',Yii::t('import.errors', 'Columna  "{columna}" no tiene el formato fecha, observe el valor {valor}',['valor'=>$valor,'columna'=>$nombrecampo]));   
+          
       }
-      if(!$validacion){
+      /*if(!$validacion){
           $this->addError('activo',Yii::t('import.errors', 'Error en el formato de la columna  "{columna}", los tipos no coinciden, revise el archivo de carga',['columna'=>$nombrecampo]));
         // throw new \yii\base\Exception(Yii::t('import.errors', 'The csv file has not the same type columns "{columna}" than type fields in this load data',['columna'=>$nombrecampo]));
            return false; 
-              }
-         
+              }*/
+      if($this->hasErrors()){
+          $validacion=false;  
+      }
+      $this->errors=$oldErrors;
       return $validacion;
  }
  

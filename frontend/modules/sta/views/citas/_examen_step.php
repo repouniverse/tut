@@ -9,9 +9,9 @@
  use frontend\modules\sta\models\VwStaExamenesSearch;
 
 ?>
-<div class='alert alert-info'><?=$modeloMuestra->descripcion?></div>
 
 
+<h5><?=$mensaje?></h5>
 
 <?php echo $this->render('calificaciones',['codexamen'=>$codexamen]); ?>
 <div class="progress"></div>
@@ -28,9 +28,11 @@
          'tableOptions'=>['class'=>'table table-condensed table-hover table-bordered table-striped'],
         'columns' => [
                 
-            'codtest',
+            ['attribute'=>'codtest',
+                'header'=>'Prueba'
+                ],
               'item',
-            'pregunta',
+            [ 'attribute' => 'pregunta', 'contentOptions' => [ 'style' => 'width: 40%;' ], ], 
              /*[
                         'class' => 'kartik\grid\EditableColumn',
                        
