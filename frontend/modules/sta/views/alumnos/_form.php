@@ -14,7 +14,10 @@ use common\helpers\h;
 
 <div class="alumnos-form">
     <br>
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin([
+       //'enableAjaxValidation'=>true,
+    'fieldClass'=>'\common\components\MyActiveField'
+    ]); ?>
       <div class="box-header">
         <div class="col-md-12">
             <div class="form-group no-margin">
@@ -37,17 +40,18 @@ use common\helpers\h;
 
    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">  
    <?php 
-   //$model->fillRelations();
-   // print_r($model->_obRelations);die();
-  // $necesi=new Parametros;
-    echo selectWidget::widget([
+   /* echo selectWidget::widget([
            // 'id'=>'mipapa',
             'model'=>$model,
             'form'=>$form,
             'campo'=>'codcar',
              'addCampos'=>[2],
             //'foreignskeys'=>[1,2,3],
-        ]);  ?>
+        ]); */ ?>
+       <?php if(!$model->isNewRecord) { ?>
+        <?= $form->field($model->carrera,'descar')->textInput(['disabled'=>true,'maxlength' => true]) ?>
+       <?php } ?>
+       
     </div>
           
           
@@ -55,16 +59,16 @@ use common\helpers\h;
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
                    <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
-                        <?= $form->field($model, 'ap')->textInput(['maxlength' => true]) ?>
+                        <?= $form->field($model, 'ap')->textInput(['disabled'=>true,'maxlength' => true]) ?>
 
                   </div>
 
                      <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
-                       <?= $form->field($model, 'am')->textInput(['maxlength' => true]) ?>
+                       <?= $form->field($model, 'am')->textInput(['disabled'=>true,'maxlength' => true]) ?>
 
                      </div>
                                 <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
-                           <?= $form->field($model, 'nombres')->textInput(['maxlength' => true]) ?>
+                           <?= $form->field($model, 'nombres')->textInput(['disabled'=>true,'maxlength' => true]) ?>
 
                               </div>
                             
@@ -108,7 +112,7 @@ use common\helpers\h;
           
           
   <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
-     <?= $form->field($model, 'codalu')->textInput(['maxlength' => true]) ?>
+     <?= $form->field($model, 'codalu')->textInput(['disabled'=>true,'maxlength' => true]) ?>
 
  </div>
           
@@ -132,6 +136,7 @@ use common\helpers\h;
      <?= $form->field($model, 'domicilio')->textInput(['maxlength' => true]) ?>
 
  </div>
+
    
     <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12"> 
     <?= ComboDep::widget([
@@ -233,8 +238,15 @@ use common\helpers\h;
                       //'disabled'=>($model->isBlockedField('codpuesto'))?'disabled':null,
                         ]
                     ) ?>
- </div>      
-     
+ </div>  
+  <div class="col-lg-3 col-md-12 col-sm-6 col-xs-12">
+     <?= $form->field($model, 'celulares')->textInput(['maxlength' => true]) ?>
+
+ </div>         
+     <div class="col-lg-3 col-md-12 col-sm-6 col-xs-12">
+     <?= $form->field($model, 'fijos')->textInput(['maxlength' => true]) ?>
+
+ </div> 
     <?php ActiveForm::end(); ?>
 
 </div>

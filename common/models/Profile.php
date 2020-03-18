@@ -267,5 +267,10 @@ class Profile extends \common\models\base\modelBase implements \common\interface
     }
 
   
+    public static function UserIdByTrabajador($codtra){
+       return static::find()->andWhere(['codtra'=>$codtra])->one();
+    }
+    
+    
   
              }

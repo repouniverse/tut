@@ -22,6 +22,7 @@ echo \common\widgets\spinnerWidget\spinnerWidget::widget();
                 ]);
 
 ?>
+
 <?php 
  echo TabsX::widget([
      'position' => TabsX::POS_ABOVE,
@@ -32,21 +33,18 @@ echo \common\widgets\spinnerWidget\spinnerWidget::widget();
         [
             'label' =>'<i class="glyphicon glyphicon-hourglass"></i> '.yii::t('base.names','Citas'), //$this->context->countDetail() obtiene el contador del detalle
             'content'=> $this->render('_tab_citas',['modelTallerDet'=>$modelTallerdet,'codperiodo'=>$codperiodo,'dataProvider'=>$dataProvider]),
-//'content' => $this->render('detalle',['form'=>$form,'orden'=>$this->context->countDetail(),'modelDetail'=>$modelDetail]),
             'active' => true,
              'options' => ['id' => 'tnID3'],
         ],
         [
             'label' =>'<i class="glyphicon glyphicon-calendar"></i> '. yii::t('base.names','Programación'), //$this->context->countDetail() obtiene el contador del detalle
-            'content'=> $this->render('_tab_calendario',['codperiodo'=>$codperiodo,'idalu'=>$model->id,'modelPsico'=>$modelPsico,  'items'=>[['name'=>$codalu,'color'=>$color]],'citasPendientes'=>$citasPendientes,'model'=>$modelPsico]),
-//'content' => $this->render('detalle',['form'=>$form,'orden'=>$this->context->countDetail(),'modelDetail'=>$modelDetail]),
+            'content'=> $this->render('_tab_calendario',['codalu'=>$codalu,'codperiodo'=>$codperiodo,'idalu'=>$model->id,'modelPsico'=>$modelPsico,  'items'=>[['name'=>$codalu,'color'=>$color]],'citasPendientes'=>$citasPendientes,'model'=>$modelPsico]),
             'active' => false,
              'options' => ['id' => 'myy6nID4'],
         ],
       [
             'label' =>'<i class="glyphicon glyphicon-calendar"></i> '. yii::t('base.names','Documentos'), //$this->context->countDetail() obtiene el contador del detalle
             'content'=> $this->render('_tab_documentos',['model'=>$modelTallerdet]),
-//'content' => $this->render('detalle',['form'=>$form,'orden'=>$this->context->countDetail(),'modelDetail'=>$modelDetail]),
             'active' => false,
              'options' => ['id' => 'mxx4ID4'],
         ],

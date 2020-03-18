@@ -152,7 +152,7 @@ class selectWidget extends \yii\base\Widget
         
      private function getModelForeign(){
           $foreignClass=$this->_foreignClass;
-          yii::error('inicinado ');
+         // yii::error('inicinado ');
      if(is_null($this->_modelForeign)){
         if($this->model->isNewRecord or empty($this->model->{$this->campo} )  ){
             // yii::error('---nueov record ---');

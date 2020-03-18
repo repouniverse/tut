@@ -45,6 +45,16 @@ use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
                     return Html::a($model->fechaprog,$url, $options);
                         },
                 ],
+         [
+    'attribute' => 'asistio',
+    'format' => 'raw',
+    'value' => function ($model) {
+      return '<span class="label label-'.array_keys($model->marcadorStatus())[0].'">'.array_values($model->marcadorStatus())[0].'</span>';
+        return \yii\helpers\Html::checkbox('calificacion[]', $model->asistio, [ 'disabled' => true]);
+
+             },
+
+          ],
             //'codfac',
             //'ftermino',
            [  'attribute'=>'detalles',

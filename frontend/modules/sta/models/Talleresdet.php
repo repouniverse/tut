@@ -3,9 +3,15 @@
 namespace frontend\modules\sta\models;
 use frontend\modules\sta\staModule;
 use frontend\modules\sta\models\StaDocuAlu;
+use frontend\modules\sta\models\Citas;
+use frontend\modules\sta\models\Examenes;
+use frontend\modules\sta\models\StaResultados;
+use frontend\modules\sta\models\StaPercentiles;
 use common\models\masters\Trabajadores;
 use Yii;
  use common\helpers\timeHelper;
+  use common\helpers\h;
+ 
 /**
  * This is the model class for table "{{%sta_talleresdet}}".
  *
@@ -214,10 +220,22 @@ public function getTrabajador()
   }
   
   private function citasPasadasQuery(){
-       $ahora=date(timeHelper::formatMysql());
+       $horas=h::gsetting('sta', 'nhorasreprogramacion');
+       $limite=self::CarbonNow()->subHours($horas)->format(timeHelper::formatMysql());
       return $this->getCitas()->
-              andWhere(['<','fechaprog',$ahora]);
+              andWhere(['<','fechaprog',$limite]);
   }
+  
+  private function citasPendientesQuery(){
+       $horas=h::gsetting('sta', 'nhorasreprogramacion');
+       $limite=self::CarbonNow()->subHours($horas)->format(timeHelper::formatMysql());
+      return $this->getCitas()->
+              andWhere(['>=','fechaprog',$limite])->
+              andWhere(['asistio'=>'0'/*,'masivo'=>'0'*/]);
+  }
+  
+  
+  
   
   public function cambiaPsicologo($nuevo){
       $oldScenario=$this->getScenario();
@@ -237,4 +255,35 @@ public function getTrabajador()
      return Test::find()->where(['codtest'=>$examenesCods])->asArray()->all();
       
   }
+
+
+public function indicadores(){
+    $arreglo=[];
+    $citasId=Citas::find()->select(['id'])->
+      andWhere(['talleresdet_id'=>$this->id,'asistio'=>'1'])->column();
+   $examenesId=Examenes::find()->select(['id'])->distinct()->
+      andWhere(['citas_id'=>$citasId])->column();
+    $resultados=StaResultados::find()->select(['categoria','b.nombre'])->join('INNER JOIN','{{%sta_testindicadores}} b','indicador_id=b.id')->andWhere(['examen_id'=>$examenesId])->asArray()->all();
+   foreach( $resultados as $filaResultado){
+    $arreglo[$filaResultado['categoria']][]=$filaResultado['nombre'];
+   }
+    yii::error($arreglo);
+  return $arreglo;
+  
+}
+
+public function textoIndicadores($calificacion){
+    $arreglo=$this->indicadores();
+    $cadena='';
+    $contador=1;
+    if(!array_key_exists($calificacion,$arreglo)){
+        return '';
+    }
+    foreach($arreglo[$calificacion] as $clave=>$nombre){
+        $cadena.='('.$contador.')'.$nombre.'  |  ';
+        $contador++;
+    }
+    return $cadena;
+}
+
 }

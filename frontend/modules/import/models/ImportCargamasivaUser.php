@@ -225,6 +225,7 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
           $tipo=$filashijas[$index]['tipo'];
           $longitud=$filashijas[$index]['sizecampo'];
           $nombrecampo=$filashijas[$index]['nombrecampo'];
+          $requerida=($filashijas[$index]['requerida'])?true:false;
          /*yii::error($nombrecampo);
          yii::error($tipo);
            yii::error($valor);
@@ -246,19 +247,19 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
           
           $msgAdicional=yii::t('import.errors','Verifique que la fila validada no sea el encabezado del archivo');
            
-          if($carga->isTypeChar($tipo)&&($longitud <> strlen($valor))){
+          if($carga->isTypeChar($tipo)&&($longitud < strlen($valor))  && $requerida){
               yii::error('char: NO coindieorn las longitudes',__METHOD__);
             $this->addError('activo',Yii::t('import.errors', 'Longitud ({longitud}) de la columna fija "{columna}", no coincide con la longitud del valor {valor}'.$msgAdicional,['valor'=>$valor,'longitud'=>$longitud,'columna'=>$nombrecampo]));   
            $validacion=false;
             
            }
-           if ($carga->isTypeVarChar($tipo) &&($longitud < strlen($valor))){
+           if ($carga->isTypeVarChar($tipo) &&($longitud < strlen($valor)) && $requerida){
                 yii::error('varchar: NO coindieorn las longitudes',__METHOD__);
             $this->addError('activo',Yii::t('import.errors', 'Longitud máxima ({longitud}) de la columna  "{columna}",es menor que la longitud del valor {valor}'.$msgAdicional,['valor'=>$valor,'longitud'=>$longitud,'columna'=>$nombrecampo]));   
            $validacion=false;
             
            }
-           if($carga->isNumeric($tipo)&& (!is_numeric($valor))){
+           if($carga->isNumeric($tipo)&& (!is_numeric($valor)) && $requerida){
                 yii::error('numerico : NO es el tipo',__METHOD__);
             $this->addError('activo',Yii::t('import.errors', 'Columna  "{columna}" es un valor numérico y  "{valor}" no lo es '.$msgAdicional,['valor'=>$valor,'columna'=>$nombrecampo]));   
            
@@ -304,7 +305,7 @@ class ImportCargamasivaUser extends \common\models\base\modelBase
      foreach($errores as $campo=>$detalle){
          foreach($detalle as $cla=>$mensaje){
              yii::error('uy  recorreindo los errores');
-             if(!($this->insertLogCarga($line, $campo, $mensaje, '0')))
+             if(!($this->insertLogCarga($line, $campo, substr($mensaje,0,80), '0')))
                yii::error('uy fallo');       
          }
      }

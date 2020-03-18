@@ -566,16 +566,18 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
             $typ=$this->dateorTimeFields[$field];
             $formatToShow= $this->gsetting($key, $typ);
              $formatToAnalize= $this->gsetting($this->reverseKey($key), $typ); 
-            // if($show)yii::error('foramto para analizar :'.$formatToAnalize);
-             // if($show)yii::error('foramto para mostrar :'.$formatToShow);
-               //if($show)yii::error('typ :'.$typ);
+           /*yii::error('foramto para analizar :'.$formatToAnalize);
+           yii::error('foramto para mostrar :'.$formatToShow);
+           yii::error('typ :'.$typ);
+           yii::error('key :'.$key);
+            yii::error('reversekey :'.$this->reverseKey($key));*/
              //$objetof=DateTime::createFromFormat($this->getGeneralFormat($formatToAnalize,$typ,$show),$this->{$field});
                   
           $resultado=Yii::$app->formatter->asDate(
                          DateTime::createFromFormat(
                                $this->getGeneralFormat($formatToAnalize,$typ,$show),
                                                  (!$literal)?$this->{$field}:$field
-                                                                            ),
+                                                                            ) ,
                                                     'php:'.$this->getGeneralFormat($formatToShow,$typ,$show)
                                                        );
                   //yii::error(' El resultado : '.$resultado);
@@ -668,13 +670,15 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
          * Si no especifica nada, se verificar todo el registro 
          */        
         public function hasChanged($attribute=null){ 
-            //yii::error('haschanged');
+           // yii::error('Funcion has  changed');
             if( !is_null($attribute)){
                 // yii::error($attribute);
                  //yii::error(array_keys($this->dateorTimeFields));
                if(in_array($attribute,array_keys($this->dateorTimeFields))){ 
                   // yii::error('es fecha');
                    return $this->hasChangeTimeField($attribute) ;
+                }else{
+                   //yii::error('No ees fecha');  
                 }
                  return (!($this->{$attribute}==$this->getOldAttribute($attribute)));
         
@@ -699,26 +703,67 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
          * al ejecutarse  cada vez que el modelo presenta
          * estos campos con le evento afterfind();
          */
-        private function hasChangeTimeField($attribute){  
-          /*  yii::error(static::_FORMATBD);yii::error($this->dateorTimeFields[$attribute]);
-           yii::error($this->gsetting(static::_FORMATBD, $this->dateorTimeFields[$attribute]));
+        private function hasChangeTimeField($attribute){ 
+           // yii::error('Atributo '.$attribute);
+            //yii::error('VAlor del Atributo '.$this->{$attribute});
+           // yii::error(static::_FORMATBD);
+           // yii::error($this->dateorTimeFields[$attribute]);
+           //yii::error($this->gsetting(static::_FORMATBD, $this->dateorTimeFields[$attribute]));
           
-           $oldformat=Yii::$app->formatter->dateFormat;
-            yii::error($oldformat);
-         Yii::$app->formatter->dateFormat =
-                     $this->gsetting(static::_FORMATBD, $this->dateorTimeFields[$attribute]);
-       yii::error(Yii::$app->formatter->dateFormat );
-       yii::error($this->{$attribute} ); yii::error($this->dateorTimeFields[$attribute] );
-         $currentValue= Yii::$app->formatter->format($this->{$attribute}, $this->dateorTimeFields[$attribute]);
-                   $originalValue=$this->getOldAttribute($attribute);
-                  yii::error('valor actual'); yii::error($currentValue);
-                   yii::error('valor anterior');yii::error($originalValue);*/
-                   //Yii::$app->formatter->dateFormat=$oldformat;
-                    //return (!($currentValue==$originalValue));  
+          /* $oldformat=Yii::$app->formatter->dateFormat;
+           // yii::error($oldformat);
+         Yii::$app->formatter->datetimeFormat =
+       'php:'.$this->gsetting(static::_FORMATBD, $this->dateorTimeFields[$attribute]);
+       //yii::error(Yii::$app->formatter->dateFormat );
+       yii::error('**********seguimiento***************' ); 
+       yii::error('campo' ); 
+       yii::error($attribute); 
+        yii::error('gsetting('.static::_FORMATBD.' , '.$this->dateorTimeFields[$attribute].'))' ); 
+       yii::error($this->gsetting(static::_FORMATBD, $this->dateorTimeFields[$attribute]));
+       yii::error('Valor del campo' ); 
+       yii::error($this->{$attribute} );
+       yii::error('Fromato de la fecha a aplicar ' );
+        yii::error($this->dateorTimeFields[$attribute] );
+        
+         $currentValue= Yii::$app->formatter->format(
+                            $this->{$attribute}, 
+                         $this->dateorTimeFields[$attribute]
+                         );
+        $originalValue=$this->getOldAttribute($attribute);
+                  yii::error('valor actual');
+          yii::error('Yii::app->formatter->format('.$this->{$attribute}.','.$this->dateorTimeFields[$attribute].')');  
+                  yii::error($currentValue);
+                  yii::error('valor anterior');yii::error($originalValue);
+              Yii::$app->formatter->dateFormat=$oldformat;
+              yii::error('********Fin*************');
+                return (!($currentValue==$originalValue));  */
             
-              $originalValue=$this->getOldAttribute($attribute);
-              $currentValue=$this->{$attribute};
-             return (!($currentValue==$originalValue)); 
+            $originalValue=$this->getOldAttribute($attribute);
+            $currentValue=$this->{$attribute};
+            //yii::error('--compronado si originalValue ('.$originalValue.') =  currentValue('.$currentValue.' )');
+              if($originalValue==$currentValue){
+                 // yii::error('Si;    son iguales.   Esto quiere decir que no ha cambiado');
+                  return false;
+              }else{
+                  // yii::error('No;  No  son iguales.  Pero aun falta determinadar si solo es una diferencia de transformacion de formatos: ');
+                   //yii::error('if( $this->swichtDate($attribute,false)==$originalValue) ');
+                  //yii::error('if( "'.$this->swichtDate($attribute,false).'"=="'.$originalValue.'"  ) ');
+                  
+                  if($this->swichtDate($attribute,false)==$originalValue){
+                    // yii::error('Si;  eran iguales.  Soloq ue se habian transformado');
+                    return false;
+                  }else{
+                    // yii::error('No;  No  son iguales.  El campo ha sido modificado');
+                   
+                      return true;
+                  }
+                    
+                   
+                  
+              }
+             // yii::error($currentValue);
+             //yii::error($originalValue);
+            // return (!($currentValue==$originalValue)); 
         }
         
         

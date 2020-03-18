@@ -7,7 +7,7 @@ $params = array_merge(
 );
 
 return [
-    'name'=>'Minerva',
+    'name'=>'Tutoría ',
     'sourceLanguage' => 'en',
     'id' => 'frontend',
     'basePath' => dirname(__DIR__),
@@ -67,6 +67,10 @@ return [
          'assetManager'=>[
                'bundles'=>[
                    'dmstr\web\AdminLteAsset'=>['skin'=>'skin-green'],
+                   /*'yii\web\JqueryAsset' => [
+                                        'js' => [YII_DEBUG ? 'https://code.jquery.com/jquery-3.2.1.js' : 'https://code.jquery.com/jquery-3.2.1.min.js'],
+                                        'jsOptions' => ['type' => 'text/javascript'],
+                                            ],*/
                              ],
                         ],
          'request' => [
@@ -123,6 +127,21 @@ return [
             ],
         ],
         */
+    ],
+    'as access' => [
+        'class' => 'mdm\admin\components\AccessControl',
+        'allowActions' => [
+            'site/login/',
+            'site/clear-cache/',
+            'site/signup',
+             'site/request-password-reset',
+            'site/reset-password', 
+           'site/logout',
+            'sta/citas/examen-banco',
+            'sta/citas/arregla-for-ajax',
+            'sta/citas/respuesta-examen',
+            'sta/citas/termina-examen',
+        ]
     ],
     'params' => $params,
 ];

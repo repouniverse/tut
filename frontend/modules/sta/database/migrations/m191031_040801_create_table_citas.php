@@ -46,6 +46,7 @@ if(!$this->existsTable($table)) {
         'masivo'=>$this->char(1)->notNull()->append($this->collateColumn()),
           'duracion'=>$this->integer(3)->notNull(),
           'codfac'=>$this->string(8)->notNull()->append($this->collateColumn()),
+         'flujo_id'=>$this->integer(11)->notNull(),
         ],$this->collateTable());
   $this->addForeignKey($this->generateNameFk($table), $table,
               'codfac', static::NAME_TABLE_FACULTAD,'codfac');

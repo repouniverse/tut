@@ -61,6 +61,11 @@ class FinderController extends  \common\controllers\base\baseController
                         'class' => 'common\actions\ActionAudit',
                         //'property1' => 'value1',
                         //'property2' => 'value2',
+                            ],
+          'addmaletin'=> [
+                        'class' => 'common\actions\ActionAddMaletin',
+                        //'property1' => 'value1',
+                        //'property2' => 'value2',
                             ]
       ];
       

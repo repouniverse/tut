@@ -16,6 +16,7 @@ use frontend\modules\sta\models\VwAlutallerSearch;
 use frontend\modules\sta\models\VwAluriesgoSearch;
 use frontend\modules\sta\models\TallerpsicoSearch;
 use frontend\modules\sta\models\StaTestTalleres;
+use frontend\modules\sta\models\StaPercentiles;
 use frontend\modules\sta\models\VwStaTutoresSearch;
 use frontend\modules\sta\models\StaIpslab;
 use frontend\modules\sta\models\Rangos;
@@ -55,8 +56,8 @@ class ProgramasController extends baseController
      */
     public function actionIndex()
     {
-        $class = new  \ReflectionClass('\frontend\modules\sta\models\Alumnos');
-       $clase='\frontend\modules\sta\models\Entregas';
+       // $class = new  \ReflectionClass('\frontend\modules\sta\models\Alumnos');
+      // $clase='\frontend\modules\sta\models\Entregas';
        
        //var_dump(is_subclass_of($clase, \common\models\base\modelBase::className()));
         //var_dump($class->getParentClass());die();
@@ -161,8 +162,18 @@ on a.talleresdet_id=b.id)  left join
      */
     public function actionUpdate($id)
     {
+       
+        
+        
+        
+        
+        
+        
+        
         $model = $this->findModel($id);
        // VAR_DUMP(\frontend\modules\sta\helpers\comboHelper::getCboTutoresByProg($id));DIE();
+        
+        
         
         //$range=$model->range('12/12/2019');
         //var_dump($range->getInitialDate(),$range->getFinalDate());die();
@@ -546,64 +557,83 @@ public function actionMakeCitaByStudent(){
         $codalu=h::request()->get('codalu');
         $fecha=h::request()->get('fecha');
         $model= Tallerpsico::findOne($id);
+        $datos=[];
+        $error=false; 
+      //var_dump($fecha);die();
        // print_r($model->getTalleresdet($codalu)->attributes);
         //var_dump($model->attributes);die();
         $validator = new \yii\validators\RegularExpressionValidator(['pattern'=> h::gsetting('sta', 'regexcodalu')]);
-        if($validator->validate($codalu, $error) && !is_null($model)) {
+         if(!$validator->validate($codalu, $error)) {
+             $error=true;
+             $datos['error']=yii::t('sta.errors','El código de alumno no es el adecuado');
+         }
+        if(is_null($model)) {
+             $error=true; $datos['error']=yii::t('sta.errors','No existe el registro Taller-Psicólogo para el id '.$id);
+         }
+        if(!\common\helpers\timeHelper::IsFormatMysqlDateTime($fecha)) {
+             $error=true; $datos['error']=yii::t('sta.errors','La fecha {fecha} suministrada no tiene el formato adecuado ',['fecha'=>$fecha]);
+         }
+        if(!$error) { //Sio no hay errores
+            $codigotra=$model->taller->psicologoPorDia(\Carbon\Carbon::createFromFormat(\common\helpers\timeHelper::formatMysql(),$fecha));
+            
             $attributes=[
                 'talleres_id'=>$model->talleres_id,
                 'talleresdet_id'=>$model->modelTalleresdet($codalu)->id,
                 'fechaprog'=>$model::SwichtFormatDate($fecha,$model::_FDATETIME,true),
-                'codtra'=>$model->codtra,
+                'codtra'=>($codigotra)?$codigotra:$model->codtra,
                  'codfac'=>$model->codfac,
                 
             ];
            // var_dump($fecha,$model::_FDATETIME,$model::SwichtFormatDate($fecha,$model::_FDATETIME,true));die();
-       
-             
-            if(Citas::firstOrCreateStatic($attributes,Citas::SCE_CREACION_BASICA)){
-              $datos['success']=yii::t('sta.errors','Se ha creado la cita satisfactoriamente');
+           $cita=New Citas();
+           $cita->setScenario(Citas::SCE_CREACION_BASICA);
+           $cita->attributes=$attributes;
+           $cita->flujo_id=$cita->obtenerEtapaId(); //Aquis e autoclifica en que tepad esta 
+            if($cita->save()){
+                
+               if(h::gsetting('sta','notificacitasmail')){
+                   $cita->enviacorreo();
+               }
+                
+              $datos['success']=yii::t('sta.errors','Se ha creado la cita {numero} satisfactoriamente',['numero'=>$cita->numero]);
                 
             }else{
-                $mod=new Citas();
+                /*$mod=new Citas();
                 $mod->setScenario(Citas::SCE_CREACION_BASICA);
                 $mod->setAttributes($attributes);
-                $mod->validate();
-              $datos['error']=yii::t('sta.errors','Hubo un problema interno al grabar el registro de las citas : '.$mod->getFirstError());
-                UNSET($mod);
+                $mod->validate();*/
+              $datos['error']=yii::t('sta.errors','Hubo un problema interno al grabar el registro de las citas : '.$cita->getFirstError());
+                UNSET($cita);
                // RETURN $datos;
             }
                 
-           return $datos; 
+           
             
             
-                } else{
-                  $datos['error']=yii::t('sta.errors','El código de alumno no es el adecuado');
-                
-                }
- 
+                } 
+    return $datos; 
        
     }
 }
 
-public function actionTrataAlumno($id){   
-    //ENOCNTRADNO EL TALLER DET
-   // echo $id;die();
+public function actionTrataAlumno($id){  
+    //yii::error('paso 1');
+    //yii::error(time());
+    //$inicio=time();
     $modelTallerdet = \frontend\modules\sta\models\Talleresdet::findOne($id);
-    //print_r($modelTallerdet->listMailFromField($attribute, $condition));
-    //ENCONTRANDO TALLER_PSICO
-    
     $modelPsico=$modelTallerdet->tallerPsico();
-    //echo $modelTallerdet->codalu;die();
-     //ENCONTRANDO EL ALUMNO    
+    if(is_null($modelPsico)){
+        return $this->render('aviso_falta_psicologo');
+    }
+     //yii::error('paso 2 han pasado  '.(time()-$inicio));
+    //$inicio=time();
     $model=Alumnos::findOne(['codalu'=>$modelTallerdet->codalu]);
-    
-    //ECHO $modelTallerdet->talleres->descripcion; die();
-    /*Provider de Citas por alumno*/
     $dataProvider=(new StaVwCitasSearch())->searchByTallerId($modelTallerdet->id);
     /*****************/
     $color='#d351e2';
-    /*Provider de citas pendientes*/    
+    /*Provider de citas pendientes*/ 
+     //yii::error('paso 3 han pasado  '.(time()-$inicio));
+   // $inicio=time();
     $citasPendientes=$modelPsico->
             putColorThisCodalu(
                     $modelPsico->eventosPendientes(),$model->codalu,$color);
@@ -612,9 +642,10 @@ public function actionTrataAlumno($id){
     
     /************************/
     //print_r($citasPendientes);die();
+    //yii::error('paso 4 han pasado  '.(time()-$inicio));
+   // $inicio=time();
     
-    
-       return $this->render('_tabsCitas',
+      return $this->render('_tabsCitas',
                [
                    'model'=>$model, 
                    'modelPsico'=>$modelPsico,
@@ -625,6 +656,8 @@ public function actionTrataAlumno($id){
                    'citasPendientes'=>$citasPendientes,
                 'codperiodo'=>$modelTallerdet->talleres->codperiodo,
                    ]);
+     //yii::error('paso 5 han pasado  '.(time()-$inicio));
+   // $inicio=time();  
     
 }
 
@@ -735,6 +768,7 @@ public function actionConvocaAlumno($id){
          $modelDet = \frontend\modules\sta\models\Talleresdet::findOne($id);
          $model->codfac=$modelDet->talleres->codfac;
           $model->talleresdet_id=$modelDet->id;
+          $model->fecha=$model->SwichtFormatDate(date(\common\helpers\timeHelper::formatMysqlDate()), 'date', true);
        // var_dump($modeltallerdet);die();
         //$model->setScenario($model::SCENARIO_TUTOR);        
        $datos=[];
@@ -768,9 +802,33 @@ public function actionConvocaAlumno($id){
 public function actionEditaDocu($id){        
          $this->layout = "install";
          $model= \frontend\modules\sta\models\StaDocuAlu::findOne($id);
-         
+        
+         /*Filtro de acceso*/
+             if($model->hasMethod('canDownload')){
+                 if(!$model->canDownload()){
+                     return "no puedes Visualizar este documento"; 
+                 }
+             }
+       /*Fin del filtro */
         $datos=[];
+        
+        
+        $modeldet=$model->talleresdet;
+        $calificadorAlto=$modeldet->textoIndicadores(StaPercentiles::CALIFICACION_ALTO);
+         $calificadorBajo=$modeldet->textoIndicadores(StaPercentiles::CALIFICACION_BAJO);
+       //$mensajeIndicadores=$modeldet->indicadores();
+        //if(strlen($model->indi_altos)==0 /*&& (count($mensajeIndicadores[StaPercentiles::CALIFICACION_ALTO])>0)*/){
+           // foreach ()
+        //var_dump($modeldet->TextoIndicadores(StaPercentiles::CALIFICACION_ALTO));die();
+           $model->indi_altos=$calificadorAlto;
+           $model->indi_riesgo1=$calificadorBajo;
+           $model->adecuado_nivel=$calificadorAlto;
+           $model->indi_riesgo=$calificadorBajo;
+       // }
+        
+        
         if(h::request()->isPost){
+        // var_dump(h::request()->post());die();
             $model->load(h::request()->post());
              h::response()->format = \yii\web\Response::FORMAT_JSON;
             $datos=\yii\widgets\ActiveForm::validate($model);
@@ -785,7 +843,7 @@ public function actionEditaDocu($id){
         }else{
            return $this->renderAjax('_modal_docu_alu_'.$model->codocu, [
                         'model' => $model,
-                         'modeldet' => $model->talleresdet,
+                         'modeldet' => $modeldet,
                         'id' => $id,
                         'gridName'=>h::request()->get('gridName'),
                         'idModal'=>h::request()->get('idModal'),
@@ -856,6 +914,11 @@ public function actionEditaDocu($id){
          $this->layout = "install";
          $model= \frontend\modules\sta\models\Talleresdet::findOne($id);
          
+         if(empty($model->codtra)){
+             $model->setScenario($model::SCENARIO_PSICO_PSICO);
+         }
+         
+         
         $datos=[];
         if(h::request()->isPost){
             $model->load(h::request()->post());
@@ -864,13 +927,28 @@ public function actionEditaDocu($id){
             if(count($datos)>0){
                return ['success'=>2,'msg'=>$datos];  
             }else{
-               // $model->save();
-                //var_dump($model->talleres_id,$model->getOldAttribute('codtra'),$model->codtra);die();
-                $model->cambiaPsicologo($model->codtra);
-                  //$model->taller->sincronizeCant();
-                return ['success'=>1,'id'=>$model->id];
+                if($model->getScenario()==$model::SCENARIO_PSICO_PSICO){
+                    $model->save();
+                     return ['success'=>1,'id'=>$model->id];
+                   }
+                
+                
+               $model->cambiaPsicologo($model->codtra);
+                 return ['success'=>1,'id'=>$model->id];
             }
         }else{
+          if($model->getScenario()==$model::SCENARIO_PSICO_PSICO){
+              return $this->renderAjax('_modal_asigna_psico_alu', [
+                        //'modelTaller' => $model->talleres,
+                         'model' => $model,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                       // 'cantidadLibres'=>$cantidadLibres,
+          
+              ]);   
+          }
+            
            return $this->renderAjax('_modal_cambio_psico_alu', [
                         'modelTaller' => $model->talleres,
                          'model' => $model,
@@ -883,5 +961,70 @@ public function actionEditaDocu($id){
         }
 
     }
+    
+public function actionBalanceEventos($id){
+    $model=$this->findModel($id);
+    $semana=h::request()->get('semana')+0;
+   $haysemana= \frontend\modules\sta\models\StaEventos::find()->andWhere([
+        'talleres_id'=>$id,
+         'semana'=>$semana,
+            ])->exists();
+   if($semana){
+      
+       
+     $searchModel = new \frontend\modules\sta\models\StaEventosdetSearch();
+        $dataProvider = $searchModel->searchByPrograma($id,Yii::$app->request->queryParams);
+        
+      $allCodes=$model->codeStudents();
+      $ideventos=\frontend\modules\sta\models\StaEventos::find()->select(['id'])->andWhere([
+        'talleres_id'=>$id,
+         'semana'=>$semana,
+            ])->column();
+      $codesInEventos=\frontend\modules\sta\models\StaEventosdet::find()->select(['codalu'])->
+             andWhere([
+                 'libre'=>'0',
+                 'eventos_id'=>$ideventos,
+                 ])->column();
+     /*echo  \frontend\modules\sta\models\StaEventosdet::find()->select(['codalu'])->
+             andWhere([
+                 'libre'=>'0',
+                 'eventos_id'=>$ideventos,
+                 ])->createCommand()->getRawSql();die();*/
+      $codesFaltantes=array_diff($allCodes, $codesInEventos);
+        
+        $dataProviderFaltantes=New \yii\data\ActiveDataProvider([
+       'query'=> \frontend\modules\sta\models\Talleresdet::find()->
+                select(['codalu'])->andWhere(['codalu'=>$codesFaltantes]),
+        'pagination' => [
+        'pageSize' => 40,
+                ], 
+        ]);
+     
+     $nconvocatorias=\frontend\modules\sta\models\StaEventosdet::find()->andWhere(['eventos_id'=>$ideventos])->count();
+     $nasistencias=\frontend\modules\sta\models\StaEventosdet::find()->andWhere(['eventos_id'=>$ideventos,'asistio'=>'1'])->count();
+           
+     $natendidos=\frontend\modules\sta\models\StaEventosdet::find()->
+                andWhere(['eventos_id'=>$ideventos,'asistio'=>'1'])->count();
+     $porconvocar=count($codesFaltantes); 
+     $enproceso=\frontend\modules\sta\models\StaEventosdet::find()->
+                andWhere(['eventos_id'=>$ideventos,'libre'=>'0','asistio'=>'0'])->count();
+        
+
+        return $this->render('_eventos_detalle', [
+            'natendidos' =>$natendidos,
+            'porconvocar'=>$porconvocar,
+            'nconvocatorias' =>$nconvocatorias,
+            'nasistencias'=>$nasistencias,
+            'enproceso'=>$enproceso,
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+             'dataProviderFaltantes'=>$dataProviderFaltantes
+        ]);    
+   }else{
+       echo "Esta semana es invalida ";
+   }
+    
+      
+}
 
 }

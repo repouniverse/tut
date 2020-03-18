@@ -35,7 +35,8 @@ if(!$this->existsTable($table)) {
          'ciclo'=>$this->integer(2),
          'duracioncita'=>$this->char(5)->notNull()->append($this->collateColumn()),
         'tolerancia'=>$this->decimal(4,2),
-        'codocu'=>$this->char(3)->append($this->collateColumn()),
+          'correo'=>$this->string(60)->append($this->collateColumn()),
+         'codocu'=>$this->char(3)->append($this->collateColumn()),
         'descripcion'=>$this->string(40)->notNull()->append($this->collateColumn()),
          'detalles'=>$this->text()->append($this->collateColumn()),
          

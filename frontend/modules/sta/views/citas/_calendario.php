@@ -4,24 +4,27 @@ use yii\web\JsExpression;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use common\helpers\h;
-use yii\grid\GridView;
+//use yii\grid\GridView;
 use yii\widgets\Pjax;
+use frontend\modules\sta\staModule;
 /* @var $this yii\web\View */
 /* @var $model frontend\modules\sta\models\Talleres */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
+
+
+
 <div class="borereuccess">   
-    
-     
-      <div class="box-body">
-        
-           
-   <div class="col-lg-12 col-md-12 col-sm-6 col-xs-12">
-              
+  <div class="box-body">               
 <?php
-
-
+  IF(staModule::getCurrentPeriod()==$model->taller->codperiodo){?>
+    
+        
+            
+   <div class="col-lg-12 col-md-12 col-sm-6 col-xs-12">
+ 
+ <?PHP     
 $jsRemoveCallback = <<<JS
 function(title) {
   console.log('removeCallback', title);
@@ -33,19 +36,20 @@ function(title, color) {
   console.log('createCallback', title, color);
 }
 JS;
+$modelPsico=$model->tallerdet->tallerPsico();
+if(!is_null($modelPsico)){
+$codalu=$model->tallerdet->codalu;
 echo CalendarScheduleWidget::widget([
     'defaultEventDuration'=>$model->taller->duracioncita,
     'draggableEvents' => [
-                         'title' => yii::t('sta.labels','Próximas citas'),
-                        'canSetRemoveAfterDrop' => false,
-                        'canDropToTrash' =>false,
-                         'items' => [
-                                        ['name' => $model->tallerdet->codalu, 'color' => '#ff0000'],
-                                    ],
-                            'removeCallback' => new JsExpression($jsRemoveCallback)
-                            ],
+         'items' => [
+             ['name' => $codalu, 'color' => '#ff0000'],
+                  ],
+        'removeCallback' => new JsExpression($jsRemoveCallback)
+    ],
     'createEvents' => [
-        'title'=>'','colors'=>[],
+        'colors' => ['#286090', '#5cb85c', '#5bc0de', '#f0ad4e', '#d9534f'],
+        'createCallback' => new JsExpression($jsCreateCallback)
     ],
     'fullCalendarOptions' => [
         
@@ -63,19 +67,18 @@ echo CalendarScheduleWidget::widget([
             ['title' => 'evento 2', 'start' => date('Y-m-10 10:00:00'), 'allDay' => true, 'color' => '#5bc0de'],
         ],*/
         
+      
         
-        
-        'eventReceive' => new JsExpression('function(event, delta, revertFunc) {
-                    alert(event.title + " was received on " + event.start.format("YYYY-MM-DD HH:mm:ss"));
-                    
- var fechainicio=event.start.format("YYYY-MM-DD HH:mm:ss");
+        'eventReceive' => new JsExpression('function(event, delta,minuteDelta, revertFunc) {
+       if (confirm("'.yii::t('sta.labels','¿Confirmar que desea crear esta Cita ?').'")) {
+                  var fechainicio=event.start.format("YYYY-MM-DD HH:mm:ss");
         $.ajax({ 
                     method:"get",    
                     url: "'.\yii\helpers\Url::toRoute('/sta/programas/make-cita-by-student').'",
                     delay: 250,
-                        data: {id:'.$model->tallerdet->tallerPsico()->id.', fecha:fechainicio,codalu:event.title  },
+                        data: {id:'.$modelPsico->id.', fecha:fechainicio,codalu:event.title  },
              error:  function(xhr, textStatus, error){               
-                            //revertFunc();
+                           // revertFunc();
                                 }, 
               success: function(json) {  
                         var n = Noty("id");
@@ -97,37 +100,193 @@ echo CalendarScheduleWidget::widget([
                         },
    cache: true
   })
-
-
-
-
-
-
-
-
-
-if (!confirm("Are you sure about this change?")) {
-                             revertFunc(); }
+        }else{
+      //revertFunc();
+      }
+                             
                                     }'),
-        'eventDrop' => new JsExpression(
-                'function(event, delta, revertFunc) {
-                    alert(event.title + " was dropped on " + event.start.format());
-                    if (!confirm("Are you sure about this change?")) {
-                             revertFunc(); }
-                                    }'),
+        'eventDrop' => new JsExpression('function(event, delta,revertFunc) {
+           
+       if(event.title=="'.$codalu.'"){
+       if (confirm("'.yii::t('sta.labels','¿Confirmar que desea hacer esta operación ?').'")) {
+                  var fechainicio=event.start.format("YYYY-MM-DD HH:mm:ss");
+                   var fechatermino=event.end.format("YYYY-MM-DD HH:mm:ss");
+        $.ajax({ 
+                    method:"get",    
+                    url: "'.\yii\helpers\Url::toRoute(['/sta/citas/reprograma-cita']).'",
+                    delay: 250,
+                        data: {idcita:event.id, finicio:fechainicio,ftermino:fechatermino },
+             error:  function(xhr, textStatus, error){               
+                           var n = Noty("id");                      
+                            $.noty.setText(n.options.id, "No se completó la operación,refresque la página e intente nuevamente");
+                             
+                              $.noty.setType(n.options.id, "error"); 
+                                }, 
+              success: function(json) {  
+                        var n = Noty("id");
+                       if ( !(typeof json["error"]==="undefined") ) {
+                      //revertFunc();
+                   $.noty.setText(n.options.id,"<span class=\'glyphicon glyphicon-remove-sign\'></span>      "+ json["error"]);
+                              $.noty.setType(n.options.id, "error"); 
+                              }
+                         if ( !(typeof json["success"]==="undefined") ) {
+                                        $.noty.setText(n.options.id,"<span class=\'glyphicon glyphicon-ok-sign\'></span>" + json["success"]);
+                             $.noty.setType(n.options.id, "success");
+                              } 
+                               if ( !(typeof json["warning"]==="undefined") ) {
+                                        $.noty.setText(n.options.id,"<span class=\'glyphicon glyphicon-info-sign\'></span>" +json["warning"]);
+                             $.noty.setType(n.options.id, "warning");
+                              } 
+                              
+                      
+                        },
+   cache: true
+  })
+        }else{
+     // revertFunc();
+      }
+                             
+                        }else{
+      alert("No puede editar citas que no pertenezcan a este alumno");   
+      }
+}'),
+        
+        /*evento resize*/
         'eventResize' => new JsExpression('function(event, delta, revertFunc) {
-                    alert(event.title + " SE MOVIO A     INICIO->" + event.start.format("YYYY-MM-DD H:m:s")+ "   FIN  -> "+event.end.format("YYYY-MM-DD HH:mm:ss") );
-                    if (!confirm("Are you sure about this change?")) {
-                    
+               if(event.title=="'.$codalu.'"){
+                   // alert(event.title + " SE MOVIO A     INICIO->" + event.start.format("YYYY-MM-DD H:m:s")+ "   FIN  -> "+event.end.format("YYYY-MM-DD HH:mm:ss") );
+                    if (confirm("'.yii::t('sta.labels','¿Confirmar que desea cambiar la duración de esta cita ?').'")) {
+                               var fechainicio=event.start.format("YYYY-MM-DD HH:mm:ss");
+                               var fechatermino=event.end.format("YYYY-MM-DD HH:mm:ss");
+                               // alert(event.start.format("YYYY-MM-DD HH:mm:ss"));
+                                // alert(event.end.format("YYYY-MM-DD HH:mm:ss"));
+                               //alert(event.id);
+        $.ajax({ 
+                    method:"get",    
+                    url: "'.\yii\helpers\Url::toRoute(['/sta/citas/reprograma-cita']).'",
+                    delay: 250,
+                        data: {idcita:event.id, finicio:fechainicio ,ftermino:fechatermino},
+             error:  function(xhr, textStatus, error){               
+                           var n = Noty("id");                      
+                              $.noty.setText(n.options.id, "No se completó la operación,refresque la página e intente nuevamente");
+                              $.noty.setType(n.options.id, "error");
+                                }, 
+              success: function(json) {  
+                        var n = Noty("id");
+                       if ( !(typeof json["error"]==="undefined") ) {
+                      //revertFunc();
+                   $.noty.setText(n.options.id,"<span class=\'glyphicon glyphicon-remove-sign\'></span>      "+ json["error"]);
+                              $.noty.setType(n.options.id, "error"); 
+                              }
+                         if ( !(typeof json["success"]==="undefined") ) {
+                                        $.noty.setText(n.options.id,"<span class=\'glyphicon glyphicon-ok-sign\'></span>" + json["success"]);
+                             $.noty.setType(n.options.id, "success");
+                              } 
+                               if ( !(typeof json["warning"]==="undefined") ) {
+                                        $.noty.setText(n.options.id,"<span class=\'glyphicon glyphicon-info-sign\'></span>" +json["warning"]);
+                             $.noty.setType(n.options.id, "warning");
+                              } 
+                              
+                      
+                        },
+   cache: true
+  })
+        }else{
+      //revertFunc();
 
-                             revertFunc(); }}'),
-        'eventClick' => new JsExpression('function(event) {alert("hiciste clik  en "+event.title)}'),
+                            } } else{
+                             alert("No puede editar citas que no pertenezcan a este alumno");  
+                            }
+                  }'),
+        /*fin del veno resize*/
+        
+        
+        /*evento Click*/
+        'eventClick' => new JsExpression('function(event) {'
+                . 'if (confirm("'.yii::t('sta.labels','¿Confirmar que desea visualizar la cita ?').'")) {
+                 var url = "sta/citas/view?id="+event.id; // t
+          var abso="'.\yii\helpers\Url::home(true).'";
+              window.open(abso+url);
+          //window.location=abso+url;
+                }'
+                . '}'),
+     
+        'dayClick'=>new JsExpression('function(date, jsEvent, view) {
+            var fecha=date.format("YYYY-MM-DD HH:mm:ss");
+            var hora=fecha.substr(11,2);
+            if(hora=="00"){
+             //no hacer nada
+            }else{
+            fechax=date.format("DD/MM/YYYY HH:mm");
+            if (confirm("'.yii::t('sta.labels','¿Confirmar que desea REPROGRAMAR esta cita a la nueva fecha ').'"+ fechax+" ?")) {
+                
+
+                  $.ajax({
+              url: "'.\yii\helpers\Url::toRoute(['/sta/citas/reprograma-cita']).'",
+              type: "get",
+              data: {idcita:'.$model->id.', finicio:fecha },
+              dataType: "json", 
+              error:  function(xhr, textStatus, error){               
+                            var n = Noty("id");                      
+                              $.noty.setText(n.options.id, error);
+                              $.noty.setType(n.options.id, "error");       
+                                }, 
+              success: function(json) {
+              var n = Noty("id");
+                      
+                       if ( !(typeof json["error"]==="undefined") ) {
+                        $.noty.setText(n.options.id,"<span class=\"glyphicon glyphicon-trash\"></span>      "+ json["error"]);
+                              $.noty.setType(n.options.id, "error");  
+                          }    
+
+                             if ( !(typeof json["warning"]==="undefined" )) {
+                        $.noty.setText(n.options.id,"<span class=\"glyphicon glyphicon-trash\"></span>      "+ json["warning"]);
+                              $.noty.setType(n.options.id, "warning"); 
+                              $.pjax.reload({container: "#botones-examenes"});
+                             } 
+                          if ( !(typeof json["success"]==="undefined" )) {
+                         
+                         
+                        $.noty.setText(n.options.id,"<span class=\"glyphicon glyphicon-ok\"></span>      "+ json["success"]);
+                             
+                            $.noty.setType(n.options.id, "success");  
+                               
+                             }      
+                   
+                        }
+                        });
+
+
+
+
+
+
+
+
+
+            }
+
+
+            }
+      }'),
+        
+        
+        
     ]
-]);
+]); 
 
+
+} else{ ?>
+   <div class="alert alert-info"><span class="fa fa-book-reader"></span><?='    '.yii::t('sta.labels','Es posible que este alumno no tenga ningún psicólogo asignado')?></div>       
+<?php }   ?>
+ </div>  
+<?PHP
+  }ELSE{ ?>
+    <div class="alert alert-info"><span class="fa fa-book-reader"></span><?='    '.yii::t('sta.labels','La programación de citas sólo es posible en el periodo activo  '.staModule::getCurrentPeriod())?></div>  
+ <?PHP }
 
 ?>
-    </div>   
-       
+    
+        
 </div>
     </div>

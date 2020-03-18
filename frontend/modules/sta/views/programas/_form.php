@@ -27,11 +27,7 @@ use common\helpers\h;
             
 
            
-            <?php if($canti<=0){ ?>
-            <button id="boton-programar-citas" type="button" class="btn btn-success">
-                <span class="glyphicon glyphicon-list-alt"></span><?=yii::t('sta.labels','  Programar Citas')?>
-            </button>
-             <?php } ?>
+            
             </div>
         </div>
     </div>
@@ -131,6 +127,10 @@ use common\helpers\h;
  </div>
   <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
      <?= $form->field($model, 'tolerancia')->textInput(['maxlength' => true]) ?>
+
+ </div>
+<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+     <?= $form->field($model, 'correo')->textInput(['maxlength' => true]) ?>
 
  </div>
   <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">

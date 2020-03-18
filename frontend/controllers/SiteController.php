@@ -408,6 +408,30 @@ Datos de caché de configuración se han actualizado');
         ]);
     }
 public function actionRutas(){
+    
+    $model=New \frontend\modules\sta\models\Citas();
+    $model->fechaprog='22/03/2020 13:50:00';
+    $model->talleres_id=50;
+    
+    var_dump($model->isInJourney(),$model->getErrors());
+    die();
+    
+    
+    /*$carbon=New \Carbon\Carbon();
+    $carbon=$carbon->addHours(5)->addMinutes(45);
+    var_dump($carbon,$carbon->parse('09:30'));die();*/
+    //\frontend\modules\sta\staModule::notificaMailCitasProximas();
+    //die();
+   /* $fecha1='2020-02-26 07:00:00';  
+    $fecha2='2020-04-15 00:45:13';
+    ECHO $fecha1."<BR>";
+    ECHO $fecha2."<BR>";
+    var_dump(\common\helpers\timeHelper::IsFormatMysqlDateTime($fecha1),
+            \common\helpers\timeHelper::IsFormatMysqlDateTime($fecha2)
+            );
+    die();
+    
+    */
    echo " Url::home()  :   ".Url::home()."<br>";
    echo " Url::home('https')  :   ".Url::home('https')."<br>";
    echo " Url::base()  :   ".Url::base()."<br>";

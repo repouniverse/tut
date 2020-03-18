@@ -139,6 +139,13 @@ public $booleanFields=['opcional'];
     }
     
     public function indicadorId($grupo){
+        if($this->codtest=='B0006'){
+           yii::error('buscando percentil con codigo de grupo :'.$grupo);
+         yii::error($this->getIndicadores()->select(['id'])->where(['grupo'=>$grupo])->limit(1)->createCommand()->getRawSql());
+          $valor= $this->getIndicadores()->select(['id'])->where(['grupo'=>$grupo])->limit(1)->scalar();
+         yii::error('Elvalor es :'.$valor);
+        }
+        yii::error('buscando percentil con codigo de grupo :'.$grupo);
         $valor= $this->getIndicadores()->select(['id'])->where(['grupo'=>$grupo])->limit(1)->scalar();
        if(is_null($valor)){
           throw new \yii\base\Exception(yii::t('base.errors',' No existe indicador para el grupo de pregunta  \'{grupo}\' Revise datos maestros de la tabla test, tesdet y testindicadores  ',['grupo'=>$grupo]));      

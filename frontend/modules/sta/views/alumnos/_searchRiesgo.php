@@ -47,6 +47,15 @@ use common\widgets\selectwidget\selectWidget;
                         ]
                     ) ?>
  </div>
+ <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">    
+ <?= $form->field($model, 'status')->
+            dropDownList(['I'=>'INCORPORADOS','N'=>'DE ORIGEN REGULAR'],
+                  ['prompt'=>'--'.yii::t('base.verbs','Seleccione un Valor')."--",
+                    // 'class'=>'probandoSelect2',
+                      //'disabled'=>($model->isBlockedField('codpuesto'))?'disabled':null,
+                        ]
+                    ) ?>
+ </div>
 <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12"> 
     <?= $form->field($model,'codalu') ?>
 </div> 

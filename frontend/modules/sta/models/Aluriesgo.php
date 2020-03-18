@@ -6,7 +6,7 @@ use frontend\modules\sta\staModule;
 use frontend\modules\sta\models\Alumnos;
 use frontend\modules\sta\models\Cursos;
 use Yii;
-
+use common\behaviors\FileBehavior;
 /**
  * This is the model class for table "{{%sta_aluriesgo}}".
  *
@@ -21,6 +21,7 @@ use Yii;
  */
 class Aluriesgo extends \common\models\base\modelBase
 {
+    const SCENARIO_REGISTER='registro';
     /**
      * {@inheritdoc}
      */
@@ -29,6 +30,21 @@ class Aluriesgo extends \common\models\base\modelBase
         return '{{%sta_aluriesgo}}';
     }
 
+    public function behaviors()
+            {
+	return [
+		
+		'fileBehavior' => [
+			'class' => FileBehavior::className()
+		],
+            
+           
+		
+                ];
+            }
+    
+    
+    
     /**
      * {@inheritdoc}
      */
@@ -41,13 +57,23 @@ class Aluriesgo extends \common\models\base\modelBase
             [['codperiodo',
                 'entrega_id',
                 'codcur',
-                'codalu',
+                'codalu', 
                 'codfac',
                 'codcar',
                 'nveces',
                 'nveces15'
                 ],'required','on'=>'import'],
-           ['codperiodo', 'unique', 'targetAttribute' => 
+            [['status'],'safe'],
+            [['codperiodo',
+                //'entrega_id',
+                'codcur',
+                'codalu',
+                'codfac',
+                //'codcar',
+                'nveces',
+                'nveces15'
+                ],'required','on'=>self::SCENARIO_REGISTER],
+            ['codperiodo', 'unique', 'targetAttribute' => 
                  ['codalu','codcar','codcur', 'codperiodo'],
               'message'=>yii::t('sta.errors',
                       'Esta combinacion de valores {codalu}-{codcur}-{codperiodo}-{codcar} ya existe',
@@ -58,6 +84,7 @@ class Aluriesgo extends \common\models\base\modelBase
                       )],
             [['codcur'], 'string', 'max' => 10],
             [['codalu'], 'string', 'max' => 14],
+             [['codalu'], 'validateCodigos', 'on' => self::SCENARIO_REGISTER],
             [['codalu'], 'exist', 'skipOnError' => true,'message'=>'no exiset alu', 'targetClass' => Alumnos::className(), 'targetAttribute' => ['codalu' => 'codalu']],
             [['codcur'], 'exist', 'skipOnError' => true, 'message'=>'no exiset mate','targetClass' => Materias::className(), 'targetAttribute' => ['codcur' => 'codcur']],
         [['codperiodo'], 'exist', 'skipOnError' => true,'message'=>'no exiset periodo', 'targetClass' => Periodos::className(), 'targetAttribute' => ['codperiodo' => 'codperiodo']],
@@ -77,7 +104,7 @@ class Aluriesgo extends \common\models\base\modelBase
             'nveces15',
             'codcur',
             'codalu'];
-       // $scenarios[self::SCENARIO_REGISTER] = ['username', 'email', 'password'];
+        $scenarios[self::SCENARIO_REGISTER] = ['codalu','codfac', 'codcur', 'codperiodo','status','nveces','nveces15'];
         return $scenarios;
     }
     /**
@@ -98,7 +125,14 @@ class Aluriesgo extends \common\models\base\modelBase
         ];
     }
 
-   
+   public function hasChilds() {
+       return Talleresdet::find()->andWhere([
+           'codalu'=>$this->codalu,
+           'codfac'=>$this->codfac,
+           'codperiodo'=>$this->codperiodo,
+       ])->exists();
+       
+   }
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -245,5 +279,58 @@ public static function cursosByStudentPeriodProvider($codalu,$codperiodo){
              'query'=>static::cursosByStudentPeriod($codalu,$codperiodo),
          ]);
  } 
+ 
+ public function validateCodigos($attribute,$params){
+    /* var_dump(Alumnos::find()->where([
+         'codalu'=>$this->codalu,
+         'codfac'=>$this->codfac])->createCommand()->getRawSql(),
+             Alumnos::find()->where([
+         'codalu'=>$this->codalu,
+         'codfac'=>$this->codfac])->exists());*/
+     if(!(Alumnos::find()->where([
+         'codalu'=>$this->codalu,
+         'codfac'=>$this->codfac])->exists())){
+          $this->addError ('codalu',yii::t('sta.labels','No se encontró registro de este alumno en esta facultad, verifique'));  
+    
+     }
+     $alumno=Alumnos::findOne(['codalu'=>$this->codalu]);
+     //var_dump($this->codalu,$alumno);die();
+     if(!is_null($alumno)){
+       if(!(Materias::find()->where([
+         'codcur'=>$this->codcur,
+          'codcar'=>$alumno->codcar,
+             
+             ])->exists())){
+        $this->addError ('codcur',yii::t('sta.labels','No se encontró registro de este curso en esta facultad, verifique'));  
+     
+     }  
+     }else{
+       $this->addError ('codalu',yii::t('sta.labels','No se encontró registro de este alumno en el registro maestro'));  
+      
+     }
+     
+     
+     if(!$this->isNewRecord){
+         if($this->hasChilds() && $this->hasChanged()){
+           $this->addError ('codalu',yii::t('sta.labels','No puede modificar este registro, porque ya tiene otros registros hijo'));  
+       
+         }
+     }
+     
+    
+ }
+ 
+ public function beforeSave($insert){
+     if($insert){
+      if($this->getScenario()==self::SCENARIO_REGISTER) {
+          $this->codcar=$this->alumno->codcar;
+          $this->status='I';
+      } ELSE{
+         $this->status='N'; 
+      }
+       
+     }
+     return parent::beforeSave($insert);
+ }
  
 }

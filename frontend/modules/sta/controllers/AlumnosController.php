@@ -12,6 +12,7 @@ use frontend\controllers\base\baseController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use common\helpers\h;
+use yii\widgets\ActiveForm;
 use frontend\modules\sta\staModule;
 /**
  * AlumnosController implements the CRUD actions for Alumnos model.
@@ -39,7 +40,21 @@ class AlumnosController extends baseController
      */
     public function actionIndex()
     {
-        print_r(\frontend\modules\sta\components\Indicadores::IAsistenciasPorFacultad());die();
+       //$model=new \frontend\modules\sta\models\Citas(); 
+        //echo $model->findOne(1210)->obtenerEtapaId(); die();
+       /* $model=new \frontend\modules\sta\models\StaEventos();
+        $model->fechaprog='21/02/2020 13:00:45';
+        VAR_DUMP($model->toCarbon('fechaprog')->subHours(1)->format('Y-m-d H:i:s'),
+                $model->toCarbon('fechaprog')->addHours(24)->format('Y-m-d H:i:s'),
+                date('Y-m-d H:i:s'),$model->isDateToWork());DIE();
+        */
+      /* echo  \common\models\base\modelBase::getGeneralFormat(
+               'd/m/Y',
+               'date',
+               FALSE
+               );
+       die(); */
+        // print_r(\frontend\modules\sta\components\Indicadores::IAsistenciasPorFacultad());die();
       
        /* \frontend\modules\sta\models\Examenes::findOne(161)->makeResultados();
         \frontend\modules\sta\models\Examenes::findOne(162)->makeResultados();
@@ -70,6 +85,19 @@ class AlumnosController extends baseController
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+    
+     public function actionReincorporados()
+    {
+       
+        //var_dump(\frontend\modules\sta\models\Facultades::find()->select('codfac')->asArray()->all());die();
+        $searchModel = new AluriesgoSearch();
+        $dataProvider = $searchModel->searchByIncorporado(Yii::$app->request->queryParams);
+
+        return $this->render('reincorporados', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
@@ -112,7 +140,10 @@ class AlumnosController extends baseController
     public function actionCreate()
     {
         $model = new Alumnos();
-
+if (h::request()->isAjax && $model->load(h::request()->post())) {
+                h::response()->format = Response::FORMAT_JSON;
+                return ActiveForm::validate($model);
+        }
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
@@ -238,4 +269,52 @@ class AlumnosController extends baseController
            ]);
        }
    }
+   
+  public function actionIncorporar(){
+      $model= new Aluriesgo();
+      $model->codperiodo= staModule::getCurrentPeriod();
+      $model->setScenario($model::SCENARIO_REGISTER);
+       
+      if (h::request()->isAjax && $model->load(h::request()->post())) {
+         // var_dump($model->codfac);DIE();
+                h::response()->format = \yii\web\Response::FORMAT_JSON;
+                return \yii\widgets\ActiveForm::validate($model);
+        }
+        
+        
+        
+        if ($model->load(h::request()->post()) && $model->save()) {
+            return $this->redirect(['alumnos-riesgo']);
+           // return $this->redirect(['incorporados', 'id' => $model->id]);
+        }
+
+        return $this->render('crea_reincorporado', [
+            'model' => $model,
+        ]);
+  } 
+   
+   public function actionEditaIncorporado($id){
+      $model=Aluriesgo::findOne($id);
+      if($model===null){
+         throw new NotFoundHttpException(Yii::t('sta.labels', 'No se ha encontrado el registro con ese id'));
+     
+      }
+      //$model->codperiodo= staModule::getCurrentPeriod();
+      $model->setScenario($model::SCENARIO_REGISTER);
+      if (h::request()->isAjax && $model->load(h::request()->post())) {
+          //var_dump($model->codfac);
+                h::response()->format = \yii\web\Response::FORMAT_JSON;
+                return \yii\widgets\ActiveForm::validate($model);
+        }
+        
+        
+        
+        if ($model->load(h::request()->post()) && $model->save()) {
+            return $this->redirect(['alumnos-riesgo']);
+        }
+
+        return $this->render('crea_reincorporado', [
+            'model' => $model,
+        ]);
+  } 
 }

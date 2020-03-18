@@ -148,10 +148,11 @@ class ImportCargamasiva extends modelBase
     
     
     private function insertChilds(){
-       
+       //VAR_DUMP($this->ordenCampos());DIE();
             $modeloatratar=$this->modelAsocc();
              $columnas=$modeloatratar->getTableSchema()->columns;
                 $i=1;
+              // VAR_DUMP($this->ordenCampos());DIE();
                // print_r($columnas);die();
               foreach($columnas as $nameField=>$oBCol){ 
                 	if(
@@ -342,17 +343,35 @@ public function isDateorTime($tipo,$nombrecampo,$longitud){
  
 public function ordenCampos(){
     $modelo=$this->modelAsocc();
-   $intersecion= array_intersect($modelo->safeFields,$modelo->primaryKey());
-  // print_r($modelo->safeFields);
+    $camposSafe=$modelo->getSafeFields();
+    //ECHO get_class($modelo);die();
+     $intersecion= array_intersect($camposSafe,$modelo->primaryKey());
+  if(!$this->insercion){
+     if(count($intersecion)==0){
+         //echo 'ttytyt';die();
+         $arraycampos=array_merge($modelo->primaryKey(),$camposSafe);
+         //return array_keys($arraycampos); 
+       return array_combine(array_values($arraycampos),array_keys($arraycampos));
+   }else{
+       //echo 'es iaaa';die();
+      return array_flip($camposSafe); 
+   }
+      
+  }else{
+    //echo 'es insercion';die();
+   /*print_r($modelo->safeFields);
+    print_r($modelo->primaryKey());die();*/
    if(count($intersecion)==0){
-       return array_flip($modelo->safeFields);
+       return array_flip($camposSafe);
    }elseif(count($intersecion)==count($modelo->primaryKey())){
-     $base=array_diff($modelo->safeFields,$modelo->primaryKey());
+     $base=array_diff($camposSafe,$modelo->primaryKey());
      return array_flip(array_values(array_merge($modelo->primaryKey(),$base)));
    }else{
-      $base=array_diff($modelo->safeFields, array_intersect($modelo->primaryKey(),$modelo->safeFields)); 
-      return array_flip(array_values(array_merge(array_intersect($modelo->primaryKey(),$modelo->safeFields),$base)));
-   }
+      $base=array_diff($camposSafe, array_intersect($modelo->primaryKey(),$camposSafe)); 
+      return array_flip(array_values(array_merge(array_intersect($modelo->primaryKey(),$camposSafe),$base)));
+   }  
+  }
+  
 }
  
   public function findModelAsocc($fila,$scenario=null){

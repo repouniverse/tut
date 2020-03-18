@@ -37,7 +37,7 @@ use dmstr\widgets\Alert;
 
 <footer class="main-footer">
     <div class="pull-right hidden-xs">
-       <i class="fa fa-wrench fa-1x" aria-hidden="true"></i> <b>Version</b> 0.4
+       <i class="fa fa-wrench fa-1x" aria-hidden="true"></i> <b>Version</b> 0.9
     </div>
     Minerva ®
 </footer>

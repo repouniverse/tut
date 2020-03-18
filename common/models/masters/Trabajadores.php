@@ -38,11 +38,14 @@ class Trabajadores extends modelBase implements \common\interfaces\PersonInterfa
 		
 		'fileBehavior' => [
 			'class' => \nemmo\attachments\behaviors\FileBehavior::className()
-		]
+		],
+             'auditoriaBehavior' => [
+			'class' => '\common\behaviors\AuditBehavior' ,
+                               ],
 		
 	];
 }
-    
+ 
     
      public function init(){
          $this->prefijo='76';

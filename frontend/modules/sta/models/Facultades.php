@@ -34,7 +34,7 @@ class Facultades extends \common\models\base\modelBase
             [['codfac', 'desfac'], 'required'],
             [['codfac', 'code3'], 'string', 'max' => 6],
             [['desfac'], 'string', 'max' => 60],
-            [['code1', 'code2'], 'string', 'max' => 2],
+            [['code1', 'code2'], 'string', 'max' => 78],
             [['codfac'], 'unique'],
         ];
     }

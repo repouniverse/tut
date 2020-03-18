@@ -51,6 +51,7 @@ class Tallerpsico extends \common\models\base\modelBase
             [['talleres_id','nalumnos'], 'integer'],
             [['codtra'], 'string', 'max' => 6],
              [['codtra'], 'validateCambio','on'=>self::SCENARIO_CAMBIO], //auxiliar 
+            [['codtra'], 'validateFacultad'], //auxiliar 
             [['codtra'], 'unique',
                 'targetAttribute' => ['codtra', 'talleres_id'],
                 'message'=>yii::t('sta.labels','Este tutor ya está registrado'),
@@ -109,6 +110,17 @@ class Tallerpsico extends \common\models\base\modelBase
      */
     public function citasPendientesQuery()
     {
+         $horas=h::gsetting('sta', 'nhorasreprogramacion');
+       $limite=self::CarbonNow()->subHours($horas)->format(timeHelper::formatMysql());
+    
+       return Citas::find()->
+              andWhere(['>=','fechaprog',$limite])->andWhere(['codfac'=>$this->codfac])
+              ->andWhere([ 
+                  /* 'talleres_id'=>$this->talleres_id,*/
+                 // 'codtra'=>$this->codtra,
+                  //'masivo'=>'0',
+                  'asistio'=> '0',
+                  ]);
         /* var_dump(Citas::find()->where( 
                 [
                     'codtra'=>$this->codtra,
@@ -452,9 +464,21 @@ class Tallerpsico extends \common\models\base\modelBase
     
  public function putColorThisCodalu($events,$codalu,$color="#ff0000"){
        // $codalu=$this->tallerdet->codalu;
+    $tutores= array_unique(array_column($events,'codtra'));
+   
+    $colores=['#31B404','#FFBF00','#AEB404','#848484','#084B8A','#071418'];
+    $colores=array_slice($colores,0,count($tutores));
+   //yii::error($tutores,__FUNCTION__);
+  //yii::error($colores);
+    $colores=array_combine($tutores,$colores);
+     
+      //$codtraaux='';
        foreach($events as $index=>$event) {
-           if(trim(strtoupper($codalu))==trim(strtoupper($event['title'])))
-            $events[$index]['color']=$color;
+           if(trim(strtoupper($codalu))==trim(strtoupper($event['title']))){
+             $events[$index]['color']=$color;  
+           }else{
+              $events[$index]['color']=$colores[$event['codtra']];
+           }
        }
        return $events;
     }    
@@ -501,7 +525,7 @@ class Tallerpsico extends \common\models\base\modelBase
         $this->addError('codtra',yii::t('sta.errors','Escoja un nuevo psicólogo'));
       
         if(!($this->cantidad_transferir >0)){
-            var_dump($this->cantidad_transferir); die();
+            //var_dump($this->cantidad_transferir); die();
             $this->addError('codtra',yii::t('sta.errors','Cantida debe de ser mayor a cero'));
      
         }else{
@@ -513,5 +537,26 @@ class Tallerpsico extends \common\models\base\modelBase
          
         
     }
-   
+   public function validateFacultad($attribute, $params)
+    {
+       if(!($this->nalumnos > 0)) 
+          $this->addError ('codtra',yii::t('sta.errors','cantidad debe ser mayor a cero'));  
+          
+      if(!($this->talleres_id > 0))
+      $this->addError ('codtra',yii::t('sta.errors','Talleres_id es obligatorio'));
+    //verficamos que este trabajador tenga bei puesot sus datros de usuario
+   // \yiiunit\gii\Profile::UserIdByTrabajador($codtra);
+      $profile=Profile::UserIdByTrabajador($this->codtra);
+      if(is_null($profile))
+      $this->addError ('codtra',yii::t('sta.errors','Este psicólogo no está registrado cion cuenta de usuario, revise el profile'));
+           
+      
+      //$this->codtra 
+      
+     // var_dump(UserFacultades::filterFacultades($profile->user_id),$this->taller->codfac);die();
+      if( !in_array($this->taller->codfac, UserFacultades::filterFacultades($profile->user_id))){
+        $this->addError ('codtra',yii::t('sta.errors','Este psicólogo no está registrado en esta facultad, verifique que sus cuenta de usuario tenga afiliada la facultad'));   
+       }
+        
+    }
 }

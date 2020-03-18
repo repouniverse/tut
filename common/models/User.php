@@ -8,7 +8,7 @@ use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 use common\models\Profile;
 use common\models\Useraudit;
-
+use common\models\base\modelBase;
 /**
  * User model
  *
@@ -23,11 +23,12 @@ use common\models\Useraudit;
  * @property integer $updated_at
  * @property string $password write-only password
  */
-class User extends base\modelBase implements IdentityInterface
+class User extends modelBase implements IdentityInterface
 {
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
   const SCENARIO_MAIL='mail';
+  CONST SCENARIO_REGISTER='registro';
 const USUARIO_PERMANENTE='guest';
     /**
      * {@inheritdoc}
@@ -41,7 +42,7 @@ const USUARIO_PERMANENTE='guest';
     {
         $scenarios = parent::scenarios();
         $scenarios[self::SCENARIO_MAIL] = ['email'];
-       // $scenarios[self::SCENARIO_REGISTER] = ['username', 'email', 'password'];
+        $scenarios[self::SCENARIO_REGISTER] = ['id', 'username', 'email','auth_key','password_hash', 'password','status'];
         return $scenarios;
     }
     
@@ -63,7 +64,7 @@ const USUARIO_PERMANENTE='guest';
         return [
              ['email', 'email', 'on' => self::SCENARIO_MAIL],
              ['email', 'unique', 'on' => self::SCENARIO_MAIL],
-            
+            [['id', 'username', 'email','auth_key','password_hash', 'password','status'] ,'safe','on' => self::SCENARIO_REGISTER],
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
         ];
@@ -200,12 +201,9 @@ const USUARIO_PERMANENTE='guest';
         $this->password_reset_token = null;
     }
     
-     public function getProfile($id=null,$tipo=null){
+     public function getProfile($id=null){
       // var_dump($this->id);
        Profile::firstOrCreateStatic(['user_id'=>(!is_null($id))?$id:$this->id]);
-       if(!is_null($tipo)){
-          Profile::updateAll(['tipo'=>$tipo],['user_id'=>$this->id]); 
-       }
        return Profile::find()->where(['user_id'=>(!is_null($id))?$id:$this->id])->one();
        
    }

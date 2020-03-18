@@ -33,7 +33,7 @@ public function safeDown()
     
  private function getFields(){
      return [ /*Alu*/'a.ap','a.am','a.nombres','a.codfac','a.dni','a.correo','a.celulares','a.fijos',
-                  /*Aluriesgo*/'b.id','b.codcur','b.codalu','b.nveces','b.nveces15','b.codperiodo','b.codcar',
+                  /*Aluriesgo*/'b.status','b.id','b.codcur','b.codalu','b.nveces','b.nveces15','b.codperiodo','b.codcar',
                   /*Cursos*/ 'd.nomcur',
           /*Facultades*/ 'f.desfac',
              /*Carreras*/ 'g.descar',      

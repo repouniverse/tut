@@ -63,9 +63,14 @@ class StaVwCitasSearch extends StaVwCitas
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
-
+//var_dump($this->asistio);
         $this->load($params);
-
+       //var_dump($this->asistio);die();
+        if($this->asistio==''){
+            ///$query->andFilterWhere(['asistio'=>$this->asistio]);
+        }else{
+            $query->andFilterWhere(['asistio'=>$this->asistio]);
+        }
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
@@ -75,7 +80,7 @@ class StaVwCitasSearch extends StaVwCitas
                  ->andFilterWhere(['like', 'amtutor', $this->amtutor])
             ->andFilterWhere(['like', 'nombrestutor', $this->nombrestutor])
            ->andFilterWhere(['codperiodo'=>$this->codperiodo])
-            ->andFilterWhere(['asistio'=>$this->asistio])
+          // ->andFilterWhere(['asistio'=>$this->asistio])
                 ->andFilterWhere(['codalu'=>$this->codalu])
            ->andFilterWhere(['like', 'ap', $this->ap])
       ->andFilterWhere(['like', 'am', $this->am])
@@ -85,7 +90,7 @@ class StaVwCitasSearch extends StaVwCitas
                 ->andFilterWhere(['codcar'=>$this->codcar])
                    ->andFilterWhere(['codtra'=>$this->codtra])
             ->andFilterWhere(['like', 'codaula', $this->codaula]);
-         
+         //echo $query->createCommand()->getRawSql();die();
          if(!empty($this->fechaprog) && !empty($this->fechaprog1)){
          $query->andFilterWhere([
              'between',
@@ -134,7 +139,7 @@ class StaVwCitasSearch extends StaVwCitas
         // echo $query->createCommand()->getRawSql();die();
         return $dataProvider;
     }
-   public function searchByPsicoToday($codtra)
+   public function searchByPsicoToday($codfac)
     {
       $codperiodo=  staModule::getCurrentPeriod();
       
@@ -144,7 +149,7 @@ class StaVwCitasSearch extends StaVwCitas
             'query' => $query,
         ]);
 
-         $query->andWhere(['codtra'=> $codtra])->   
+         $query->andWhere(['codfac'=> $codfac])-> 
              andWhere([
              'between',
              'fechaprog',
@@ -154,7 +159,7 @@ class StaVwCitasSearch extends StaVwCitas
              self::CarbonNow()->endOfDay()->format(
                h::gsetting('timeBD','datetime')
                )
-                        ]); 
+                        ])->orderBy('fechaprog asc'); 
          //echo date('Y-m-d H:i:s');die();
         //echo $query->createCommand()->getRawSql();die();
         return $dataProvider;

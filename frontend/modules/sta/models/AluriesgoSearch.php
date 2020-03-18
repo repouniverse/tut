@@ -49,7 +49,7 @@ class AluriesgoSearch extends Aluriesgo
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination'=>['pageSize '=>10]
+            //'pagination'=>['pageSize '=>10]
         ]);
 
         $this->load($params);
@@ -68,12 +68,43 @@ class AluriesgoSearch extends Aluriesgo
 
         $query->andFilterWhere(['like', 'codcar', $this->codcar])
             ->andFilterWhere(['like', 'ap', $this->codcur])            
-            ->andFilterWhere(['like', 'sexo', $this->codperiodo]);
+          ;
 
         return $dataProvider;
     }
     
-    
+     public function searchByIncorporado($params)
+    {
+        $query = Aluriesgo::find();
+
+        // add conditions that should always apply here
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            //'pagination'=>['pageSize '=>10]
+        ]);
+
+        $this->load($params);
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to return any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+        // grid filtering conditions
+       /* $query->andFilterWhere([
+            'id' => $this->id,
+            'profile_id' => $this->profile_id,
+        ]);*/
+
+        $query->andFilterWhere(['status'=>'I'])
+                ->andFilterWhere(['like', 'codcar', $this->codcar])
+            ->andFilterWhere(['like', 'ap', $this->codcur])            
+          ;
+
+        return $dataProvider;
+    }
     public function searchByPeriodoAlumno(){
         
     }

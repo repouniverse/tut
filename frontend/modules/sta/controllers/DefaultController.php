@@ -146,8 +146,17 @@ class DefaultController extends Controller
        $nalumnos=Aluriesgo::studentsInRiskByFacQuery($codfac)->count();
        $taller=\frontend\modules\sta\models\Talleres::findOne(['codfac'=>$codfac,'codperiodo'=> \frontend\modules\sta\staModule::getCurrentPeriod()]);
        
+       $tallerPsico=New Tallerpsico();
+     $tallerPsico->codfac=$codfac;
+     $citasPendientes=$tallerPsico->
+            putColorThisCodalu(
+                   $tallerPsico->eventosPendientes(),'',null);
+    
+     
+       
      return $this->render('secretaria',[
          'codfac'=> $codfac,
+          'citasPendientes'=> $citasPendientes,
           'nalumnos'=> $nalumnos,
         'kpiContacto'=>(!is_null($taller))?$taller->kp_contactados():\frontend\modules\sta\models\Talleres::kp_contactadosEmpty(),
                     
@@ -156,19 +165,34 @@ class DefaultController extends Controller
   
   public function actionPanelPsicologo(){
       
-      $codfac=h::user()->getFirstFacultad();
-      $codtra=h::user()->profile->codtra;
-      $provider = \frontend\modules\sta\models\StaVwCitasSearch::searchByPsicoToday($codtra);
-      $tallerPsico=New Tallerpsico();
-      $tallerPsico->codtra=$codtra;
-      $eventosPendientes=$tallerPsico->eventosPendientes();
       
+     
+      //$codfac=h::user()->getFirstFacultad();
+      $codtra=h::user()->profile->codtra;
+      $registro=\frontend\modules\sta\models\Rangos::findOne(['codtra'=>$codtra,'dia'=>date('w')]);
+      if(!is_null($registro)){
+       $codfac= $registro->talleres->codfac; 
+      }else{
+         $codfac=h::user()->getFirstFacultad(); 
+      }
+      $provider = \frontend\modules\sta\models\StaVwCitasSearch::searchByPsicoToday($codfac);
+      $tallerPsico=New Tallerpsico();
+     // $codfac='FAUA';
+      $tallerPsico->codfac=$codfac;
+      //$eventosPendientes=$tallerPsico->eventosPendientes();
+     /// var_dump($codfac,count($eventosPendientes));die();
+       $citasPendientes=$tallerPsico->
+            putColorThisCodalu(
+                   $tallerPsico->eventosPendientes(),'',null);
+    
+    
      return $this->render('psicologo',[
          'provider' =>$provider,
-          'citasPendientes'=> $eventosPendientes,
+          'citasPendientes'=> $citasPendientes,
           'codperiodo'=>  \frontend\modules\sta\staModule::getCurrentPeriod(),
                   
      ]);
+      
   }
   
   public function actionAcurricular(){
@@ -206,6 +230,8 @@ class DefaultController extends Controller
   }
   
   
-  
+public function actionExportaciones(){
+    return $this->render('exportaciones');
+}  
   
 }

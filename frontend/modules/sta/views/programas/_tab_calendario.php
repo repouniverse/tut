@@ -4,7 +4,8 @@ use yii\web\JsExpression;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use common\helpers\h;
-use yii\grid\GridView;
+//use yii\grid\GridView;
+//use frontend\modules\sta\staModule;
 use yii\widgets\Pjax;
 use frontend\modules\sta\staModule;
 /* @var $this yii\web\View */
@@ -109,15 +110,21 @@ echo CalendarScheduleWidget::widget([
                              
                                     }'),
         'eventDrop' => new JsExpression('function(event, delta,revertFunc) {
+           
+       if(event.title=="'.$codalu.'"){
        if (confirm("'.yii::t('sta.labels','¿Confirmar que desea hacer esta operación ?').'")) {
                   var fechainicio=event.start.format("YYYY-MM-DD HH:mm:ss");
+                   var fechatermino=event.end.format("YYYY-MM-DD HH:mm:ss");
         $.ajax({ 
                     method:"get",    
                     url: "'.\yii\helpers\Url::toRoute(['/sta/citas/reprograma-cita']).'",
                     delay: 250,
-                        data: {idcita:event.id, finicio:fechainicio },
+                        data: {idcita:event.id, finicio:fechainicio,ftermino:fechatermino },
              error:  function(xhr, textStatus, error){               
-                           //revertFunc();
+                           var n = Noty("id");                      
+                            $.noty.setText(n.options.id, "No se completó la operación,refresque la página e intente nuevamente");
+                             
+                              $.noty.setType(n.options.id, "error"); 
                                 }, 
               success: function(json) {  
                         var n = Noty("id");
@@ -143,10 +150,14 @@ echo CalendarScheduleWidget::widget([
      // revertFunc();
       }
                              
-                                    }'),
+                        }else{
+      alert("No puede editar citas que no pertenezcan a este alumno");   
+      }
+}'),
         
         /*evento resize*/
         'eventResize' => new JsExpression('function(event, delta, revertFunc) {
+               if(event.title=="'.$codalu.'"){
                    // alert(event.title + " SE MOVIO A     INICIO->" + event.start.format("YYYY-MM-DD H:m:s")+ "   FIN  -> "+event.end.format("YYYY-MM-DD HH:mm:ss") );
                     if (confirm("'.yii::t('sta.labels','¿Confirmar que desea cambiar la duración de esta cita ?').'")) {
                                var fechainicio=event.start.format("YYYY-MM-DD HH:mm:ss");
@@ -160,7 +171,9 @@ echo CalendarScheduleWidget::widget([
                     delay: 250,
                         data: {idcita:event.id, finicio:fechainicio ,ftermino:fechatermino},
              error:  function(xhr, textStatus, error){               
-                           //revertFunc();
+                           var n = Noty("id");                      
+                              $.noty.setText(n.options.id, "No se completó la operación,refresque la página e intente nuevamente");
+                              $.noty.setType(n.options.id, "error");
                                 }, 
               success: function(json) {  
                         var n = Noty("id");
@@ -185,6 +198,8 @@ echo CalendarScheduleWidget::widget([
         }else{
       //revertFunc();
 
+                            } } else{
+                             alert("No puede editar citas que no pertenezcan a este alumno");  
                             }
                   }'),
         /*fin del veno resize*/
@@ -193,7 +208,10 @@ echo CalendarScheduleWidget::widget([
         /*evento Click*/
         'eventClick' => new JsExpression('function(event) {'
                 . 'if (confirm("'.yii::t('sta.labels','¿Confirmar que desea visualizar la cita ?').'")) {
-                
+                 var url = "sta/citas/view?id="+event.id; // t
+          var abso="'.\yii\helpers\Url::home(true).'";
+              window.open(abso+url);
+          //window.location=abso+url;
                 }'
                 . '}'),
     ]

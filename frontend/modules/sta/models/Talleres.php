@@ -67,8 +67,9 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
              [['descripcion','duracioncita','codfac','codperiodo','codtra','codtra_psico','fopen'], 'required'],
             [['codfac'], 'string', 'max' => 8],
             [['descripcion'], 'string', 'max' => 40],
-            [['tolerancia','duracioncita'], 'safe'],
-            // [['descripcion'], 'string', 'max' => 40],
+            [['tolerancia','duracioncita','correo'], 'safe'],
+            [['correo'], 'email'],
+            [['duracioncita'], 'string', 'max' => 5],
             [['codtra', 'codtra_psico', 'codperiodo'], 'string', 'max' => 6],
             [['fopen', 'fclose', 'codcur'], 'string', 'max' => 10],
             [['activa', 'electivo'], 'string', 'max' => 1],
@@ -444,11 +445,19 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
       
      
      public function citasPendientesQuery(){
-        return  Citas::find()->where([
-            'talleres_id'=>$this->id])->andWhere([
-            '>','fechaprog',date('Y-d-m')
-            ]);
+         $horas=h::gsetting('sta', 'nhorasreprogramacion');
+       $limite=self::CarbonNow()->subHours($horas)->format(timeHelper::formatMysql());
+      return Citas::find()->
+              andWhere(['>=','fechaprog',$limite])
+              ->andWhere([
+                  /* 'talleres_id'=>$this->talleres_id,*/
+                  //'codtra'=>$this->codtra,
+                  //'masivo'=>'0',
+                  'asistio'=> '0',
+                  ]);
      }
+     
+     
      
      public function citasRealizadasQuery(){
         return  Citas::find()->where([
@@ -559,6 +568,43 @@ public function codPsicologos($except=[]){
 
  public function codeStudents(){
      return $this->getAlumnos()->select(['codalu'])->column();
- }    
+ }
+ 
+ /*
+     * Funcion que notifica con un correo 
+     * al alumno si le toca la cita (n) horas antes
+     * de lo programado
+     */
+ 
+    public function notificaMailBefore(){
+        
+        
+        
     }
+ 
+ public function psicologoPorDia(\Carbon\Carbon $fecha){
+     //$fecha->format(\common\helpers\timeHelper::formatMysql())
+     //var_dump($fecha->dayOfWeek);die();
+    $codtra= $this->getRanges()->select(['codtra'])->where(['dia'=>$fecha->dayOfWeek])->scalar();
+    if($codtra===null){
+        return false;
+    }
+    return $codtra;     
+ }
+ 
+ 
+ public function listMailsFromTutores(){
+     //primero debemos de conseguir lso codigos de los trabajadores las piscologas 
+   // $codes=$this->getTutores()->select(['codtra'])->column();
+    //$usersId= \common\models\Profile::find()->select(['user_id'])->where(['codtra'=>$codes])->column();
+    //$correos=\common\models\User::find()->select(['email'])->where(['id'=>$usersId])->column();
+  $correos=[];
+     if(!empty($this->correo)){
+       $correos[]=$this->correo;
+   }
+    //yii::error('estos son los correos');
+    //yii::error($correos);
+    return $correos;
+ }
+}
 

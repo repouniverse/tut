@@ -14,9 +14,9 @@ class FilterAccess extends ActionFilter
     
     public function beforeAction($action)
     {
-       // var_dump(yii::$app->controller->module);die();
-     if(h::user()->isGuest)
-         yii::$app->controller->redirect(['/site/login']);    
+         //echo Url::current();die();
+       // yii::error('Filtrando  y recordando la Url '.Url::current());
+          //Url::remember(Url::current(),'intentona'); 
         return parent::beforeAction($action);
     }
 

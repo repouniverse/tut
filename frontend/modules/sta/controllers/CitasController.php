@@ -108,17 +108,17 @@ class CitasController extends baseController
         if (h::request()->isAjax && $model->load(h::request()->post())) {
                 h::response()->format = Response::FORMAT_JSON;
                  //var_dump(h::request()->isAjax,$model->load(h::request()->post()));die();
-                yii::error('paso por is ajax  load Post');
+                ///yii::error('paso por is ajax  load Post');
                 return ActiveForm::validate($model);
         }
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            yii::error('paso por Load y save()');
+           // yii::error('paso por Load y save()');
             return $this->redirect(['view', 'id' => $model->id]);
         }else{
             //print_r($model->getErrors());die();
         }
-       $eventos=$model->putColorThisCodalu($model->eventosPendientes());
-       yii::error('Renderizando vista');
+       $eventos=$model->putColorThisCodalu($model->eventosPendientes(),$model->tallerdet->codalu,$color="#ff0000");
+       //yii::error('Renderizando vista');die();
         return $this->render('update', [
             'model' => $model,
             'eventos'=>$eventos,
@@ -323,7 +323,10 @@ public function  actionNotificaExamenDigital(){
             return ['error'=>yii::t('sta.errors','Error : NO se encontró el registro alumno')];
          if(is_null($cita))
             return ['error'=>yii::t('sta.errors','Error : NO se encontró el registro cita')];
-       if($cita->isBateriaCompleta())
+       if($idLastCita=$cita->lastCitaWithExamen()){
+             return ['error'=>yii::t('sta.errors','Ya existía la cita {numerocita} con evaluaciones',['numerocita'=>Citas::findOne($idLastCita)->numero])];   
+           }
+         if($cita->isBateriaCompleta())
            return ['error'=>yii::t('sta.errors','Error: No puede notificar porque no hay preguntas activas ó las preguntas ya están contestadas')];
       
          if(!$cita->asistio)
@@ -405,22 +408,26 @@ public function getUser(){
 
 public function actionExamenBanco($id){
     $this->layout="install";
-     $cita=Citas::findFree()->where(['id'=>$id])->one();
-     $numeroPreguntas=$cita->numeroPreguntas();
+     $id=(integer)$id;     
+     if(!preg_match('/^[0-9]+$/',$id.'')){
+         $this->render('_error_acceso',[/*'model'=>$cita,'numeroPreguntas'=>$numeroPreguntas*/]); 
+     }
        $cadenatoken=h::request()->get('token');
-         yii::error('cadena token :'.$cadenatoken);
-         yii::error('Comparando el token');
-         $token=\common\components\token\Token::compare('citas', 'token_'.$cita->id, $cadenatoken);
+        // yii::error('cadena token :'.$cadenatoken);
+        // yii::error('Comparando el token');
+         $token=\common\components\token\Token::compare('citas', 'token_'.$id, $cadenatoken);
                      if(is_null($token)){
-                         yii::error('Token es nulo pucha maquina , n coidide ');
+                        // yii::error('Token es nulo pucha maquina , n coidide ');
                                     
-                                     return  $this->render('_error_token',['model'=>$cita,'numeroPreguntas'=>$numeroPreguntas]); 
+                                     return  $this->render('_error_token',[/*'model'=>$cita,'numeroPreguntas'=>$numeroPreguntas*/]); 
                             }else{
-                                yii::error('Ya leyo la comparacion del token, ahora lo borramos');
+                               // yii::error('Ya leyo la comparacion del token, ahora lo borramos');
                                   $token->delete();
+                                  $cita=Citas::findFree()->where(['id'=>$id])->one();
+                                     $numeroPreguntas=$cita->numeroPreguntas();
                                    //  yii::error('Crenado el detalle ');
                                     // $cita->generaExamenes();
-                                     yii::error('creando la cookie');
+                                     //yii::error('creando la cookie');
                                      //echo "hay  ".$cookiesRead->count()." cookies <br> ";
                                      $cookiesSend = Yii::$app->response->cookies;
                                      $cookiesSend->add(new \yii\web\Cookie([
@@ -791,6 +798,9 @@ function actionBancoPreguntas($id){
      $model= $this->findModel($id);
      $fechaInicio=h::request()->get('finicio');
      $fechaTermino=h::request()->get('ftermino');
+     //var_dump($fechaInicio,$fechaTermino);die();
+     //yii::error('fecha inicio '.$fechaInicio);
+      //yii::error('fecha termino '.$fechaTermino);
      if(is_null($fechaTermino)){
          $verifiFtem=true;
      }else{
@@ -819,7 +829,10 @@ function actionBancoPreguntas($id){
          $model=$this->findModel($id);
         $codbateria=h::request()->get('bateria');
         if(in_array($codbateria, array_keys(\frontend\modules\sta\helpers\comboHelper::baterias()))){
-           $model->agregaBateria($codbateria); 
+           if($idLastCita=$model->lastCitaWithExamen()){
+             return ['error'=>yii::t('sta.errors','Ya existía la cita {numerocita} con evaluaciones',['numerocita'=>Citas::findOne($idLastCita)->numero])];   
+           }
+            $model->agregaBateria($codbateria); 
            return ['success'=>yii::t('sta.errors','Se agregaron las pruebas de la batería')];
         }else{
           return ['error'=>yii::t('sta.errors','Código de batería no válido')];   
@@ -842,7 +855,7 @@ function actionBancoPreguntas($id){
       if(!$cita->hasCompletePreguntas())
             return ['error'=>yii::t('sta.errors','El banco de preguntas aun no esta completo, refresque preguntas')];
       if(!$cita->isBateriaCompleta())
-           return ['error'=>yii::t('sta.errors','Error: Hay preguntas sin contestar')];
+           return ['error'=>yii::t('sta.errors','Error: Hay preguntas sin contestar o el alumno aun no ha rendido la prueba, verifique por favor')];
       $cita->makeResultados();
        return ['success'=>yii::t('sta.errors','Se han procesado las pruebas, con éxito')];
      
@@ -870,16 +883,14 @@ public function actionReportInfPsicologico($id){
     if(is_null($model))
    throw new NotFoundHttpException(Yii::t('sta.labels', 'No se encontro ningun registro con el id '.$id));
    $codocu=$model->codocu;
-    if($codocu=='105'){
-       echo "En proceso de diseño";die(); 
-    }
+    
     
     /*Filtro de acceso*/
-             /*if($model->hasMethod('canDownload')){
+             if($model->hasMethod('canDownload')){
                  if(!$model->canDownload()){
                      return "no puedes Visualizar este documento"; 
                  }
-             }*/
+             }
        /*Fin del filtro */
      $view="/citas/reportes/reporte_".$codocu;
      $alumno=$model->talleresdet->alumno;    
@@ -899,6 +910,14 @@ public function actionReportInfPsicologico($id){
          $pagina=$this->render($view,['model'=>$model,'alumno'=>$alumno,'examenesId'=>$examenesId]);
     
     }
+    if($codocu=='105'){
+       $cita=Citas::findOne($model->cita_id);
+            $examenesId=$cita->examenesId();
+            //var_dump($examenesId);die();
+            //$resultados= \frontend\modules\sta\models\StaResultados::find()->andWhere(['examen_id'=>$examenesId])->all();
+         $pagina=$this->render($view,['model'=>$model,'alumno'=>$alumno,'examenesId'=>$examenesId]);
+    
+    }
    if($codocu=='104'){
           //Solo ara el documento 104
          $citas=Citas::find()->andWhere(['talleresdet_id'=>$model->talleresdet_id])->orderBy('fechaprog asc')->all();
@@ -909,6 +928,8 @@ public function actionReportInfPsicologico($id){
      
   if($codocu=='107')
   return $pagina;
+  if($codocu=='105')
+  return $pagina;
    $mpdf= \frontend\modules\report\Module::getPdf();
    $mpdf->margin_header=1;
     $mpdf->margin_footer=1;
@@ -917,13 +938,61 @@ public function actionReportInfPsicologico($id){
    $mpdf->DefHTMLHeaderByName(
   'Chapter2Header',$this->render("/citas/reportes/cabecera")
 );
-   $mpdf->DefHTMLFooterByName('pie',$this->render("/citas/reportes/footer"));
-   $mpdf->SetHTMLHeaderByName('pie');
+   //$mpdf->DefHTMLFooterByName('pie',$this->render("/citas/reportes/footer"));
+   $mpdf->SetHTMLHeaderByName('Chapter2Header');
    $mpdf->WriteHTML($pagina);
       return  $mpdf->output();
             
 }
 
+public function actionRefreshEtapa($id){
+   $alumnitos= \frontend\modules\sta\models\Talleresdet::find()->where(['talleres_id'=>$id])->all();
+    foreach($alumnitos as $alumno){
+       $citas=$alumno->getCitas()->orderBy('fechaprog asc')->all();
+       $contador=1;
+        foreach($citas as $cita){
+            if($cita->masivo){
+                $cita->flujo_id=1;
+                $cita->save();
+            }else{
+                if($contador==1){                
+                  $cita->flujo_id=2;
+                  $cita->save();
+                 if($cita->asistio){
+                    $contador++;
+                    }
+                }else{
+                  $cita->flujo_id=3;
+                  $cita->save();
+                  $contador++;
+                }
+              
+            }
+        }
+    }
+}
+
+
+public function actionProcesaBatch(){
+    //hallando las citas que tienen examenes
+
+        if (h::request()->isAjax) {
+                h::response()->format = Response::FORMAT_JSON;
+                //return ActiveForm::validate($model);
+        }
+    
+ $idExamenes= \frontend\modules\sta\models\StaResultados::find()->select(['examen_id'])->distinct()->column();
+ $idCitas  = Examenes::find()->select(['citas_id'])->distinct()->andWhere(['not in','id',$idExamenes])->column();
+
+ $citas=Citas::find()->andWhere(['id'=>$idCitas])->all();
+ //var_dump(count($citas));die();
+ foreach($citas as $cita){     
+       $cita->makeResultados(); 
+    
+ }
+ return ['success'=>yii::t('sta.labels','Se procesaron las evaluaciones')];
+   
+}
 
 
 }

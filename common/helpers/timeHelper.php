@@ -91,10 +91,10 @@ class timeHelper {
    } 
    
    public static function regexMysqlDate(){
-      return '/[0-9]{4}-[0-9]{1}[0-2]{1}-[0-3]{1}[0-9]{1}/';
+      return '/[0-9]{4}-[0-1]{1}[0-9]{1}-[0-3]{1}[0-9]{1}/';
   }
   public static function regexMysqlDateTime(){
-      return '/[0-9]{4}-[0-9]{1}[0-2]{1}-[0-3]{1}[0-9]{1} [0-2]{1}[0-9]{1}:[0-5]{1}[0-9]{1}:[0-5]{1}[0-9]{1}/';
+      return '/[0-9]{4}-[0-1]{1}[0-9]{1}-[0-3]{1}[0-9]{1} [0-2]{1}[0-9]{1}:[0-5]{1}[0-9]{1}:[0-5]{1}[0-9]{1}/';
   }
   public static function IsFormatMysqlDate($fecha){
      if(preg_match(static::regexMysqlDateTime(),$fecha)){
@@ -121,7 +121,13 @@ class timeHelper {
          return yii::t('base.names','Buenas Noches');
   }
   
-  
+  public static function semanas(){
+      $semanas=[];
+      for ($i = 1; $i <= 52; $i++) {
+          $semanas[$i]='Semana '.$i;
+         }
+       return $semanas;
+    }
   
 }  
   

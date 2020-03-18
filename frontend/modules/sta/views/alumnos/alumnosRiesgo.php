@@ -12,6 +12,10 @@ ECHO spinnerWidget::widget();
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\modules\sta\models\AlumnosController */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+//$this->title = Yii::t('base.names', 'Crear Reincorporación');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('base.names', 'Programas'), 'url' => ['programas/index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('base.names', 'Alumnos'), 'url' => ['alumnos/index']];
+//$this->params['breadcrumbs'][] =['label' => Yii::t('base.names', 'Alumnos Incorporados'), 'url' => ['alumnos/incorporados']];
 
 $this->title = Yii::t('sta.labels', 'Alumnos en Riesgo Académico');
 //$this->params['breadcrumbs'][] = $this->title;
@@ -32,7 +36,7 @@ $this->title = Yii::t('sta.labels', 'Alumnos en Riesgo Académico');
 $gridColumns = [
                     [
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{view}',
+                'template' => '{view}{edit}',
                 'buttons' => [
                           'view' => function($url, $model) {    
                              $url=\yii\helpers\Url::toRoute([
@@ -47,7 +51,24 @@ $gridColumns = [
                         ];
                         return Html::a('<span class="btn btn-warning btn-sm glyphicon glyphicon-search"></span>', $url, $options/*$options*/);
                          },
+                          'edit' => function($url, $model) {
+                             if($model->status=='I'){
+                                 $url=\yii\helpers\Url::toRoute([
+                                 'edita-incorporado',
+                                 'id'=>$model->id,
+                                 //'codperiodo'=>$model->codperiodo
+                                     ]);
+                        $options = [
+                            'data-pjax'=>'0',
+                            'target'=>'_blank',
+                            'title' => Yii::t('base.verbs', 'Editar'),                            
+                        ];
+                        return Html::a('<span class="btn btn-success btn-sm glyphicon glyphicon-pencil"></span>', $url, $options/*$options*/);
                          
+                             }ELSE{
+                                 return '';
+                             }
+                             },
                     ]
                 ],
                 [

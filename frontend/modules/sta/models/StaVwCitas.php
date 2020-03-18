@@ -3,6 +3,7 @@
 namespace frontend\modules\sta\models;
 use frontend\modules\sta\staModule;
 use common\models\masters\Documentos;
+use common\helpers\h;
 use frontend\modules\sta\interfaces\editableViewInterface;
 use common\models\base\modelBase;
 use Yii;
@@ -22,7 +23,7 @@ editableViewInterface
     
     public $dateorTimeFields=['fechaprog'=>self::_FDATETIME,
         'fechaprog1'=>self::_FDATETIME];
-   // public $booleanFields=['asistio'];
+   public $booleanFields=['asistio'];
     public $fechaprog1;
      public $finicio1;
       public $ftermino1;
@@ -121,4 +122,25 @@ editableViewInterface
     public function delete(){
        return $this->cita->delete();
     }
+    
+   public function marcadorStatus(){
+     if(!$this->isVencida()){ //futuro
+          if($this->asistio){
+             return ['success'=>Yii::t('sta.labels','EFECTUADA')]; 
+         }else{
+            return ['warning'=>Yii::t('sta.labels','PROGRAMADA')];  
+         }
+     }else{ //presenet y pasado
+         if($this->asistio){
+             return ['success'=>Yii::t('sta.labels','EFECTUADA')]; 
+         }else{
+            return ['danger'=>Yii::t('sta.labels','VENCIDA')];  
+         }
+        
+     }
+ } 
+  public function isVencida(){
+     $horas=h::gsetting('sta', 'nhorasreprogramacion');
+     return $this->toCarbon('fechaprog')->lessThanOrEqualTo(self::CarbonNow()->subHours($horas));
+  }  
 }

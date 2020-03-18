@@ -31,6 +31,8 @@ if(!$this->existsTable($table)) {
         'hfin'=>$this->char(5)->notNull()->append($this->collateColumn()),
         'tolerancia'=>$this->decimal(4,1)->notNull(),
        'activo'=>$this->char(1)->notNull()->append($this->collateColumn()),
+       'codtra'=>$this->string(6)->append($this->collateColumn()),
+       
         ],$this->collateTable());
   
   /*  $this->addForeignKey($this->generateNameFk($table), $table,

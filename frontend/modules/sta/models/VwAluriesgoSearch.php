@@ -17,7 +17,7 @@ class VwAluriesgoSearch extends VwAluriesgo
     public function rules()
     {
         return [
-           [['codcar','codperiodo','codfac','codcur', 'ap', 'am', 'nombres',  'codalu', 'dni', 'correo', 'fijos', 'celulares', 'fijos','nomcur'], 'safe'],
+           [['codcar','status','codperiodo','codfac','codcur', 'ap', 'am', 'nombres',  'codalu', 'dni', 'correo', 'fijos', 'celulares', 'fijos','nomcur'], 'safe'],
      
         ];
     }
@@ -62,6 +62,7 @@ class VwAluriesgoSearch extends VwAluriesgo
             ->andFilterWhere(['like', 'ap', $this->ap])
                  ->andFilterWhere(['like', 'codcur', $this->codcur])
             ->andFilterWhere(['like', 'am', $this->am])
+             ->andFilterWhere(['status'=> $this->status])
             ->andFilterWhere(['like', 'nombres', $this->nombres])
            ->andFilterWhere(['like', 'correo', $this->correo])
             ->andFilterWhere(['like', 'codalu', $this->codalu])

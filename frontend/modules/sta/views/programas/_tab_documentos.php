@@ -21,7 +21,7 @@
         </div>
     </div> 
     
-   <?php Pjax::begin(['id'=>'palogay_docu']); ?>
+   <?php Pjax::begin(['id'=>'grid_docu']); ?>
     
    <?php //var_dump((new SigiApoderadosSearch())->searchByEdificio($model->id)); die(); ?>
     <?= GridView::widget([
@@ -33,12 +33,12 @@
                  [
                 'class' => 'yii\grid\ActionColumn',
                 //'template' => Helper::filterActionColumn(['view', 'activate', 'delete']),
-            'template' => '{edit}{attach}{delete}{pdf}',
+            'template' => '{edit}{attach}{pdf}',
                'buttons' => [
-                   'delete' => function ($url,$model) {
+                  /* 'delete' => function ($url,$model) {
 			   $url = \yii\helpers\Url::toRoute($this->context->id.'/deletemodel-for-ajax');
-                              return \yii\helpers\Html::a('<span class="btn btn-danger glyphicon glyphicon-trash"></span>', '#', ['title'=>$url,/*'id'=>$model->codparam,*/'family'=>'pinke','id'=>\yii\helpers\Json::encode(['id'=>$model->id,'modelito'=> str_replace('@','\\',get_class($model))]),/*'title' => 'Borrar'*/]);
-                            },
+                              return \yii\helpers\Html::a('<span class="btn btn-danger glyphicon glyphicon-trash"></span>', '#', ['title'=>$url,/*'id'=>$model->codparam,'family'=>'pinke','id'=>\yii\helpers\Json::encode(['id'=>$model->id,'modelito'=> str_replace('@','\\',get_class($model))]),/*'title' => 'Borrar']);
+                            },*/
                     'attach' => function($url, $model) {  
                          $url=\yii\helpers\Url::toRoute(['/finder/selectimage','isImage'=>false,'idModal'=>'imagemodal','modelid'=>$model->id,'nombreclase'=> str_replace('\\','_',get_class($model))]);
                         $options = [
@@ -55,21 +55,26 @@
                         },
                         
                         'edit' => function ($url,$model) {
-			   $url = \yii\helpers\Url::toRoute([$this->context->id.'/edita-docu','id'=>$model->id,'gridName'=>'palogay_docu','idModal'=>'buscarvalor']);
+			   $url = \yii\helpers\Url::toRoute([$this->context->id.'/edita-docu','id'=>$model->id,'gridName'=>'grid_docu','idModal'=>'buscarvalor']);
 
                               return \yii\helpers\Html::a('<span class="btn btn-danger glyphicon glyphicon-pencil"></span>', $url, ['class'=>'botonAbre']);
                             },
                         'pdf' => function ($url,$model) {
-			   $url = \yii\helpers\Url::toRoute(['/sta/citas/report-inf-psicologico','id'=>$model->id,'gridName'=>'palogay_docu','idModal'=>'buscarvalor']);
+			   $url = \yii\helpers\Url::toRoute(['/sta/citas/report-inf-psicologico','id'=>$model->id,'gridName'=>'grid_docu','idModal'=>'buscarvalor']);
                               if($model->cita_id > 0 or $model->codocu=='104')
                               return \yii\helpers\Html::a('<span class="btn btn-warning fa fa-file-pdf"></span>', $url, ['data-pjax'=>'0','target'=>'_blank']);
                               return '';
                              } 
                     ]
                 ],
-            'codocu',
+            [
+              'attribute' => 'codocu',
+                  //'header'=>'Código',
+              
+                    ],
               [
               'attribute' => '',
+                  'header'=>'Nombre',
                'format'=>'raw',
                 'value' => function ($model) {
                     if($model->hasAttachments()){
@@ -80,6 +85,18 @@
                        return $model->documento->desdocu ;
                     }
                    },
+                    ],
+                 [
+              'attribute' => 'cita_id',
+               'format'=>'raw',
+                'value' => function ($model) {
+                       if(!empty($model->cita_id)){
+                           $cadena= '<span style="font-size:14px; color:#ad5eb7; font-weight:700;">'.$model->cita->numero.'</span>';   
+                           return Html::a($cadena,Url::toRoute(['/sta/citas/update','id'=>$model->cita_id]),['data-pjax'=>'0','target'=>'_blank']);
+                       }else{
+                           return '';
+                       }
+                     }
                     ],
                 [
               'attribute' => 'detalle',
@@ -105,7 +122,7 @@
         <?php 
    echo linkAjaxGridWidget::widget([
            'id'=>'widgetgruidBanuyucos',
-            'idGrilla'=>'palogay_docu',
+            'idGrilla'=>'grid_docu',
             'family'=>'pinke',
           'type'=>'POST',
            'evento'=>'click',
@@ -130,7 +147,9 @@
                               $.noty.setType(n.options.id, 'error');       
                                 }, 
               success: function(data) {
-              $.pjax.reload('#palogay_docu');
+             
+
+               $.pjax.reload({container: '#grid_docu',timeout:3000});
                    
                         }
                         });

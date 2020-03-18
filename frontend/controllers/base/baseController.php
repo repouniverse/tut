@@ -78,7 +78,7 @@ class baseController extends Controller
              return  \yii\helpers\Json::encode(['output'=>'OK', 'message'=>'SE EDITO SIN PROBLEMAS']);
              }
        else {
-           var_dump($model->getFisrtError());
+           //var_dump($model->getFisrtError());
            RETURN  ['output'=>'Error', 'message'=>$model->getFirstError()];
        // }}else {
             // return ['output'=>'', 'message'=>''];

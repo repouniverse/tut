@@ -11,23 +11,26 @@
         <div class="col-md-12">
             <div class="form-group no-margin">
             <div class="row">
-               <div class="btn-group">
-                   <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+             
+                   <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
         <?= Html::dropDownList("combo_test_bateria",null,
           frontend\modules\sta\helpers\comboHelper::baterias(),
             ['prompt'=>'--Seleccione un Valor--',
              'class'=>'form-group form-control',
                 'id'=>'combo_test_bateria'])  ?>
                 </div>
-             <?=($model->asistio)?\yii\helpers\Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Agregar batería'), ['class' => 'btn btn-info','href' => '#','id'=>'btn-add-bateria']):''?>
+                  <div class="btn-group">
+               <?php Pjax::begin(['id'=>'botones-examenes']); ?>
+             <?=($model->asistio && !$vencida)?\yii\helpers\Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Agregar batería'), ['class' => 'btn btn-info','href' => '#','id'=>'btn-add-bateria']):''?>
           
                
                 
          <?php /*$url= \yii\helpers\Url::to(['agrega-examen','id'=>$model->id,'gridName'=>'grilla-examenes','idModal'=>'buscarvalor']);*/?>
        <?php /* echo ($model->asistio)?\yii\helpers\Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Agregar evaluacion'), ['href' => $url,'id'=>'btn-add-test','class' => 'botonAbre btn btn-warning']):''*/?>
          <?php /*echo ($model->asistio)?\yii\helpers\Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Refrescar Preguntas'), ['id'=>'boton_bateria','class' => 'btn btn-warning']):''*/?> 
- <?=($model->asistio)?\yii\helpers\Html::button('<span class="fa fa-envelope"></span>   '.Yii::t('sta.labels', 'Notificar'), ['id'=>'boton_notifica','class' => 'btn btn-warning']):''?>  
-            </div>
+ <?=($model->asistio && !$vencida)?\yii\helpers\Html::button('<span class="fa fa-envelope"></span>   '.Yii::t('sta.labels', 'Notificar'), ['id'=>'boton_notifica','class' => 'btn btn-warning']):''?>  
+            <?php Pjax::end(); ?>
+               </div>
                 </div>
             </div>
         </div>
@@ -268,11 +271,16 @@ $string4="$('#boton_procesa').on( 'click', function(){
 
                              if ( !(typeof json['warning']==='undefined' )) {
                         $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['warning']);
-                              $.noty.setType(n.options.id, 'warning');  
+                              $.noty.setType(n.options.id, 'warning'); 
+                              $.pjax.reload({container: '#botones-examenes'});
                              } 
                           if ( !(typeof json['success']==='undefined' )) {
-                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['success']);
-                              $.noty.setType(n.options.id, 'success');  
+                         
+                         
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-ok\'></span>      '+ json['success']);
+                             
+                            $.noty.setType(n.options.id, 'success');  
+                               
                              }      
                    
                         }

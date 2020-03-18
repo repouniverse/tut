@@ -64,6 +64,10 @@ $this->params['breadcrumbs'][] = $this->title;
             'codtest',
             'descripcion',
             'orden',
+             [
+                 'attribute'=>'codbateria',
+                 'filter'=>  \frontend\modules\sta\helpers\comboHelper::baterias(),
+                 ],
             'version',
             'nveces',
                  ['class' => 'frontend\modules\report\components\columnGridReport',

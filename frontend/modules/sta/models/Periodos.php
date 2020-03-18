@@ -30,7 +30,7 @@ class Periodos extends \common\models\base\modelBase
     public function rules()
     {
         return [
-            ['codperiodo', 'safe'],
+            [['codperiodo','activa'], 'safe'],
              ['codperiodo', 'unique'],
             [['codperiodo'], 'string', 'max' => 7],
             [['periodo'], 'string', 'max' => 40],

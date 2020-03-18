@@ -46,9 +46,11 @@ class Alumnos extends \common\models\base\modelBase implements PersonInterface ,
      */
     const SCENARIO_SOLO='solo';
     const SCENARIO_CORREO='correo';
+       const SCENARIO_CELULARES='celulares';
     const SCENARIO_BATCH='batch';//varios datos 
     const SCENARIO_BATCH_MEDIO='import_medio'; //datos pocos
     const SCENARIO_BATCH_MINIMO='import_minimo'; //datos pocos
+    const SCENARIO_ADICIONALES='adicionales';
     public static function tableName()
     {
         return '{{%sta_alu}}';
@@ -74,9 +76,9 @@ class Alumnos extends \common\models\base\modelBase implements PersonInterface ,
     {
         return [
             
-            [['codalu', 'codcar', 'ap', 'am', 'nombres'], 'required'],
+            [['codalu', 'codcar', 'ap', 'am', 'nombres','correo','celulares'], 'required'],
             [['profile_id'], 'integer'],
-             [['celulares'], 'integer'],
+             //[['celulares'], 'integer'],
             [['codcar'], 'string', 'max' => 6],
              [['codfac'], 'string', 'max' => 8],
             [['ap', 'am', 'nombres'], 'string', 'max' => 40],
@@ -102,6 +104,8 @@ class Alumnos extends \common\models\base\modelBase implements PersonInterface ,
         $scenarios = parent::scenarios();
         $scenarios[self::SCENARIO_SOLO] = ['profile_id'];
         $scenarios[self::SCENARIO_CORREO] = ['correo'];
+         $scenarios[self::SCENARIO_CELULARES] = ['celulares'];
+        $scenarios[self::SCENARIO_ADICIONALES] = ['dni','domicilio','correo','celulares','fijos'];
         $scenarios[self::SCENARIO_BATCH] = [ 'codalu','codcar', 'ap', 'am', 'nombres', 'dni','domicilio','correo','celulares','fijos'];
          $scenarios[self::SCENARIO_BATCH_MEDIO] = ['codalu', 'codcar', 'ap', 'am', 'nombres', 'dni','domicilio','celulares'];
        // $scenarios[self::SCENARIO_REGISTER] = ['username', 'email', 'password'];
@@ -137,6 +141,8 @@ class Alumnos extends \common\models\base\modelBase implements PersonInterface ,
     {
         return $this->hasOne(Facultades::className(), ['codfac' => 'codfac']);
     }
+    
+   
 
     /**
      * @return \yii\db\ActiveQuery

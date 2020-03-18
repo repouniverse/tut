@@ -36,7 +36,7 @@ class StaTestdet extends \common\models\base\modelBase
         return [
             [['codtest', 'item', 'grupo', 'pregunta'], 'required'],
             [['detalles'], 'string'],
-             [['inversa'], 'safe'],
+             [['inversa','desfase'], 'safe'],
             [['codtest'], 'string', 'max' => 8],
             [['item'], 'string', 'max' => 3],
             [['grupo'], 'string', 'max' => 2],
@@ -88,7 +88,7 @@ class StaTestdet extends \common\models\base\modelBase
             $array2=$arrayCalificaciones;
             rsort($array2);
             $arrayTotal= array_combine($arrayCalificaciones, $array2);
-          return  $arrayTotal[$respuesta];
+          return  $arrayTotal[$respuesta]+$this->desfase;
           
         }else{
             return $respuesta;

@@ -42,6 +42,19 @@ use yii\widgets\Pjax;
                  
                  ],
              'tolerancia',
+            [
+                'attribute'=>'psico',
+                'header'=>'Psicólogo',
+                 'value'=>function($model){
+                   if(!empty($model->codtra)){
+                       return $model->trabajadores->fullName();
+                   }else{
+                      return  ''; 
+                   }
+                   
+                        
+                 }
+            ],                 
             'hinicio',
              'hfin',
           
@@ -53,6 +66,6 @@ use yii\widgets\Pjax;
   
        
 <?php
- $url= Url::to(['edit-rango','id'=>$model->id,'gridName'=>'grilla-rangos','idModal'=>'buscarvalor']);
+/* $url= Url::to(['edit-rango','id'=>$model->id,'gridName'=>'grilla-rangos','idModal'=>'buscarvalor']);
    echo  Html::button(yii::t('base.verbs','Modificar Rangos'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Tutor'),'id'=>'btn_contacts', 'class' => 'botonAbre btn btn-success']); 
-?> 
+*/?> 

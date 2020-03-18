@@ -37,6 +37,12 @@ use kartik\widgets\TimePicker;
              ['prompt'=>yii::t('sta.labels','--Seleccione un Valor--')]);
       ?>
   </div>
+      <div class="col-lg-8 col-md-9 col-sm-6 col-xs-12">
+              <?=$form->field($modeldet, 'correo')->textInput(['disabled'=>true,'value'=>$modeldet->alumno->correo])?>
+          </div> 
+     <div class="col-lg-8 col-md-9 col-sm-6 col-xs-12">
+              <?=$form->field($modeldet, 'celulares')->textInput(['disabled'=>true,'value'=>$modeldet->alumno->celulares])?>
+          </div> 
           
            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12"> 
       <?= $form->field($model, 'fecha',[/*'enableAjaxValidation' => true*/])->widget(DatePicker::class, [

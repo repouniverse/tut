@@ -8,7 +8,7 @@ use frontend\modules\sta\components\Indicadores;
         <!-- Info boxes -->
         
         <div class="btn-group">
-    <a href="<?=\yii\helpers\Url::toRoute('/sta/entregas')?>" class="btn btn-warning btn-lg ">
+   <!-- <a href="<?=\yii\helpers\Url::toRoute('/sta/entregas')?>" class="btn btn-warning btn-lg ">
         <i class="glyphicon glyphicon-briefcase" aria-hidden="true"></i> <?=yii::t('sta.labels','Entregas')?>
     </a>
     <a href="<?=\yii\helpers\Url::toRoute('/sta/test')?>" class="btn btn-success btn-lg ">
@@ -20,7 +20,7 @@ use frontend\modules\sta\components\Indicadores;
             
     <a href="<?=\yii\helpers\Url::toRoute('/sta/periodos')?>" class="btn btn-dark btn-lg ">
         <i class="glyphicon glyphicon-calendar " aria-hidden="true"></i> <?=yii::t('sta.labels','Periodos')?>
-    </a>
+    </a> !-->
 </div>
         
         

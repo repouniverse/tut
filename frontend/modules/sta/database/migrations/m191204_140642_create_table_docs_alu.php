@@ -27,7 +27,11 @@ if(!$this->existsTable($table)) {
          'indi_riesgo'=>$this->text()->append($this->collateColumn()),
         'sugerencias'=>$this->text()->append($this->collateColumn()),
         'metas'=>$this->text()->append($this->collateColumn()),
+        'indi_encont'=>$this->text()->append($this->collateColumn()),
+        'conclu_acad'=>$this->text()->append($this->collateColumn()),
+         'metas_acad'=>$this->text()->append($this->collateColumn()),
          'codfac'=>$this->string(8)->notNull()->append($this->collateColumn()),
+        
         ],$this->collateTable());
    $this->addForeignKey($this->generateNameFk($table), $table,
               'talleresdet_id', static::NAME_TABLE_TALLERESDET,'id');

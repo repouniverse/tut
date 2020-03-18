@@ -2,9 +2,10 @@
 
 namespace frontend\modules\sta\models;
 use common\helpers\h;
+use common\models\masters\Trabajadores;
 USE \yii2mod\settings\models\enumerables\SettingType;
 use Yii;
-
+use common\helpers\RangeDates;
 /**
  * This is the model class for table "{{%sta_rangos}}".
  *
@@ -40,7 +41,7 @@ class Rangos extends \common\models\base\modelBase
         return [
             [['talleres_id', 'dia', 'hinicio', 'hfin', 'tolerancia','nombredia'], 'required'],
             [['talleres_id', 'dia'], 'integer'],
-            [['hinicio','hfin','activo'], 'safe','on'=>self::SCENARIO_HORAS],
+            [['hinicio','hfin','activo','codtra'], 'safe','on'=>self::SCENARIO_HORAS],
              [['hinicio','hfin'], 'validateHoras','on'=>self::SCENARIO_HORAS],
             [['hinicio', 'hfin'], 'string', 'max' => 5],
             [['talleres_id'], 'exist', 'skipOnError' => true, 'targetClass' => Talleres::className(), 'targetAttribute' => ['talleres_id' => 'id']],
@@ -65,7 +66,7 @@ class Rangos extends \common\models\base\modelBase
       public function scenarios()
     {
         $scenarios = parent::scenarios(); 
-        $scenarios[self::SCENARIO_HORAS] = ['hinicio','hfin','activo'];
+        $scenarios[self::SCENARIO_HORAS] = ['hinicio','hfin','activo','codtra'];
        // $scenarios[self::SCENARIO_REGISTER] = ['username', 'email', 'password'];
         return $scenarios;
     }
@@ -76,6 +77,10 @@ class Rangos extends \common\models\base\modelBase
     public function getTalleres()
     {
         return $this->hasOne(Talleres::className(), ['id' => 'talleres_id']);
+    }
+    public function getTrabajadores()
+    {
+        return $this->hasOne(Trabajadores::className(), ['codigotra' => 'codtra']);
     }
 
     /**
@@ -102,4 +107,23 @@ class Rangos extends \common\models\base\modelBase
         
     }
  
+ /*
+  * Devuelve el rango de atencion del dia
+  * Recibe un objeto carbon como parametro 
+  * devuelve el objeto rango
+  */
+    
+  public function Range(\Carbon\Carbon $fecha ){
+      $diaWeekOriginal=$fecha->weekDay();
+      $diaWeekHoy=
+      var_dump($fecha);
+      var_dump($fecha->parse($this->hinicio));
+      var_dump($fecha->parse($this->hfin));
+      $rango=New RangeDates([
+             $fecha->parse($this->hinicio),
+            $fecha->parse($this->hfin)
+        ]);
+      RETURN $rango;
+  }  
+    
 }

@@ -7,7 +7,7 @@ use frontend\modules\sta\components\ActiveQueryScope;
  *
  * @see Entregas
  */
-class EntregasQuery extends ActiveQueryScope
+class EntregasQuery extends \yii\db\ActiveQuery
 {
     /*public function active()
     {

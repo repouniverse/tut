@@ -18,12 +18,12 @@ return [
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
-        'formatter' => [
+        /*'formatter' => [
         'class' => 'yii\i18n\Formatter',
         'nullDisplay' => '',
             'decimalSeparator' => '.',
             'thousandSeparator' => ', ',
-          ],
+          ],*/
     ],
     
   /* 'as access' => [
@@ -310,26 +310,12 @@ return [
            'enableAutoLogin'=>false,
            // authTimeout
             'enableSession' => true,
-            'authTimeout'=>60*500,
+            'authTimeout'=>60*40,
     ]
         
         
         
            ],
-    'as access' => [
-        'class' => 'mdm\admin\components\AccessControl',
-        'allowActions' => [
-            'site/login/',
-            'site/clear-cache/',
-            'site/signup',
-             'site/request-password-reset',
-            'site/reset-password', 
-           'site/logout',
-            'sta/citas/examen-banco',
-            'sta/citas/arregla-for-ajax',
-            'sta/citas/respuesta-examen',
-            'sta/citas/termina-examen',
-        ]
-    ]
+    
     
 ];

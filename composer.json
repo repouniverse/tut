@@ -13,6 +13,7 @@
         "source": "https://github.com/yiisoft/yii2"
     },
     "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
         "php": ">=5.4.0",
        "yiisoft/yii2": "~2.0.20",
@@ -59,7 +60,10 @@
         "miloschuman/yii2-highcharts-widget": "*",
         "buttflattery/yii2-formwizard": "@dev",
         "drsdre/yii2-wizardwidget": "*",
-        "scotthuangzl/yii2-google-chart": "dev-master"
+        "kartik-v/yii2-editors": "@dev",
+        "kartik-v/yii2-krajee-base": "dev-master",
+        "franciscomaya/yii2-sceditor": "dev-master",
+        "2amigos/yii2-ckeditor-widget": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

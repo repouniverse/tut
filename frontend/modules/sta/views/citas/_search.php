@@ -69,15 +69,33 @@ use common\helpers\h;
     <?=$form->field($model, 'aptutor')->textInput()?>
  </div>
      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-        <?= 
-            $form->field($model, 'asistio')->
-            dropDownList(['1'=>yii::t('sta.labels','Asistió'),'0'=>yii::t('sta.labels','Ausente')] ,
+        <?php
+           $filtro=h::request()->get('StaVwCitasSearch')['asistio'];
+           // var_dump($filtro);
+            //var_dump($model->asistio);
+           if(is_null($filtro) or $filtro=='')
+           {
+               $combovalor='';
+           }elseif($filtro=='0'){
+              $combovalor='0'; 
+           }elseif($filtro=='1'){
+               $combovalor='1';  
+           }
+          
+           echo $form->field($model, 'asistio')->
+            dropDownList(
+                    [
+                       '0'=>yii::t('sta.labels','Ausente'),
+                        '1'=>yii::t('sta.labels','Asistió'),
+                        
+                    ] ,
                     ['prompt'=>'--'.yii::t('base.verbs','Todas')."--",
+                     'value'=>$combovalor,
                         //'enableAjaxValidation' => true,
                     // 'class'=>'probandoSelect2',
                       //'disabled'=>($model->isBlockedField('codpuesto'))?'disabled':null,
                         ]
-                    )  ?>
+                    );  ?>
      <?php //echo cboperiodos::widget(['model'=>$model,'attribute'=>'codperiodo', 'form'=>$form]) ?>
   </div>
   <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">

@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use frontend\modules\sta\helpers\comboHelper;
 //use common\widgets\selectwidget\selectWidget;
@@ -23,8 +24,8 @@ use frontend\modules\sta\helpers\comboHelper;
     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"> 
     <div class="form-group">
         <?= Html::submitButton("<span class='fa fa-search'></span>     ".Yii::t('sta.labels', 'buscar'), ['class' => 'btn btn-primary']) ?>
-        <?= Html::button("<span class='fa fa-eye'></span>     ".Yii::t('sta.labels', 'Ver'), ['onClick'=>"$('#buscador').toggle()",  'class' => 'btn btn-success']) ?>
-    </div>
+        <?=Html::a('<span class="fa fa-user-plus" ></span>'.'  '.yii::t('sta.labels','Crear'),Url::to(['/sta/alumnos/create']),['data-pjax'=>'0','class'=>"btn btn-success"])?>
+          </div>
      </div>
     <div id="buscador">
         <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12"> 

@@ -17,6 +17,15 @@ class comboHelper extends Combito
                         \frontend\modules\sta\models\Facultades::find()->all(),
                 'codfac','desfac');
     }
+    /*
+     * Devuelve facultade sgiltradas por accso de usuario
+     */
+    public static function getCboFacultadesByUser($iduser=null){
+       $facus= \frontend\modules\sta\models\UserFacultades::filterFacultades($iduser);
+        return ArrayHelper::map(
+                        \frontend\modules\sta\models\Facultades::find()->where(['codfac'=>$facus])->all(),
+                'codfac','desfac');
+    }
     
     public static function getCboPeriodos(){
         return ArrayHelper::map(
@@ -103,9 +112,10 @@ class comboHelper extends Combito
     
    public static function baterias(){
      return [
-         'F17'=>'BATERIA DE EVALUACION PSICOLOGICA F17',
-     ];
- }
+        // 'F17'=>'BATERIA DE EVALUACION PSICOLOGICA F17',
+         'F18'=>'BATERIA DE EVALUACION PSICOLOGICA F18',
+       ];
+   }
    
   public static function geCboGruposTest($codtest){
      return ArrayHelper::map( \frontend\modules\sta\models\StaTestdet::find()-> 
@@ -129,6 +139,23 @@ class comboHelper extends Combito
           
      return ArrayHelper::map($query->all(),
             'id','numero');  
+    }
+    //Sca todas las actyivicades de la tabla sta flujo
+    public static function getCboFlujoEventos($codperiodo=null){
+    if(is_null($codperiodo)){
+         $codperiodo=\frontend\modules\sta\staModule::getCurrentPeriod();
+    }       
+return ArrayHelper::map( \frontend\modules\sta\models\StaFlujo::find()-> 
+      where(['codperiodo'=>$codperiodo,'esevento'=>'1'])->all(),
+            'id','proceso'); 
+    }
+    public static function getCboFlujoTotal($codperiodo=null){
+    if(is_null($codperiodo)){
+         $codperiodo=\frontend\modules\sta\staModule::getCurrentPeriod();
+    }       
+return ArrayHelper::map( \frontend\modules\sta\models\StaFlujo::find()-> 
+      where(['codperiodo'=>$codperiodo])->all(),
+            'id','proceso'); 
     }
 }
 

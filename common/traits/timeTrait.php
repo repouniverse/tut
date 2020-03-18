@@ -21,6 +21,7 @@ trait timeTrait
         '2020-08-30',
         '2021-11-01',
         '2020-12-25',
+        '2020-04-10',
              ];
 
     private function holyDays(){
