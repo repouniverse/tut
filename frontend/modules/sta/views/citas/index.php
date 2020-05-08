@@ -10,7 +10,8 @@ use yii\widgets\Pjax;
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\modules\sta\models\CitasSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-
+  use common\widgets\spinnerWidget\spinnerWidget;
+    ECHO spinnerWidget::widget();
 $this->title = Yii::t('sta.labels', 'Citas');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -19,7 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h4><?= Html::encode($this->title) ?></h4>
     <div class="box box-success">
      <div class="box-body">
-   
+    <?php Pjax::begin(['id'=>'listado_citas']); ?>
     <?php  echo $this->render('_search', ['model' => $searchModel]); ?>
          <hr/>
     
@@ -99,7 +100,7 @@ $this->params['breadcrumbs'][] = $this->title;
        if($model->asistio){
            return '<i style="color:#5bb75b;"><span class="fa fa-check-square">1</span></i>';
        }else{
-          return '<i style="color:#ff7b7b;"><span class="fa fa-times-circle">0</span></i>'; 
+          return '';//<i style="color:#ff7b7b;"><span class="fa fa-times-circle">0</span></i>'; 
        }
              },
 
@@ -113,14 +114,11 @@ $this->params['breadcrumbs'][] = $this->title;
                'attribute' => 'ap',
                     'group'=>TRUE,
                     ], 
-                     [
-               'attribute' => 'am',
-                    'group'=>TRUE,
-                    ], 
-                    [  'attribute' => 'nombres',
+                    
+         [  'attribute' => 'aptutor',
                     'group'=>TRUE,
                     ],
-         [  'attribute' => 'aptutor',
+          [  'attribute' => 'proceso',
                     'group'=>TRUE,
                     ],
            /* 'id',
@@ -139,7 +137,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
           
         ];
-    
+             
+   echo Html::beginForm(['/finder/addmaletin'],'post',['id'=>'miform']);
+   echo  Html::submitButton('<span class="fa fa-briefcase"></span>   '.Yii::t('sta.labels', ''), ['class' => 'btn btn-success']);
+  
     echo ExportMenu::widget([
     'dataProvider' => $dataProvider,
      'filename'=>'Citas',
@@ -158,13 +159,14 @@ $this->params['breadcrumbs'][] = $this->title;
     ]
 ]) ?>
  
+     
  <hr>
     
     
     <div style='overflow:auto;'>
-    <?php Pjax::begin(['id'=>'listado_citas']); ?>
-    <?=Html::beginForm(['controller/bulk'],'post');?>
-    <?= GridView::widget([
+   
+      <?= GridView::widget([
+        'id'=>'mygrilla',
         'dataProvider' => $dataProvider,
          //'summary' => '',
          'tableOptions'=>['class'=>'table table-condensed table-hover table-bordered table-striped'],
@@ -189,6 +191,8 @@ $url=Url::to(['/finder/addmaletin']);
 $cadenaJs="
  $('div[id=\"".$divPjax."\"] [type=checkbox]').on( 'click', function() { 
      identidad=this.value;
+     var keys = $('#mygrilla').yiiGridView('getSelectedRows');
+     alert(keys);
 //alert(this.checked);
 //var mycadena = this.name;
 //var myarr = mycadena.split('_');
@@ -205,15 +209,7 @@ $cadenaJs="
                                 }, 
               
                success: function(html) {
-              $('.progress').html( html );
-             // alert($('.progress').html());
-            // alert($('.progress-bar-danger').attr('aria-valuenow'));
-             var porcentaje=$('.progress-bar-danger').attr('aria-valuenow');
-             if(porcentaje >= 100){
-             $('#btn-conf-examen').removeAttr('disabled');
-               
-             }
-
+              
                         }
                    
                        
@@ -225,8 +221,48 @@ $cadenaJs="
         })";
        
   // echo  \yii\helpers\Html::script($stringJs);
-   $this->registerJs($cadenaJs);
+   //$this->registerJs($cadenaJs);
    // $this->getView()->registerJs($stringJs2);
          
 
-?>     
+?>
+<?php $this->registerJs("jQuery(document).ready(function($) {
+       $('#miform').submit(function(event) {
+            event.preventDefault(); // stopping submitting
+            var data = $(this).serializeArray();
+            var url = $(this).attr('action');
+            $.ajax({
+                url: url,
+                type: 'post',
+                dataType: 'json',
+                data: data,
+                 error:  function(xhr, textStatus, error){               
+                            var n = Noty('id');                      
+                              $.noty.setText(n.options.id, error);
+                              $.noty.setType(n.options.id, 'error');       
+                                }, 
+              success: function(json) {
+              var n = Noty('id');
+                      
+                       if ( !(typeof json['error']==='undefined') ) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['error']);
+                              $.noty.setType(n.options.id, 'error');  
+                          }    
+
+                             if ( !(typeof json['warning']==='undefined' )) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['warning']);
+                              $.noty.setType(n.options.id, 'warning');  
+                             } 
+                          if ( !(typeof json['success']==='undefined' )) {
+                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['success']);
+                              $.noty.setType(n.options.id, 'success');  
+                             }      
+                   
+                        }
+                       
+            });
+            
+        
+        });
+    });",\yii\web\View::POS_END);  
+  ?>     

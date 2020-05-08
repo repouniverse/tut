@@ -23,7 +23,10 @@ use common\widgets\selectwidget\selectWidget;
     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"> 
     <div class="form-group">
         <?= Html::submitButton("<span class='fa fa-search'></span>     ".Yii::t('sta.labels', 'buscar'), ['class' => 'btn btn-primary']) ?>
-        <?= Html::button("<span class='fa fa-eye'></span>     ".Yii::t('sta.labels', 'Ver'), ['onClick'=>"$('#buscador').toggle()",  'class' => 'btn btn-success']) ?>
+        <?php $url=\yii\helpers\Url::toRoute(['/sta/alumnos/agregar-riesgo']);  ?>      
+              <?=Html::a('<span class="fa fa-user-plus" ></span>'.'  '.yii::t('sta.labels','Agregar alumno'),$url,['target'=>'_blank','data-pjax'=>'0','class'=>"btn btn-warning"])?>
+              
+
     </div>
      </div>
     <div id="buscador">

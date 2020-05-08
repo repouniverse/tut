@@ -203,4 +203,6 @@ class ComboHelper  {
                         \common\models\masters\Monedas::find()->all(),
                 'codmon','codmon');
     }
+    
+     
 }

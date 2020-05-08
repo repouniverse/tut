@@ -4,16 +4,16 @@
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
 /* @var $model \common\models\LoginForm */
-
+ use kartik\tabs\TabsX;
 use yii\helpers\Html;
 use common\helpers\h;
 use yii\bootstrap\ActiveForm;
 
-$this->title = 'Profile';
+$this->title = '   '.yii::t('sta.labels','Datos de usuario');
 //$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-login">
-    <h6><?= Html::encode($this->title) ?></h6>
+    <h4><span class="fa fa-user"></span><?= Html::encode($this->title) ?></h4>
  <div class="box box-success">
     
 
@@ -62,6 +62,9 @@ $this->title = 'Profile';
             <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
                 <?= Html::checkbox('agreeff',h::user()->isActive(), [ 'disabled'=>'disabled', 'label' =>yii::t('base.forms','Enabled')]) ?>
              </diV>
+          <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                 <?=$form->field($model,'recexternos')->checkBox() ?>
+             </diV>
             <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
                 <?= $form->field($model, 'names')->textInput(['autofocus' => true]) ?>
                     </diV>
@@ -79,7 +82,29 @@ $this->title = 'Profile';
                 
             <?php ActiveForm::end(); ?>
             
-            
+      <?php 
+ echo TabsX::widget([
+     'position' => TabsX::POS_ABOVE,
+     'bordered'=>true,
+    'align' => TabsX::ALIGN_LEFT,
+      'encodeLabels'=>false,
+    'items' => [
+        [
+            'label' =>'<i class="fa fa-bookmark"></i> '.yii::t('base.names','Favoritos'), //$this->context->countDetail() obtiene el contador del detalle
+            'content'=>$this->render('_tab_profile_favoritos'),
+            'active' => true,
+             'options' => ['id' => 'tnID3'],
+        ],
+        [
+            'label' =>'<i class="fa fa-list-ul"></i> '. yii::t('base.names','Registro Acceso'), //$this->context->countDetail() obtiene el contador del detalle
+           'content'=>$this->render('_tab_profile_audit'),
+            'active' => false,
+             'options' => ['id' => 'myy6nID4'],
+        ],
+      
+    ],
+]); 
+    ?>       
        
     </div>
     <br>

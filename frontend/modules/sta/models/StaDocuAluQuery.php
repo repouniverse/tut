@@ -7,7 +7,7 @@ namespace frontend\modules\sta\models;
  *
  * @see StaDocuAlu
  */
-class StaDocuAluQuery extends \frontend\modules\sta\components\ActiveQueryScope
+class StaDocuAluQuery extends \frontend\modules\sta\components\ActiveQueryStatus
 {
     /*public function active()
     {
@@ -31,4 +31,8 @@ class StaDocuAluQuery extends \frontend\modules\sta\components\ActiveQueryScope
     {
         return parent::one($db);
     }
+    
+    
+    
+    
 }

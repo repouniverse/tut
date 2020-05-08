@@ -58,15 +58,17 @@ class Alumnos extends \common\models\base\modelBase implements PersonInterface ,
 
     
      public function behaviors()
-{
+      {
 	return [
-		
+		'auditoriaBehavior' => [
+			'class' => '\common\behaviors\AuditBehavior' ,
+                               ],
 		'fileBehavior' => [
 			'class' => FileBehavior::className()
 		]
 		
 	];
-}
+       }
     
     
     /**
@@ -241,7 +243,7 @@ class Alumnos extends \common\models\base\modelBase implements PersonInterface ,
      * Cuantos cursos itiene en riresgo ene lactual periodo
      */
    public function howManyRisks(){
-       return Aluriesgo::find()->where([
+       return Aluriesgo::except()->where([
            '[[codalu]]'=>$this->codalu,
            '[[codperiodo]]'=> staModule::getCurrentPeriod(),
                ])->count();
@@ -252,7 +254,7 @@ class Alumnos extends \common\models\base\modelBase implements PersonInterface ,
       * Que periodos son los que ha etado en riesgo
       */
    public function periodsInRisk(){
-       return array_column(Aluriesgo::find()->select('[[codperiodo]]')->where([
+       return array_column(Aluriesgo::except()->select('[[codperiodo]]')->where([
            '[[codalu]]'=>$this->codalu])->asArray()->all(),'codperiodo');
        
    }
@@ -270,7 +272,7 @@ class Alumnos extends \common\models\base\modelBase implements PersonInterface ,
      if($taller===NUll){
          return null;
      }
-   return Talleresdet::find()->where([
+   return Talleresdet::except()->where([
               'codalu'=>$this->codalu, 
        'talleres_id'=>$taller->id, 
            ])->one();

@@ -7,7 +7,7 @@ namespace frontend\modules\sta\models;
  *
  * @see StaExamenesdet
  */
-class StaExamenesdetQuery extends \frontend\modules\sta\components\ActiveQueryScope
+class StaExamenesdetQuery extends \frontend\modules\sta\components\ActiveQueryStatus
 {
     /*public function active()
     {

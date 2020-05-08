@@ -108,7 +108,7 @@ class staModule extends \yii\base\Module
      * 
      */
     public static function getPathImage($codalu){
-     if(h::gsetting('sta','showImgOrce')){
+     if(h::gsetting('sta','showImgOrce') or h::user()->profile->recexternos){
           $hasExternal=self::externalUrlImage($codalu);
          if($hasExternal)
          return $hasExternal;

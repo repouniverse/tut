@@ -47,7 +47,7 @@ class Examenes extends modelSensibleAccess
         return [
             [['citas_id', 'codtest'], 'required'],
             [['citas_id'], 'integer'],
-             [['fnotificacion','virtual','codfac','reporte_id'],'safe'],
+             [['fnotificacion','virtual','codfac','reporte_id','status'],'safe'],
             [['detalles'], 'string'],
             [['codtest'], 'string', 'max' => 8],
             [['codtest'], 'exist', 'skipOnError' => true, 'targetClass' => Test::className(), 'targetAttribute' => ['codtest' => 'codtest']],
@@ -132,15 +132,28 @@ class Examenes extends modelSensibleAccess
       $valor=false;
       $detalles=$this->test->testdets;
     //var_dump($this->test);die();
+      
       foreach($detalles as $detalle){
-          yii::error('recorreindo '.$detalle->pregunta);
+          $idIndi=$detalle->indicadorId();
+          //yii::error('recorreindo '.$detalle->pregunta);
            $attributos=[
           'examenes_id'=>$this->id,
            'codfac'=>$this->codfac,
           'test_id'=>$detalle->id,
-          'indicador_id'=>$detalle->indicadorId(),
+          'indicador_id'=>$idIndi,
+          'status'=> Aluriesgo::FLAG_NORMAL
                    ];
-      $valor=StaExamenesdet::firstOrCreateStatic($attributos, StaExamenesdet::SCENARIO_MIN );
+          
+      $verifyAttributes=[
+          'examenes_id'=>$this->id,
+           'codfac'=>$this->codfac,
+          'test_id'=>$detalle->id,
+          'indicador_id'=>$idIndi,
+         // 'status'=> Aluriesgo::FLAG_NORMAL
+                   ];
+      $valor=StaExamenesdet::firstOrCreateStatic($attributos,
+              StaExamenesdet::SCENARIO_MIN,$verifyAttributes
+              );
        if($valor===false){
            yii::error('fallo');
            $mimodelo=new StaExamenesdet();
@@ -160,14 +173,29 @@ class Examenes extends modelSensibleAccess
      return count($this->getExamenesDet()->asArray()->all());
   }
   
+  /*Esta funcion determina el porcentaje de avance 
+   * en las pregunrtas cotestadas por el alumno 
+   * durante la prueba virtual 
+   * Verifica que el campo 'valor' de la tabla StaExamenesdet
+   * No sea nulo 
+   */
+  
  public function porcentajeAvance(){
      $respondidas=$this->getExamenesDet()
              ->andWhere(['not',['valor'=>null]])->count();
+    //yii::error($this->getExamenesDet()
+            // ->andWhere(['not',['valor'=>null]])->createCommand()->getRawSql());
+     // yii::error('Cita  '.$this->cita->numero);
+     //yii::error('Respondidas  '.$respondidas);
      $totales=$this->npreguntas();
+    // yii::error('Totales  '.$totales);
      //return random_int(20, 99);
      if($totales>0){
+        // yii::error('Retornando   '.round((100*$respondidas/$totales),1));
         return round((100*$respondidas/$totales),1); 
+        
      }
+      //yii::error('Retornando  cero a la fuerza   0 ');
      return 0;
  }
   
@@ -194,28 +222,31 @@ class Examenes extends modelSensibleAccess
      
  }
  
- public function makeResultados(){
+ public function makeResultados($codperiodo){
      $valor=true;
+    $flujo_id=$this->cita->flujo_id;
+     //var_dump($this->porcentajeAvance());
   if($this->porcentajeAvance() >=100){
+     // yii::error('avnce');
        $this->makePuntaje();
    $detalles=$this->getExamenesDet()
     ->select(['examenes_id','indicador_id','sum(puntaje) as puntajetotal'])
     ->groupBy(['examenes_id','indicador_id'])->asArray()->all();
-   yii::error('Sql del RESUMEN');
+  /* yii::error('Sql del RESUMEN');
      yii::error($this->getExamenesDet()
     ->select(['examenes_id','indicador_id','sum(puntaje) as puntajetotal'])
-    ->groupBy(['examenes_id','indicador_id'])->createCommand()->getRawSql());
+    ->groupBy(['examenes_id','indicador_id'])->createCommand()->getRawSql());*/
    foreach($detalles as $detalle){
        //$indicador= StaTestindicadores::findOne($detalle['indicador_id']);
        $percentil= StaPercentiles::find()->where([
          'indicador_id'=> $detalle['indicador_id'],
           'puntaje'=>$detalle['puntajetotal']
        ])->one();
-       yii::error('Sql del percentil');
+       /*yii::error('Sql del percentil');
        yii::error(StaPercentiles::find()->where([
          'indicador_id'=> $detalle['indicador_id'],
           'puntaje'=>$detalle['puntajetotal']
-       ])->createCommand()->getRawSql());
+       ])->createCommand()->getRawSql());*/
        if(is_null($percentil)){
         yii::error('No se encontró el percentil');   
        }
@@ -224,13 +255,36 @@ class Examenes extends modelSensibleAccess
           'examen_id'=>$detalle['examenes_id'],
            'indicador_id'=>$detalle['indicador_id'],
            'codfac'=>$this->codfac,
+             'codperiodo'=>$codperiodo,
           'puntaje_total'=>$detalle['puntajetotal'],
           'percentil'=>$percentil->percentil,
            'categoria'=>$percentil->categoria, 
+           'flujo_id'=>$flujo_id,
+            'status'=> Aluriesgo::FLAG_NORMAL,
            'interpretacion'=>$percentil->indicador->interpretacion(trim($percentil->categoria)),
                    ];
+        $exists=StaResultados::find()->andWhere([
+            'examen_id'=>$detalle['examenes_id'],
+            'indicador_id'=>$detalle['indicador_id']
+                ])->exists();
+       
+        if($exists){
+            yii::error('existe');
+            $resultado= StaResultados::findOne([
+                        'examen_id'=>$detalle['examenes_id'],
+                        'indicador_id'=>$detalle['indicador_id']
+                                ]);
+        }else{
+           $resultado= New StaResultados();           
+        }
+        $resultado->setAttributes($attributos);  
+           IF(!$resultado->save()){
+               yii::error('Fallo y estos son los errores : ');
+               yii::error($resultado->getErrors()); 
+             $valor=false;
+           }
         
-        $valor= StaResultados::firstOrCreateStatic(
+       /* $valor= StaResultados::firstOrCreateStatic(
                 $attributos,
                 null,
                 [ 'examen_id'=>$detalle['examenes_id'],'indicador_id'=>$detalle['indicador_id']]
@@ -243,12 +297,13 @@ class Examenes extends modelSensibleAccess
            $mimodelo->validate();
            yii::error($mimodelo->getErrors());
            break;
-       }
+       }*/
         
    }
    return $valor;
       
   }else{
+      yii::error('no hay avnce');
       return false;
   }
   

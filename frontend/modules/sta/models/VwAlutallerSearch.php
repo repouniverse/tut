@@ -40,7 +40,7 @@ class VwAlutallerSearch extends VwAlutaller
      */
     public function search($params)
     {
-        $query = VwAlutaller::find();
+        $query = VwAlutaller::except();
 
         // add conditions that should always apply here
 
@@ -116,7 +116,7 @@ class VwAlutallerSearch extends VwAlutaller
     }
     public function searchByTaller($params,$talleres_id)
     {
-        $query = VwAlutaller::find();
+        $query = VwAlutaller::except();
 
         // add conditions that should always apply here
 

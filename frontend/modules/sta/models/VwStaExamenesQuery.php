@@ -1,13 +1,13 @@
 <?php
 
 namespace frontend\modules\sta\models;
-use frontend\modules\sta\components\ActiveQueryScope;
+use frontend\modules\sta\components\ActiveQueryStatus;
 /**
  * This is the ActiveQuery class for [[VwStaExamenes]].
  *
  * @see VwStaExamenes
  */
-class VwStaExamenesQuery extends ActiveQueryScope
+class VwStaExamenesQuery extends ActiveQueryStatus
 {
     /*public function active()
     {

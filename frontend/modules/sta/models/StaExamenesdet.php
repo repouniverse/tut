@@ -39,7 +39,7 @@ class StaExamenesdet extends \common\models\base\modelBase
             [['examenes_id', 'test_id', 'codfac', 'valor'], 'required'],
             [['examenes_id', 'test_id', 'valor'], 'integer'],
             [['detalles'], 'string'],
-             [['codfac','valor','indicador_id'], 'safe'],
+             [['codfac','valor','indicador_id','status'], 'safe'],
             [['codfac'], 'string', 'max' => 8],
             [['codfac'], 'exist', 'skipOnError' => true, 'targetClass' => Facultades::className(), 'targetAttribute' => ['codfac' => 'codfac']],
             [['examenes_id'], 'exist', 'skipOnError' => true, 'targetClass' => Examenes::className(), 'targetAttribute' => ['examenes_id' => 'id']],
@@ -48,7 +48,7 @@ class StaExamenesdet extends \common\models\base\modelBase
  public function scenarios()
     {
         $scenarios = parent::scenarios(); 
-        $scenarios[self::SCENARIO_MIN] = ['examenes_id','test_id','codfac','indicador_id'];
+        $scenarios[self::SCENARIO_MIN] = ['examenes_id','test_id','codfac','indicador_id','status'];
          $scenarios[self::SCENARIO_RESPUESTA] = ['valor','puntaje'];
         return $scenarios;
     }

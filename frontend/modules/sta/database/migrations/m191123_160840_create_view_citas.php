@@ -22,6 +22,7 @@ class m191123_160840_create_view_citas extends viewMigration
          'd.nombres as nombrestutor',
         's.codperiodo','s.descripcion','s.numero','s.nombre as nombreprogrma',
         'b.codalu',
+        'v.proceso',
          'c.ap','c.am','c.nombres','c.codcar','c.id as idalumno',
          'a.*',
         ])
@@ -29,7 +30,8 @@ class m191123_160840_create_view_citas extends viewMigration
      innerJoin('{{%sta_alu}} c', 'c.codalu=b.codalu')->
      innerJoin('{{%sta_talleres}} s', 's.id=b.talleres_id')->          
       innerJoin('{{%sta_citas}} a', 'a.talleresdet_id=b.id')->
-      innerJoin('{{%trabajadores}} d', 'd.codigotra=a.codtra')
+      innerJoin('{{%trabajadores}} d', 'd.codigotra=a.codtra')->
+     innerJoin('{{%sta_flujo}} v', 'v.id=a.flujo_id')
                 )->execute();
        
    }

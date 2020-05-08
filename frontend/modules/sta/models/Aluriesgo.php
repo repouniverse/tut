@@ -22,6 +22,10 @@ use common\behaviors\FileBehavior;
 class Aluriesgo extends \common\models\base\modelBase
 {
     const SCENARIO_REGISTER='registro';
+    const SCENARIO_REGISTER_NORMAL='registro_normal';
+    const FLAG_RETIRADO='R';
+    const FLAG_INCORPORADO='I';
+    const FLAG_NORMAL='N';
     /**
      * {@inheritdoc}
      */
@@ -37,7 +41,9 @@ class Aluriesgo extends \common\models\base\modelBase
 		'fileBehavior' => [
 			'class' => FileBehavior::className()
 		],
-            
+            'auditoriaBehavior' => [
+			'class' => '\common\behaviors\AuditBehavior' ,
+                               ],
            
 		
                 ];
@@ -72,16 +78,18 @@ class Aluriesgo extends \common\models\base\modelBase
                 //'codcar',
                 'nveces',
                 'nveces15'
-                ],'required','on'=>self::SCENARIO_REGISTER],
-            ['codperiodo', 'unique', 'targetAttribute' => 
-                 ['codalu','codcar','codcur', 'codperiodo'],
+                ],'required','on'=>[self::SCENARIO_REGISTER,self::SCENARIO_REGISTER_NORMAL]],
+            ['codalu', 'unique', 'targetAttribute' => 
+                 ['codalu','codcur', 'codperiodo'],
               'message'=>yii::t('sta.errors',
-                      'Esta combinacion de valores {codalu}-{codcur}-{codperiodo}-{codcar} ya existe',
+                      'Esta combinacion de valores {codalu}-{codcur}-{codperiodo} ya existe',
                       ['codalu'=>$this->getAttributeLabel('codalu'),
                         'codcur'=>$this->getAttributeLabel('codcur'),
                           'codperiodo'=>$this->getAttributeLabel('codperiodo'),
-                          'codcar'=>$this->getAttributeLabel('codcar')]
-                      )],
+                          //'codcar'=>$this->getAttributeLabel('codcar')
+                          ]
+                      )
+                ],
             [['codcur'], 'string', 'max' => 10],
             [['codalu'], 'string', 'max' => 14],
              [['codalu'], 'validateCodigos', 'on' => self::SCENARIO_REGISTER],
@@ -105,6 +113,7 @@ class Aluriesgo extends \common\models\base\modelBase
             'codcur',
             'codalu'];
         $scenarios[self::SCENARIO_REGISTER] = ['codalu','codfac', 'codcur', 'codperiodo','status','nveces','nveces15'];
+         $scenarios[self::SCENARIO_REGISTER_NORMAL] = ['codalu','codfac', 'codcur', 'codperiodo','status','nveces','nveces15'];
         return $scenarios;
     }
     /**
@@ -194,8 +203,8 @@ class Aluriesgo extends \common\models\base\modelBase
      */
     public static function studentsInRiskQuery(){
        //return static::find()->select('codalu','codperiodo')->distinct(); 
-        $query = static::find()->select(
-                [                    Aluriesgo::tableName().'.codalu','codperiodo'
+        $query = static::except()->select(
+                [                   'codalu','codperiodo','status'
                     ]
                 )
                 ->distinct()/*->innerJoin(Alumnos::tableName(), Aluriesgo::tableName().'.codalu='. Alumnos::tableName().'.codalu')*/;
@@ -205,7 +214,7 @@ class Aluriesgo extends \common\models\base\modelBase
     
     public static function studentsInRiskByFacQuery($codfac,$codperiodo=null){
         $codper=(is_null($codperiodo))?\frontend\modules\sta\staModule::getCurrentPeriod():$codperiodo;
-       $query=Aluriesgo::studentsInRiskQuery();
+       $query=self::studentsInRiskQuery();
         $query->andWhere([
                'codfac'=>$codfac,
                'codperiodo'=>$codper,
@@ -215,7 +224,7 @@ class Aluriesgo extends \common\models\base\modelBase
     
     public static function worstStudentsByFac($codfac,$codperiodo=null){
       $codper=(is_null($codperiodo))?staModule::getCurrentPeriod():$codperiodo;
-      $query=static::find()->from(static::tableName().' t ')->select([
+      $query=static::except()->from(static::tableName().' t ')->select([
          'count([[t.codcur]]) as cant',
          'm.codalu','t.codperiodo',
          ])->innerJoin(Alumnos::tableName().' m ','[[t.codalu]]=m.codalu')
@@ -240,7 +249,7 @@ class Aluriesgo extends \common\models\base\modelBase
     
     public static function worstCursosByFac($codfac,$codperiodo=null){
       $codper=(is_null($codperiodo))?staModule::getCurrentPeriod():$codperiodo;
-      $query=static::find()->from(static::tableName().' t ')->select([
+      $query=static::except()->from(static::tableName().' t ')->select([
          'count([[t.codcur]]) as cant',
          'm.codcur','m.nomcur','t.codperiodo'
          ])->innerJoin(Cursos::tableName().' m ','[[t.codcur]]=m.codcur')
@@ -265,7 +274,7 @@ class Aluriesgo extends \common\models\base\modelBase
      }
      
  public static function cursosByStudentPeriod($codalu,$codperiodo){
-     return static::find()->where(['[[codperiodo]]'=>$codperiodo,
+     return static::except()->where(['[[codperiodo]]'=>$codperiodo,
          '[[codalu]]'=>$codalu])/*->/*asArray()->*//*all()*/;
  } 
  
@@ -322,15 +331,25 @@ public static function cursosByStudentPeriodProvider($codalu,$codperiodo){
  
  public function beforeSave($insert){
      if($insert){
-      if($this->getScenario()==self::SCENARIO_REGISTER) {
+      if(IN_ARRAY($this->getScenario(),[self::SCENARIO_REGISTER,self::SCENARIO_REGISTER_NORMAL])) {
           $this->codcar=$this->alumno->codcar;
-          $this->status='I';
-      } ELSE{
-         $this->status='N'; 
-      }
-       
+          //$this->status=self::FLAG_INCORPORADO;
+      } 
+       if($this->getScenario()==self::SCENARIO_REGISTER) {
+          //$this->codcar=$this->alumno->codcar;
+          $this->status=self::FLAG_INCORPORADO;
+      } 
+      if($this->getScenario()==self::SCENARIO_REGISTER_NORMAL) {
+          //$this->codcar=$this->alumno->codcar;
+          $this->status=self::FLAG_NORMAL;
+      } 
      }
      return parent::beforeSave($insert);
  }
+ 
+ public static function except(){
+    return  self::find()->andWhere(['<>','status',self::FLAG_RETIRADO]);
+ }
+ 
  
 }

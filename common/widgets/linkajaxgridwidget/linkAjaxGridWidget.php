@@ -92,7 +92,7 @@ $.ajax({
              
                //alert(typeof json['dfdfd']==='undefined');
                         var n = Noty('id');
-                         $.pjax.reload({container: '#".$this->idGrilla."'});
+                         $.pjax.reload({container: '#".$this->idGrilla."', async: false});
                        if ( !(typeof json['error']==='undefined') ) {
                         $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['error']);
                               $.noty.setType(n.options.id, 'error');  

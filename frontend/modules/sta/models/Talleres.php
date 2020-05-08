@@ -3,8 +3,10 @@
 namespace frontend\modules\sta\models;
 use frontend\modules\sta\models\Aluriesgo;
 use frontend\modules\sta\models\UserFacultades;
+use frontend\modules\sta\models\Facultades;
 use frontend\modules\sta\models\Talleresdet;
 use frontend\modules\sta\models\Rangos;
+use frontend\modules\sta\models\StaResumenasistencias;
 use common\models\masters\Trabajadores;
 use common\models\masters\Trabajadores AS Psicologo;
 use yii\helpers\ArrayHelper;
@@ -45,7 +47,15 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
    //public $hardFields=['codfac','codperiodo'];
     public $_rangesArray=[];
    
-    
+   public function behaviors()
+      {
+	return [
+		'auditoriaBehavior' => [
+			'class' => '\common\behaviors\AuditBehavior' ,
+                               ],
+		
+	];
+  } 
     
     
     
@@ -64,7 +74,7 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
     {
         return [
             [['ciclo'], 'integer'],
-             [['descripcion','duracioncita','codfac','codperiodo','codtra','codtra_psico','fopen'], 'required'],
+             [['descripcion','duracioncita','codfac','codperiodo','codtra','codtra_psico','fopen','correo'], 'required'],
             [['codfac'], 'string', 'max' => 8],
             [['descripcion'], 'string', 'max' => 40],
             [['tolerancia','duracioncita','correo'], 'safe'],
@@ -170,12 +180,20 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
         $cantidad=count($data);
        // ECHO $cantidad; die();
         $contador=0;
+        $codtra=$this->firstPisco();
+        
        foreach($data as $fila){
           IF(Talleresdet::firstOrCreateStatic([
                'talleres_id'=>$this->id,
                'codalu'=>$fila['codalu'],
               'codfac'=>$this->codfac,
-           ], Talleresdet::SCENARIO_BATCH ))
+              'status'=>$fila['status'],
+              'codtra'=>$codtra,
+           ], Talleresdet::SCENARIO_BATCH ,[
+               'talleres_id'=>$this->id,
+               'codalu'=>$fila['codalu'],
+              //'codfac'=>$this->codfac,
+           ]))
           $contador++;        
        }
        return ['total'=>$cantidad,'contador'=>$contador];
@@ -226,7 +244,7 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
     * de tutor dentro del programa
     */
    public function busyStudents(){
-      return  Talleresdet::find()->where(['talleres_id'=>$this->id])->
+      return  Talleresdet::except()->where(['talleres_id'=>$this->id])->
           andWhere(['not', ['codtra' => null]])        
           ->all();
        
@@ -237,7 +255,7 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
     * de tutor dentro del programa
     */
    public function freeStudents(){
-      return  Talleresdet::find()->where(['talleres_id'=>$this->id])->
+      return  Talleresdet::except()->where(['talleres_id'=>$this->id])->
           andWhere(['codtra' => null])        
           ->all();
        
@@ -247,7 +265,7 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
     * Esta funcion devuelve las cantidades de alunos or turor
     */
    public function countStudentsByTutor($tutor){
-      return  Talleresdet::find()->where(['talleres_id'=>$this->id])->
+      return  Talleresdet::except()->where(['talleres_id'=>$this->id])->
           andWhere(['codtra' => $tutor])        
           ->count();
        
@@ -257,7 +275,7 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
     * Esta funcion devuelve las cantidades de alunos or turor
     */
    public function countStudentsFree(){
-      return  Talleresdet::find()->where(['talleres_id'=>$this->id])->
+      return  Talleresdet::except()->where(['talleres_id'=>$this->id])->
           andWhere(['codtra' => null])        
           ->count();
        
@@ -507,7 +525,7 @@ private function kp_nAlusConAsistencia(){
             ->where(['talleres_id'=>$this->id])
             ->andWhere(['asistio'=>'1'])
             ->asArray()->all(),'talleresdet_id');
-  return Talleresdet::find()->where([
+  return Talleresdet::except()->where([
       'in','id',$citasAsistidas
   ])->count();
     
@@ -516,7 +534,9 @@ private function kp_nAlusConAsistencia(){
 /*Alunos que han  contestado a alguan llamada o aviso  */
 private function kp_nAlusRespondieron(){
     $idtes=array_column($this->getAlumnos()->
-            select('id')->distinct()           
+            select('id')->andWhere(
+             ['<>','status', Aluriesgo::FLAG_RETIRADO
+                 ])->distinct()           
            ->asArray()->all(),'id');
     /*var_dump($idtes);*/
     $convocatorias=array_column(StaConvocatoria::find()->
@@ -528,7 +548,7 @@ private function kp_nAlusRespondieron(){
             select('talleresdet_id')->distinct()
             ->where(['in','talleresdet_id',$idtes])
             ->andWhere(['resultado'=>'1'])->createCommand()->getRawSql());die();*/
-  return Talleresdet::find()->where([
+  return Talleresdet::except()->where([
       'in','id',$convocatorias
   ])->andWhere([
       'not in','id',
@@ -567,7 +587,12 @@ public function codPsicologos($except=[]){
 }
 
  public function codeStudents(){
-     return $this->getAlumnos()->select(['codalu'])->column();
+    /* var_dump($this->getAlumnos()->select(['codalu'])->andWhere(
+             ['NOT IN', 'status', [Aluriesgo::FLAG_RETIRADO]]
+             )->createCommand()->getRawSql());die();*/
+     return $this->getAlumnos()->select(['codalu'])->andWhere(
+             ['NOT IN', 'status', [Aluriesgo::FLAG_RETIRADO]]
+             )->column();
  }
  
  /*
@@ -592,6 +617,14 @@ public function codPsicologos($except=[]){
     return $codtra;     
  }
  
+ public function firstPisco(){
+   $registro=$codtra= $this->getRanges()->one();  
+   if(!is_null($registro)){
+      return $registro->codtra;
+   }else{
+       return null;
+   }
+ }
  
  public function listMailsFromTutores(){
      //primero debemos de conseguir lso codigos de los trabajadores las piscologas 
@@ -606,5 +639,293 @@ public function codPsicologos($except=[]){
     //yii::error($correos);
     return $correos;
  }
+ 
+ public static function CurrentProgramaId($codfac){
+     return self::findOne([
+         'codfac'=>$codfac,
+         'codperiodo'=> \frontend\modules\sta\staModule::getCurrentPeriod(),
+     ])->id;
+ }
+ 
+ 
+ /*
+ * FUNCION RIVADA QUER TRABAJA PARA LA 
+ * FUNCION 
+ * 
+ */
+private function prepareAttributesCreateResumen($tallerdet,$citas){
+     $fechas= array_column($citas,'fechaprog');
+     $abril=0;
+     $marzo=0;
+     $mayo=0;
+     $junio=0;
+     $julio=0;
+     foreach($fechas as $fecha){
+      if((substr($fecha,5,2)+0)==4)
+       $abril++;
+    if((substr($fecha,5,2)+0)==3)
+     $marzo++;
+     if((substr($fecha,5,2)+0)==5)
+     $mayo++;
+      if((substr($fecha,5,2)+0)==6)
+     $junio++;
+      if((substr($fecha,5,2)+0)==7)
+     $julio++;
+    
+     }
+    
+    
+    $alumno=$tallerdet->alumno;
+    $codperiodo= \frontend\modules\sta\staModule::getCurrentPeriod();
+    $base= [
+        'codalu'=>$alumno->codalu,
+         'codcar'=>$alumno->codcar,
+         'codperiodo'=>$codperiodo,
+        'tallerdet_id'=>$tallerdet->id,
+        'nombres'=>substr($alumno->fullName(false,true),0,40),
+        'codfac'=>$tallerdet->codfac,
+        'status'=>'1',
+        'n_informe'=>$tallerdet->nInformeEditado(),
+         'c_21'=>count($citas),
+        'tabril'=>$abril,
+        'tmarzo'=>$marzo,
+        'tmayo'=>$mayo,
+        'tjunio'=>$junio,
+        'tjulio'=>$julio
+        
+    ];
+    $adicional=[];
+     $baseContadorTutorias=3;
+    $baseContadorTalleres=15;
+    $taller_tipo='x';
+    foreach($citas as $cita){
+        if($cita['flujo_id']==1  ){
+            IF(Citas::findOne($cita['id'])->hasPerformedTest()){
+                 $adicional['c_'.$cita['flujo_id']]=self::SwichtFormatDate($cita['fechaprog'],'datetime',true);   
+            }ELSE{
+                $adicional['c_'.$cita['flujo_id']]='';    
+            }
+           
+        }else{
+            if($cita['flujo_id']==2){/* Entrevistas*/
+               
+                  $adicional['c_'.$cita['flujo_id']]=self::SwichtFormatDate($cita['fechaprog'],'datetime',true);    
+               
+                
+            }elseif($cita['flujo_id']==3){/*Tutorias */
+                
+               $adicional['c_'.$baseContadorTutorias]=self::SwichtFormatDate($cita['fechaprog'],'datetime',true);    
+                 
+               $baseContadorTutorias++; 
+            }elseif($cita['flujo_id']==5){/*Evaluacion de salida */
+                
+                $adicional['c_20']=self::SwichtFormatDate($cita['fechaprog'],'datetime',true);    
+                 
+            }else{/*El resto  $cita['flujo_id']=   15,16,17 son talleres */
+             
+               if($taller_tipo ==$cita['flujo_id']){
+                   $registro=StaResumenasistencias::findOne(['tallerdet_id'=>$cita['talleresdet_id']]);
+                   $anterior=(is_null($registro))?'':substring($registro->{'c_'.($baseContadorTalleres-1)},0,5);
+                   
+                   $adicional['c_'.($baseContadorTalleres-1)]=$anterior.'-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);   
+                   
+                   
+               }else{
+                   if($taller_tipo ==$cita['flujo_id']){
+                   $adicional['c_'.$baseContadorTalleres]=substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+                   }else{
+                  $adicional['c_'.$cita['flujo_id']]='';   
+                
+                   }
+                   $baseContadorTalleres++ ;                  
+               }
+                $taller_tipo= $cita['flujo_id'];
+              
+             
+            }
+           
+        }
+      
+    }
+    $campostotales=array_merge($base,$adicional);    
+    return $campostotales;
+}
+
+
+ private function prepareAttributesUpdateResumen($tallerdet,$citas){
+    
+   // $alumno=$tallerdet->alumno;
+   /* $base= [
+        'codalu'=>$alumno->codalu,
+        'nombres'=>substr($alumno->fullName(),0,40),
+        'codfac'=>$tallerdet->codfac,
+        'status'=>'1',
+        'n_informe'=>$tallerdet->nInformeEditado(),
+    ];*/
+     $fechas= array_column($citas,'fechaprog');
+     $abril=0;
+     $marzo=0;
+     $mayo=0;
+     $junio=0;
+     $julio=0;
+     foreach($fechas as $fecha){
+      if((substr($fecha,5,2)+0)==4)
+       $abril++;
+    if((substr($fecha,5,2)+0)==3)
+     $marzo++;
+     if((substr($fecha,5,2)+0)==5)
+     $mayo++;
+      if((substr($fecha,5,2)+0)==6)
+     $junio++;
+      if((substr($fecha,5,2)+0)==7)
+     $julio++;
+    
+     }
+     
+     
+     
+    $adicional=[];
+    //var_dump($citas);die();
+    $base=['n_informe'=>$tallerdet->nInformeEditado(),
+        'c_21'=>count($citas),
+        'tabril'=>$abril,
+        'tmarzo'=>$marzo,
+        'tmayo'=>$mayo,
+        'tjunio'=>$junio,
+        'tjulio'=>$julio
+        
+        ];
+    
+    $baseContadorTutorias=3;
+    $baseContadorTalleres=15;
+    $taller_tipo='x';
+    $memoria='';
+    foreach($citas as $cita){
+        if($cita['flujo_id']==1  ){
+            IF(Citas::findOne($cita['id'])->hasPerformedTest()){
+                //if($tallerdet->codalu=='20182674G')
+                //yii::error('aqui va le codigo hizo examen');
+                 $adicional['c_'.$cita['flujo_id']]=self::SwichtFormatDate($cita['fechaprog'],'datetime',true);   
+            }ELSE{
+               // if($tallerdet->codalu=='20182674G')
+               /// yii::error('aqui va le codigo NO HIZO EXAMENE');
+                //yii::error('@'.self::SwichtFormatDate($cita['fechaprog'],'datetime',true)); 
+                $adicional['c_'.$cita['flujo_id']]='@'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,16);    
+            }
+           
+        }else{
+            if($cita['flujo_id']==2){/* Entrevistas*/
+                
+                  $adicional['c_'.$cita['flujo_id']]=self::SwichtFormatDate($cita['fechaprog'],'datetime',true);    
+               
+                
+            }elseif($cita['flujo_id']==3){/*Tutorias */
+               
+               $adicional['c_'.$baseContadorTutorias]=self::SwichtFormatDate($cita['fechaprog'],'datetime',true);    
+                 
+               $baseContadorTutorias++; 
+            }elseif($cita['flujo_id']==5){/*Evaluacion de salida */
+               
+                $adicional['c_20']=self::SwichtFormatDate($cita['fechaprog'],'datetime',true);    
+                  
+            }else{/*El resto  $cita['flujo_id']=   15,16,17 son talleres */
+               // yii::error('La cita es');
+              // yii::error($cita);
+               
+               if($taller_tipo ==$cita['flujo_id']){
+                   //yii::error(StaResumenasistencias::findOne(['tallerdet_id'=>$cita['talleresdet_id']])->c_15);
+                   //$anterior=substr(StaResumenasistencias::findOne(['tallerdet_id'=>$cita['talleresdet_id']])->{'c_'.($baseContadorTalleres-1)},0,5);
+                 
+                  // yii::error('anterior :   '.$anterior);
+                   //yii::error($anterior);
+                   $adicional['c_'.($baseContadorTalleres-1)]=$memoria.'-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);   
+                     //yii::error('adicional  :  '.$anterior.'-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5));
+                   
+               }else{
+                  
+                   // yii::error('Colocando en c'.$baseContadorTalleres.'El valor de '.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5));
+                   $adicional['c_'.$baseContadorTalleres]=substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+                
+                   $baseContadorTalleres++ ;   
+                   // yii::error('aumentado la base a '.$baseContadorTalleres);
+               }
+                $memoria=substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                $taller_tipo= $cita['flujo_id'];
+              
+             
+            }
+           
+        }
+      
+    }
+     
+    $campostotales=array_merge($base,$adicional);
+    
+    return $campostotales;
+}
+ 
+ 
+ public function refrescaAsistencia(){     
+     $talleresdet=Talleresdet::except()->andWhere(['talleres_id'=>$this->id,'codfac'=>$this->codfac])->all();
+     foreach($talleresdet as $tallerdet){
+          //foreach($talleresdet as $tallerdet){
+              $citas=$tallerdet->getCitas()->select(['id','talleresdet_id','fechaprog','flujo_id','activo'])->andWhere(['asistio'=>'1','activo'=>'1'])->orderBy('flujo_id ASC')->asArray()->all();
+            $registro=StaResumenasistencias::findOne(['tallerdet_id'=>$tallerdet->id]);
+              if(is_null($registro)){
+               $attributes=$this->prepareAttributesCreateResumen($tallerdet, $citas); 
+             $registro=new StaResumenasistencias();
+               }else{
+                $attributes=$this->prepareAttributesUpdateResumen($tallerdet, $citas); 
+              }
+             
+               $registro->cleanAttributes();
+                $registro->setAttributes($attributes);
+                
+                yii::error($registro->attributes);
+                $registro->save();
+                    
+     }  
+                   
+          //die();     
+        
+   }
+ 
+ public function correosPrograma(){   
+   $correos=  Talleresdet::except()->select(['b.correo'])->
+           join('INNER JOIN','{{%sta_alu}} b','b.codalu=t.codalu')->           
+           andWhere(['talleres_id'=>$this->id])->asArray()->column();
+   return $correos;
+ }
+ public function correosProgramaList($delimiter=';'){   
+   $correos= $this->correosPrograma();
+   //var_dump(count($correos));die();
+   $lista='';
+   foreach($correos as $key=>$correo){
+       $lista.=$delimiter.$correo;
+   }
+   return substr($lista,1);
+ }  
+  
+public function correosProgramaFaltanList($delimiter=';'){   
+   
+         $idsExamenes=\frontend\modules\sta\models\StaResultados::find()->select(['examen_id'])->distinct()->where(['codfac'=>$this->codfac,'codperiodo'=>$this->codperiodo])->column();
+        // var_dump(\frontend\modules\sta\models\StaResultados::find()->select(['examen_id'])->distinct()->where(['codfac'=>$this->codfac,'codperiodo'=>$this->codperiodo])->createCommand()->getRawSql());die();
+         $idCitas=Examenes::find()->select(['citas_id'])->where(['id'=>$idsExamenes])->column();
+         $idsTalleresdetConExa= array_unique(\frontend\modules\sta\models\Citas::find()->select(['talleresdet_id'])->where(['id'=>$idCitas])->column());
+        //var_dump($this->codfac,$this->codperiodo,count($idsTalleresdetConExa));die();
+         $idsTalleresdet=\frontend\modules\sta\models\Talleresdet::except()->select(['id'])->andWhere(['talleres_id'=>$this->id])->andWhere(['not in','id',$idsTalleresdetConExa])->column();
+         $codalusFaltan= \frontend\modules\sta\models\Talleresdet::except()->select(['codalu'])->where(['id'=>$idsTalleresdet])->column();
+        
+         $correos=Alumnos::find()->select(['correo'])->where(['codalu'=>$codalusFaltan])->column();
+       // $correos= $this->correosPrograma();
+         //var_dump(count($idsTalleresdet));die();
+        $lista='';
+   foreach($correos as $key=>$correo){
+       $lista.=$delimiter.$correo;
+   }
+   return substr($lista,1); 
+  
+ }  
+ 
 }
 

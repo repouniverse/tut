@@ -213,30 +213,58 @@ class FileHelper extends FileHelperOriginal {
    /*
     * FORMTEA BYTES EN OTRAS UNIDEDADES
     */
-  public static function formatBytes($bytes, $precision = 2) { 
-    $units = array('B', 'KB', 'MB', 'GB', 'TB'); 
-
-    $bytes = max($bytes, 0); 
-    $pow = floor(($bytes ? log($bytes) : 0) / log(1024)); 
-    $pow = min($pow, count($units) - 1); 
-
-    // Uncomment one of the following alternatives
-    // $bytes /= pow(1024, $pow);
-    // $bytes /= (1 << (10 * $pow)); 
-
-    return round($bytes, $precision) . ' ' . $units[$pow]; 
-} 
+  public static function formatBytes($bytes, $decimals = 2) {
+  $sz = 'BKMGTP';
+  $factor = floor((strlen($bytes) - 1) / 3);
+  return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . @$sz[$factor];
+}
+ 
    
 
 
 public static function extDocs(){
-    return array('ppt','pptx','doc','docx','xls','xlsx','pdf','jpg','jpeg'); 
+    return array('ppt','pptx','doc','docx','xls','xlsx','pdf','jpg','jpeg','png'); 
+}
+
+public static function extIconsDocs(){
+    return array('ppt'=>'fa-file-powerpoint','pptx'=>'fa-file-powerpoint',
+        'doc'=>'fa-file-word','docx'=>'fa-file-word',
+        'xls'=>'fa-file-excel','xlsx'=>'fa-file-excel','pdf'=>'fa-file-pdf','jpg'=>'fa-file-image',
+        'jpeg'=>'fa-file-image','png'=>'fa-file-image'); 
+}
+public static function getIconDocs($extension){
+   if(substr(trim($extension),0,1)=='.')
+   $extension=substr(trim($extension),1);
+   if(array_key_exists($extension, self::extIconsDocs())){
+       return self::extIconsDocs()[$extension];
+   }else{
+       return 'fa-file';
+   }
 }
 
 public static function randomNameFile($ext){
     if(!(substr($ext,0,1)=='.'))
       $ext='.'.$ext;    
     return uniqid().'_'.h::userId().'_'.str_replace('.','_',h::request()->getUserIP()).$ext;
+}
+
+public function UrlImage($path,$internal=true){
+ if(is_file($path)){
+    /* echo " path  : ".$path; echo "<br>";
+     echo " path  alias root  : ".yii::getAlias('@root')."<br>";
+     echo " URL BASE :   ".\yii\helpers\Url::base(true)."<br>";
+     */
+     if($internal){
+        return str_replace(yii::getAlias('@root'),'',$path);
+      }else{
+       $ruta= str_replace(yii::getAlias('@root'), \yii\helpers\Url::base(true) ,$path);  
+       $ruta=str_replace(\yii\helpers\Url::home(),'/',$ruta);
+       return $ruta;
+      }
+ }else{
+   return '';  
+ }
+  
 }
 
 }

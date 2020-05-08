@@ -230,6 +230,7 @@ class Mailer extends Correo
                        'mail','portservermail',
                        Yii::$app->params['portservermail']),
                   'encryption' => 'ssl',
+                    //'SMTPAuth' => true,
               /*Esta line ase agergo apra que funcione en localhost */
                   'streamOptions'=>['ssl' =>['allow_self_signed' => true,'verify_peer_name' => false, 'verify_peer' => false]],
         ];

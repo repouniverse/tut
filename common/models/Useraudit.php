@@ -45,9 +45,9 @@ class Useraudit extends \common\models\base\modelBase
         return [
             'id' => Yii::t('base.names', 'ID'),
             'user_id' => Yii::t('base.names', 'User ID'),
-            'when' => Yii::t('base.names', 'When'),
-            'ip' => Yii::t('base.names', 'Ip'),
-            'action' => Yii::t('base.names', 'Action'),
+            'when' => Yii::t('base.names', 'Cuando'),
+            'ip' => Yii::t('base.names', 'Dirección de red IP'),
+            'action' => Yii::t('base.names', 'Acción'),
         ];
     }
 
@@ -63,4 +63,15 @@ class Useraudit extends \common\models\base\modelBase
     public static function  lastLogin($iduser){
         return static::find()->where(['user_id'=>$iduser,'action'=>static::ACTION_LOGIN])->max('[[when]]');
     }
+    
+    
+    public static function UsersInLine(){
+        $carbon= \Carbon\Carbon::now();
+        $carbon->subMinutes(40);
+        $inLine=self::find()->select(['username'])->distinct()->join('inner join', '{{%user}} b', 'user_id=b.id')->                
+                where(['>=','when',$carbon->subMinutes(40)->format('Y-m-d H:i:s')])->orderBy('when desc')->limit(20)->asArray()->all();
+        return $inLine;
+    }
+    
+    
 }

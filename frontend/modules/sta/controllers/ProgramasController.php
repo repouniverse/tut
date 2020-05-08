@@ -17,6 +17,7 @@ use frontend\modules\sta\models\VwAluriesgoSearch;
 use frontend\modules\sta\models\TallerpsicoSearch;
 use frontend\modules\sta\models\StaTestTalleres;
 use frontend\modules\sta\models\StaPercentiles;
+use frontend\modules\sta\models\CitasSearch;
 use frontend\modules\sta\models\VwStaTutoresSearch;
 use frontend\modules\sta\models\StaIpslab;
 use frontend\modules\sta\models\Rangos;
@@ -573,6 +574,9 @@ public function actionMakeCitaByStudent(){
         if(!\common\helpers\timeHelper::IsFormatMysqlDateTime($fecha)) {
              $error=true; $datos['error']=yii::t('sta.errors','La fecha {fecha} suministrada no tiene el formato adecuado ',['fecha'=>$fecha]);
          }
+         
+        
+         
         if(!$error) { //Sio no hay errores
             $codigotra=$model->taller->psicologoPorDia(\Carbon\Carbon::createFromFormat(\common\helpers\timeHelper::formatMysql(),$fecha));
             
@@ -594,10 +598,11 @@ public function actionMakeCitaByStudent(){
                if(h::gsetting('sta','notificacitasmail')){
                    $cita->enviacorreo();
                }
-                
+               
               $datos['success']=yii::t('sta.errors','Se ha creado la cita {numero} satisfactoriamente',['numero'=>$cita->numero]);
                 
             }else{
+               var_dump($cita->getErrors());die();
                 /*$mod=new Citas();
                 $mod->setScenario(Citas::SCE_CREACION_BASICA);
                 $mod->setAttributes($attributes);
@@ -628,7 +633,8 @@ public function actionTrataAlumno($id){
      //yii::error('paso 2 han pasado  '.(time()-$inicio));
     //$inicio=time();
     $model=Alumnos::findOne(['codalu'=>$modelTallerdet->codalu]);
-    $dataProvider=(new StaVwCitasSearch())->searchByTallerId($modelTallerdet->id);
+    //$dataProvider=(new StaVwCitasSearch())->searchByTallerId($modelTallerdet->id);
+     $dataProvider=(new CitasSearch())->searchByTaller($modelTallerdet->id);
     /*****************/
     $color='#d351e2';
     /*Provider de citas pendientes*/ 
@@ -816,25 +822,43 @@ public function actionEditaDocu($id){
         $modeldet=$model->talleresdet;
         $calificadorAlto=$modeldet->textoIndicadores(StaPercentiles::CALIFICACION_ALTO);
          $calificadorBajo=$modeldet->textoIndicadores(StaPercentiles::CALIFICACION_BAJO);
+          $calificadorMedio=$modeldet->textoIndicadores(StaPercentiles::CALIFICACION_PROMEDIO);
        //$mensajeIndicadores=$modeldet->indicadores();
         //if(strlen($model->indi_altos)==0 /*&& (count($mensajeIndicadores[StaPercentiles::CALIFICACION_ALTO])>0)*/){
            // foreach ()
         //var_dump($modeldet->TextoIndicadores(StaPercentiles::CALIFICACION_ALTO));die();
-           $model->indi_altos=$calificadorAlto;
-           $model->indi_riesgo1=$calificadorBajo;
-           $model->adecuado_nivel=$calificadorAlto;
+         
+          if(strlen(trim($model->indi_altos))=='')
+          $model->indi_altos=$calificadorAlto;
+           if(strlen(trim($model->cuenta_buen))=='')
+          $model->cuenta_buen=$calificadorAlto;
+         if(strlen(trim($model->metas_acad))=='')
+           $model->metas_acad=$calificadorBajo;
+          // $model->indi_riesgo1=$calificadorBajo;
+          if(strlen(trim($model->adecuado_nivel))=='')
+           $model->adecuado_nivel=$calificadorMedio;
+           if(strlen(trim($model->indi_riesgo))=='')
            $model->indi_riesgo=$calificadorBajo;
+            if(strlen(trim($model->sugerencias))=='')
+           $model->sugerencias=$calificadorBajo;
+             if(strlen(trim($model->metas_aux))=='')
+           $model->metas_aux=$calificadorBajo;
+           
        // }
         
+        if(h::request()->isPost){ 
+         //var_dump(h::request()->post());die();
+           
+             //var_dump(Yii::$app->request->post(),$model->attributes); die();
         
-        if(h::request()->isPost){
-        // var_dump(h::request()->post());die();
             $model->load(h::request()->post());
              h::response()->format = \yii\web\Response::FORMAT_JSON;
             $datos=\yii\widgets\ActiveForm::validate($model);
             if(count($datos)>0){
                return ['success'=>2,'msg'=>$datos];  
             }else{
+               // var_dump($model->attributes);die();
+                
                 $model->save();
                 
                 //$model->assignStudentsByRandom();
@@ -964,12 +988,12 @@ public function actionEditaDocu($id){
     
 public function actionBalanceEventos($id){
     $model=$this->findModel($id);
-    $semana=h::request()->get('semana')+0;
+    $tipo=h::request()->get('tipo')+0;
    $haysemana= \frontend\modules\sta\models\StaEventos::find()->andWhere([
         'talleres_id'=>$id,
-         'semana'=>$semana,
+         'tipo'=>$tipo,
             ])->exists();
-   if($semana){
+   if($tipo){
       
        
      $searchModel = new \frontend\modules\sta\models\StaEventosdetSearch();
@@ -978,7 +1002,7 @@ public function actionBalanceEventos($id){
       $allCodes=$model->codeStudents();
       $ideventos=\frontend\modules\sta\models\StaEventos::find()->select(['id'])->andWhere([
         'talleres_id'=>$id,
-         'semana'=>$semana,
+         'tipo'=>$tipo,
             ])->column();
       $codesInEventos=\frontend\modules\sta\models\StaEventosdet::find()->select(['codalu'])->
              andWhere([
@@ -992,8 +1016,9 @@ public function actionBalanceEventos($id){
                  ])->createCommand()->getRawSql();die();*/
       $codesFaltantes=array_diff($allCodes, $codesInEventos);
         
+      
         $dataProviderFaltantes=New \yii\data\ActiveDataProvider([
-       'query'=> \frontend\modules\sta\models\Talleresdet::find()->
+       'query'=> \frontend\modules\sta\models\Talleresdet::except()->
                 select(['codalu'])->andWhere(['codalu'=>$codesFaltantes]),
         'pagination' => [
         'pageSize' => 40,
@@ -1023,8 +1048,40 @@ public function actionBalanceEventos($id){
    }else{
        echo "Esta semana es invalida ";
    }
-    
+  
+ 
+   
       
 }
+
+ public function actionCorreosAlumnos($id){
+      if(h::request()->isAjax){
+        if(h::request()->get('faltan')=='si'){
+            $faltan=true;
+        }else{
+            $faltan=false;
+        }
+         $model=$this->findModel($id);
+          return $this->renderAjax('_correos',[
+              'model'=>$model,
+              'faltan'=>$faltan
+              ]);
+      }
+  } 
+
+public function actionResultados(){
+
+        
+        
+        $searchModel = new \frontend\modules\sta\models\VwStaResultadosSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('index_resultados', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    } 
+
+
 
 }

@@ -12,9 +12,18 @@ echo \common\widgets\spinnerWidget\spinnerWidget::widget();
 <h4><span class="fa fa-calendar"></span><?='   '.\yii\helpers\Html::encode(yii::t('sta.labels','Programar Alumno')).'-'.$model->codalu ?></h4>
 <div class="box box-success">
 <div class="box body">
+
 <?php  
  use kartik\tabs\TabsX;
 ?>
+     <div class="col-md-12">
+    <div class="btn-group">   
+          <?php $url=\yii\Helpers\Url::toRoute(['/sta/alumnos/retira-del-programa','id'=>$modelTallerdet->id]);  ?>      
+              <?=\yii\Helpers\Html::a('<span class="fa fa-file-pdf" ></span>'.'  '.yii::t('sta.labels','Retirar Alumno'),$url,['target'=>'_blank','data-pjax'=>'0','class'=>"btn btn-danger"])?>
+            
+     </div>            
+    </div>
+    <br><br>
 <?php
 
  echo $this->render('/alumnos/auxiliares/_form_view_alu_basico',

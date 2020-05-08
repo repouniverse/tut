@@ -15,8 +15,8 @@ class ActiveQueryScope extends \yii\db\ActiveQuery
     {
       //var_dump(UserFacultades::filterFacultades());die();
        //$this->andWhere([ 'in', 'codfac',['FIM','FIP'] ]);
-      $this->andWhere(['in',
-              'codfac', UserFacultades::filterFacultades()
+      $this->alias('t')->andWhere(['in',
+              't.codfac', UserFacultades::filterFacultades()
                ]);
         parent::init();
     }

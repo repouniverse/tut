@@ -24,15 +24,15 @@ $this->params['breadcrumbs'][] = ['label' =>yii::t('sta.labels', 'Ir a programa'
 $this->params['breadcrumbs'][] = Yii::t('sta.labels', 'Editar');
 ?>
 
- <h4> <i class="fa fa-edit"></i><?= Html::encode($this->title) ?>-<?=$nombre.Html::a(Html::img($model->tallerdet->alumno->getUrlImage(),['width'=>60,'height'=>65, 'class'=>"img-thumbnail cuaizquierdo"])) ?></h4>
+ <h4> <i class="fa fa-edit"></i><?= Html::encode($this->title) ?>-<?=$nombre ?></h4>
 
     <div class="box box-body">
        <div class="box-header">
         <div class="col-md-12">
             <div class="form-group no-margin">
             <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-            <div class="btn-group">   
-          <?php $url=Url::toRoute(['/sta/programas/trata-alumno','id'=>$model->talleresdet_id,'idalumno'=>$model->tallerdet->alumno->id,'codperiodo'=>$model->taller->codperiodo]);  ?>      
+            <div class="btn-group">  
+           <?php $url=Url::toRoute(['/sta/programas/trata-alumno','id'=>$model->talleresdet_id,'idalumno'=>$model->tallerdet->alumno->id,'codperiodo'=>$model->taller->codperiodo]);  ?>      
               <?=Html::a('<span class="fa fa-file-pdf" ></span>'.'  '.yii::t('sta.labels','Datos del estudiante'),$url,['target'=>'_blank','data-pjax'=>'0','class'=>"btn btn-danger"])?>
             <?= common\widgets\auditwidget\auditWidget::widget(['model'=>$model])?>
            <?php  
@@ -65,10 +65,12 @@ $this->params['breadcrumbs'][] = Yii::t('sta.labels', 'Editar');
                 $url=Url::to(['update','id'=>$id]);
                 echo ($id && $id <> $model->id)?Html::a('<i style="font-size:25px;color:#57a21d;"><span class="glyphicon glyphicon-step-forward"></span></i>', $url):'';
                 ?>
+               
                 </div> 
                 </div> 
                 
-               
+                <?=Html::a(Html::img($model->tallerdet->alumno->getUrlImage(),['width'=>100,'height'=>120, 'class'=>"img-thumbnail cuaizquierdo"]))?>
+          
                
             
                 
@@ -130,20 +132,13 @@ $this->params['breadcrumbs'][] = Yii::t('sta.labels', 'Editar');
                <?php } ?>
                <?php  Pjax::end() ?>
         </div> 
-          <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-               <?php 
-             echo Html::label($model->getAttributeLabel('flujo_id'));  
-          echo Html::dropDownList(
-                  'hishfisf',
-                  $model->flujo_id.'',
-                  \frontend\modules\sta\helpers\comboHelper::getCboFlujoTotal(),
-                  [//'prompt'=>'--'.yii::t('base.verbs','Seleccione un Valor')."--",
-                    'class' => 'form-control',
-                     'disabled'=>true,
-                        ]
-                    ) ?>
-                </div>
-      
+       
+         
+        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+               <?= Html::activeLabel($alumno,'celulares')?>
+              <?= Html::activeTextInput($alumno, 'celulares',['class'=>'form-control','disabled'=>'disabled']) /*   textInput($name, $value)  $form->field($model, 'numero')->textInput(['disabled'=>'disabled','style'=>'color:#ad5eb7; font-weight:700;'])*/ ?>
+            
+        </div>
       
     <?php 
       $items=  [
@@ -154,22 +149,28 @@ $this->params['breadcrumbs'][] = Yii::t('sta.labels', 'Editar');
              'options' => ['id' => 'myveryownID3'],
         ],
         [
-          'label'=>'<i class="fa fa-users"></i> '.yii::t('sta.labels','Calendario'), //$this->context->countDetail() obtiene el contador del detalle
+          'label'=>'<i class="fa fa-calendar-alt"></i> '.yii::t('sta.labels','Calendario'), //$this->context->countDetail() obtiene el contador del detalle
             'content'=> $this->render('_calendario',[ 'model' => $model,'eventos'=>$eventos,'vencida'=>$vencida]),
             'active' => false,
              'options' => ['id' => 'myvyr76wnID4'],
         ],
         [
-          'label'=>'<i class="fa fa-users"></i> '.yii::t('sta.labels','Resultados'), //$this->context->countDetail() obtiene el contador del detalle
+          'label'=>'<i class="fa fa-poll"></i> '.yii::t('sta.labels','Resultados'), //$this->context->countDetail() obtiene el contador del detalle
             'content'=> $this->render('_resultados',[ 'model' => $model,'nombre'=>$nombre,'vencida'=>$vencida,'idFirstCita'=>$idFirstCita]),
             'active' => false,
              'options' => ['id' => 'myv2bgnI6'],
+        ],
+          [
+          'label'=>'<i class="fa fa-paperclip"></i> '.yii::t('sta.labels','Adjuntos'), //$this->context->countDetail() obtiene el contador del detalle
+            'content'=> $this->render('_adjuntos',[ 'model' => $model]),
+            'active' => false,
+             'options' => ['id' => 'myv2ftubgnI6'],
         ]
     ];  ?>
         <?php 
         if($model->masivo){
            $items[]=[
-          'label'=>'<i class="fa fa-users"></i> '.yii::t('sta.labels','Examenes'), //$this->context->countDetail() obtiene el contador del detalle
+          'label'=>'<i class="fa fa-stethoscope"></i> '.yii::t('sta.labels','Examenes'), //$this->context->countDetail() obtiene el contador del detalle
             'content'=> $this->render('_examenes',[ 'model' => $model,'vencida'=>$vencida]),
             'active' => false,
              'options' => ['id' => 'myveryownID4'],

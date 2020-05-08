@@ -7,7 +7,7 @@ namespace frontend\modules\sta\models;
  *
  * @see VwAluriesgo
  */
-class VwAluriesgoQuery extends \frontend\modules\sta\components\ActiveQueryScope
+class VwAluriesgoQuery extends \frontend\modules\sta\components\ActiveQueryStatus
 {
     /*public function active()
     {

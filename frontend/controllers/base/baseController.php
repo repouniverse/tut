@@ -186,6 +186,7 @@ private static function findKeyArrayInPost(){
   public function actionDeletemodelForAjax(){
         if(h::request()->isAjax){
            $id= h::request()->post('id');
+          // var_dump(h::request()->post('modelito'));die();
            $clase=str_replace('@','\\',h::request()->post('modelito'));
           // var_dump(h::request()->post(),$id,$clase);die();
            $datos=$this->deleteModel($id, $clase);

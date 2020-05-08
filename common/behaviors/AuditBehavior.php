@@ -12,7 +12,8 @@ use yii\base\Behavior;
 use yii\helpers\Json;
 use common\models\audit\Activerecordlog;
 use yii\db\ActiveRecord;
-use \yii\web\ServerErrorHttpException;
+use yii\web\ServerErrorHttpException;
+use yii\base\Exception;
 
 class AuditBehavior extends Behavior
 {
@@ -63,6 +64,7 @@ class AuditBehavior extends Behavior
      */
     
     public function doBeforeSave(){
+        //echo "hola"; die();
      //if($this->isInTransaction())
        $owner=$this->owner;     
           $ip=yii::$app->request->getRemoteIP();
@@ -72,8 +74,8 @@ class AuditBehavior extends Behavior
        foreach($owner->attributes as $attribute=>$value){
            //yii::error($attribute);
           if($this->hasChanged($attribute)){ 
-               //yii::error('este atributo ha cambiado');
-             // ECHO '<br><br>'.$attribute;DIE();
+              // yii::error('este atributo ha cambiado  '.$attribute);
+             //ECHO '<br><br>'.$attribute;
               $model=New Activerecordlog();
                $model=$this->setLogValues($model,$attribute,
             false,
@@ -84,11 +86,26 @@ class AuditBehavior extends Behavior
             $controllerId,
             $currentUrl  
                        );
-              if(!$model->save()){
-                  throw new ServerErrorHttpException(Yii::t('models.errors', 'NO SE PUDO GRABAR  '.serialize($model->geterrors())));
-              }
-          }          
+                //yii::error('grabando');
+              try{
+                        if(!$model->save()){
+                  //yii::error('huboerror'); 
+                   //yii::error($model->getErrors());
+                         throw new ServerErrorHttpException(Yii::t('models.errors', 'NO SE PUDO GRABAR  '.serialize($model->geterrors())));
+                         }else{
+             //yii::error('grabo'); 
+                        }
+                  } catch (Exception $ex) {
+                      $MENSAJE=$ex->getMessage();
+                      yii::error('ActiveRecordLog-Se ha presentado un error',__FUNCTION__);
+                      yii::error(substr($MENSAJE,0,100),__FUNCTION__);
+                      
+                      //echo $ex->getMessage(); die();
+                     
+                   }
+          }       
        } 
+      
     }
     
     
@@ -111,9 +128,25 @@ class AuditBehavior extends Behavior
             $ip,
             $controllerId,
             $currentUrl );
-        if(!$model->save()){
-         throw new ServerErrorHttpException(Yii::t('models.errors', 'NO SE PUDO GRABAR  '.serialize($model->geterrors())));
+         //yii::error('grabando');
+         try{
+               if(!$model->save()){
+                      //yii::error($model->getErrors());
+                    throw new ServerErrorHttpException(Yii::t('models.errors', 'NO SE PUDO GRABAR  '.serialize($model->geterrors())));
+                       }else{
+                      // yii::error('grabo'); 
+                  } 
+         } catch (Exception $ex) {
+             
+            $MENSAJE=$ex->getMessage();
+                      yii::error('ActiveRecordLog-Se ha presentado un error',__FUNCTION__);
+                      yii::error(substr($MENSAJE,0,100),__FUNCTION__);
+                      
+             
+             
+            
          }
+        
     }
     
     
@@ -157,14 +190,17 @@ class AuditBehavior extends Behavior
         //$owner=$this->owner;
         //$username=yii::$app->user->identity->username;
         $identidad=$owner->getPrimaryKey().'';
-        $oldValue=$owner->getOldAttribute($attribute).'';
+        $oldValue=utf8_encode(strip_tags($owner->getOldAttribute($attribute).''));
+       //$oldValue=$owner->getOldAttribute($attribute).'';
         if(strlen($oldValue)>80){
-          $oldValue=substr($oldValue,0,8).'... texto largo';  
+          $oldValue=substr($oldValue,0,8);  
         }
-        $newValue=$owner->{$attribute}.'';
+        $newValue=utf8_encode(strip_tags($owner->{$attribute}.''));
+         //$newValue=$owner->{$attribute}.'';
         if(strlen($newValue)>80){
-          $newValue=substr($newValue,0,8).'... texto largo'; 
+          $newValue=substr($newValue,0,8); 
         }
+      
         $model->setAttributes([
             'model'=>$owner::className(),
             'clave'=>$identidad/*Json::encode($this->owner->getPrimaryKey(true))*/,
@@ -174,7 +210,7 @@ class AuditBehavior extends Behavior
             //'ip'=>yii::$app->request->getUrl(),
             'controlador'=>$controllerId,
             'description'=>substr($currentUrl,0,105),
-            'nombrecampo'=>$owner->getAttributeLabel($attribute),
+            'nombrecampo'=>substr($owner->getAttributeLabel($attribute),0,45),
             'oldvalue'=>$oldValue,
             'newvalue'=>$newValue,
              'username'=>$username, 

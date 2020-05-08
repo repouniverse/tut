@@ -26,6 +26,44 @@
                 'items' =>$items ,
             ]
         ) ?>
+        
+    <br>  
+      <?PHP 
+        if(\common\helpers\h::userName()=='administrador'){
+       ?> 
+    
+ 
+    
+    
+    
+    
+          <div class="sidebar-menu tree">
+                <table class="">
+                        <thead>
+                            <tr>
+                                <th style="color:#60a917 !important;">Usuarios conectados</th>
+                            </tr>
+                        </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+             <ul class="sidebar-menu tree" data-widget="tree">
+                   <?php
+            $usersArray= common\models\Useraudit::UsersInLine();
+           foreach($usersArray as $User){               
+               ?>
+                 <li class="treeview">
+                      <a href="#"><span class="fa fa-user"><?="                ".$User['username'];?></span></a>
+                 </li>
+           <?php } ?>  
+             </ul>    
+            </div>
+
+        
+        
+       <?PHP   }
+      ?>  
+        
     </section>
     
     

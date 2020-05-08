@@ -8,7 +8,7 @@ class m191217_165538_creatview_papeleta extends viewMigration
     const NAME_VIEW='{{%vw_sigi_papeletas}}';
   public function safeUp()
     {
-         $vista=static::NAME_VIEW;
+      /*   $vista=static::NAME_VIEW;
         if($this->existsTable($vista)) {
         $this->dropView($vista);
         }
@@ -31,15 +31,15 @@ class m191217_165538_creatview_papeleta extends viewMigration
      innerJoin('{{%vw_sigi_colectores}} f', 'a.colector_id=f.idcolector')->
       leftJoin('{{%sigi_unidades}} e', 'a.unidad_id=e.id')
                 )->execute();
-       
+      */ 
    }
 public function safeDown()
     {
-     
+    /* 
     $vista=static::NAME_VIEW;
         if($this->existsTable($vista)) {
         $this->dropView($vista);
-        }
+        }*/
     }
     
 }

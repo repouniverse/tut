@@ -14,7 +14,7 @@ trait timeTrait
         '2020-12-25',
         '2020-01-01',
         '2020-10-08',
-        '2020-05-01',
+        //'2020-05-01',
         '2020-06-29',
         '2020-07-28',
         '2020-07-29',
@@ -30,7 +30,7 @@ trait timeTrait
     
     public function isHolyDay(Carbon $fecha){
         
-        return ($fecha->isSunday() /*or $fecha->isSaturday()*/ or
+        return (/*$fecha->isSunday()*/ /*or $fecha->isSaturday()*/ /*or*/
                 in_array($fecha->format('Y-m-d'),$this->holyDays())
                 )?true:false;
     }

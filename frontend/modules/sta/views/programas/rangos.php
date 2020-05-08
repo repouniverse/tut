@@ -2,12 +2,15 @@
 use yii\helpers\Url;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
+use frontend\modules\sta\models\StaVwCitas;
 
 ?>
 
 
     
-   
+   <br>
+<p class="text-green"><b><span class="fa fa-list-ul"></span><?='      '.yii::t('sta.labels','Distribución de horarios')?></p></b>
+
 
     <?php Pjax::begin(['id'=>'grilla-rangos']); ?>
    
@@ -69,3 +72,42 @@ use yii\widgets\Pjax;
 /* $url= Url::to(['edit-rango','id'=>$model->id,'gridName'=>'grilla-rangos','idModal'=>'buscarvalor']);
    echo  Html::button(yii::t('base.verbs','Modificar Rangos'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Tutor'),'id'=>'btn_contacts', 'class' => 'botonAbre btn btn-success']); 
 */?> 
+<br>
+<p class="text-green"><b><span class="fa fa-list-ul"></span><?='      '.yii::t('sta.labels','Carga de atenciones')?></p></b>
+
+<?php 
+
+
+    echo GridView::widget([
+        'dataProvider' =>new \yii\data\ArrayDataProvider([
+            'allModels'=> StaVwCitas::find()->select([
+                ' count(talleresdet_id) as cantidad','codtra' , 'codfac' ,
+'aptutor','nombrestutor','proceso'])->andWhere([
+    'asistio'=>'1',
+    'codfac'=>$model->codfac
+        ])->
+  groupBy(['codtra' , 'codfac','aptutor','nombrestutor','proceso'])->
+  orderBy(['codfac'=>SORT_ASC,'codtra'=>SORT_ASC,'proceso'=>SORT_ASC,])->asArray()->all()
+        ]
+                ),
+         'summary' => '',
+         'tableOptions'=>['class'=>'table no-margin'],
+       // 'filterModel' => $searchModel,
+        'columns' => [
+              ['attribute'=>'#Citas Atendidas',
+                  'value'=>function($model){
+                        return $model['cantidad'];
+                     }
+                     ],
+            'codtra',
+            //'aptutor',
+            'proceso',
+            'nombrestutor'
+             
+          
+        ],
+    ]);  
+
+?>
+ 
+

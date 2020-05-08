@@ -37,6 +37,8 @@ class PasswordResetRequestForm extends Model
      */
     public function sendEmail()
     {
+      //die();  
+        //echo Yii::$app->params['supportEmail']; die();
         /* @var $user User */
         $user = User::findOne([
             'status' => User::STATUS_ACTIVE,
@@ -53,14 +55,23 @@ class PasswordResetRequestForm extends Model
                 return false;
             }
         }
-
-        return Yii::$app
-            ->mailer
-            ->compose(
-                ['html' => 'passwordResetToken-html', 'text' => 'passwordResetToken-text'],
+  $mailer= Yii::$app
+            ->mailer;
+  $mailer->htmlLayout = 'layouts/html';
+  $message=$mailer->compose();
+        return
+            $message/*->compose(
+                [ 'html' => 'passwordResetToken-html', 
+                  'img' => $message->embed(\Yii::getAlias('@frontend/web/img/logo_cabecera.png')),
+                    //'html' => 'layouts/html', 
+                    'text' => 'passwordResetToken-text'],
                 ['user' => $user]
             )
-            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' -Automático'])
+           */->setHtmlBody($mailer->render('passwordResetToken-html', [
+    'img' => $message->embed(\Yii::getAlias(\Yii::getAlias('@frontend/web/img/logo_cabecera.png'))),
+        'user' => $user    
+               ], $mailer->htmlLayout))     
+            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' -Restablecer contraseña'])
             ->setTo($this->email)
             ->setSubject(yii::t('base.verbs','Solicitud de cambio de contrasena') .'  '. Yii::$app->name)
             ->send();

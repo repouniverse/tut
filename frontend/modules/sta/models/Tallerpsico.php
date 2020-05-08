@@ -434,7 +434,7 @@ class Tallerpsico extends \common\models\base\modelBase
      *      */
     public function alumnosPendientes($nveces=null){
         $items=[];
-        $consulta=Talleresdet::find()->select('[[codalu]]')->
+        $consulta=Talleresdet::except()->select('[[codalu]]')->
         where(['talleres_id'=>$this->talleres_id])->asArray()->all();
         foreach($consulta as $row){
             $items[]=['name'=>$row['codalu'],'color'=>'#234564'];

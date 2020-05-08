@@ -97,7 +97,7 @@ class timeHelper {
       return '/[0-9]{4}-[0-1]{1}[0-9]{1}-[0-3]{1}[0-9]{1} [0-2]{1}[0-9]{1}:[0-5]{1}[0-9]{1}:[0-5]{1}[0-9]{1}/';
   }
   public static function IsFormatMysqlDate($fecha){
-     if(preg_match(static::regexMysqlDateTime(),$fecha)){
+     if(preg_match(static::regexMysqlDate(),$fecha)){
          return true;
      }else{
          return false;

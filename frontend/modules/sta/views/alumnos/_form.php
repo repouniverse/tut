@@ -23,7 +23,8 @@ use common\helpers\h;
             <div class="form-group no-margin">
                 
         <?= Html::submitButton(Yii::t('sta.labels', 'Guardar'), ['class' => 'btn btn-success']) ?>
-            
+          <?= common\widgets\auditwidget\auditWidget::widget(['model'=>$model])?>
+           
 
             </div>
         </div>

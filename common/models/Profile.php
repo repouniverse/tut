@@ -47,7 +47,7 @@ class Profile extends \common\models\base\modelBase implements \common\interface
           
       ];      
             
-            
+  public $booleanFields=['recexternos'];          
             
     public static function tableName()
     {
@@ -79,7 +79,8 @@ class Profile extends \common\models\base\modelBase implements \common\interface
 
             [['photo', 'detalle'], 'string'],
             [['names'], 'string', 'max' => 60],
-             [['names','duration','durationabsolute','url','codtra'], 'safe'],
+             
+             [['names','duration','durationabsolute','url','codtra','recexternos'], 'safe'],
             [['tipo'],'required','on'=>self::SCENARIO_INTERLOCUTOR],
             [['tipo'],'safe','on'=>self::SCENARIO_INTERLOCUTOR],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
@@ -107,6 +108,7 @@ class Profile extends \common\models\base\modelBase implements \common\interface
             'photo' => Yii::t('base.names', 'Foto'),
             'detalle' => Yii::t('base.names', 'Detalle'),
             'interlocutor' => Yii::t('base.names', 'Type'),
+             'recexternos' => Yii::t('base.names', 'Usa Rec Externos'),
             'duration' => Yii::t('base.names', 'Duracion'),
             'durationabsolute' => Yii::t('base.names', 'Duracion absoluta'),
         ];

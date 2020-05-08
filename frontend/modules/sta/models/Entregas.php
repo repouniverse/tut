@@ -54,7 +54,7 @@ class Entregas extends \common\models\base\DocumentBase
         return [
             [['fecha','descripcion','codperiodo','fechacorte','modelo','escenario'], 'required'],
             [['descripcion'], 'string', 'max' => 40],
-            ['codperiodo', 'unique', 'targetAttribute' => ['modelo', 'codperiodo']],
+           // ['codperiodo', 'unique', 'targetAttribute' => ['modelo', 'codperiodo']],
             [['fecha', 'fechacorte'], 'string', 'max' => 10],
              [['fecha', 'fechacorte'], 'validateFechas'],
             [['version'], 'string', 'max' => 1],

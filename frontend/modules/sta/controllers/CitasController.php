@@ -5,6 +5,8 @@ USE frontend\modules\sta\staModule;
 use Yii;
 use frontend\modules\sta\models\StaVwCitas;
 use frontend\modules\sta\models\Citas;
+use frontend\modules\sta\models\Talleres;
+use frontend\modules\sta\models\Alumnos;
 use frontend\modules\sta\models\CitasSearch;
 use frontend\modules\sta\models\StaVwCitasSearch;
 use frontend\modules\sta\models\Examenes;
@@ -106,11 +108,16 @@ class CitasController extends baseController
         //print_r($model->codExamenes());die();
      
         if (h::request()->isAjax && $model->load(h::request()->post())) {
+           
                 h::response()->format = Response::FORMAT_JSON;
                  //var_dump(h::request()->isAjax,$model->load(h::request()->post()));die();
                 ///yii::error('paso por is ajax  load Post');
                 return ActiveForm::validate($model);
         }
+        
+        
+        
+        
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
            // yii::error('paso por Load y save()');
             return $this->redirect(['view', 'id' => $model->id]);
@@ -282,9 +289,11 @@ public function  actionNotificaExamenDigital(){
        
            
        }
+       \common\components\token\Token::deleteAll(['name'=>'token_'.$alumno->id]);
         $token=  \common\components\token\Token::create('citas', 'token_'.$alumno->id, null, time());
        
        // $cita=$examen->cita;
+        $replyTo=$examen->cita->taller->correo;
         
         $link= Url::to(['/sta/citas/examen-virtual','id'=>$examen->id,'token'=>$token->token],true);
         $mailer = new \common\components\Mailer();
@@ -297,7 +306,9 @@ public function  actionNotificaExamenDigital(){
                     . "una examen  programado. <br> Presiona el siguiente link "
                     . "para acceder a la prueba: <br>"
                     . "    <a  href=\"".$link."\" >Presiona aquí </a>");
-           
+           if(!empty($replyTo)){
+              $message->setReplyTo($replyTo); 
+           }
     try {
         
            $result = $mailer->send($message);
@@ -326,6 +337,9 @@ public function  actionNotificaExamenDigital(){
        if($idLastCita=$cita->lastCitaWithExamen()){
              return ['error'=>yii::t('sta.errors','Ya existía la cita {numerocita} con evaluaciones',['numerocita'=>Citas::findOne($idLastCita)->numero])];   
            }
+           /*
+            * Si ya se contestaron todas las preguntas para que enviar el banco
+            */
          if($cita->isBateriaCompleta())
            return ['error'=>yii::t('sta.errors','Error: No puede notificar porque no hay preguntas activas ó las preguntas ya están contestadas')];
       
@@ -343,7 +357,7 @@ public function  actionNotificaExamenDigital(){
         $token=  \common\components\token\Token::create('citas', 'token_'.$cita->id, null, time());
        
        // $cita=$examen->cita;
-        
+         $replyTo=$cita->taller->correo;
         $link= Url::to(['/sta/citas/examen-banco','id'=>$cita->id,'token'=>$token->token],true);
         $mailer = new \common\components\Mailer();
         $message =new  \yii\swiftmailer\Message();
@@ -355,7 +369,9 @@ public function  actionNotificaExamenDigital(){
                     . "una examen  programado. <br> Presiona el siguiente link "
                     . "para acceder a la prueba: <br>"
                     . "    <a  href=\"".$link."\" >Presiona aquí </a>");
-           
+           if(!empty($replyTo)){
+              $message->setReplyTo($replyTo); 
+           }
     try {
         
            $result = $mailer->send($message);
@@ -718,10 +734,13 @@ function actionBancoPreguntas($id){
              ->update('{{%sta_examenesdet}}', ['valor' => $valor], 'id=:clave',[':clave'=>$clave])
              ->execute();
                    }
+                   
+             
             //$model->makeResultados();                   
            $session->remove('repuestasExamen');
            //$cookies = Yii::$app->response->cookies;
-          
+           //$model->ftermino=$model->CarbonNow()->format($model->formatToCarbon($model::_FDATETIME));
+             // $model->save();
         // remueve una cookie
            // $cookies->remove($nombrecookie);
            return $this->render('finalizacion_examen');
@@ -872,7 +891,7 @@ public function actionEliminaCita($id){
          return $this->redirect(['view', 'id' => $model->id]);
     }else{
          Yii::$app->session->setFlash('success', 'La cita ha sido eliminada');
-        return $this->redirect('index');
+        return $this->redirect(['view', 'id' => $model->id]);
          
     }
 } 
@@ -919,8 +938,9 @@ public function actionReportInfPsicologico($id){
     
     }
    if($codocu=='104'){
+      // echo "En proceso... Disculpen las molestias";die();
           //Solo ara el documento 104
-         $citas=Citas::find()->andWhere(['talleresdet_id'=>$model->talleresdet_id])->orderBy('fechaprog asc')->all();
+         $citas=Citas::find()->andWhere(['asistio'=>'1','talleresdet_id'=>$model->talleresdet_id])->orderBy('fechaprog asc')->all();
        $pagina=$this->render($view,['model'=>$model,'alumno'=>$alumno,'citas'=>$citas]);
     
     }
@@ -928,7 +948,21 @@ public function actionReportInfPsicologico($id){
      
   if($codocu=='107')
   return $pagina;
-  if($codocu=='105')
+  if($codocu=='105'){
+    if(h::userId()==7){
+        \yii::$app->response->content = $pagina;
+        $contenido=\yii::$app->response->content;
+       // echo $contenido; die();
+        $ruta= \yii::getAlias('@frontend/modules/sta/archivos/informes');
+        //\Yii::$app->response->sendFile($ruta.'/estesies.html')->send();
+         file_put_contents($ruta.'/hola23.html', $contenido);
+         
+         
+    }
+     return $pagina; 
+  }
+  
+   if($codocu=='104')
   return $pagina;
    $mpdf= \frontend\modules\report\Module::getPdf();
    $mpdf->margin_header=1;
@@ -946,7 +980,7 @@ public function actionReportInfPsicologico($id){
 }
 
 public function actionRefreshEtapa($id){
-   $alumnitos= \frontend\modules\sta\models\Talleresdet::find()->where(['talleres_id'=>$id])->all();
+   $alumnitos= \frontend\modules\sta\models\Talleresdet::except()->where(['talleres_id'=>$id])->all();
     foreach($alumnitos as $alumno){
        $citas=$alumno->getCitas()->orderBy('fechaprog asc')->all();
        $contador=1;
@@ -973,26 +1007,252 @@ public function actionRefreshEtapa($id){
 }
 
 
-public function actionProcesaBatch(){
+public function actionProcesaBatch($id){
     //hallando las citas que tienen examenes
 
         if (h::request()->isAjax) {
                 h::response()->format = Response::FORMAT_JSON;
+                $taller=Talleres::findOne($id);
+            if(!is_null($taller)){
+                $codfac=$taller->codfac;
+                $idsExamenes=\frontend\modules\sta\models\StaExamenesdet::find()->select(['examenes_id'])->distinct()->
+                        andWhere(['codfac'=>$codfac,'puntaje'=>null])->andWhere(['not',['valor'=>null]])->column();
+                
+                $idCitas=Examenes::find()->select(['citas_id'])->distinct()->andWhere(['id'=>$idsExamenes])->column();
+                
+
+                    $citas=Citas::find()->andWhere(['id'=>$idCitas])->all();
+                       //  var_dump($idCitas);die();
+                           //var_dump(count($citas));die();
+                    foreach($citas as $cita){     
+                            $cita->makeResultados(); 
+    
+                            }
+                                return ['success'=>yii::t('sta.labels','Se procesaron las evaluaciones')];
                 //return ActiveForm::validate($model);
         }
-    
- $idExamenes= \frontend\modules\sta\models\StaResultados::find()->select(['examen_id'])->distinct()->column();
- $idCitas  = Examenes::find()->select(['citas_id'])->distinct()->andWhere(['not in','id',$idExamenes])->column();
-
- $citas=Citas::find()->andWhere(['id'=>$idCitas])->all();
- //var_dump(count($citas));die();
- foreach($citas as $cita){     
-       $cita->makeResultados(); 
-    
- }
- return ['success'=>yii::t('sta.labels','Se procesaron las evaluaciones')];
+ 
    
+   }
 }
 
 
+
+/*
+ * FUNCION EU CREA O ACTUALIZA EL PADRON DE ASISTENCIAS
+ * 
+ */
+public function actionAsistencias(){
+   if(h::request()->isAjax){
+         h::response()->format = Response::FORMAT_JSON;         
+     $talleres=Talleres::find()->andWhere(['codperiodo'=> staModule::getCurrentPeriod()])->all();
+     foreach($talleres as $taller){
+        $taller->refrescaAsistencia(); 
+     }
+     return ['success'=>yii::t('sta.labels','Se ha actualizado el parte de asistencia')];
+     
+    }
+}
+
+
+public function actionResumenListado(){
+      
+        $searchModel = new \frontend\modules\sta\models\StaResumenasistenciasSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+       // h::session()->setFlash('warning',yii::t('sta.labels','No olvide refrescar los datos con el botón naranja de la parte superior'));
+        return $this->render('resumen_asistencias', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+}
+
+public function actionReprogramaMasivo(){
+   /* $citas=Citas::find()->andWhere(['>','fechaprog','2020-03-30 00:00:00'])->
+           andWhere(['<','fechaprog','2020-03-31 23:59:00'])->all();*/
+    
+    $citas=Citas::find()->andWhere(['>','fechaprog','2020-04-12 00:00:00'])->
+           andWhere(['codfac'=>'FC'])->orderBy('fechaprog asc')->all();
+    /*ECHO (Citas::find()->andWhere(['>','fechaprog','2020-03-30 00:00:00'])->
+           andWhere(['codfac'=>'FIC'])->orderBy('fechaprog asc')->createCommand()->getRawSql());
+   die();*/
+   
+    foreach($citas as $cita){
+        $fechaOriginal=$cita->toCarbon('fechaprog');
+        $fechaPostergada=$cita->toCarbon('fechaprog')->addDays(7);
+        echo $cita->codfac."  : Fecha programada ".$fechaOriginal->format('d/m/Y')."   Fecha Reporgaramada ".$fechaPostergada->format('d/m/Y')." <br>";
+        if($cita->reprograma($fechaPostergada)){
+            echo "exito <br>";
+        }else{
+           echo "fracaso <br> ".$cita->getFirstError()."<br>"; 
+        }
+    }
+    die();
+    
+    foreach($citas as $cita){
+        //$diaactual=$cita->toCarbon('fechaprog')->weekDay();
+        
+        if($cita->toCarbon('fechaprog')->weekDay()==5){
+         $nuevaFecha=$cita->toCarbon('fechaprog')->addDay(3);   
+        }ELSE{
+          $nuevaFecha=$cita->toCarbon('fechaprog')->addDay(1);     
+        }
+     $codigotra=$cita->taller->psicologoPorDia($nuevaFecha);
+          
+            if($codigotra==$cita->codtra){
+               if($cita->reprograma($nuevaFecha)){
+                    yii::error('ok'); 
+                }else{
+                    yii::error('error');
+                } 
+            }else{
+                
+            }
+        //$rango=$cita->horarioToday();
+      // echo $cita->toCarbon('fechaprog')->format('d D').'('.$cita->toCarbon('fechaprog')->weekDay().')  A  ->    '.$nuevaFecha->format('d D').' ('.$nuevaFecha->weekDay().") <BR>";
+        
+        
+    }
+}
+
+/*FUNCION PARA PODER RESCATAR O BORRAR  LOS TOKENS 
+ * ENVIADOS EN CASO DE ERROR POR EJEMPLO
+ * UN ALUMNO REGISTRO EL CORREO DE UN AMIGO, PERO LUEGO
+ * SE EQUIVOCO Y EL TOKEN QUEDA ABIERTO 
+ * ESTO ES UN PELIGRO, ENTONCES TENEMOS QUE BORRARLO 
+ * $id: Id del alumno
+ */
+public function actionRescueToken($id){
+   
+ if (h::request()->isAjax) {
+        $registro= Alumnos::findOne(['codalu'=>$id]);  
+     
+                h::response()->format = Response::FORMAT_JSON;
+       if(!is_null($registro)){
+   \common\components\token\Token::deleteAll(['name'=>'token_'.$registro->id]); 
+     return ['success'=>yii::t('sta.labels','Se rescató el token para este Alumno')];
+             } else{
+      return ['error'=>yii::t('sta.labels','No se ha encontrado ningún registro para este Id')];            
+             }        
+        } 
+}
+
+public function actionPruebasIncompletas(){
+    
+        $idsExamenes= \frontend\modules\sta\models\StaExamenesdet::find()->
+        select(['examenes_id'])-> andWhere(['valor'=>null])->column();   
+       $idCitas=\frontend\modules\sta\models\Examenes::find()->
+        select(['citas_id'])->andWhere(['id'=>$idsExamenes])->column(); 
+       $searchModel = new StaVwCitasSearch();
+        $dataProvider = $searchModel->searchByIds(Yii::$app->request->queryParams,$idCitas);
+       
+       
+    return $this->render('index_faltan', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]); 
+}
+
+public function actionAgregaIndicador($id){        
+         $this->layout = "install";
+         $cita=$this->findModel($id);
+         $model= new \frontend\modules\sta\models\StaCitaIndicadores();
+         //$model->setScenario($model::SCENARIO_AGREGA_ALUMNO); 
+         $model->citas_id=$cita->id;
+         $model->talleresdet_id=$cita->talleresdet_id;
+         $model->codfac=$cita->codfac;
+         
+        $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                //$model->setScenario('default'); 
+               //if(!$evento->isDateToWork())
+                 //return ['error'=>2,'msg'=>$datos];     
+             // $mensajes= $evento->creaDetalle($model->codalu);
+              
+             $model->save();
+             // yii::error($mensajes,__FUNCTION__);
+               // $model->save();
+                //var_dump($model->talleres_id,$model->getOldAttribute('codtra'),$model->codtra);die();
+                //$model->cambiaPsicologo($model->codtra);
+                  //$model->taller->sincronizeCant();
+                return ['success'=>1,'id'=>$model->id];
+            }
+        }else{
+           return $this->renderAjax('_modal_agrega_indicador', [
+                       // 'modelTaller' => $model->talleres,
+                         'model' => $model,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                       // 'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+
+    } 
+
+public function actionEditaIndicador($id){        
+         $this->layout = "install";
+         //$cita=$this->findModel($id);
+         $model= \frontend\modules\sta\models\StaCitaIndicadores::findone($id);
+         //$model->setScenario($model::SCENARIO_AGREGA_ALUMNO); 
+        
+        $datos=[];
+        if(h::request()->isPost){
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>2,'msg'=>$datos];  
+            }else{
+                //$model->setScenario('default'); 
+               //if(!$evento->isDateToWork())
+                 //return ['error'=>2,'msg'=>$datos];     
+             // $mensajes= $evento->creaDetalle($model->codalu);
+              
+             $model->save();
+             // yii::error($mensajes,__FUNCTION__);
+               // $model->save();
+                //var_dump($model->talleres_id,$model->getOldAttribute('codtra'),$model->codtra);die();
+                //$model->cambiaPsicologo($model->codtra);
+                  //$model->taller->sincronizeCant();
+                return ['success'=>1,'id'=>$model->id];
+            }
+        }else{
+           return $this->renderAjax('_modal_agrega_indicador', [
+                       // 'modelTaller' => $model->talleres,
+                         'model' => $model,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                       // 'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+
+    } 
+/*
+ * Renderiza el delallde una cuta por emdio de un ajax 
+ */
+ public function actionAjaxDetalleCita(){
+   
+  if(h::request()->isAjax)  {
+     $id=h::request()->post('expandRowKey');
+    $model=$this->findModel($id);
+    
+       return $this->renderAjax('_ajax_view', [
+                       // 'modelTaller' => $model->talleres,
+                         'model' => $model
+            ]); 
+  }
+  
+ } 
+ 
+ 
+    
 }

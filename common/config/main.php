@@ -15,6 +15,8 @@ return [
     ],
     'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
     'components' => [
+               
+        
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
@@ -310,7 +312,7 @@ return [
            'enableAutoLogin'=>false,
            // authTimeout
             'enableSession' => true,
-            'authTimeout'=>60*40,
+            'authTimeout'=>60*180,
     ]
         
         

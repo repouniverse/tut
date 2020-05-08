@@ -18,8 +18,8 @@ $tipo=h::user()->profile->tipo;
 <div class="citas-form">
   <div class="box-body">
     <?php $form = ActiveForm::begin([
-       'enableAjaxValidation'=>true,
-    'fieldClass'=>'\common\components\MyActiveField'
+       //'enableAjaxValidation'=>true,
+   // 'fieldClass'=>'\common\components\MyActiveField'
     ]); ?>
       <div class="box-header">
         <div class="col-md-12">
@@ -41,6 +41,7 @@ $tipo=h::user()->profile->tipo;
           
           <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12"> 
      <?php 
+    
        echo $form->field($model, 'codtra')->
             dropDownList(ComboHelper::getCboTutoresByProg($model->taller->id),
                   ['prompt'=>'--'.yii::t('base.verbs','Choose a Value')."--",
@@ -73,8 +74,8 @@ $tipo=h::user()->profile->tipo;
                 ?>
       
   </div> 
-  
-  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+
+  <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
       <?php 
       if($vencida){
        echo $form->field($model, 'finicio')->textInput(['disabled' =>true]);
@@ -96,7 +97,7 @@ $tipo=h::user()->profile->tipo;
        
                 ?>
   </div> 
-   <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+   <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
       <?php 
       if($vencida){
        echo $form->field($model, 'ftermino')->textInput(['disabled' =>true]);
@@ -116,18 +117,50 @@ $tipo=h::user()->profile->tipo;
                     ]);
       }   ?>
   </div>
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12"> 
+    <?php 
+     //var_dump([$model->possibleFlujosToChange()]);
+                 $posibls=$model->possibleFlujosToChange();
+                array_push($posibls,$model->flujo_id);
+       echo $form->field($model, 'flujo_id')->
+            dropDownList(\frontend\modules\sta\helpers\comboHelper::getCboFlujoByIds($posibls),
+                  ['prompt'=>'--'.yii::t('base.verbs','Choose a Value')."--",
+                     ]
+                    );
+        ?>
+    </div> 
+          
+          
           
  <?php if($model->isVisibleField('detalles_secre', $tipo)){  ?>
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-     <?php /*echo $form->field($model, 'detalles_secre')->textArea(['rows' => 4,'disabled'=>!$model->isEditableField( 'detalles_secre', $tipo)]);*/ ?>
-      <?php echo $form->field($model, 'detalles_secre')->widget(\rikcage\sceditor\SCEditor::className(), [
+    
+      <?PHP
+     //echo $form->field($model, 'sugerencias')->textarea();
+     echo $form->field($model, 'detalles_secre')->widget(\dosamigos\ckeditor\CKEditor::className(), [
+        'options' => ['rows' => 4],
+         'clientOptions'=>['language'=>'es',
+             //'disableNativeSpellChecker' => false,
+             //scayt_sLang=
+             ],
+        //'preset' => 'basic'
+         //'language'=>'es',
+        ]);
+      ?>
+  
+      
+      
+      
+      
+      
+      <?php  /*echo $form->field($model, 'detalles_secre')->widget(\rikcage\sceditor\SCEditor::className(), [
         'options' => ['rows' => 10],
         'clientOptions' => [
             'toolbar'=>'bold,italic,underline,left,center,right,justify,font,size,color|cut,copy,paste,table,image,link,unlinkemail,youtube,print,maximize',
             'plugins' => 'bbcode',
             'locale'=>'es'
         ]
-    ]); ?> 
+    ]);*/ ?> 
   </div>
   
    
@@ -153,6 +186,16 @@ $tipo=h::user()->profile->tipo;
  <?php } ?>
  
  <?php if($model->isVisibleField('detalles_indicadores', $tipo)){  ?>
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+      
+     
+     
+     <?php 
+      $url= Url::to(['agrega-indicador','id'=>$model->id,'gridName'=>'grilla-indicadores','idModal'=>'buscarvalor']);
+     echo  Html::button('<span class="fa fa-plus"></span>', ['href' => $url, 'title' => yii::t('sta.labels','Agregar comentario'),'id'=>'btn_indincador', 'class' => 'botonAbre btn btn-success']); 
+   ?>
+      <?php echo $this->render('_indicadores',['model'=>$model]);    ?>
+  </div>
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
      <?= $form->field($model, 'detalles_indicadores')->textArea(['rows' => 4,'disabled'=>!$model->isEditableField( 'detalles_indicadores', $tipo)]) ?>
   </div>

@@ -30,7 +30,9 @@ class StaDocuAlu extends modelSensibleAccess
 public function behaviors()
             {
 	return [
-		
+		/*'auditoriaBehavior' => [
+			'class' => '\common\behaviors\AuditBehavior' ,
+                               ],*/
 		'fileBehavior' => [
 			'class' => FileBehavior::className()
 		],
@@ -51,7 +53,7 @@ public function behaviors()
             [['codocu'], 'required'],
             [['detalle'], 'string'],
             [['cita_id'], 'safe'],
-            [['codfac','indi_altos','indi_riesgo1','obs_entrev','cuenta_buen','adecuado_nivel','indi_riesgo','metas','sugerencias','indi_encont','conclu_acad','metas_acad','recom_tutor_acad'], 'safe'],
+            [['codfac','indi_altos','indi_riesgo1','obs_entrev','cuenta_buen','adecuado_nivel','indi_riesgo','metas','sugerencias','indi_encont','conclu_acad','metas_acad','recom_tutor_acad','metas_aux','status'], 'safe'],
             [['codocu'], 'string', 'max' => 3],
             [['descripcion'], 'string', 'max' => 30],
             [['talleresdet_id'], 'exist', 'skipOnError' => true, 'targetClass' => Talleresdet::className(), 'targetAttribute' => ['talleresdet_id' => 'id']],
@@ -71,17 +73,19 @@ public function behaviors()
             'descripcion' => Yii::t('app', 'Descripcion'),
             'detalle' => Yii::t('app', 'Detalle'),
             'codestado' => Yii::t('app', 'Estado'),
-            'indi_altos' => Yii::t('sta.labels', 'El estudiante de pregrado en condición de riesgo académico de la Universidad Nacional de Ingeniería, muestra indicadores altos para un buen desempeño académico tales como:'),
+            'indi_altos' => Yii::t('sta.labels', 'Teniendo en cuenta los hallazgos en la evaluación psicológica se concluye que el alumno presenta alto nivel en:'),
              'indi_riesgo1' => Yii::t('sta.labels', 'Sin embargo se observa  indicadores de riesgo, lo que significa que posee bajos niveles de :'),
             'obs_entrev' => Yii::t('sta.labels', 'Observaciones durante la entrevista:'),
             'cuenta_buen' => Yii::t('sta.labels', 'Teniendo en cuenta los hallazgos en la evaluación psicológica se concluye que:'),
             'adecuado_nivel' => Yii::t('sta.labels', 'Así tambien presenta adecuado nivel en:'),
             'indi_riesgo' => Yii::t('sta.labels', 'Por otro lado presenta indicadores de riesgo como:'),
             'metas' => Yii::t('sta.labels', 'El presente plan describe las metas de tutoría psicológica que se llevarán acabo con el referido(a) alumno(a), a partir de los resultados de la evaluación inicial de tutoría psicológica en el semestre 2020-I , la misma que brinda los siguientes indicadores prioritariamente:'),
+            'metas_aux' => Yii::t('sta.labels', 'El presente plan describe las metas de tutoría psicológica que se llevarán acabo con el referido(a) alumno(a), a partir de los resultados de la evaluación inicial de tutoría psicológica en el semestre 2020-I , la misma que brinda los siguientes indicadores prioritariamente:'),
+            
             'sugerencias' => Yii::t('sta.labels', 'Se sugiere trabajar los siguientes indicadores de riesgo :'),
             'indi_encont' => Yii::t('sta.labels', 'El estudiante de pregrado en condición de riesgo académico de la Universidad Nacional de Ingeniería, durante la entrevista muestra:'),
             'conclu_acad' => Yii::t('sta.labels', 'Conclusiones de la evaluación:'),
-            'metas_acad' => Yii::t('sta.labels', 'La tutoría psicológica trabajará las siguientes actividades,  a partir de los resultados de la evaluación inicial de tutoría psicológica en el semestre 2020-I:'),
+            'metas_acad' => Yii::t('sta.labels', 'La tutoría psicológica propone, a partir de los resultados encontrados,desarrollar los indicadores siguientes :'),
             'recom_tutor_acad' => Yii::t('sta.labels', 'Recomendaciones para el tutor académico:'),
             ];
     }
@@ -101,7 +105,10 @@ public function behaviors()
     {
         return $this->hasOne(Citas::className(), ['id' => 'cita_id']);
     }
-
+public function getFacultad()
+    {
+        return $this->hasOne(Facultades::className(), ['codfac' => 'codfac']);
+    }
     /**
      * {@inheritdoc}
      * @return StaDocuAluQuery the active query used by this AR class.

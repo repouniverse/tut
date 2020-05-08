@@ -15,6 +15,15 @@ use frontend\modules\sta\helpers\comboHelper;
 <button id="boton-procesa-batch" type="button" class="btn btn-success">
     <span class="glyphicon glyphicon-refresh"></span><?=yii::t('sta.labels','  Procesar resultados de las pruebas')?>
 </button>
+<button id="boton-correos" type="button" class="btn btn-success">
+    <span class="glyphicon glyphicon-refresh"></span><?=yii::t('sta.labels','  Obtener Correos')?>
+</button>
+<button id="boton-correos-faltan" type="button" class="btn btn-success">
+    <span class="glyphicon glyphicon-refresh"></span><?=yii::t('sta.labels','  Obtener Correos alumnos por evaluar')?>
+</button>
+<div id="miarea">
+    
+</div>
   <?php    $this->registerJs("
          
 $('#boton-procesa-batch').on( 'click', function(){    
@@ -45,6 +54,51 @@ $('#boton-procesa-batch').on( 'click', function(){
                               } 
                              // $.pjax.defaults.timeout = false;  
                        // $.pjax.reload({container: '#grilla-minus'});
+                        },
+   cache: true
+  })
+ }
+ 
+);",\yii\web\View::POS_END);  
+  ?>
+<?php    $this->registerJs("
+         
+$('#boton-correos').on( 'click', function(){    
+  $.ajax({ 
+  
+   method:'get',    
+      url: '".\yii\helpers\Url::toRoute('/sta/programas/correos-alumnos')."',
+   delay: 250,
+ data: {id:".$model->id."},
+             error:  function(xhr, textStatus, error){               
+                               
+                                }, 
+              success: function(data) {  
+                      
+                       $('#miarea').html(data);
+                        },
+   cache: true
+  })
+ }
+ 
+);",\yii\web\View::POS_END);  
+  ?>
+
+ <?php    $this->registerJs("
+         
+$('#boton-correos-faltan').on( 'click', function(){    
+  $.ajax({ 
+  
+   method:'get',    
+      url: '".\yii\helpers\Url::toRoute('/sta/programas/correos-alumnos')."',
+   delay: 250,
+ data: {id:".$model->id.",faltan:'si'},
+             error:  function(xhr, textStatus, error){               
+                               
+                                }, 
+              success: function(data) {  
+                      
+                       $('#miarea').html(data);
                         },
    cache: true
   })

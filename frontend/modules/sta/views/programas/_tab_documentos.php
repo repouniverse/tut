@@ -55,7 +55,7 @@
                         },
                         
                         'edit' => function ($url,$model) {
-			   $url = \yii\helpers\Url::toRoute([$this->context->id.'/edita-docu','id'=>$model->id,'gridName'=>'grid_docu','idModal'=>'buscarvalor']);
+			   $url = \yii\helpers\Url::toRoute(['/sta/programas/edita-docu','id'=>$model->id,'gridName'=>'grid_docu','idModal'=>'buscarvalor']);
 
                               return \yii\helpers\Html::a('<span class="btn btn-danger glyphicon glyphicon-pencil"></span>', $url, ['class'=>'botonAbre']);
                             },

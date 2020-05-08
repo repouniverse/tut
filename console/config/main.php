@@ -89,6 +89,7 @@ return [
                             'frontend\modules\sta\database\migrations',
                             'frontend\modules\sigi\database\migrations',
                              'frontend\modules\access\database\migrations',
+                            'frontend\modules\avisos\database\migrations',
                             
                             ],
                         ],

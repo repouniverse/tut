@@ -19,7 +19,7 @@ use yii\helpers\Url;
 /**
  * Site controller
  */
-class SiteController extends Controller
+class SiteController extends \frontend\controllers\base\baseController
 {
     /**
      * {@inheritdoc}
@@ -409,29 +409,44 @@ Datos de caché de configuración se han actualizado');
     }
 public function actionRutas(){
     
-    $model=New \frontend\modules\sta\models\Citas();
-    $model->fechaprog='22/03/2020 13:50:00';
-    $model->talleres_id=50;
     
-    var_dump($model->isInJourney(),$model->getErrors());
+    $alumnos=\frontend\modules\sta\models\Aluriesgo::find()->
+     select(['max(nveces15) as n15','codalu','codfac'])->
+     groupBy(['codalu','codfac'])->asArray()->all();
+   
+   foreach($alumnos as $alumno){
+       \frontend\modules\sta\models\StaResumenasistencias::updateAll(
+               ['nveces'=>$alumno['n15']],
+               ['codalu'=>$alumno['codalu']]);
+         }
     die();
     
+    $cita=new \frontend\modules\sta\models\Citas();
+     $cita->talleresdet_id=1352;
+   // $cita->obtenerEtapaId();
+   //var_dump($cita->obtenerEtapaId());
+   //die();
+     $filtro=$cita->CarbonNow()->subHours(24)->format(\common\helpers\timeHelper::formatMysqlDateTime());
     
-    /*$carbon=New \Carbon\Carbon();
-    $carbon=$carbon->addHours(5)->addMinutes(45);
-    var_dump($carbon,$carbon->parse('09:30'));die();*/
-    //\frontend\modules\sta\staModule::notificaMailCitasProximas();
-    //die();
-   /* $fecha1='2020-02-26 07:00:00';  
-    $fecha2='2020-04-15 00:45:13';
-    ECHO $fecha1."<BR>";
-    ECHO $fecha2."<BR>";
-    var_dump(\common\helpers\timeHelper::IsFormatMysqlDateTime($fecha1),
-            \common\helpers\timeHelper::IsFormatMysqlDateTime($fecha2)
-            );
-    die();
+   $query= $cita->find()->select(['flujo_id'])->andWhere([
+         'talleresdet_id'=>$cita->talleresdet_id,
+         'masivo'=>'0','asistio'=>'1'])->orWhere(['and',
+          'talleresdet_id=:talleresdet_id',
+         'masivo=0',['>','fechaprog',$filtro ]
+         ],[':talleresdet_id'=>$cita->talleresdet_id])->andWhere(['<>','id',23]);
+   var_dump($query->createCommand()->getRawSql()); die();
     
-    */
+    
+    
+    
+    
+    $valores=[2553,2623,2547,2526];
+    foreach($valores as $valor){
+        $cita->talleresdet_id= $valor;
+        echo "ID  ".$valor."   :   FLUJO ".$cita->obtenerEtapaId()."<br>";
+    }
+   DIE(); 
+   
    echo " Url::home()  :   ".Url::home()."<br>";
    echo " Url::home('https')  :   ".Url::home('https')."<br>";
    echo " Url::base()  :   ".Url::base()."<br>";
@@ -447,7 +462,186 @@ public function actionRutas(){
    //yii::$app->urlManager->setHostInfo('');
    //echo " Url::base()  :   ".Url::base()."<br>";
    //echo " UrlManager::setHostInfo()   :   ".yii::$app->urlManager->setHostInfo('http://case.itekron.com/frontend/web/sta/entregas/update?id=32')."<br>";
-}
+
+    
+   
+   
+    var_dump($cita->obtenerEtapaId());
+   die();
+    
+    
+    $valor=null;
+    var_dump($valor.'');die();
+  
+   var_dump($cita->obtenerEtapaId());die();
+   //echo $cita::SwichtFormatDate('21/04/2020 11:55:13',$cita::_FDATETIME,false); 
+   die();
+   
+   $cita->talleresdet_id=2008;
+   // $cita->obtenerEtapaId();
+   var_dump($cita->obtenerEtapaId());
+   die();
+    
+    $carbon=New \Carbon\Carbon();
+    $carbon=$carbon->addHours(5)->addMinutes(45);
+    var_dump($carbon,$carbon->parse('09:30'));die();
+    
+     $formato= \common\helpers\timeHelper::formatMysqlDate();
+      $fechadefault=\frontend\modules\sta\models\Aluriesgo::CarbonNow()->format($formato);
+     var_dump($fechadefault);
+    die();
+    $carbon=\Carbon\Carbon::createFromFormat('Y-m-d','2020-08-01');
+    var_dump($carbon->endOfDay()->format('Y-m-d H:i:s'));
+    die();
+     $formatoMySql=\common\helpers\timeHelper::formatMysqlDateTime();
+    $cita= \frontend\modules\sta\models\Citas::findOne(729);
+    echo $cita->CarbonNow()->addMinutes(20)->format($formatoMySql);die();
+    $cita= \frontend\modules\sta\models\Citas::findOne(1350);
+    var_dump($cita->CarbonNow()->format($cita->formatToCarbon($cita::_FDATETIME)));die();
+    
+    
+    $taller= \frontend\modules\sta\models\Talleresdet::findOne(2518);
+    
+    $taller->retiraDelPrograma(false);
+    die();
+
+    
+    
+    $cita= \frontend\modules\sta\models\Citas::findOne(1350);
+    
+    
+   $registros= \frontend\modules\sta\models\Citas::find()->with([
+    'examenes'
+   
+])->andWhere(['id'=>275])->limit(5)->asArray()->all();
+    print_r($registros);die();
+    
+    
+    
+    //echo date('Y-m-d H:i:s');die();
+    $cita= \frontend\modules\sta\models\Citas::findOne(729);
+    $cita->fechaprog='03/04/2020 08:50:34';
+    var_dump($cita->isInJourney(),$cita->getErrors()); die();
+    
+    $carbon=New \Carbon\Carbon();
+    $carbon=$carbon->addHours(5)->addMinutes(45);
+    var_dump($carbon,$carbon->parse('09:30'));die();
+    //\frontend\modules\sta\staModule::notificaMailCitasProximas();
+    //die();
+   /* $fecha1='2020-02-26 07:00:00';  
+    $fecha2='2020-04-15 00:45:13';    ECHO $fecha1."<BR>";
+    ECHO $fecha2."<BR>";
+    var_dump(\common\helpers\timeHelper::IsFormatMysqlDateTime($fecha1),
+            \common\helpers\timeHelper::IsFormatMysqlDateTime($fecha2)
+            );
+    die();
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    var_dump(h::gsetting('sta','notificacitasmail'));die();
+  $registro=New \frontend\modules\sta\models\Citas();
+ $fechax=date(\common\helpers\timeHelper::formatMysqlDateTime());
+ echo  $registro::SwichtFormatDate($fechax,$registro::_FDATETIME, true);
+  die();
+ $registro->talleresdet_id=1444;
+  /*$query=$registro->find()->orWhere(['and',
+                'talleresdet_id='.$registro->talleresdet_id,
+                'asistio=0',
+                'masivo=0',
+      'fechaprog >'.$registro::CarbonNow()->subHours(5)->format(\common\helpers\timeHelper::formatMysqlDateTime())                
+            ]);
+  echo $query->createCommand()->getRawSql();die();*/
+  echo $registro->obtenerEtapaId();die();
+    
+    
+    
+ $registro= \frontend\modules\sta\models\StaResumenasistencias::findOne(6);
+ $cita= \frontend\modules\sta\models\Citas::findOne(280);
+ var_dump($registro->c_1);
+ var_dump($cita->fechaprog);
+ die();
+    
+    
+    Yii::$app->session->setFlash('success',yii::t('sta.labels','Se ha efectuado el ingreso'));
+     return $this->redirect(['sta/programas/update',
+         'id'=> \frontend\modules\sta\models\Talleres::CurrentProgramaId( h::user()->getFirstFacultad())]);
+    die();
+    
+    
+    
+    
+    $model=new \frontend\modules\sta\models\Aluriesgo();
+    $model->setAttributes([
+        'codcur'=>'EE214',
+        'codalu'=>'20100230B',
+        'codperiodo'=>'2020I',        
+    ]);
+    $model->validate();
+    print_r($model->getErrors());
+    die();
+    
+    
+    
+    
+    
+    
+    
+    
+    $mailer= Yii::$app
+            ->mailer;
+  $mailer->htmlLayout = 'layouts/html';
+  $message=$mailer->compose();
+        return
+            $message/*->compose(
+                [ 'html' => 'passwordResetToken-html', 
+                  'img' => $message->embed(\Yii::getAlias('@frontend/web/img/logo_cabecera.png')),
+                    //'html' => 'layouts/html', 
+                    'text' => 'passwordResetToken-text'],
+                ['user' => $user]
+            )
+           */->setHtmlBody($mailer->render('saludo_correo-html', [
+    'img' => $message->embed(\Yii::getAlias(\Yii::getAlias('@frontend/web/img/logo_cabecera.png'))),
+     'destinatario' => 'Dra Dany',   
+               ], $mailer->htmlLayout))     
+            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' -Restablecer contraseña'])
+            ->setTo('lbarrientosm@gmail.com')
+            ->setSubject('Saludos desde el nuevo correo ')
+            ->send();
+    
+    
+    
+    
+    
+    
+   echo yii::getAlias('@frontend/web/img/anonimo.png');
+    echo "<br>";
+   echo  "<img src='".\common\helpers\FileHelper::UrlImage(yii::getAlias('@frontend/web/img/anonimo.png'),false)."' >";die();
+    die();
+    /*$query=\frontend\modules\sta\components\Indicadores::queryCountCategoriasResultadosBase();
+    echo $query->createCommand()->getRawSql();
+    die();
+    
+    
+    
+    var_dump(\common\models\Useraudit::UsersInLine());
+    die();
+    
+    $modeli=\frontend\modules\sta\models\Rangos::findOne(48);
+    var_dump($modeli->talleres);die();*/
+   /* $model=New \frontend\modules\sta\models\Citas();
+    $model->fechaprog='22/03/2020 13:50:00';
+    $model->talleres_id=50;
+    
+    var_dump($model->isInJourney(),$model->getErrors());
+    die();*/
+    
+    }
 public function actionCookies(){
     $cookiesRead = Yii::$app->request->cookies;
     $cookiesSend = Yii::$app->response->cookies;
@@ -477,5 +671,72 @@ public function actionCookies(){
      
   }  
    
-   
+  public function actionSetHomeUrl($id){
+      if(h::request()->isAjax){
+          
+         h::response()->format = \yii\web\Response::FORMAT_JSON;
+        $registro=  \common\models\Userfavoritos::findOne($id);
+        if(is_null($registro)){
+            return ['error'=>yii::t('base.errors','No se encontró el registro para este id')];
+        }else{
+            $registro->setHomeUrl();
+            return ['success'=>yii::t('base.errors','Se cambió la página de inicio')]; 
+        }
+      }
+  }
+  
+ public function  actionManual(){
+     echo " En construcción"; 
+ }
+  
+ public function  actionControlCambios(){
+     echo " En construcción"; 
+ }
+ 
+ /*
+  * Captura una funcion de captura datos al maletin
+  * recibe un array de la siguiente forma
+  * 
+  *   'nombreModelo'=[ id1, id2, id3, ...] 
+  */
+ public function  actionInputMaletin(){
+    if (\Yii::$app->request->isAjax) {
+
+    // Sets the response format (in case you want json response)
+
+    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+
+    $data = \Yii::$app->request->post();
+    var_dump(count($data),$data);
+  return ['success'=>'SALIO BIEN'];
+   // do something with the data
+
+
 }
+ }
+ 
+ public function actionRenderAjaxAdjuntos(){
+    if(h::request()->isAjax){
+        $this->layout="install";
+     $id=h::request()->post('expandRowKey');    
+        $clase=str_replace('_','\\',h::request()->get('nombreclase'));       
+        $model=$clase::findOne($id);
+       
+   return $this->renderAjax('@frontend/views/comunes/previo', [
+                        'model' => $model,
+                 //'allowedExtensions' => $allowedExtensions,
+                        //'vendorsForCombo' => $vendorsForCombo,
+            ]);     
+         
+    }
+ }
+ 
+ public function actionMantenimiento(){
+   $this->layout="install"; 
+   return $this->render('mantenimiento');     
+         
+    }
+ }
+ 
+

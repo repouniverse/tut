@@ -142,7 +142,7 @@ protected function findModel($id)
        } else{
            //var_dump($model->codpuesto,staModule::COD_TRABAJADOR_PSICOLOGO);
            if($model->codpuesto== staModule::COD_TRABAJADOR_PSICOLOGO){
-              $idProgramas= Talleresdet::find()->select('talleres_id')->where(['codtra'=>$codtra])->column();
+              $idProgramas= Talleresdet::except()->select('talleres_id')->where(['codtra'=>$codtra])->column();
               $providerTalleresAntiguos=  new \yii\data\ActiveDataProvider([
                                 'query' => Talleres::find()->where(['id'=>$idProgramas])->andWhere(['<>','codperiodo',staModule::getCurrentPeriod()])->orderBy('codperiodo DESC'),
                                     'pagination' => [

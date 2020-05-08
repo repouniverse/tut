@@ -99,6 +99,25 @@ use common\helpers\h;
      <?php //echo cboperiodos::widget(['model'=>$model,'attribute'=>'codperiodo', 'form'=>$form]) ?>
   </div>
   <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <?php
+      $filtro=h::request()->get('StaVwCitasSearch')['codperiodo'];
+           // var_dump($filtro);
+            //var_dump($model->asistio);
+           if(is_null($filtro) or $filtro=='')
+           {
+              $codperiodo=null;
+           }else{
+               $codperiodo=$filtro;  
+           }
+          
+            echo $form->field($model, 'flujo_id')->
+            dropDownList(comboHelper::getCboFlujoTotal($codperiodo) ,
+                    ['prompt'=>'--'.yii::t('base.verbs','Escoja un valor')."--",
+                        //'enableAjaxValidation' => true,
+                    // 'class'=>'probandoSelect2',
+                      //'disabled'=>($model->isBlockedField('codpuesto'))?'disabled':null,
+                        ]
+                    )  ?>
  </div>
 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
     

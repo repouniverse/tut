@@ -74,4 +74,72 @@ class CitasSearch extends Citas
 
         return $dataProvider;
     }
+    
+    public function searchByTaller($id)
+    {
+        $query = Citas::find();
+
+        // add conditions that should always apply here
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+
+        //$this->load($params);
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to return any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+        // grid filtering conditions
+        $query->andFilterWhere([
+            'id' => $this->id,
+            'talleresdet_id' => $id,
+            'talleres_id' => $this->talleres_id,
+            //'duracion' => $this->duracion,
+        ]);
+
+        $query->andFilterWhere(['like', 'fechaprog', $this->fechaprog])
+            ->andFilterWhere(['like', 'codtra', $this->codtra])
+            ->andFilterWhere(['like', 'finicio', $this->finicio])
+            ->andFilterWhere(['like', 'ftermino', $this->ftermino])
+            ->andFilterWhere(['like', 'fingreso', $this->fingreso])
+            ->andFilterWhere(['like', 'detalles', $this->detalles])
+            ->andFilterWhere(['like', 'codaula', $this->codaula]);
+
+        return $dataProvider;
+    }
+   
+    public function searchByEvento($talleresdet_id,$flujo_id)
+    {
+        $query = Citas::find();
+
+        // add conditions that should always apply here
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+
+        //$this->load($params);
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to return any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+        // grid filtering conditions
+        $query->andFilterWhere([
+            //'id' => $this->id,
+            'talleresdet_id' => $talleresdet_id,
+            'flujo_id' => $flujo_id,
+            //'duracion' => $this->duracion,
+        ]);
+
+       
+        return $dataProvider;
+    }
+    
 }

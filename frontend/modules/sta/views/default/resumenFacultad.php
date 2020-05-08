@@ -2,6 +2,9 @@
 use dosamigos\chartjs\ChartJs;
 use yii\grid\GridView;
 use frontend\modules\sta\models\Talleresdet;
+use miloschuman\highcharts\Highcharts;
+use miloschuman\highcharts\HighchartsAsset;
+use frontend\modules\sta\components\Indicadores;
 ?>
 <div class="box box-success">
         
@@ -21,7 +24,7 @@ use frontend\modules\sta\models\Talleresdet;
           <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
             <?= \yii\helpers\Html::label(yii::t('sta.labels','Ir a otra Facultad'),'micombo',['class'=>'control-label'])?>
         
-        <?= \yii\helpers\Html::dropDownList('micombofac',$model->codfac,\frontend\modules\sta\helpers\comboHelper::getCboFacultades(),
+        <?= \yii\helpers\Html::dropDownList('micombofac',$model->codfac,\frontend\modules\sta\helpers\comboHelper::getCboFacultadesByUser(\common\helpers\h::userId()),
                     ['prompt'=>yii::t('sta.labels','--Seleccione un valor--'),
                      'class'=>'form-group form-control',
                      'id'=>'id_micombofac'
@@ -91,58 +94,139 @@ use frontend\modules\sta\models\Talleresdet;
      </div>     
          
               <div class="row">
-                <div class="col-md-8">
-                  <p class="text-center text-info">
-                     <span class="fa fa-calendar-o"></span><?='  '.yii::t('sta.labels','Número de Citas {desde} - {hasta} {ano}',[
-                         'desde'=>'18/09/2019',
-                         'hasta'=>'25/12/2019',
-                         'ano'=>date('Y')
-                     ])?> 
-                    
-                  </p>
-
-                  <div class="chart">
+                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                   
-                    
-                        <?= ChartJs::widget([
-                            'type' => 'line',
-                                'options' => [
-                                    'height' => 400,
-                                         'width' => 400
-                                            ],
-                                'data' => [
-        'labels' => ["Día 1", "Día 2", "Día 3", "Día 4", "Día 5", "Día 6", "Día 7"],
-        'datasets' => [
-            [
-                'label' => "Primer grupo",
-                'backgroundColor' => "rgba(179,181,198,0.2)",
-                'borderColor' => "rgba(179,181,198,1)",
-                'pointBackgroundColor' => "rgba(179,181,198,1)",
-                'pointBorderColor' => "#fff",
-                'pointHoverBackgroundColor' => "#fff",
-                'pointHoverBorderColor' => "rgba(179,181,198,1)",
-                'data' => [65, 59, 90, 81, 56, 55, 40]
-            ],
-            [
-                'label' => "Segundo grupo",
-                'backgroundColor' => "rgba(255,99,132,0.2)",
-                'borderColor' => "rgba(255,99,132,1)",
-                'pointBackgroundColor' => "rgba(255,99,132,1)",
-                'pointBorderColor' => "#fff",
-                'pointHoverBackgroundColor' => "#fff",
-                'pointHoverBorderColor' => "rgba(255,99,132,1)",
-                'data' => [28, 48, 40, 19, 96, 27, 100]
+                  <div class="chart">
+                  <?php
+                  
+                 /*echo Indicadores::queryCountCategoriasResultadosBaseFilter($codfac,$codperiodo)->
+                        createCommand()->getRawSql();die();*/
+                $matriz= Indicadores::queryCountCategoriasResultadosBaseFilter($codfac,$codperiodo)->asArray()->all(); 
+                $indicadores=ARRAY_VALUES(array_unique(array_column($matriz,'nombre')));
+                $categorias=ARRAY_VALUES(array_unique(array_column($matriz,'categoria')));
+                $faltantes=[];
+                //yii::error($matriz);
+                $matrizFinal=[];
+                foreach($indicadores as $nombreindicador){
+                   $matrizFiltrada= array_filter($matriz, function($v, $k) use($nombreindicador) {
+                        return  trim($v['nombre']) == trim($nombreindicador);
+                             }, ARRAY_FILTER_USE_BOTH);
+                 // var_dump($matrizFiltrada);die();
+                           //yii::error($matrizFiltrada);
+                  // $matrizFinal=array_merge($matrizFinal,$matrizFiltrada);
+                             $copiaMatrizFiltrada=$matrizFiltrada;
+                   if(count($matrizFiltrada) < 3){
+                       $faltan=array_diff($categorias, array_column($matrizFiltrada,'categoria'));
+                       //yii::error($faltan);
+                       asort($faltan);
+                       if(count($faltan)>0){
+                           foreach($faltan as $categoriafaltante){
+                                //YII::ERROR('SE AGREGA  '.$categoriafaltante);
+                               $copiaMatrizFiltrada[]=['ncategoria'=>0,'categoria'=>$categoriafaltante,'nombre'=>$nombreindicador];
+                                yii::error('crudo');
+                    yii::error($copiaMatrizFiltrada);
+                   $copiaMatrizFiltrada=\common\helpers\ArrayHelper::array_sort($copiaMatrizFiltrada, 'categoria', SORT_ASC);
+                   yii::error('ordenada');
+                    yii::error($copiaMatrizFiltrada);
+                           }
+                       }
+                   }
+                  
+                  $matrizFinal=array_merge($matrizFinal,$copiaMatrizFiltrada); 
+                  //yii::error($matrizFinal);
+                }
+                $cantidad=count($matriz);
+                $bajo=[];$alto=[];$promedio=[];
+               // $cantidad=0;
+                  foreach($matrizFinal as $fila){ 
+                 if($fila['categoria']== frontend\modules\sta\models\StaPercentiles::CALIFICACION_BAJO)
+                 {
+                     $bajo[]=$fila['ncategoria'];
+                    //$cantidad+=$fila['ncategoria'];
+                 }
+                  if($fila['categoria']== frontend\modules\sta\models\StaPercentiles::CALIFICACION_PROMEDIO)
+                   $promedio[]=$fila['ncategoria'];
+                  if($fila['categoria']== frontend\modules\sta\models\StaPercentiles::CALIFICACION_ALTO)
+                   $alto[]=$fila['ncategoria'];
+                }
+                $bajo=array_map('intval', $bajo);
+                $promedio=array_map('intval', $promedio);
+                $alto=array_map('intval', $alto);
+//var_dump($indicadores);die();
+              if(array_key_exists(0, $bajo)) {
+                  
+              
+                   ECHO Highcharts::widget([
+    'id'=>'grafiquito',
+   'options' => [
+       'chart'=>['type'=>'column',
+            'height'=>800],
+      'title' => ['text' => 'Resultados '.($alto[0]+$bajo[0]+$promedio[0]).' evaluados de '.$nalumnos.' alumnos '],
+      'xAxis' => [
+         //'categories' => $indicadores,
+          'categories' => $indicadores,
+          'labels'=>['rotation'=>-45],
+      ],
+      'yAxis' => [
+         'min'=>0,
+         'title' => ['text' => 'Cantidades'],
+          'stackLabels'=>[
+            'enabled'=>true,
+            'style'=>[
+                'fontWeight'=> 'bold',
+                'color'=>'gray'
             ]
         ]
-    ]
+      ],
+       
+       
+       
+      'legend'=>[
+           'align'=>'right',
+        'x'=> -30,
+        'verticalAlign'=> 'top',
+        'y'=> 25,
+        'floating'=> true,
+        'backgroundColor'=> 'white',
+        'borderColor'=> '#CCC',
+        'borderWidth'=> 1,
+        'shadow'=>false
+          ],
+        'tooltip'=> [
+        'headerFormat'=> '<b>{point.x}</b><br/>',
+        'pointFormat'=> '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+                ],
+       'credits'=>false,
+       'plotOptions'=> [
+        'column'=> [
+            'stacking'=> 'normal',
+            'dataLabels'=> [
+                'enabled'=> true
+                    ]
+                ],
+          // 'series'=>['color'=>'red']
+          ],
+       
+         'series'=> [[
+        'name'=> 'BAJO',
+        'data'=>$bajo, 'color'=>'#e03131'
+    ], [
+        'name'=>'PROMEDIO',
+        'data'=>$promedio, 'color'=>'#fdd658'
+    ], [
+        'name'=> 'ALTO',
+        'data'=>$alto, 'color'=>'#4c8a0d'
+    ]],
+       ]
 ]);
-?>             
-                
+          }         
+                  ?>
+                 
                   </div>
                   <!-- /.chart-responsive -->
                 </div>
                 <!-- /.col -->
-                <div class="col-md-4">
+                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                   <p class="text-center text-info">
                     <?=yii::t('sta.labels','Metas Cumplimieto de Citas')?>
                   </p>
@@ -196,8 +280,14 @@ use frontend\modules\sta\models\Talleresdet;
         //alert($(this).val());
           var url = '".\yii\helpers\Url::current()."';
              //  alert(url);
-          url=url.replace('codfac=".$model->codfac."','codfac='+$(this).val()); 
-             // alert(url);
+          //url=url.replace('codfac=".$model->codfac."','codfac='+$(this).val());
+             if(url.search('codfac')>0){
+             url=url.replace('codfac=".$model->codfac."','codfac='+$(this).val());
+             }else{
+             url=url+'?codfac='+$(this).val(); 
+             }
+              
+              //alert(url);
            window.location=url;
           
           return false;

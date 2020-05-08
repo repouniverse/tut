@@ -49,7 +49,7 @@ class Talleresdet extends \common\models\base\modelBase
      public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios[self::SCENARIO_BATCH] = ['talleres_id','codalu','codfac'];
+        $scenarios[self::SCENARIO_BATCH] = ['talleres_id','codalu','codfac','status','codtra'];
         $scenarios[self::SCENARIO_PSICO] = ['codtra_psico'];
         $scenarios[self::SCENARIO_TUTOR] = ['rank_tutor','detalle_tutor'];
         $scenarios[self::SCENARIO_PSICO_PSICO] = ['codtra'];
@@ -67,7 +67,7 @@ class Talleresdet extends \common\models\base\modelBase
             [['talleres_id', 'codalu'], 'required'],
             [['talleres_id'], 'integer'],
             [['detalles'], 'string'],
-            [['rank_psico','rank_tutor'], 'safe'],
+            [['rank_psico','rank_tutor','status','codtra'], 'safe'],
             [['codalu'], 'string', 'max' => 14],
             [['fingreso'], 'string', 'max' => 10],
             [['codtra'], 'string', 'max' => 6],
@@ -159,6 +159,7 @@ public function getTrabajador()
                 'talleresdet_id'=>$this->id,
                 'codocu'=>$code,
                  'codfac'=>$this->codfac,
+                 'status'=>Aluriesgo::FLAG_NORMAL,
                     ]);
         }
         
@@ -263,11 +264,30 @@ public function indicadores(){
       andWhere(['talleresdet_id'=>$this->id,'asistio'=>'1'])->column();
    $examenesId=Examenes::find()->select(['id'])->distinct()->
       andWhere(['citas_id'=>$citasId])->column();
-    $resultados=StaResultados::find()->select(['categoria','b.nombre'])->join('INNER JOIN','{{%sta_testindicadores}} b','indicador_id=b.id')->andWhere(['examen_id'=>$examenesId])->asArray()->all();
+    $resultados=StaResultados::find()->select(['categoria','b.nombre','b.id','b.invertido'])->join('INNER JOIN','{{%sta_testindicadores}} b','indicador_id=b.id')->andWhere(['examen_id'=>$examenesId])->asArray()->all();
    foreach( $resultados as $filaResultado){
-    $arreglo[$filaResultado['categoria']][]=$filaResultado['nombre'];
+    
+    if($filaResultado['invertido']=='1'){
+       // yii::error('esta invertido '.$filaResultado['nombre']);
+        $categoria=$filaResultado['categoria'];
+        if($categoria==\frontend\modules\sta\models\StaPercentiles::CALIFICACION_ALTO){
+            //yii::error('cambiando la caegoria de '.$categoria.'  a   '.\frontend\modules\sta\models\StaPercentiles::CALIFICACION_BAJO);
+           $categoria=\frontend\modules\sta\models\StaPercentiles::CALIFICACION_BAJO; 
+        }else{
+          if($categoria==\frontend\modules\sta\models\StaPercentiles::CALIFICACION_BAJO){
+           $categoria=\frontend\modules\sta\models\StaPercentiles::CALIFICACION_ALTO; 
+          }  
+        }
+        
+        //yii::error('La categoria inical era '.$filaResultado['categoria']);
+        //yii::error('La categoria final queda '.$categoria);
+        $arreglo[$categoria][]=$filaResultado['nombre'];
+    }else{
+      $arreglo[$filaResultado['categoria']][]=$filaResultado['nombre'];  
+    }
+    
    }
-    yii::error($arreglo);
+   // yii::error($arreglo);
   return $arreglo;
   
 }
@@ -280,10 +300,125 @@ public function textoIndicadores($calificacion){
         return '';
     }
     foreach($arreglo[$calificacion] as $clave=>$nombre){
-        $cadena.='('.$contador.')'.$nombre.'  |  ';
+        $cadena.=ucfirst(mb_strtolower($nombre,'UTF-8')).',  ';
+        //$cadena.='('.$contador.')'.$nombre.'  |  ';
         $contador++;
     }
     return $cadena;
 }
 
+public function hasInformeEditado(){
+    return $this->getDocumentos()->andWhere(['>','cita_id',0])->exists();
+}
+public function nInformeEditado(){
+    return $this->getDocumentos()->andWhere(['>','cita_id',0])->count();
+}
+
+
+/*
+ * Funcion que retira o eliminar retiro 
+ * del programa de tutoria, 
+ * En realidad solo modfica le FLAG: 'N' 'R'
+ * @retiro : true   Retiro   false  Deshacer retiro
+ */
+public function retiraDelPrograma($retiro=true){  
+    $flag=($retiro)?Aluriesgo::FLAG_RETIRADO: Aluriesgo::FLAG_NORMAL;
+    $flagCita=($retiro)?'0':'1';
+    $codperiodo=$this->talleres->codperiodo;
+    $citasid=$this->idCitas();
+    
+ if($codperiodo == staModule::getCurrentPeriod()){
+       $transaccion=$this->getDb()->beginTransaction(\yii\db\Transaction::SERIALIZABLE);
+    /*Mofiicando latabla ALurieso*/
+     Aluriesgo::updateAll(
+            ['status'=> $flag],
+            ['codalu'=>$this->codalu,'codperiodo'=>$codperiodo]);
+    /*Mofiicando latabla Tllerdet*/ 
+    self::updateAll(
+            ['status'=> $flag],
+            ['codalu'=>$this->codalu]);
+    /*Mofiicando latabla Tllerdet*/ 
+     Citas::updateAll(
+            ['activo'=> $flagCita],
+            [
+                'talleresdet_id'=>$this->id,
+              
+              ]);
+     
+              StaResumenasistencias::deleteAll(['codalu'=>$this->codalu]);
+              
+              StaDocuAlu::updateAll(['status'=> $flag], ['talleresdet_id'=> $this->talleres_id]);
+     //$citasid=['1163','1166'];
+     $idExamenes=Examenes::find()->select(['id'])->andWhere(['citas_id'=>$citasid])->column();
+     //var_dump($citasid,Examenes::find()->select(['id'])->andWhere(['citas_id'=>$citasid])->createCommand()->getRawSql());
+     Examenes::updateAll( ['status'=> $flag], ['id'=>$idExamenes]);
+     StaExamenesdet::updateAll(['status'=> $flag], ['examenes_id'=>$idExamenes]);
+     //$transaccion->rollback();
+     //var_dump($citasid,$idExamenes);die();
+     
+   
+   
+     //$this->status=$flag;
+     //$this->save();
+    /* Despuesd e ahacer estas actulizaciones */
+    
+    $transaccion->commit();
+    return true;
+ }else{
+   $this->addError('codalu',yii::t('sta.errors','Sólo puede retirar alumnos en el periodo activo'));
+ }
+   
+}
+
+
+
+
+ public static function except(){
+    return  self::find()->andWhere(['<>','status', Aluriesgo::FLAG_RETIRADO]);
+ }
+ 
+ 
+ public function idCitas(){
+    // VAR_DUMP($this->getCitas()->select(['id']));DIE();
+     return $this->getCitas()->select(['id'])->column();
+ }
+ 
+public function hasPerformedFirstExamen(){
+    /*
+     * Ubicando el flujo id de la primera evaluacion
+     */
+  $haRendido=false;
+    $flujo=Staflujo::find()->andWhere(['examen'=>'1',
+      'codperiodo'=>$this->talleres->codperiodo
+          ])->orderBy('gactividad asc')->one();
+    
+  if(!is_null($flujo)){
+      $flujo_id=$flujo->actividad;
+      //var_dump($flujo_id);
+      /*Filtrando las citas que corresponde a este flujo de primer examen*/
+      $citas=Citas::find()->andWhere([
+          'flujo_id'=>$flujo_id,
+          'asistio'=>'1',
+          'talleresdet_id'=>$this->id
+          ])->all();
+      /*Recorriéndolas y detectando en cual ha redndio examen*/
+      foreach($citas as $cita){
+          //var_dump($cita->numero);
+         if($cita->hasPerformedTest()){
+            // echo "ESTA CITA SI TINENE EXAMEN<BR>";
+             $haRendido=true;
+             break;
+         }
+        }
+     return $haRendido;
+  }else{
+      throw new BadRequestHttpException(yii::t('base.errors','Por favor defina la estructura del fujo de trabajo para la priemra evaluacion'));  
+  }
+  
+}
+ 
+
+
+
+ 
 }

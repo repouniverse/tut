@@ -23,7 +23,7 @@ editableViewInterface
     
     public $dateorTimeFields=['fechaprog'=>self::_FDATETIME,
         'fechaprog1'=>self::_FDATETIME];
-   public $booleanFields=['asistio'];
+   public $booleanFields=['asistio','masivo'];
     public $fechaprog1;
      public $finicio1;
       public $ftermino1;
@@ -55,17 +55,17 @@ editableViewInterface
     public function attributeLabels()
     {
         return [
-            'aptutor' => Yii::t('sta.labels', 'Ap Psicólogo'),
-            'codtra' => Yii::t('sta.labels', 'Psicólogo'),
-            'amtutor' => Yii::t('sta.labels', 'Am Psicólogo'),
-            'nombrestutor' => Yii::t('sta.labels', 'Nombre Psicólogo'),
+            'aptutor' => Yii::t('sta.labels', 'Ap Psic'),
+            'codtra' => Yii::t('sta.labels', 'Psic'),
+            'amtutor' => Yii::t('sta.labels', 'Am Psi'),
+            'nombrestutor' => Yii::t('sta.labels', 'N Psi'),
             'codperiodo' => Yii::t('sta.labels', 'Periodo'),
-            'codalu' => Yii::t('sta.labels', 'Código Alumno'),
+            'codalu' => Yii::t('sta.labels', 'Cód'),
             'ap' => Yii::t('sta.labels', 'Ap Alumno'),
             'am' => Yii::t('sta.labels', 'Am Alumno'),
             'nombres' => Yii::t('sta.labels', 'Nombres'),
-            'codfac' => Yii::t('sta.labels', 'Facultad'),
-            'codcar' => Yii::t('sta.labels', 'Especialidad'),
+            'codfac' => Yii::t('sta.labels', 'Fac'),
+            'codcar' => Yii::t('sta.labels', 'Espec'),
             'id' => Yii::t('sta.labels', 'ID'),
             'talleresdet_id' => Yii::t('sta.labels', 'Talleresdet ID'),
             'talleres_id' => Yii::t('sta.labels', 'Talleres ID'),
@@ -78,6 +78,7 @@ editableViewInterface
             'detalles' => Yii::t('sta.labels', 'Detalles'),
             'codaula' => Yii::t('sta.labels', 'Codaula'),
             'duracion' => Yii::t('sta.labels', 'Duracion'),
+             'flujo_id' => Yii::t('sta.labels', 'Etapa'),
         ];
     }
 
@@ -142,5 +143,13 @@ editableViewInterface
   public function isVencida(){
      $horas=h::gsetting('sta', 'nhorasreprogramacion');
      return $this->toCarbon('fechaprog')->lessThanOrEqualTo(self::CarbonNow()->subHours($horas));
-  }  
+  } 
+   public function nReprogramaciones(){
+       return StaCitaLog::find()->andWhere(['citas_id'=>$this->id])->count();
+     }
+     
+   public function getPrimaryKey($asArray=false){
+       return $this->id;
+   }
+     
 }

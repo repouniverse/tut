@@ -23,7 +23,7 @@ use frontend\modules\sta\helpers\comboHelper;
     
     <div style='overflow:auto;'>
    <?php 
-    Pjax::begin(['id'=>'sumilla']);
+    Pjax::begin(['id'=>'sumilla','timeout'=>false]);
    ////$dataTutores= comboHelper::getCboTutoresByProg($model->id);
    //print_r($dataTutores);die();
    $gridColumns = [
@@ -66,8 +66,13 @@ use frontend\modules\sta\helpers\comboHelper;
     'headerOptions' => ['class' => 'kartik-sheet-style'], 
     'expandOneOnly' => true
 ],                    
-                            
-[  'attribute' => 'cantidad',
+      [  'attribute'=>'Ha',
+                'format'=>'raw',
+                 'value' => function ($model, $key, $index, $column) {
+                     return $model->hallazgo()?"<i style='color:#e42a66; font-size:18px;'><span class='fa fa-robot'></span></i>":"";
+                        },
+                ],                       
+/*[  'attribute' => 'cantidad',
     'format'=>'raw',
     'value' => function ($model, $key, $index, $column) {
                     $options=['id'=>$model->codalu,
@@ -75,7 +80,7 @@ use frontend\modules\sta\helpers\comboHelper;
                                ];
                     return Html::a('<span class="badge badge-danger">'.$model->cantidad.'</span>', '#', $options);
                         }
-],
+],*/
  [  'attribute' => '%Asis',
     'format'=>'raw',
     'value' => function ($model, $key, $index, $column) {
@@ -84,11 +89,14 @@ use frontend\modules\sta\helpers\comboHelper;
 ],
 [  'attribute' => 'ap',
 ],
+        [  'attribute' => 'am',
+],
 [  'attribute' => 'nombres', 
 ],         
 [
                 'attribute'=>'codalu',
                 'format'=>'raw',
+                 'contentOptions'=>['width'=>'300px'],
                 'value' => function ($model, $key, $index, $column) {
                     $options=['id'=>$model->codalu,
                               //'class'=>'class_link_ajax'
@@ -110,9 +118,7 @@ use frontend\modules\sta\helpers\comboHelper;
        [ 
     'attribute' => 'celulares', 
 ],
-                                  [ 
-    'attribute' => 'correo', 
-],
+                                  
 ];
    
    
@@ -144,7 +150,7 @@ use frontend\modules\sta\helpers\comboHelper;
     
 
   
-  <?php    $this->registerJs("
+  <?php $this->registerJs("
          
 $('#boton-refrescar').on( 'click', function(){    
   $.ajax({ 

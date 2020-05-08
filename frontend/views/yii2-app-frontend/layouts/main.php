@@ -21,6 +21,7 @@ use yii\helpers\Html;
     <!DOCTYPE html>
     <html lang="<?= Yii::$app->language ?>">
     <head>
+        <link rel="icon" type="image/ico" href="<?=\yii\helpers\Url::home()?>img/psico.ico" />  
           <meta charset="<?= Yii::$app->charset ?>"/>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <?= Html::csrfMetaTags() ?>
@@ -79,12 +80,13 @@ echo ModalAjax::widget([
     'options' => [ // you can add js options here, see noty plugin page for available options
         'dismissQueue' => true,
         'layout' => 'center',
-        'theme' => 'relax',
+        'theme' => 'metroui',
         'animation' => [
             'open' => 'animated flipInX',
             'close' => 'animated flipOutX',
         ],
-        'timeout' => false,
+        'timeout' =>1000, //false para que no se borre
+        'progressBar'=>true,
     ],
     'enableSessionFlash' => true,
     'enableIcon' => true,

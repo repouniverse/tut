@@ -10,10 +10,12 @@ use yii\helpers\ArrayHelper;
 use common\models\masters\Valoresdefault;
 use mdm\admin\models\User;
 class h {
+     const SESION_MALETIN = 'maletin';
      const DATE_FORMAT = 'php:Y-m-d';
     const DATETIME_FORMAT = 'php:Y-m-d H:i:s';
     const TIME_FORMAT = 'php:H:i:s';   
-  
+   const FLAG_ACTIVE = '1'; 
+    const FLAG_INACTIVE = '0'; 
 
     public static function convert($dateStr, $type='date', $format = null) {
         if ($type === 'datetime') {
@@ -48,8 +50,19 @@ class h {
         return yii::$app->user;
     }
     
-    public static function  userId(){
-        return yii::$app->user->identity->id;
+    public static function  userId($username=null){
+      if(!is_null($username)){
+          $registro=User::findByUsername($username);
+       // User::find()->where(['username'=>trim($username)])->one();
+       if(!is_null($registro)){
+           return $registro->id;
+       }else{
+           return null;
+       }
+      }else{
+        return yii::$app->user->identity->id;  
+      }
+        
     }
     public static function  userName(){
         //var_dump(yii::$app->user->isGuest);die();

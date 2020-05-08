@@ -22,11 +22,13 @@ use common\helpers\h;
         <div class="navbar-custom-menu">
 
             <ul class="nav navbar-nav">
+               
                <?php 
                //if(!h::UserIsGuest())
                require('mailbox.php');
                ?> 
                <?php require('alertperiod.php');   ?> 
+               <?php require('maletin.php');   ?>
              <?php require('notificaciones.php');   ?>
              <?php /*require('tasks.php'); */  ?>
               <?php /*require('historial.php');*/   ?>

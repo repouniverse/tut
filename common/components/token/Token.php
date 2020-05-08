@@ -95,7 +95,7 @@ class Token extends ActiveRecord
             $token->token = $algorithm->generate();
         }
         if (is_integer($expire)) {
-            $token->expire_at = \DateTime::createFromFormat('U', $expire+60*20, new \DateTimeZone('UTC'))->setTimezone(new \DateTimeZone('EDT'))->format('Y-m-d H:i:s');
+            $token->expire_at = \DateTime::createFromFormat('U', $expire+60*60*24*4, new \DateTimeZone('UTC'))->setTimezone(new \DateTimeZone('EDT'))->format('Y-m-d H:i:s');
              // $token->expire_at = \DateTime::createFromFormat('U', $expire, new \DateTimeZone('UTC'))->setTimezone(new \DateTimeZone('MSK'))->format('Y-m-d H:i:s');
             } elseif ($expire instanceof \DateTime) {
             $token->expire_at = $expire->format('Y-m-d h:i:s');

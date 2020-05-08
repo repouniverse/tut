@@ -9,6 +9,7 @@
  */
 namespace frontend\modules\sta\helpers;
 use common\helpers\ComboHelper as Combito;
+use common\helpers\h;
 use yii\helpers\ArrayHelper;
 class comboHelper extends Combito
 {
@@ -155,6 +156,42 @@ return ArrayHelper::map( \frontend\modules\sta\models\StaFlujo::find()->
     }       
 return ArrayHelper::map( \frontend\modules\sta\models\StaFlujo::find()-> 
       where(['codperiodo'=>$codperiodo])->all(),
+            'id','proceso'); 
+    }
+    
+  public static function geCboCorreosProgramas($codfac=null,$codperiodo=null){
+    if(is_null($codfac)){
+        $facultades=h::user()->getFacultades();
+    }else{
+       $facultades=$codfac; 
+    }
+    if(is_null($codperiodo)){
+        $codperiodo= \frontend\modules\sta\staModule::getCurrentPeriod();
+    }
+     return ArrayHelper::map( \frontend\modules\sta\models\Talleres::find()-> 
+      where(['codfac'=>$facultades,'codperiodo'=>$codperiodo])->all(),
+            'correo','correo'); 
+    } 
+ 
+    public  static function getCboCategorias(){
+      return [
+      \frontend\modules\sta\models\StaPercentiles::CALIFICACION_ALTO=>\frontend\modules\sta\models\StaPercentiles::CALIFICACION_ALTO,
+          \frontend\modules\sta\models\StaPercentiles::CALIFICACION_BAJO=>\frontend\modules\sta\models\StaPercentiles::CALIFICACION_BAJO,
+      \frontend\modules\sta\models\StaPercentiles::CALIFICACION_PROMEDIO=>\frontend\modules\sta\models\StaPercentiles::CALIFICACION_PROMEDIO,    
+      ];
+    }
+  public  static function getCboIndicadores($codbateria){
+      return ArrayHelper::map(\frontend\modules\sta\models\StaTestindicadores::find()-> 
+      where(['codbateria'=>$codbateria])->all(),
+            'id','nombre'); 
+    }
+    
+     public static function getCboFlujoByIds($ids,$codperiodo=null){
+    if(is_null($codperiodo)){
+         $codperiodo=\frontend\modules\sta\staModule::getCurrentPeriod();
+    }       
+return ArrayHelper::map( \frontend\modules\sta\models\StaFlujo::find()-> 
+      where(['codperiodo'=>$codperiodo,'actividad'=>$ids])->all(),
             'id','proceso'); 
     }
 }

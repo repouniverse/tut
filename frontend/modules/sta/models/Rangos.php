@@ -115,13 +115,16 @@ class Rangos extends \common\models\base\modelBase
     
   public function Range(\Carbon\Carbon $fecha ){
       $diaWeekOriginal=$fecha->weekDay();
-      $diaWeekHoy=
-      var_dump($fecha);
-      var_dump($fecha->parse($this->hinicio));
-      var_dump($fecha->parse($this->hfin));
+     // $carbonInicio=$fecha->copy()->endOfDay()->subHours(24)->parse;
+       $carbonInicio=$fecha->copy()->parse($this->hinicio);
+       $carbonFinal=$fecha->copy()->parse($this->hfin);
+     // $diaWeekHoy=
+      /*var_dump($fecha);
+      /*var_dump($fecha->parse($this->hinicio));
+      /*var_dump($fecha->parse($this->hfin));*/
       $rango=New RangeDates([
-             $fecha->parse($this->hinicio),
-            $fecha->parse($this->hfin)
+              $carbonInicio,
+            $carbonFinal
         ]);
       RETURN $rango;
   }  

@@ -24,8 +24,7 @@ use common\helpers\h;
             <div class="form-group no-margin">
                 
         <?= Html::submitButton("<span class='glyphicon glyphicon-floppy-disk'></span>".Yii::t('sta.labels', 'Guardar'), ['class' => 'btn btn-success']) ?>
-            
-
+          
            
             
             </div>

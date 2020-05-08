@@ -7,7 +7,7 @@ $params = array_merge(
 );
 
 return [
-    'name'=>'Tutoría ',
+    'name'=>'Tutoría_Psicológica_R',
     'sourceLanguage' => 'en',
     'id' => 'frontend',
     'basePath' => dirname(__DIR__),
@@ -28,15 +28,21 @@ return [
 		'tableName' => '{{%attachments}}' // Optional, default to 'attach_file'
 	],
         
+        'avisos' => [
+            'class' => 'frontend\modules\avisos\Module',
+        ],
+           
 	
 ],
     
         
-    
+   
     
     
     'components' => [
-        
+         'mailer' =>['class'=>'common\components\Mailer',
+                'viewPath'=>'@frontend/mail',
+            ],
        'formatter' => [
         'class' => 'yii\i18n\Formatter',
         'nullDisplay' => '',
@@ -133,7 +139,7 @@ return [
         'allowActions' => [
             'site/login/',
             'site/clear-cache/',
-            'site/signup',
+           // 'site/signup',
              'site/request-password-reset',
             'site/reset-password', 
            'site/logout',

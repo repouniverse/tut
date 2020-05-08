@@ -1,13 +1,13 @@
 <?php
 
 namespace frontend\modules\sta\models;
-use frontend\modules\sta\components\ActiveQueryScope;
+use frontend\modules\sta\components\ActiveQueryStatus;
 /**
  * This is the ActiveQuery class for [[Examenes]].
  *
  * @see Examenes
  */
-class ExamenesQuery extends ActiveQueryScope
+class ExamenesQuery extends ActiveQueryStatus
 {
     /*public function active()
     {
@@ -23,6 +23,9 @@ class ExamenesQuery extends ActiveQueryScope
         return parent::all($db);
     }
 
+    public function WithRetired(){
+        return  $this->orWhere(['status'=> Aluriesgo::FLAG_RETIRADO]);
+    }
     /**
      * {@inheritdoc}
      * @return Examenes|array|null

@@ -28,7 +28,7 @@
          <?php /*$url= \yii\helpers\Url::to(['agrega-examen','id'=>$model->id,'gridName'=>'grilla-examenes','idModal'=>'buscarvalor']);*/?>
        <?php /* echo ($model->asistio)?\yii\helpers\Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Agregar evaluacion'), ['href' => $url,'id'=>'btn-add-test','class' => 'botonAbre btn btn-warning']):''*/?>
          <?php /*echo ($model->asistio)?\yii\helpers\Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Refrescar Preguntas'), ['id'=>'boton_bateria','class' => 'btn btn-warning']):''*/?> 
- <?=($model->asistio && !$vencida)?\yii\helpers\Html::button('<span class="fa fa-envelope"></span>   '.Yii::t('sta.labels', 'Notificar'), ['id'=>'boton_notifica','class' => 'btn btn-warning']):''?>  
+ <?=($model->asistio &&  !$vencida)?\yii\helpers\Html::button('<span class="fa fa-envelope"></span>   '.Yii::t('sta.labels', 'Notificar'), ['id'=>'boton_notifica','class' => 'btn btn-warning']):''?>  
             <?php Pjax::end(); ?>
                </div>
                 </div>

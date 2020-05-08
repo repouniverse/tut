@@ -141,7 +141,7 @@ class AlumnosController extends baseController
     {
         $model = new Alumnos();
 if (h::request()->isAjax && $model->load(h::request()->post())) {
-                h::response()->format = Response::FORMAT_JSON;
+                h::response()->format = \yii\web\Response::FORMAT_JSON;
                 return ActiveForm::validate($model);
         }
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -223,7 +223,7 @@ if (h::request()->isAjax && $model->load(h::request()->post())) {
        if(is_null($taller) ){
              return $this->render('_nohayprograma',['model'=>$model,'codperiodo'=>$codperiodo]);
        }ELSE{
-         $modelTallerdet= \frontend\modules\sta\models\Talleresdet::find()->where(['codalu'=>$model->codalu,'talleres_id'=>$taller->id])->one();
+         $modelTallerdet= \frontend\modules\sta\models\Talleresdet::except()->where(['codalu'=>$model->codalu,'talleres_id'=>$taller->id])->one();
           if(is_null($modelTallerdet) ){
                 return $this->render('_nohayprograma',['model'=>$model,'codperiodo'=>$codperiodo]);
        
@@ -272,6 +272,7 @@ if (h::request()->isAjax && $model->load(h::request()->post())) {
    
   public function actionIncorporar(){
       $model= new Aluriesgo();
+      
       $model->codperiodo= staModule::getCurrentPeriod();
       $model->setScenario($model::SCENARIO_REGISTER);
        
@@ -282,14 +283,18 @@ if (h::request()->isAjax && $model->load(h::request()->post())) {
         }
         
         
-        
         if ($model->load(h::request()->post()) && $model->save()) {
-            return $this->redirect(['alumnos-riesgo']);
+             Yii::$app->session->setFlash('success',yii::t('sta.labels','Se ha efectuado el ingreso'));
+            return $this->redirect(['programas/update','id'=> \frontend\modules\sta\models\Talleres::CurrentProgramaId( h::user()->getFirstFacultad())]);
+          
+            //return $this->redirect(['alumnos-riesgo']);
+           
            // return $this->redirect(['incorporados', 'id' => $model->id]);
         }
 
         return $this->render('crea_reincorporado', [
             'model' => $model,
+            'verbo'=>'Reincorporación'
         ]);
   } 
    
@@ -309,6 +314,7 @@ if (h::request()->isAjax && $model->load(h::request()->post())) {
         
         
         
+        
         if ($model->load(h::request()->post()) && $model->save()) {
             return $this->redirect(['alumnos-riesgo']);
         }
@@ -317,4 +323,89 @@ if (h::request()->isAjax && $model->load(h::request()->post())) {
             'model' => $model,
         ]);
   } 
+  
+  public function actionAgregarRiesgo(){
+      $model= new Aluriesgo();
+      
+      $model->codperiodo= staModule::getCurrentPeriod();
+      $model->setScenario($model::SCENARIO_REGISTER_NORMAL);
+       
+      if (h::request()->isAjax && $model->load(h::request()->post())) {
+         // var_dump($model->codfac);DIE();
+                h::response()->format = \yii\web\Response::FORMAT_JSON;
+                return \yii\widgets\ActiveForm::validate($model);
+        }
+        
+        
+        if ($model->load(h::request()->post()) && $model->save()) {
+             Yii::$app->session->setFlash('success',yii::t('sta.labels','Se ha efectuado el ingreso'));
+            return $this->redirect(['programas/update','id'=> \frontend\modules\sta\models\Talleres::CurrentProgramaId( h::user()->getFirstFacultad())]);
+           }
+
+        return $this->render('crea_reincorporado', [
+            'model' => $model,
+            'verbo'=>'Adicional'
+        ]);
+  } 
+  
+  public function actionRetiraDelPrograma($id){
+     $registro= \frontend\modules\sta\models\Talleresdet::findOne($id);
+       if(!is_null($registro)){
+           $model=New \frontend\modules\sta\models\StaRetiros();
+           $model->tallerdet_id=$id;
+           $model->codalu=$registro->codalu;
+           $model->estado=$model::STATUS_ACTIVO;
+           $model->codocu=$model::CODIGO_DOC;
+           $model->codfac=$registro->talleres->codfac;
+            if (h::request()->isAjax && $model->load(h::request()->post())) {
+          
+                h::response()->format = \yii\web\Response::FORMAT_JSON;
+                return \yii\widgets\ActiveForm::validate($model);
+             }
+        
+       
+        if ($model->load(h::request()->post()) && $model->save()) {
+             Yii::$app->session->setFlash('success',yii::t('sta.labels','Se ha efectuado el retiro, pero si lo deseas puedes reforzar el retiro ocn algún documento'));
+            return $this->redirect(['update-retira-del-programa','id'=>$model->id]);
+           }
+        return $this->render('crea_retiro', [
+            'model' => $model,
+            //'verbo'=>'Adicional'
+        ]);        
+                   
+       }
+  }
+  
+  
+  public function actionUpdateRetiraDelPrograma($id){
+     $model= \frontend\modules\sta\models\StaRetiros::findOne($id);
+       if(!is_null($model)){          
+            if (h::request()->isAjax && $model->load(h::request()->post())) {
+         // var_dump($model->codfac);DIE();
+                h::response()->format = \yii\web\Response::FORMAT_JSON;
+                return \yii\widgets\ActiveForm::validate($model);
+             }
+        
+        if ($model->load(h::request()->post()) && $model->save()) {
+             Yii::$app->session->setFlash('success',yii::t('sta.labels','Se ha efectuado el retiro'));
+            return $this->redirect(['programas/update','id'=>$model->tallerdet->talleres->id]);
+           }
+        return $this->render('crea_retiro', [
+            'model' => $model,
+            //'verbo'=>'Adicional'
+        ]);        
+                   
+       }
+  }
+                   
+   public function actionRetiros(){
+       $searchModel = new \frontend\modules\sta\models\StaVwRetirosSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('retiros', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+   }      
+  
 }

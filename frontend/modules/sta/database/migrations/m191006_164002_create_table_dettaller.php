@@ -25,6 +25,7 @@ if(!$this->existsTable($table)) {
         'detalles'=>$this->text()->append($this->collateColumn()),
          'codtra'=>$this->string(6)->append($this->collateColumn()),
           'codfac'=>$this->string(8)->append($this->collateColumn()),
+          'status'=>$this->char(1)->append($this->collateColumn()),
          
          
         ],$this->collateTable());

@@ -2,6 +2,7 @@
 
 namespace frontend\modules\sta\models;
 use common\traits\timeTrait;
+use common\behaviors\AccessDownloadBehavior;
 use Yii;
 use common\interfaces\rangeInterface;
 use common\helpers\RangeDates;
@@ -10,6 +11,7 @@ use common\models\masters\Trabajadores;
 use frontend\modules\sta\staModule;
 use frontend\modules\sta\models\Rangos;
 use common\helpers\timeHelper;
+use common\behaviors\FileBehavior;
 use yii\helpers\Url;
 /**
  * This is the model class for table "{{%sta_citas}}".
@@ -99,10 +101,12 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
    public function behaviors()
          {
                 return [
-		
-		/*'fileBehavior' => [
-			'class' => '\frontend\modules\attachments\behaviors\FileBehaviorAdvanced' 
-                               ],*/
+		'AccessDownloadBehavior' => [
+			'class' => AccessDownloadBehavior::className()
+		],
+		'fileBehavior' => [
+			'class' => FileBehavior::className()
+		],
                     'auditoriaBehavior' => [
 			'class' => '\common\behaviors\AuditBehavior' ,
                                ],
@@ -116,11 +120,11 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
     public function scenarios()
     {
         $scenarios = parent::scenarios(); 
-        $scenarios[self::SCE_CREACION_BASICA] = ['talleres_id','talleresdet_id','duracion','fechaprog','codfac','codtra','asistio','masivo','flujo_id'];
+        $scenarios[self::SCE_CREACION_BASICA] = ['talleres_id','talleresdet_id','duracion','fechaprog','codfac','codtra','asistio','masivo','flujo_id','codaula','codocu'];
         $scenarios[self::SCENARIO_ASISTIO] = ['asistio'];
           $scenarios[self::SCENARIO_PSICO] = ['codtra'];
          $scenarios[self::SCENARIO_ACTIVO] = ['activo'];
-          $scenarios[self::SCENARIO_REPROGRAMA] = ['fechaprog','duracion','finicio','ftermino'];
+          $scenarios[self::SCENARIO_REPROGRAMA] = ['fechaprog','duracion','finicio','ftermino','codtra'];
         return $scenarios;
     }
     
@@ -182,14 +186,14 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
     public function rules()
     {
         return [
-            [['talleresdet_id', 'talleres_id', 'codtra','fechaprog', 'finicio', 'ftermino'], 'required'],
+            [['talleresdet_id', 'talleres_id', 'codtra','fechaprog', 'finicio', 'ftermino','flujo_id'], 'required'],
             [['talleresdet_id', 'talleres_id', 'duracion'], 'integer'],
             [['detalles'], 'string'],
              [['detalles_secre','detalles_tareas_pend','detalles_indicadores','duracion','codfac','asistio','activo','numero','masivo'], 'safe'],
             
             [['fechaprog', 'finicio', 'ftermino'], 'string', 'max' => 19],
             ['fechaprog', 'validateDispo'],
-                [['masivo','flujo_id'], 'safe'],
+                [['masivo','flujo_id','codaula','codocu'], 'safe'],
             [['codtra'], 'string', 'max' => 6],
             [['fingreso', 'codaula'], 'string', 'max' => 10],
             [['fechaprog','duracion','finicio','ftermino'],'safe','on'=>self::SCENARIO_REPROGRAMA],
@@ -242,6 +246,11 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
     {
         return $this->hasOne(Talleres::className(), ['id' => 'talleres_id']);
     }
+    
+     public function getFlujo()
+    {
+        return $this->hasOne(StaFlujo::className(), ['id' => 'flujo_id']);
+    }
 
     /**
      * @return \yii\db\ActiveQuery
@@ -259,8 +268,17 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
         return $this->hasMany(Examenes::className(), ['citas_id' => 'id']);
     }
     
-     
+     public function getLog()
+    {
+        return $this->hasMany(StaCitaLog::className(), ['citas_id' => 'id']);
+    }
 
+    public function getIndicadores()
+    {
+        return $this->hasMany(StaCitaIndicadores::className(), ['citas_id' => 'id']);
+    }
+    
+    
     /**
      * {@inheritdoc}
      * @return CitasQuery the active query used by this AR class.
@@ -277,6 +295,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
     public function beforeSave($insert) {
        if($insert){            
           $this->resolveDuration();
+          $this->codocu='150';
           if(is_null($this->asistio) or $this->asistio=='0')
            $this->asistio=false;
           $this->activo=true;
@@ -419,23 +438,34 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
      */
     public function isInJourney(){
         try{
-          $registroRango=$this->horarioToday()->Range($this->toCarbon('fechaprog'));
-          var_dump($registroRango);
+          $registroRango=$this->horarioToday();//->Range($this->toCarbon('fechaprog'));
+         
+          
         } catch (Exception $ex) {
            $this->addError('fechaprog',
           yii::t('sta.errors','Fecha de programación fuera del intervalo permitido'));  
             return false;
         }
+        $carbon=$this->toCarbon('fechaprog');
+         $hinicio=$registroRango->hinicio;
+        $hfinal=$registroRango->hfin;
+         $segundosPasadosInicio=$carbon->copy()->parse($hinicio)->diffInSeconds($carbon->copy()->parse($hinicio)->startOfDay());
+         $segundosPasadosFin=$carbon->copy()->parse($hfinal)->diffInSeconds($carbon->copy()->parse($hinicio)->startOfDay());
+         $carbonInicio= $carbon->copy()->startOfDay()->addSeconds($segundosPasadosInicio);
+         $carbonFinal= $carbon->copy()->startOfDay()->addSeconds($segundosPasadosFin);
+         
+       
         
-         if(!$this->isRangeIntoOtherRange(
+         
+         if($this->isRangeIntoOtherRange(
                $this->range(),
-               $registroRango
+               New RangeDates([$carbonInicio,$carbonFinal])
                )){
-           $this->addError('fechaprog',
-          yii::t('sta.errors','La cita no está dentro del horario predefinido')); 
-           return false;
+          /* $this->addError('fechaprog',
+          yii::t('sta.errors','La cita no está dentro del horario predefinido; revise su horario de atención')); 
+          */ return TRUE;
                }
-         return true;
+         return FALSE;
     }
     
     /*DEVUELVE el grupo de rangos en ese dia */
@@ -460,7 +490,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
         if($this->isHolyDay($this->toCarbon('fechaprog'))){
            // ECHO "Sie s feriado ";DIE();
          // $this->addError('fechaprog',yii::t('sta.errors','El día programado es no laborable'));
-         return false;
+         return true;
         }else{
          // ECHO "NO es hliday ";DIE(); 
         }
@@ -750,18 +780,21 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
            $this->addError('asistio',yii::t('sta.errors','Esta cita ya está vencida'));
               return false; 
               
-        }
-        
-         if($this->toCarbon('fechaprog')->greaterThan(self::CarbonNow())){
+        }        
+         if($this->toCarbon('fechaprog')->greaterThan(self::CarbonNow()->addHours(1))){
              $this->addError('asistio',yii::t('sta.errors','La fecha programada está en el futuro'));
               return false; 
-             }
-       
+             }       
         return true;    
     }
+    
     public function canRevertAsistencia(){
         //SE PEUDE REVERTIR LA ASISTENCIA
         //Si no se ha enera
+    }
+    
+    public function hasExamenes(){
+        return ($this->getExamenes()->count() > 0)?true:false;
     }
     
     /*Si tiene el banoc de preguntyas comleto */
@@ -771,8 +804,9 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
            if($examen->getExamenesDet()->count()==0){
               $complete=false;break; 
            }
-         return $completo;  
+           
         }
+        return $completo;
        //return $this->isBateriaCompleta();
     }
     
@@ -796,7 +830,12 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
   }
   
   public function isVencida(){
-     $horas=h::gsetting('sta', 'nhorasreprogramacion');
+    if($this->flujo_id==1){
+        $horas=750;
+    }else{
+       $horas=h::gsetting('sta', 'nhorasreprogramacion'); 
+    }
+     
      return $this->toCarbon('fechaprog')->lessThanOrEqualTo(self::CarbonNow()->subHours($horas));
   }
   /*
@@ -807,23 +846,46 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
   public function reprograma($fechaInicio,$fechaTermino=null){
      // yii::error($this->asistio);
       //yii::error($this->isVencida());
+      $oldFecha=$this->fechaprog;
       
+   /*Si  se trata de un evento no se puede reprogramar*/
+   if($this->flujo->esevento){
+      $this->addError('fechaprog',yii::t('sta.errors','Esta cita no puede reprogramarse, se trata de una cita dentro de un evento'));                          
+        return false;                   
+   }
     if(!$this->asistio && !$this->isVencida()){
+      // if(true){  
+       if(!($fechaInicio instanceof \Carbon\Carbon)){
         $CfechaInicio= \Carbon\Carbon::createFromFormat(\common\helpers\timeHelper::formatMysql(),$fechaInicio);
-        if(!is_null($fechaTermino)){
+        }else{
+        $CfechaInicio= $fechaInicio;   
+        }
+         if(!is_null($fechaTermino)){
           $CfechaTermino= \Carbon\Carbon::createFromFormat(\common\helpers\timeHelper::formatMysql(),$fechaTermino);        
           $this->duracion=$CfechaTermino->diffInMinutes($CfechaInicio); 
         }
-          //var_dump($CfechaInicio->format($this->formatToCarbon(self::_FDATETIME)));die();    
+          //var_dump($CfechaInicio->format($this->formatToCarbon(self::_FDATETIME)));die();
+        
+         $codigotra=$this->taller->psicologoPorDia($CfechaInicio);
+              
+        
         $this->fechaprog=$CfechaInicio->format($this->formatToCarbon(self::_FDATETIME));
         $this->finicio=$this->fechaprog;
+        $this->codtra=($codigotra)?$codigotra:$this->codtra;
         $this->ftermino=$CfechaInicio->addMinutes($this->duracion)->format($this->formatToCarbon(self::_FDATETIME));
                     $oldScenario=$this->getScenario();
+                    
+        
+                       
                         $this->setScenario(self::SCENARIO_REPROGRAMA);
+                            $this->registraLog($oldFecha);
                             $grabo=$this->save();
-                            if(h::gsetting('sta','notificacitasmail'))
-                            $this->enviacorreo(false); //notiifcacion depreprogramcion
-                      if(!$grabo){
+                           
+                            if(h::gsetting('sta','notificacitasmail')){
+                              $this->enviacorreo(false); //notiifcacion depreprogramcion
+                      
+                            }
+                              if(!$grabo){
                           $this->addError('fechaprog',yii::t('sta.errors',$this->getFirstError()));                          
                           return false;
                       }                       
@@ -844,13 +906,39 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
   
   public function validateDispo($attribute, $params)
     {
-      IF($this->esFeriado()){
+      /*lA FECHA NOPÙED ECAER EN UNDOMINGO O  FERIADO*/
+      IF($this->esFeriado()){         
         $this->addError('fechaprog',yii::t('sta.errors','La fecha se encuentra en un día no laborable'));
+         RETURN;
+        }
+        /*Fecha de inicio no pued ser mayoa fecha final */  
+        if(!$this->isNewRecord){
+          if($this->toCarbon('finicio')->greaterThan($this->toCarbon('ftermino'))){
+          $this->addError('finicio',yii::t('sta.errors','La fecha de inicio es mayor que la fecha de termino '));
+         RETURN;   
+          }  
+        }
+      /* if($this->toCarbon('finicio')->greaterThan($this->toCarbon('ftermino'))){
+        $this->addError('finicio',yii::t('sta.errors','La fecha de inicio es mayor que la fecha de termino '));
+         RETURN;   
+       }*/
+           
+       /*No puedne crearse ni reporgramarse citas en el pasado */      
+          if($this->isNewRecord && $this->toCarbon('fechaprog')->lt(self::CarbonNow()->subSeconds(10))){
+             
+              /*PERO HAY UNA EXCEPCION CON LAS CITAS DE LOS EVENTOS 
+               * QUE CONRLAN ASISTENCIA EXTEMPORANEAMENTE
+               */
+              IF(!$this->flujo->esevento){
+                $this->addError('fechaprog',yii::t('sta.errors','La fecha programada está en el pasado'));
+                }
+             RETURN ;   
           }
-       if(!$this->isNewRecord){
-           if($this->toCarbon('finicio')->greaterThan($this->toCarbon('ftermino')))
-           $this->addError('finicio',yii::t('sta.errors','La fecha de inicio es mayor que la fecha de termino '));
-    
+          
+          
+          
+      /* if(!$this->isNewRecord){
+          
            if($this->toCarbon('finicio')->lt($this->toCarbon('fechaprog')->subHours(1)))
            $this->addError('finicio',yii::t('sta.errors','La fecha de inicio debe ser mayor que la fecha de programacion'));
            
@@ -861,12 +949,15 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
                 $this->addError('fechaprog',yii::t('sta.errors','La fecha programada se encuentra {atraso} horas atrasadas, la tolerancia es {horas}',['atraso'=>$horasAtraso,'horas'=>h::gsetting('sta', 'nhorasreprogramacion')]));   
               } 
            }
+       * */
+       
        //if($this->isVencida())
        //$this->addError('fechaprog',yii::t('sta.errors','La cita se encuentra en el pasado, es mejor que cree una nueva')); 
      //if($this->asistio)
        //$this->addError('fechaprog',yii::t('sta.errors','Esta cita ya tiene asistencia')); 
-     
-           
+    if(!$this->isInJourney())
+    $this->addError('fechaprog',yii::t('sta.errors','Está fuera del horario predefinido')); 
+          
            } 
           
           
@@ -896,7 +987,8 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
             'codfac'=>$this->codfac,
             'user_id'=>h::userId(),
             'reporte_id'=> staModule::REPORTE_TEST,
-            'virtual'=>'1'
+            'virtual'=>'1',
+            'status'=> Aluriesgo::FLAG_NORMAL,
         ];
         $verifyAttributes=[ 'citas_id'=>$this->id,
             'codtest'=>$codtest,];
@@ -908,7 +1000,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
       if(is_null($idCita)){
           $idCita=$this->id;
       }
-       return Examenes::find()->select(['id'])
+     return Examenes::find()->select(['id'])
                 ->andWhere(['citas_id'=>$idCita])->column(); 
     
     }
@@ -922,6 +1014,8 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
      * por correo */
     
   public function isBateriaCompleta(){
+     /* var_dump(StaExamenesdet::find()->andWhere(['valor'=>null])->
+      andWhere(['examenes_id'=>$this->examenesId()])->createCommand()->getRawSql());die();
     /*yii::error(StaExamenesdet::find()->andWhere(['valor'=>null])->
       andWhere(['examenes_id'=>$this->examenesId()])->createCommand()->getRawSql());
     */return  !StaExamenesdet::find()->andWhere(['valor'=>null])->
@@ -947,8 +1041,9 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
    * segun las respuestas
    */
   public function makeResultados(){
+      $codperiodo=$this->tallerdet->talleres->codperiodo;
       foreach($this->examenes as $examen){
-          $examen->makeResultados();
+          $examen->makeResultados($codperiodo);
       }
      return true;
   }
@@ -994,12 +1089,13 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
      $link= Url::to(['/sta/citas/examen-banco','id'=>$this->id,'token'=>$token->token],true);
         $mailer = new \common\components\Mailer();
         $message =new  \yii\swiftmailer\Message();
-            $message->setSubject('Notificación de Examen')
-            ->setFrom(['neotegnia@gmail.com'=>'Tutoría UNI'])
+            $message->setSubject('Evaluación Psicológica - Tutoría')
+           ->setFrom([\common\helpers\h::gsetting('mail', 'userservermail')=>'Oficina Tutoría Psicológica UNI'])
             ->setTo($alumno->correo)
-            ->SetHtmlBody("Buenas Tardes".  $alumno->fullName()." <br>"
+            ->SetHtmlBody("Buenas Tardes   ".  $alumno->fullName()." <br>"
+               //->SetHtmlBody("Buenas Tardes   ALUMNO XXXX XXX XXXX  <br>"     
                     . "La presente es para notificarle que tienes "
-                    . "una examen  programado. <br> Presiona el siguiente link "
+                    . "una examen VIRTUAL programado. <br> Presiona el siguiente link "
                     . "para acceder a la prueba: <br>"
                     . "    <a  href=\"".$link."\" >Presiona aquí </a>");
            
@@ -1038,7 +1134,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
                     . "una cita  ".strtolower($verbo)." por la OFICINA DE TUTORÍA PSICOLÓGICA. De tu facultad<br> "
                     . "Cuándo : ".$this->fechaprog."<br>"
                    // . "Profesional a Cargo :  ".$psicologo."  <br><br>"
-                    . "Contamos con tu presencia <br>"
+                    . "Contamos con tu valioso tiempo <br>"
                     . "Muchas Gracias por tu atención.");
            $repsonderA=$this->taller->listMailsFromTutores();
           if(count($repsonderA)>0){
@@ -1092,56 +1188,141 @@ class Citas extends \common\models\base\modelBase implements rangeInterface
        return true;  
      }      
  } 
+ 
+ 
+ public function previousWithoutEvento(){
+     /*var_dump(static::find()->andWhere(['talleresdet_id'=>$this->talleresdet_id,
+         'masivo'=>'0'])->
+         andWhere(['<','fechaprog',$this->swichtDate('fechaprog',true)])
+             ->createCommand()->getRawSql());die();*/
+     return static::find()->andWhere(['talleresdet_id'=>$this->talleresdet_id,
+         'masivo'=>'0'])->
+         andWhere(['<','fechaprog',$this->swichtDate('fechaprog',true)])->
+            one();
+ }
  /* Esta funcion es muy importante porque 
   * identifica la etapa en la que debe de estar la cita
   * De acuerdo al flujo de trabajo 
   * tabla sta_flujo
   */
+ 
+ 
  public function obtenerEtapaId($idEtapa=null){
       $codperiodo=  staModule::getCurrentPeriod();
-  if(is_null($idEtapa)){      
-        $actual=static::find()->select('max(flujo_id)')->andWhere(
+      if(h::userId()==7){
+      $previo=$this->previousWithoutEvento();
+     
+      if(!is_null($previo)){
+          if($previo->asistio){
+              return $previo->flujo->nextActividad($this->tallerdet->talleres->codperiodo)->actividad;
+          }else{
+              if($previo->isVencida()){
+                return  $previo->obtenerEtapaId();
+              }else{
+                  return $previo->flujo->nextActividad($this->tallerdet->talleres->codperiodo)->actividad; 
+              }
+          }
+      }else{
+          
+         return  StaFlujo::firstRecord($this->tallerdet->talleres->codperiodo)->actividad;
+      }
+      die();
+      }
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      /*Consulta para verificar que hay citas 
+       * con asistencia y que no son eventos 
+       */
+      $queryFilter=static::find()->andWhere(
                 [
                 'talleresdet_id'=>$this->talleresdet_id,
                 'asistio'=>'1',
                 'masivo'=>'0'
-                ])->scalar();
-        if($actual===false){
-            return StaFlujo::firstRecord($codperiodo)->actividad;
-            }else{
-                if(is_null($actual)) 
+                ]);
+      
+      
+      
+      
+   
+    //yii::error($queryFilter->createCommand()->getRawSql ());
+    // $horas=h::gsetting('sta', 'nhorasreprogramacion');
+  if(is_null($idEtapa)){      
+        $actual= $queryFilter->/*orWhere(['and',
+                'talleresdet_id='.$this->talleresdet_id,
+                "asistio='0'",
+                "masivo='0'",
+      "fechaprog >'".self::CarbonNow()->subHours(5)->format(\common\helpers\timeHelper::formatMysqlDateTime())."'"              
+            ])->*/
+        select('max(flujo_id)')->scalar();
+       /* yii::error($queryFilter->orWhere(['and',
+                'talleresdet_id='.$this->talleresdet_id,
+                "asistio='0'",
+                "masivo='0'",
+      "fechaprog >'".self::CarbonNow()->subHours(5)->format(\common\helpers\timeHelper::formatMysqlDateTime())."'"              
+            ])->
+        select('max(flujo_id)')->createCommand()->getRawSql());*/
+      yii::error('El valor actual es ');
+      yii::error($actual);
+        if($actual===false or is_null($actual)){ 
+             yii::error('Chispas es nulo o es falso ');
+             yii::error('retornando StaFlujo::firstRecord($codperiodo)->actividad ');
+             yii::error(StaFlujo::firstRecord($codperiodo)->actividad);
                      return StaFlujo::firstRecord($codperiodo)->actividad;
             }
+     
+     $queryFlujo=StaFlujo::find()->where([
+      'codperiodo'=>$codperiodo,
+      'actividad'=>$actual, 
+       'esevento'=>'0' 
+           ]);
+     yii::error('queryFuljo');
+       yii::error($queryFlujo->createCommand()->getRawSql());
+     //echo $queryFlujo->createCommand()->getRawSql();die();
+    // var_dump($queryFlujo->one()->attributes);
   //Ahora verificamos que esta fase haya cumplido 
   // con todas las citas 
-  $cuantashay=static::find()->andWhere(
-    [
-        'talleresdet_id'=>$this->talleresdet_id,
-        'asistio'=>'1',
-        'flujo_id'=>$actual,
-         'masivo'=>'0' 
-    ])->count();
-  $cuantashay=$cuantashay+0;
- 
-  $cuantasDebeHaber=StaFlujo::find()->select(['nsesiones'])->where([
-      'codperiodo'=>$codperiodo,
-      'actividad'=>$actual,      
-  ])->scalar();
+  $cuantashay=(integer)$queryFilter->andWhere(['flujo_id'=>$actual])->count();
+   yii::error('CUANTASHAY');
+   yii::error($queryFilter->andWhere(['flujo_id'=>$actual])->createCommand()->getRawSql());
+   yii::error($cuantashay);
+  $cuantasDebeHaber=(integer)$queryFlujo->select(['nsesiones'])->scalar();
+   yii::error('CUANTASdDEBEHABER');
+   yii::error($queryFlujo->select(['nsesiones'])->createCommand()->getRawSql());
+   yii::error($cuantasDebeHaber);
+  
  if($cuantashay >= $cuantasDebeHaber){
-     return StaFlujo::findOne([
-      'codperiodo'=>$codperiodo,
-      'actividad'=>$actual,      
-  ])->nextActividad()->actividad;
+     //yii::error('CUANTAShay >= cuantas debe haber ');
+      //var_dump($queryFlujo->one()->attributes);die();
+      //yii::error('$queryFlujo->select(actividad)->one()->nextActividad()->actividad');
+     //yii::error($queryFlujo->select(['actividad'])->one()->nextActividad()->actividad);
+      return $queryFlujo->select(['actividad'])->one()->nextActividad()->actividad;
  }else{
-   return StaFlujo::findOne([
-      'codperiodo'=>$codperiodo,
-      'actividad'=>$actual,      
-  ])->actividad;
+      yii::error('CUANTAShay < cuantas debe haber ');
+       yii::error('$queryFlujo->one()');
+       yii::error($queryFlujo->select(['actividad'])->one());
+   return $queryFlujo->select(['actividad'])->one()->actividad;
  }
   
   
   }else{
-     return $idFlujo; 
+     return $idEtapa; 
   }
     
  
@@ -1158,19 +1339,19 @@ public function idCitaFirstEvaluacion(){
  
  public static function desgracias(){
      return [
-         'alcohol','alcoho','droga',
+         'alcohol','alcoho','droga',' delincue',
          'asesinato','violencia','separacion','separados','separacion',
          'separación','murió','muerto','muerte','murieron',
          'enferm','desahuaciado','cancer','cáncer','neoplasia','accidente',
-         'tbc','vih','divorc','denuncia','corazón','corazón',
+         'tbc ','vih','divorc','denuncia','corazón','corazón',' sida ',
          'cerebro','higado','hígado','próstata','prostata','utero','uterino',
-         'aborto',' toc ',' obsesi','fobia','pánico','psiquiatr',
+         'aborto',' toc ',' obsesi',' fobia',' pánico','psiquiatr',
          'medicina','médico','pesadilla','insomnio','desmayo','cefalea',
          'desemple','hambre','deceso','falleci','páncreas','gastritis',
-         'psicopa','legrado','viola','crimen','estómago','provincia',
+         'psicopa','legrado',' viola','crimen','estómago','provincia',
          'transtorno','depresi','ansiedad','llanto','accidente',
          ' dolor ','pastillas','clonazep','sertralina','fluoxetina',
-         ' frustraci',' odio ',' resentimiento','acoso','chantaje',
+         ' frustraci',' odio ',' resentimiento',' acoso','acosad','chantaje',
          'extorsi','asalto','hospital',' manía',' vicio','fumador',
          'ludopa'
      ];
@@ -1194,11 +1375,12 @@ public function idCitaFirstEvaluacion(){
  }
 
  public function hasProblems(){
-     return(count($this->arrayAlertas())>0)?true:false;
+     return(count($this->arrayAlertas())>0)?count($this->arrayAlertas()):false;
  }
  /*
-  * Esta funcion devuelve los porlemas de todas las citas,
-  * caificadas como asistio
+  * Esta funcion devuelve los "problemas"
+  * Según plabras detectadas de todas las citas,
+  * calificadas como asistio
   */
  public function arrayAlertasTotal(){
    $citasActivas= static::find()->where([
@@ -1221,13 +1403,179 @@ public function idCitaFirstEvaluacion(){
   */
  public function horarioToday(){
      $dia=$this->toCarbon('fechaprog')->weekDay();
-     //var_dump($dia);die();
-    return Rangos::findOne([
+     $rango=Rangos::findOne([
          'talleres_id'=>$this->talleres_id,
          'dia'=>$dia,
      ]);
+     if(is_null($rango)){
+          throw new \yii\web\NotFoundHttpException(Yii::t('sta.labels', 'No se encontro el registro RANGO'));
+  
+     }
+     //var_dump($dia);die();
+    return $rango;
+ }
+ 
+ /*
+  * Esta funcion busca una nueva fecha probable para 
+  * reprogramar la cita, la mas proxima, segun el dia 
+  * que le toca atender al psicologo, la fecha es la mas proxima 
+  * 1) Se fija la fechaporg actual 
+  * 2) Luego busca la fecha porxima que viene el spicolo
+  *    segun la tala rangos del programa 
+  * 
+  */
+ public function searchNextDate(){
+     $dia=$this->horarioToday()->dia;
+     
+     
+ }
+ 
+ /*
+  * Esta función recicla el examen de una cita determinada 
+  * quiere decir por ejemplo que si un Alumno a abierto su token
+  * y no ha confirmado su respuesta, se considera ABANDONO DEL
+  * EXAMEN.
+  * 
+  * Se tiene que reciclar estas preguntas y la cita debe de quedar
+  * como INASISTENCIA
+  * 
+  * 
+  * 
+  */
+ public function reciclaExamen(){
+     
  }
  
  
+ /*
+  * Indica si el alumno ya ha conirnado sus repsuestas del examen
+  */
+ public function hasPerformedTest(){
+   $idExamenes=$this->examenesId();
+   
+  // yii::error($idExamenes);
+   if(count($idExamenes)==0)
+   return false;
+   $nrespondidas=StaExamenesdet::find()->andWhere(['not',['valor'=>null]])->
+           andWhere(['examenes_id'=>$idExamenes])->count();
+   //yii::error(StaExamenesdet::find()->andWhere(['not',['valor'=>null]])->
+          // andWhere(['examenes_id'=>$idExamenes])->createCommand()->getRawSql());
+   $ntotales=StaExamenesdet::find()->andWhere(['examenes_id'=>$idExamenes])->count();
+  //yii::error(StaExamenesdet::find()->andWhere(['examenes_id'=>$idExamenes])->createCommand()->getRawSql());
+   if($ntotales==0)return false;
+   return (($nrespondidas/$ntotales) >= 1)?true:false;
+   
+ }
+ /*
+  * Indica nsi elalumno aun no ha abierto el link del correo 
+  * true: NO ha aierto el examen
+  * false: Y aha brio el examen
+  */
+ public function isTokenActive(){
+    $token= \common\components\token\Token::exists('citas', 'token_'.$this->id);
+    return (!is_null($token))?true:false;
+ }
+ 
+ public function nReprogramaciones(){
+   return $this->getLog()->count();  
+ }
+ /*
+  * Registra le lgo de reprogramacion*/
+  
+ public function registraLog($oldFecha){
+     //var_dump($oldFecha,$this->fechaprog);die();
+     StaCitaLog::firstOrCreateStatic(
+             ['citas_id'=>$this->id,
+              'fecha'=>$oldFecha,
+             'nuevafecha'=>$this->fechaprog,
+              ]
+             );
+ }
+ 
+ /*
+  * Esta funcion devuelve un query para hallar todas las citas hábiles 
+  * de un alumno , las que asistieron y las que aun no vencen
+  * 
+  * EL criterio:   Todas a quellas citas que cumplen la siguiente condicion
+  * 
+  *  1) NO ES LA CITA ACTUAL 
+  * 
+  * 2) No son eventos 
+  * 3) Que asistieron 
+  * 
+  * Además Unir las que estan activas:
+  * 
+  * 1) No son eventos
+  * 2) Que no asistieron
+  * 3) Pero que aún no tienen vencimiento
+  * 
+  * 
+  */
+ public function citasHabilesQuery(){
+     $horas=h::gsetting('sta', 'nhorasreprogramacion');     
+      $filtro=$this->CarbonNow()->subHours($horas)->format(\common\helpers\timeHelper::formatMysqlDateTime());
+      $query=static::find()->andWhere([
+         'talleresdet_id'=>$this->talleresdet_id,
+         'masivo'=>'0','asistio'=>'1'])->orWhere(['and',
+          'talleresdet_id=:talleresdet_id',
+         'masivo=0',['>','fechaprog',$filtro ]
+         ],[':talleresdet_id'=>$this->talleresdet_id]);
+    return $query;
+ }
+ 
+ 
+ 
+ public function isPossibleToChange($new_flujo){
+    if(in_array($new_flujo,$this->possibleFlujosToChange())){
+        IF($this->flujo_id <> $new_flujo){
+            return true;
+        }else{
+           return false; 
+        }
+    }else{
+       return false; 
+    }
+    
+ }
+ 
+ 
+ /*
+  * Ubica los posible flujos a los que pouede camabir dicha cita 
+ *los flujos que pertencen a una taller son imposibles de cambiar*/
+  
+ public function possibleFlujosToChange(){
+     $flujos=[];
+     $flujosInferiores=StaFlujo::idsFlujosNotEventoLessThan($this->flujo_id);
+     
+     if(count($flujosInferiores) >0){
+        
+        $flujoAnterior=max($flujosInferiores); 
+        
+         /*Verificamos los flujos de la cita anteriorr*/
+         $citaanterior=$this->citasHabilesQuery()->
+             andWhere(['<','fechaprog',$this->swichtDate('fechaprog', false)])
+             ->andWhere(['flujo_id'=>$flujoAnterior])->one();
+         if(is_null($citaanterior)){
+             $flujos[]= $flujoAnterior;
+         }
+     }
+    
+     return array_map('intval',$flujos);
+     
+     /*
+    
+     $citasiguiente=$this->citasHabilesQuery()->
+             andWhere(['>','fechaprog',$this->swichtDate('fechaprog', false)])->one();
+    
+     if(!is_null($citaanterior))
+      $flujos[]=$citaanterior->flujo_id;
+      if(!is_null($citasiguiente))
+      $flujos[]=$citasiguiente->flujo_id;
+     return $flujos;*/
+ }
+ 
+public function belongsToTaller(){
+    return ($this->flujo->esevento && is_null($this->flujo->examen));
+}
  
 }

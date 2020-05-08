@@ -67,6 +67,7 @@ $this->title = 'Profile';
             <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
                 <?= Html::checkbox('agreeff', false, [ 'disabled'=>'disabled', 'label' =>yii::t('base.forms','Enabled')]) ?>
              </diV>
+          
             <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
                 <?= $form->field($profile, 'names')->textInput(['disabled'=>'disabled']) ?>
                     </diV>

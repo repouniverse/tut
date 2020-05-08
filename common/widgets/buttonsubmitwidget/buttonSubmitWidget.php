@@ -58,8 +58,7 @@ class buttonSubmitWidget extends Widget
                         $.pjax.reload('#".$this->idGrilla."');
                     }else{
                           $('#".$this->idModal."').modal('hide');
-                               $.pjax.reload('#".$this->idGrilla."');
-                      
+                                $.pjax.reload({container: '#".$this->idGrilla."',timeout:6000});
                      }
                }
                if(data.success=='3'){

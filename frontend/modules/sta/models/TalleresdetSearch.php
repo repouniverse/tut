@@ -40,7 +40,7 @@ class TalleresdetSearch extends Talleres
      */
     public function search($params)
     {
-        $query = Talleres::find();
+        $query = Talleresdet::except();
 
         // add conditions that should always apply here
 
@@ -57,10 +57,10 @@ class TalleresdetSearch extends Talleres
         }
 
         // grid filtering conditions
-        $query->andFilterWhere([
-            'id' => $this->id,
+        /*$query->andFilterWhere([
+           // 'id' => $this->id,
             'ciclo' => $this->ciclo,
-        ]);
+        ]);*/
 
         $query->andFilterWhere(['like', 'codfac', $this->codfac])
             ->andFilterWhere(['like', 'codcur', $this->codcur])
@@ -72,7 +72,7 @@ class TalleresdetSearch extends Talleres
     }
      public function searchById($params,$id)
     {
-        $query = Talleres::find();
+        $query = Talleresdet::except();
 
         // add conditions that should always apply here
 

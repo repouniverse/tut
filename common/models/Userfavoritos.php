@@ -15,6 +15,9 @@ use Yii;
  */
 class Userfavoritos extends \common\models\base\modelBase
 {
+  public  $booleanFields=['ishome'];
+    
+    
     /**
      * {@inheritdoc}
      */
@@ -33,8 +36,8 @@ class Userfavoritos extends \common\models\base\modelBase
             [['user_id', 'order'], 'integer'],
             [['url'], 'string', 'max' => 125],
              [['url','alias'], 'string', 'max' => 125],
-             [['url','alias'], 'safe'],
-            [['ishome'], 'string', 'max' => 1],
+             [['url','alias','ishome'], 'safe'],
+            //[['ishome'], 'string', 'max' => 1],
         ];
     }
 
@@ -47,7 +50,7 @@ class Userfavoritos extends \common\models\base\modelBase
             'id' => Yii::t('base.names', 'ID'),
             'user_id' => Yii::t('base.names', 'User ID'),
             'url' => Yii::t('base.names', 'Url'),
-            'ishome' => Yii::t('base.names', 'Ishome'),
+            'ishome' => Yii::t('base.names', 'Inicio'),
             'order' => Yii::t('base.names', 'Order'),
         ];
     }
@@ -59,5 +62,21 @@ class Userfavoritos extends \common\models\base\modelBase
     public static function find()
     {
         return new UserfavoritosQuery(get_called_class());
+    }
+    
+    public function setHomeUrl(){
+        
+       // $transac=$this->getDb()->beginTransaction();
+       
+       $this->updateAll(['ishome'=>'0'], ['user_id'=>\common\helpers\h::userId()]);
+        $this->ishome=true;
+        if($this->save()){
+         // var_dump($this->getErrors());die();    
+        }else{
+          var_dump($this->getErrors());die();  
+        }
+       //  var_dump($this->save(),$this->getErrors());die();
+       //$transac->commit();
+        return true;
     }
 }

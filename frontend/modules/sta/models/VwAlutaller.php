@@ -191,4 +191,20 @@ class VwAlutaller extends \common\models\base\modelBase
   public function getReportPsicologo(){        
       return \common\models\masters\Trabajadores::find(['codigotra'=>$this->codtra])->one()->fullname() ;
     }
+    
+  public function except(){
+      return self::find()->andWhere(['<>','status', Aluriesgo::FLAG_RETIRADO]);
+  }
+  
+  public function hallazgo(){
+    $citas=Citas::find()->andWhere(['talleresdet_id'=>$this->id,'asistio'=>'1','masivo'=>'0'])->all();
+    $tieneProblemas=false;
+    foreach($citas as $cita){
+        if($cita->hasProblems()){
+           $tieneProblemas=true;
+           break;
+        }
+    }
+   return $tieneProblemas;
+}
 }

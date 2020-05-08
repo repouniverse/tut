@@ -43,7 +43,7 @@ class AluriesgoSearch extends Aluriesgo
     
     public function search($params)
     {
-        $query = Aluriesgo::find();
+        $query = Aluriesgo::except();
 
         // add conditions that should always apply here
 
@@ -66,8 +66,9 @@ class AluriesgoSearch extends Aluriesgo
             'profile_id' => $this->profile_id,
         ]);*/
 
-        $query->andFilterWhere(['like', 'codcar', $this->codcar])
-            ->andFilterWhere(['like', 'ap', $this->codcur])            
+        $query ->andFilterWhere(['like','codcar', $this->codcar]) 
+            ->andFilterWhere(['codfac'=> $this->codfac]) 
+            ->andFilterWhere(['like','codcur', $this->codcur])   
           ;
 
         return $dataProvider;
@@ -98,9 +99,10 @@ class AluriesgoSearch extends Aluriesgo
             'profile_id' => $this->profile_id,
         ]);*/
 
-        $query->andFilterWhere(['status'=>'I'])
-                ->andFilterWhere(['like', 'codcar', $this->codcar])
-            ->andFilterWhere(['like', 'ap', $this->codcur])            
+         $query ->andFilterWhere(['like','codcar', $this->codcar]) 
+            ->andFilterWhere(['codfac'=> $this->codfac]) 
+            ->andFilterWhere(['like','codcur', $this->codcur])
+                 ->andFilterWhere(['status'=> Aluriesgo::FLAG_INCORPORADO])  
           ;
 
         return $dataProvider;
