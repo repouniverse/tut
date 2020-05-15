@@ -48,12 +48,15 @@ class DefaultController extends Controller
     $query=\frontend\modules\sta\models\StaResumenasistencias::
      find()->where(['codperiodo'=>$codperiodo]);
     
-    
+    $exp = new yii\db\Expression("SUBSTR(c_1,1, 1) >='0' and SUBSTR(c_1,1, 1) <>'@'");
     $examenes=\frontend\modules\sta\models\StaResumenasistencias::
      find()->where(['codperiodo'=>$codperiodo])->select(['count(c_1) as nexam'])->
-            andWhere(['>','c_1',substr($codperiodo,0,4).'-01-01'])
+            andWhere($exp)
             ->groupBy('codfac')->asArray()->all();
-    
+   /* var_dump(\frontend\modules\sta\models\StaResumenasistencias::
+     find()->where(['codperiodo'=>$codperiodo])->select(['count(c_1) as nexam'])->
+            andWhere(['>','c_1',substr($codperiodo,0,4).'-01-01'])
+            ->groupBy('codfac')->createCommand()->getRawSql());die();*/
     //var_dump($query->select(['count(c_1) as nexam'])->
     //andWhere(['>','c_1',substr($codperiodo,0,4).'-01-01'])
     //->groupBy('codfac')->createCommand()->getRawSql());die();
@@ -640,6 +643,25 @@ public function actionZoom(){
   return  $this->render('zoom');
 }
 
-
+public function actionBuscaAlumno(){
+    if(h::request()->isAjax){
+         $query = \frontend\modules\sta\models\VwAluriesgo::find();
+          $valores=h::request()->post('VwAluriesgoSearch');
+        $query->andFilterWhere(['like', 'ap', $valores['ap']])
+            ->andFilterWhere(['like', 'am',$valores['am']])
+            ->andFilterWhere(['like', 'nombres', $valores['nombres']])
+           ->andFilterWhere(['like', 'codalu', $valores['codalu']])
+           ->andFilterWhere(['like', 'codfac', $valores['codfac']])
+            ->andFilterWhere(['like', 'codperiodo', $valores['codperiodo']]);
+       $model=$query->one();
+      IF(is_null($model)){
+          echo "No se encontraron registros para estos datos";
+      }else{
+          echo $this->
+         renderpartial('/alumnos/auxiliares/_form_view_alu_basico',['model'=>$model]);
+     
+        }
+     }
+}
 
 }

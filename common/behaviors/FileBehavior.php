@@ -97,6 +97,16 @@ class FileBehavior extends Fileb {
         return $this->queryBase->andWhere(['in', 'type', $exts])->count();
     }
 
+    
+    public function deleteAllAttachments(){
+        $contador=0;
+        foreach($this->getQueryBase()->all() as $registro){
+            $this->deleteFile($registro->id);
+            $contador++;
+        }
+        return $contador;
+    }
+    
     /*
      * Esta funcion devuelve los UrLS de las 
      * imagenes de los archivos adjuntos 
@@ -138,6 +148,7 @@ class FileBehavior extends Fileb {
     public function deleteFile($id) {
         $this->getModule()->detachFile($id);
     }
+    
 
     public function sendFileMail() {
         return Yii::$app
@@ -174,7 +185,7 @@ class FileBehavior extends Fileb {
 
         if (!empty($files)) {
             foreach ($files as $file) {
-                $newPathFile = $this->getModule()->getUserDirPath() . uniqid() . basename($file);
+                $newPathFile = $this->getModule()->getUserDirPath() .basename($file);
                 if (!copy($file, $newPathFile)) {
                     throw new \Exception(\Yii::t('yii', 'File upload failed.'));
                 }

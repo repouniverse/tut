@@ -319,7 +319,7 @@ public function nInformeEditado(){
  * Funcion que retira o eliminar retiro 
  * del programa de tutoria, 
  * En realidad solo modfica le FLAG: 'N' 'R'
- * @retiro : true   Retiro   false  Deshacer retiro
+ * @retiro : true   Retiro /  false  Deshacer retiro
  */
 public function retiraDelPrograma($retiro=true){  
     $flag=($retiro)?Aluriesgo::FLAG_RETIRADO: Aluriesgo::FLAG_NORMAL;

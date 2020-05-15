@@ -145,11 +145,23 @@ class comboHelper extends Combito
     public static function getCboFlujoEventos($codperiodo=null){
     if(is_null($codperiodo)){
          $codperiodo=\frontend\modules\sta\staModule::getCurrentPeriod();
-    }       
+    } 
+    
 return ArrayHelper::map( \frontend\modules\sta\models\StaFlujo::find()-> 
       where(['codperiodo'=>$codperiodo,'esevento'=>'1'])->all(),
             'id','proceso'); 
     }
+ 
+    public static function getCboFlujoEvaluaciones($codperiodo=null){
+    if(is_null($codperiodo)){
+         $codperiodo=\frontend\modules\sta\staModule::getCurrentPeriod();
+              } 
+    
+         return ArrayHelper::map( \frontend\modules\sta\models\StaFlujo::find()-> 
+      where(['codperiodo'=>$codperiodo,'esevento'=>'1','examen'=>'1'])->all(),
+            'id','proceso'); 
+    }
+    
     public static function getCboFlujoTotal($codperiodo=null){
     if(is_null($codperiodo)){
          $codperiodo=\frontend\modules\sta\staModule::getCurrentPeriod();

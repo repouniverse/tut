@@ -1082,6 +1082,14 @@ public function actionResultados(){
         ]);
     } 
 
+public function actionInformes(){
+     $searchModel = new \frontend\modules\sta\models\VwStaInformesSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
+        return $this->render('index_informes', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+}
 
 }

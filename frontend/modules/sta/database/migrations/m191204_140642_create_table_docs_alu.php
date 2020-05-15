@@ -31,6 +31,8 @@ if(!$this->existsTable($table)) {
         'conclu_acad'=>$this->text()->append($this->collateColumn()),
          'metas_acad'=>$this->text()->append($this->collateColumn()),
          'codfac'=>$this->string(8)->notNull()->append($this->collateColumn()),
+         'impreso'=>$this->char(1)->append($this->collateColumn()),
+        'ultimamod'=>$this->string(19)->append($this->collateColumn()),
         
         ],$this->collateTable());
    $this->addForeignKey($this->generateNameFk($table), $table,
@@ -39,8 +41,6 @@ if(!$this->existsTable($table)) {
               'codocu', static::NAME_TABLE_DOCUMENTOS,'codocu');
      $this->addForeignKey($this->generateNameFk($table), $table,
               'codfac', static::NAME_TABLE_FACULTAD,'codfac');
-       
-   
             } 
  }
 

@@ -108,7 +108,10 @@ foreach($etapas as $clave=>$valor){
 
             
         </div>         
-       
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <?php echo $this->render('_searchRiesgo', []); ?>
+</DIV>   
+
         
      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">    
      <H4><?=yii::t('sta.labels','Facultades'); ?></H4>

@@ -8,6 +8,7 @@
 ///https://www.yiiframework.com/extension/yii2-backup
 //http://demos.krajee.com/context-menu
 return [
+    
    //'name'=>'Nautilus',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
@@ -88,18 +89,8 @@ return [
 		],
 		'tableName' => '{{%attachments}}' // Optional, default to 'attach_file'
 	],
-         'reportico' => [
-            'class' => 'reportico\reportico\Module' ,
-            'controllerMap' => [
-                           // 'reportico' => 'reportico\reportico\controllers\ReporticoController',
-                           // 'mode' => 'reportico\reportico\controllers\ModeController',
-                            //'ajax' => 'reportico\reportico\controllers\AjaxController',
-                        ]
-            ],
+         
         
-         'report' => [
-            'class' => 'frontend\modules\report\Module',
-        ],
         
     'admin' => [
                 'class' => 'mdm\admin\Module',        
@@ -123,10 +114,8 @@ return [
          'report' => [
             'class' => 'frontend\modules\report\Module',
         ],
-        
-        
-           ],
-    
+       
+    ],
     'components' => [
            
         

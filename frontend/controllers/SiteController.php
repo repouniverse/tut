@@ -75,7 +75,7 @@ class SiteController extends \frontend\controllers\base\baseController
      */
     public function actionIndex()    {       
         // $this->layout="install";       
-      
+     // echo "Estamos trabajando ..regresamos pronto...";die();
         $urlBackend=str_replace('frontend','backend',yii::$app->urlManager->baseUrl);
         //if(yii::$app->user->isGuest){            
             if(\backend\components\Installer::readEnv('APP_INSTALLED')=='false'){
@@ -408,7 +408,43 @@ Datos de caché de configuración se han actualizado');
         ]);
     }
 public function actionRutas(){
+    $ar=[1,2,3,4,5,6];
+    array_map('strval', $ar);
+    var_dump(array_map('strval', $ar));die();
     
+    $valor= new \frontend\modules\sta\models\Citas;
+    echo $valor::SwichtFormatDate(date(\common\helpers\timeHelper::formatMysqlDateTime()),'datetime',true);
+    die();
+    $valor= \frontend\modules\sta\models\StaDocuAlu::dataGraph();
+    $options=\yii\helpers\Json::decode($valor['options']);
+    $ejex=$options['xAxis'][0]['categories'];
+    $ejey=$options['series'][0]['data'];
+     $options['xAxis'][0]['categories']=['uno','dos','tres'];
+     $options['series'][0]['data']=[1,2,3];
+     
+     $valor['options']=\yii\helpers\Json::encode($options);
+    VAR_DUMP( $valor);DIE();
+    
+    
+    
+    
+    
+    $registros=\frontend\modules\sta\models\StaEventosdet::find()->all();
+    foreach($registros as $registro){
+       $registro->updateAll(['codcar'=>$registro->alumno->codcar], ['codalu'=>$registro->alumno->codalu]); 
+    }
+    die();
+    
+    
+    
+    
+    
+   $ruta='http://export.highcharts.com/charts/chart.0f2f32aa928249a3a4e29efd256cd78c.svg';
+    echo file_get_contents($ruta);die();
+   $recurso=fopen($ruta);
+    
+    
+    echo date('Y-m-d H:i:s'); die();
     
     $alumnos=\frontend\modules\sta\models\Aluriesgo::find()->
      select(['max(nveces15) as n15','codalu','codfac'])->

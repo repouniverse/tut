@@ -41,7 +41,7 @@ class Mailer extends Correo
     const MAIL_USER_SERVER_DEFAULT='25';
     public function init(){
        // yii::$app->settings->set('section', 'key', 1258.5);
-        yii::error(static::arrayConfig());
+        //yii::error(static::arrayConfig());
         //var_dump(static::arrayConfig());die();
         $this->_transport=static::arrayConfig();
         

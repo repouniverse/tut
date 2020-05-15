@@ -207,8 +207,8 @@ echo CalendarScheduleWidget::widget([
         
         /*evento Click*/
         'eventClick' => new JsExpression('function(event) {'
-                . 'if (confirm("'.yii::t('sta.labels','¿Confirmar que desea visualizar la cita ?').'")) {
-                 var url = "sta/citas/view?id="+event.id; // t
+                . 'if (confirm("'.yii::t('sta.labels','¿Confirmar que desea editar la cita ?').'")) {
+                 var url = "sta/citas/update?id="+event.id; // t
           var abso="'.\yii\helpers\Url::home(true).'";
               window.open(abso+url);
           //window.location=abso+url;

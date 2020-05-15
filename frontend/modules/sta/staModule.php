@@ -23,7 +23,9 @@ class staModule extends \yii\base\Module
     const USER_OTROS='20';
     const RESPONSE_SUCCESS_CODE=200;
     const REPORTE_TEST=9;
-    
+    const LEVEL_ACCESS_PROFILE_BAJO='bajo';
+    const LEVEL_ACCESS_PROFILE_MEDIO='medio';
+    const LEVEL_ACCESS_PROFILE_ALTO='alto';
     const PROFILE_INVITADO='10';
      const PROFILE_TUTOR_ACADEMICO='20';
        const PROFILE_PSICOLOGO='30';
@@ -31,7 +33,38 @@ class staModule extends \yii\base\Module
        const PROFILE_AUTORIDAD='50';
       const PROFILE_ADMIN='60';
       
+ public STATIC  $tipos=[
+     self::LEVEL_ACCESS_PROFILE_BAJO=>[
+         self::PROFILE_INVITADO,
+     self::PROFILE_TUTOR_ACADEMICO,
       
+      ],
+     self::LEVEL_ACCESS_PROFILE_MEDIO=>[self::PROFILE_INVITADO,
+     self::PROFILE_TUTOR_ACADEMICO,
+         self::PROFILE_ASISTENTE,
+       ],
+     self::LEVEL_ACCESS_PROFILE_ALTO=>[self::PROFILE_INVITADO,
+     self::PROFILE_TUTOR_ACADEMICO,
+         self::PROFILE_ASISTENTE,
+         self::PROFILE_PSICOLOGO,
+         self::PROFILE_AUTORIDAD,
+         self::PROFILE_ADMIN
+         ]
+     
+ ];  
+ 
+ public static function levelAccess(){
+     $tipo=h::user()->profile->tipo;
+     $retorno=self::LEVEL_ACCESS_PROFILE_BAJO;
+   foreach(static::$tipos as $nivel=>$perfiles) {
+       if(in_array($tipo,$perfiles)){
+           $retorno=$nivel;
+           break;
+       }
+   } 
+  return $retorno;
+ }
+ 
      /* const MENSAJE_INFORME_104='STA_INF_104';
        const MENSAJE_INFORME_105='STA_INF_105';
         const MENSAJE_INFORME_106='STA_INF_106';

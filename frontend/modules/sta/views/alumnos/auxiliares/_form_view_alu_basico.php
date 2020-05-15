@@ -46,13 +46,16 @@ use common\helpers\h;
      <?= $form->field($model, 'dni')->textInput(['disabled' => 'disabled']) ?>
 
  </div>
+ <?php if( $model->hasProperty('domicilio')){ ?>
   <div class="col-lg-6 col-md-8 col-sm-12 col-xs-12">
      <?= $form->field($model, 'domicilio')->textInput(['disabled' => 'disabled']) ?>
 
  </div>
-   
+ <?php } ?>  
  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">    
- <?= \yii\helpers\Html::a('<span class="btn btn-danger btn-sm glyphicon glyphicon-pencil"></span>'.yii::t('sta.labels','Editar Datos'), \Yii\Helpers\Url::to(['/sta/alumnos/update','id'=>$model->id]),['target'=>'_blank']) ?>
+ <?= \yii\helpers\Html::a('<span class="btn btn-danger btn-sm glyphicon glyphicon-pencil"></span>', \Yii\Helpers\Url::to(['/sta/alumnos/update','id'=>$model->id]),['target'=>'_blank']) ?>
+ <?php ECHO ($model->hasProperty('codperiodo'))?\yii\helpers\Html::a('<span class="btn btn-success btn-sm glyphicon glyphicon-folder-open"></span>', \Yii\Helpers\Url::to(['/sta/alumnos/ver-detalles','id'=>$model->idalumno,'codperiodo'=>$model->codperiodo]),['target'=>'_blank']):'' ?>
+ 
  </div>  
  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">    
  <?= $form->field($model, 'celulares')->textInput(['disabled' => 'disabled']) ?>

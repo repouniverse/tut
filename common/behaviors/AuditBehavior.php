@@ -71,6 +71,7 @@ class AuditBehavior extends Behavior
        $username=yii::$app->user->identity->username;
        $controllerId=yii::$app->controller->id;
        $currentUrl=Yii::$app->request->getUrl();
+     
        foreach($owner->attributes as $attribute=>$value){
            //yii::error($attribute);
           if($this->hasChanged($attribute)){ 
@@ -189,18 +190,36 @@ class AuditBehavior extends Behavior
             ){
         //$owner=$this->owner;
         //$username=yii::$app->user->identity->username;
+          
         $identidad=$owner->getPrimaryKey().'';
-        $oldValue=utf8_encode(strip_tags($owner->getOldAttribute($attribute).''));
+        $oldValue=$owner->getOldAttribute($attribute).'';
        //$oldValue=$owner->getOldAttribute($attribute).'';
         if(strlen($oldValue)>80){
-          $oldValue=substr($oldValue,0,8);  
+          $oldValue=substr($oldValue,0,80);  
         }
-        $newValue=utf8_encode(strip_tags($owner->{$attribute}.''));
+        $newValue=$owner->{$attribute}.'';
+       
          //$newValue=$owner->{$attribute}.'';
         if(strlen($newValue)>80){
-          $newValue=substr($newValue,0,8); 
+          $newValue=substr($newValue,0,80); 
         }
-      
+   /* print_r([
+            'model'=>$owner::className(),
+            'clave'=>$identidad,
+            'field'=>$attribute,
+            'ip'=>trim($ip),
+            'creationdate'=>date('Y-m-d H:i:s'),
+            //'ip'=>yii::$app->request->getUrl(),
+            'controlador'=>$controllerId,
+            'description'=>substr($currentUrl,0,105),
+            'nombrecampo'=>substr($owner->getAttributeLabel($attribute),0,45),
+            'oldvalue'=>$oldValue,
+            'newvalue'=>$newValue,
+             'username'=>$username, 
+              'metodo'=> $this->getTypeRequest(),
+               ]);die();*/
+        
+       
         $model->setAttributes([
             'model'=>$owner::className(),
             'clave'=>$identidad/*Json::encode($this->owner->getPrimaryKey(true))*/,

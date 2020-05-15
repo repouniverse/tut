@@ -2,6 +2,7 @@
 
 namespace frontend\modules\sta\models;
 use frontend\modules\sta\models\Alumnos;
+use frontend\modules\sta\staModule;
 use Yii;
 use kartik\export\ExportMenu;
 /**
@@ -97,6 +98,10 @@ class VwAluriesgo extends \common\models\base\modelBase
     }
     
      public function getUrlImage(){
-       $this->alumno->getUrlImage();
+       if($this->hasAttachments()){        
+           return $this->files[0]->getUrl();
+       }else{
+           return staModule::getPathImage($this->codalu);        
+       }
    }
 }

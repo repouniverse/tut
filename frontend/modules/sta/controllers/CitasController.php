@@ -898,7 +898,27 @@ public function actionEliminaCita($id){
  
 public function actionReportInfPsicologico($id){
     $this->layout="reportes";
+    if($id==0){
+        $id=h::request()->get('identidad');
+    }
     $model= \frontend\modules\sta\models\StaDocuAlu::findOne($id);
+    $referencia=h::request()->get('urlimagen','');
+    
+    $ruta= \yii::getAlias('@frontend/web/img_repo/e1');  
+    if(strlen($referencia)>0){
+          if(!file_exists(\yii::getAlias('@frontend/web/img_repo/e1/'.$id.'.svg'))){
+           $recurso=fopen('http://export.highcharts.com/'.$referencia,'r');
+            file_put_contents($ruta.'/'.$id.'.svg', $recurso);  
+            fclose($recurso);
+          }
+         $rutaImagen= \yii\helpers\Url::to("@web/img_repo/e1/".$id.'.svg');
+    
+            
+    }else{
+         $rutaImagen=''; 
+    }
+    
+    $rutaTemporal=\yii::getAlias('@frontend/modules/sta/archivos/informes/');
     if(is_null($model))
    throw new NotFoundHttpException(Yii::t('sta.labels', 'No se encontro ningun registro con el id '.$id));
    $codocu=$model->codocu;
@@ -918,7 +938,7 @@ public function actionReportInfPsicologico($id){
             $examenesId=$cita->examenesId();
             //var_dump($examenesId);die();
             $resultados= \frontend\modules\sta\models\StaResultados::find()->andWhere(['examen_id'=>$examenesId])->all();
-         $pagina=$this->render($view,['model'=>$model,'alumno'=>$alumno,'resultados'=>$resultados]);
+         $pagina=$this->render($view,['rutaimagen'=>$rutaImagen,'model'=>$model,'alumno'=>$alumno,'resultados'=>$resultados]);
     
     }
     if($codocu=='107'){
@@ -926,7 +946,7 @@ public function actionReportInfPsicologico($id){
             $examenesId=$cita->examenesId();
             //var_dump($examenesId);die();
             //$resultados= \frontend\modules\sta\models\StaResultados::find()->andWhere(['examen_id'=>$examenesId])->all();
-         $pagina=$this->render($view,['model'=>$model,'alumno'=>$alumno,'examenesId'=>$examenesId]);
+         $pagina=$this->render($view,['rutaimagen'=>$rutaImagen,'model'=>$model,'alumno'=>$alumno,'examenesId'=>$examenesId]);
     
     }
     if($codocu=='105'){
@@ -934,50 +954,97 @@ public function actionReportInfPsicologico($id){
             $examenesId=$cita->examenesId();
             //var_dump($examenesId);die();
             //$resultados= \frontend\modules\sta\models\StaResultados::find()->andWhere(['examen_id'=>$examenesId])->all();
-         $pagina=$this->render($view,['model'=>$model,'alumno'=>$alumno,'examenesId'=>$examenesId]);
+         $pagina=$this->render($view,['rutaimagen'=>$rutaImagen,'model'=>$model,'alumno'=>$alumno,'examenesId'=>$examenesId]);
     
     }
    if($codocu=='104'){
       // echo "En proceso... Disculpen las molestias";die();
           //Solo ara el documento 104
          $citas=Citas::find()->andWhere(['asistio'=>'1','talleresdet_id'=>$model->talleresdet_id])->orderBy('fechaprog asc')->all();
-       $pagina=$this->render($view,['model'=>$model,'alumno'=>$alumno,'citas'=>$citas]);
+       $pagina=$this->render($view,['rutaimagen'=>$rutaImagen,'model'=>$model,'alumno'=>$alumno,'citas'=>$citas]);
     
     }
      //return $this->render("/citas/reportes/cabecera");
      
-  if($codocu=='107')
-  return $pagina;
+  if($codocu=='107'){
+     if(strlen($rutaImagen)==0){
+       // file_put_contents($ruta.'/INFORME_'.$model->id.'.html', $pagina);
+       return $pagina;  
+    }else{
+        $nombre=$model->codocu.'-'.$alumno->codalu.'-'.$alumno->ap.'-'.$model->id.'-'.str_replace('-','_',str_replace(' ','_',date(timeHelper::formatMysqlDateTime()))).'-'.h::userId().'.pdf';
+     
+      $this->preparePdf($pagina)->Output($rutaTemporal.$nombre,
+            \Mpdf\Output\Destination::FILE);
+       $model->deleteAllAttachments();
+      $model->attachFromPath($rutaTemporal.$nombre);
+      $model->changeStatusImpresion();
+      unlink($rutaTemporal.$nombre);
+      return;
+      } 
+  }
+  
   if($codocu=='105'){
-    if(h::userId()==7){
-        \yii::$app->response->content = $pagina;
-        $contenido=\yii::$app->response->content;
-       // echo $contenido; die();
-        $ruta= \yii::getAlias('@frontend/modules/sta/archivos/informes');
-        //\Yii::$app->response->sendFile($ruta.'/estesies.html')->send();
-         file_put_contents($ruta.'/hola23.html', $contenido);
-         
-         
+    if(strlen($rutaImagen)==0){
+       // file_put_contents($ruta.'/INFORME_'.$model->id.'.html', $pagina);
+       return $pagina;  
+    }else{
+        $nombre=$model->codocu.'-'.$alumno->codalu.'-'.$alumno->ap.'-'.$model->id.'-'.str_replace('-','_',str_replace(' ','_',date(timeHelper::formatMysqlDateTime()))).'-'.h::userId().'.pdf';
+     
+      $this->preparePdf($pagina)->Output($rutaTemporal.$nombre,
+            \Mpdf\Output\Destination::FILE);
+       $model->deleteAllAttachments();
+      $model->attachFromPath($rutaTemporal.$nombre);
+      $model->changeStatusImpresion();
+      unlink($rutaTemporal.$nombre);
+      return;
     }
-     return $pagina; 
   }
   
    if($codocu=='104')
   return $pagina;
-   $mpdf= \frontend\modules\report\Module::getPdf();
+  if($codocu=='106'){
+       if(strlen($rutaImagen)==0){
+       // file_put_contents($ruta.'/INFORME_'.$model->id.'.html', $pagina);
+       return $this->preparePdf($pagina)->Output();
+    }else{
+        $nombre=$model->codocu.'-'.$alumno->codalu.'-'.$alumno->ap.'-'.$model->id.'-'.str_replace('-','_',str_replace(' ','_',date(timeHelper::formatMysqlDateTime()))).'-'.h::userId().'.pdf';
+     
+      $this->preparePdf($pagina)->Output($rutaTemporal.$nombre,
+            \Mpdf\Output\Destination::FILE);
+       $model->deleteAllAttachments();
+      $model->attachFromPath($rutaTemporal.$nombre);
+      $model->changeStatusImpresion();
+      unlink($rutaTemporal.$nombre);
+      return;
+      } 
+      
+      
+      
+  }
+   
+            
+}
+
+private function preparePdf($contenidoHtml){
+    $contenidoHtml = \Pelago\Emogrifier\CssInlinerCssInliner::fromHtml($contenidoHtml)->inlineCss()
+  ->renderBodyContent(); 
+    $mpdf= \frontend\modules\report\Module::getPdf();
    $mpdf->margin_header=1;
     $mpdf->margin_footer=1;
    $mpdf->setAutoTopMargin='stretch';
    $mpdf->setAutoBottomMargin='stretch';
+   $stylesheet = file_get_contents(\yii::getAlias(("@frontend/web/css/bootstrap.min.css"))); // external css
+   $mpdf->WriteHTML($stylesheet,1);
    $mpdf->DefHTMLHeaderByName(
   'Chapter2Header',$this->render("/citas/reportes/cabecera")
 );
    //$mpdf->DefHTMLFooterByName('pie',$this->render("/citas/reportes/footer"));
    $mpdf->SetHTMLHeaderByName('Chapter2Header');
-   $mpdf->WriteHTML($pagina);
-      return  $mpdf->output();
-            
+   $mpdf->WriteHTML($contenidoHtml);
+      return  $mpdf; 
 }
+
+
 
 public function actionRefreshEtapa($id){
    $alumnitos= \frontend\modules\sta\models\Talleresdet::except()->where(['talleres_id'=>$id])->all();
@@ -1253,6 +1320,185 @@ public function actionEditaIndicador($id){
   
  } 
  
- 
+public function actionPruebaGrafico(){
+   if(h::request()->isAjax){
+       $id=h::request()->get('id');
+    $model=\frontend\modules\sta\models\StaDocuAlu::findOne($id);
     
+  $urlImagen='http://export.highcharts.com/'.h::request()->get('urlimagen');
+  $recurso=fopen($urlImagen,'r');
+ 
+   $ruta= \yii::getAlias('@frontend/modules/sta/archivos/informes');  
+  file_put_contents($ruta.'/'.$id.'.svg', $recurso);
+  
+  
+  
+  
+     
+   }
+   
+    die();
+    
+    
+  // $url='http://case.itekron.com/frontend/web/sta/citas/report-inf-psicologico?id=4087&gridName=grid_docu&idModal=buscarvalor';
+   //$html = file_get_html($url);
+//var_dump(fopen($url,'r'));
+ 
+  
+
+
+
+die();
+    
+    $options='{"colors":["#7cb5ec","#434348","#90ed7d","#f7a35c","#8085e9","#f15c80","#e4d354","#2b908f","#f45b5b","#91e8e1"],"symbols":["circle","diamond","square","triangle","triangle-down"],'
+            . '"lang":{"loading":"Loading...","months":'
+            . '["January","February","March","April","May","June","July","August","September","October","November","December"],"shortMonths":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],'
+            . '"weekdays":["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],'
+            . '"decimalPoint":".","numericSymbols":["k","M","G","T","P","E"],'
+            . '"resetZoom":"Reset zoom","resetZoomTitle":"Reset zoom level 1:1",'
+            . '"thousandsSep":" "},"global":{},"time":{"timezoneOffset":0,'
+            . '"useUTC":true},"chart":{"styledMode":false,"borderRadius":0,'
+            . '"colorCount":10,"defaultSeriesType":"line","ignoreHiddenSeries":true,'
+            . '"spacing":[10,10,15,10],"resetZoomButton":{"theme":{"zIndex":6},'
+            . '"position":{"align":"right","x":-10,"y":10}},"width":700,'
+            . '"height":null,"borderColor":"#335cad","backgroundColor":"#ffffff",'
+            . '"plotBorderColor":"#cccccc","type":"bar"},'
+            . '"title":{"style":{"color":"#333333","fontSize":"18px",'
+            . '"fill":"#333333","width":"636px"},"text":"Indicadores",'
+            . '"align":"center","margin":15,"widthAdjust":-44},'
+            . '"subtitle":{"style":{"color":"#666666","fill":"#666666",'
+            . '"width":"636px"},"text":"","align":"center","widthAdjust":-44},'
+            . '"caption":{"style":{"color":"#666666","fill":"#666666","width":"680px"},'
+            . '"margin":15,"text":"","align":"left","verticalAlign":"bottom"},'
+            . '"plotOptions":{"line":{"lineWidth":2,"allowPointSelect":false,'
+            . '"showCheckbox":false,"animation":{"duration":1000},"events":{},'
+            . '"marker":{"lineWidth":0,"lineColor":"#ffffff","enabledThreshold":2,'
+            . '"radius":4,"states":{"normal":{"animation":true},'
+            . '"hover":{"animation":{"duration":50},"enabled":true,"radiusPlus":2,'
+            . '"lineWidthPlus":1},"select":{"fillColor":"#cccccc","lineColor":"#000000","lineWidth":2}}},'
+            . '"point":{"events":{}},"dataLabels":{"align":"center","padding":5,'
+            . '"style":{"fontSize":"11px","fontWeight":"bold","color":"contrast",'
+            . '"textOutline":"1px contrast"},"verticalAlign":"bottom","x":0,"y":0},'
+            . '"cropThreshold":300,"opacity":1,"pointRange":0,"softThreshold":true,'
+            . '"states":{"normal":{"animation":true},"hover":{"animation":{"duration":50},'
+            . '"lineWidthPlus":1,"marker":{},"halo":{"size":10,"opacity":0.25}},'
+            . '"select":{"animation":{"duration":0}},"inactive":{"animation":{"duration":50},'
+            . '"opacity":0.2}},"stickyTracking":true,"turboThreshold":1000,"findNearestPointBy":"x"},'
+            . '"area":{"lineWidth":2,"allowPointSelect":false,"showCheckbox":false,'
+            . '"animation":{"duration":1000},"events":{},"marker":{"lineWidth":0,'
+            . '"lineColor":"#ffffff","enabledThreshold":2,"radius":4,'
+            . '"states":{"normal":{"animation":true},"hover":{"animation":{"duration":50},"enabled":true,"radiusPlus":2,"lineWidthPlus":1},'
+            . '"select":{"fillColor":"#cccccc","lineColor":"#000000","lineWidth":2}}},'
+            . '"point":{"events":{}},"dataLabels":{"align":"center","padding":5,"style":{"fontSize":"11px","fontWeight":"bold","color":"contrast","textOutline":"1px contrast"},'
+            . '"verticalAlign":"bottom","x":0,"y":0},'
+            . '"cropThreshold":300,"opacity":1,"pointRange":0,"softThreshold":false,'
+            . '"states":{"normal":{"animation":true},"hover":{"animation":{"duration":50},'
+            . '"lineWidthPlus":1,"marker":{},"halo":{"size":10,"opacity":0.25}},'
+            . '"select":{"animation":{"duration":0}},"inactive":{"animation":{"duration":50},'
+            . '"opacity":0.2}},"stickyTracking":true,"turboThreshold":1000,'
+            . '"findNearestPointBy":"x","threshold":0},"spline":{"lineWidth":2,"allowPointSelect":false,"showCheckbox":false,'
+            . '"animation":{"duration":1000},"events":{},"marker":{"lineWidth":0,"lineColor":"#ffffff","enabledThreshold":2,"radius":4,"states":{"normal":{"animation":true},"hover":{"animation":{"duration":50},"enabled":true,"radiusPlus":2,"lineWidthPlus":1},"select":{"fillColor":"#cccccc","lineColor":"#000000","lineWidth":2}}},"point":{"events":{}},"dataLabels":{"align":"center","padding":5,"style":{"fontSize":"11px","fontWeight":"bold","color":"contrast","textOutline":"1px contrast"},"verticalAlign":"bottom","x":0,"y":0},"cropThreshold":300,"opacity":1,"pointRange":0,"softThreshold":true,"states":{"normal":{"animation":true},"hover":{"animation":{"duration":50},"lineWidthPlus":1,'
+            . '"marker":{},"halo":{"size":10,"opacity":0.25}},"select":{"animation":{"duration":0}},"inactive":{"animation":{"duration":50},"opacity":0.2}},"stickyTracking":true,"turboThreshold":1000,"findNearestPointBy":"x"},"areaspline":{"lineWidth":2,"allowPointSelect":false,"showCheckbox":false,"animation":{"duration":1000},"events":{},"marker":{"lineWidth":0,"lineColor":"#ffffff","enabledThreshold":2,"radius":4,"states":{"normal":{"animation":true},"hover":{"animation":{"duration":50},"enabled":true,"radiusPlus":2,"lineWidthPlus":1},"select":{"fillColor":"#cccccc","lineColor":"#000000","lineWidth":2}}},"point":{"events":{}},"dataLabels":{"align":"center","padding":5,'
+            . '"style":{"fontSize":"11px","fontWeight":"bold","color":"contrast","textOutline":"1px contrast"},"verticalAlign":"bottom","x":0,"y":0},"cropThreshold":300,"opacity":1,'
+            . '"pointRange":0,"softThreshold":false,"states":{"normal":{"animation":true},"hover":{"animation":{"duration":50},"lineWidthPlus":1,"marker":{},"halo":{"size":10,"opacity":0.25}},"select":{"animation":{"duration":0}},"inactive":{"animation":{"duration":50},"opacity":0.2}},"stickyTracking":true,"turboThreshold":1000,"findNearestPointBy":"x","threshold":0},"column":{"lineWidth":2,"allowPointSelect":false,"showCheckbox":false,"animation":{"duration":1000},"events":{},"marker":null,"point":{"events":{}},"dataLabels":{"align":null,"padding":5,"style":{"fontSize":"11px","fontWeight":"bold","color":"contrast","textOutline":"1px contrast"},"verticalAlign":null,"x":0,"y":null},'
+            . '"cropThreshold":50,"opacity":1,"pointRange":null,"softThreshold":false,"states":{"normal":{"animation":true},"hover":{"animation":{"duration":50},"lineWidthPlus":1,"marker":{},"halo":false,"brightness":0.1},"select":{"animation":{"duration":0},"color":"#cccccc","borderColor":"#000000"},"inactive":{"animation":{"duration":50},"opacity":0.2}},"stickyTracking":false,"turboThreshold":1000,"findNearestPointBy":"x","borderRadius":0,"crisp":true,"groupPadding":0.2,"pointPadding":0.1,"minPointLength":0,"startFromThreshold":true,"threshold":0,"borderColor":"#ffffff"},"bar":{"lineWidth":2,"allowPointSelect":false,"showCheckbox":false,"animation":{"duration":1000},"events":{},"marker":null,"point":{"events":{}},"dataLabels":{"align":null,"padding":5,'
+            . '"style":{"fontSize":"11px","fontWeight":"bold","color":"contrast","textOutline":"1px contrast"},"verticalAlign":null,"x":0,"y":null,"enabled":true,"crop":false,"overflow":"none"},"cropThreshold":50,"opacity":1,"pointRange":null,"softThreshold":false,"states":{"normal":{"animation":true},"hover":{"animation":{"duration":50},"lineWidthPlus":1,"marker":{},"halo":false,"brightness":0.1},"select":{"animation":{"duration":0},"color":"#cccccc","borderColor":"#000000"},"inactive":{"animation":{"duration":50},"opacity":0.2}},"stickyTracking":false,"turboThreshold":1000,"findNearestPointBy":"x","borderRadius":0,"crisp":true,"groupPadding":0.2,"pointPadding":0.1,"minPointLength":0,"startFromThreshold":true,'
+            . '"tooltip":{},"threshold":0,"borderColor":"#ffffff"},"scatter":{"lineWidth":0,"allowPointSelect":false,"showCheckbox":false,"animation":{"duration":1000},"events":{},"marker":{"lineWidth":0,"lineColor":"#ffffff","enabledThreshold":2,"radius":4,"states":{"normal":{"animation":true},"hover":{"animation":{"duration":50},"enabled":true,"radiusPlus":2,"lineWidthPlus":1},"select":{"fillColor":"#cccccc","lineColor":"#000000","lineWidth":2}},"enabled":true},"point":{"events":{}},"dataLabels":{"align":"center","padding":5,"style":{"fontSize":"11px","fontWeight":"bold","color":"contrast","textOutline":"1px contrast"},"verticalAlign":"bottom","x":0,"y":0},"cropThreshold":300,"opacity":1,"pointRange":0,'
+            . '"softThreshold":true,"states":{"normal":{"animation":true},"hover":{"animation":{"duration":50},"lineWidthPlus":1,"marker":{},"halo":{"size":10,"opacity":0.25}},"select":{"animation":{"duration":0}},"inactive":{"animation":{"duration":50},"opacity":0.2}},"stickyTracking":true,"turboThreshold":1000,"findNearestPointBy":"xy","jitter":{"x":0,"y":0}},"pie":{"allowPointSelect":false,"showCheckbox":false,"animation":{"duration":1000},"events":{},"marker":null,"point":{"events":{}},"dataLabels":{"align":"center","padding":5,"style":{"fontSize":"11px","fontWeight":"bold","color":"contrast","textOutline":"1px contrast"},"verticalAlign":"bottom","x":0,"y":0,"allowOverlap":true,"connectorPadding":5,"distance":30,"enabled":true,"softConnector":true,"connectorShape":"fixedOffset","crookDistance":"70%"},"cropThreshold":300,"opacity":1,"pointRange":0,"softThreshold":true,"states":{"normal":{"animation":true},"hover":{"animation":{"duration":50},"lineWidthPlus":1,"marker":{},"halo":{"size":10,"opacity":0.25},"brightness":0.1},"select":{"animation":{"duration":0}},"inactive":{"animation":{"duration":50},"opacity":0.2}},"stickyTracking":false,"turboThreshold":1000,"findNearestPointBy":"x","center":[null,null],"clip":false,"colorByPoint":true,"ignoreHiddenPoint":true,"inactiveOtherPoints":true,"legendType":"point","size":null,"showInLegend":false,"slicedOffset":10,"borderColor":"#ffffff","borderWidth":1},"series":{"stacking":"normal","showInLegend":false,"tooltip":{}}},"labels":{"style":{"position":"absolute","color":"#333333"}},"legend":{"enabled":true,"align":"center","alignColumns":true,"layout":"horizontal","borderColor":"#999999","borderRadius":0,"navigation":{"activeColor":"#003399","inactiveColor":"#cccccc"},"itemStyle":{"color":"#333333","cursor":"pointer","fontSize":"12px","fontWeight":"bold","textOverflow":"ellipsis"},"itemHoverStyle":{"color":"#000000"},"itemHiddenStyle":{"color":"#cccccc"},"shadow":false,"itemCheckboxStyle":{"position":"absolute","width":"13px","height":"13px"},"squareSymbol":true,"symbolPadding":5,"verticalAlign":"bottom","x":0,"y":0,"title":{"style":{"fontWeight":"bold"}},"reversed":true},"loading":{"labelStyle":{"fontWeight":"bold","position":"relative","top":"45%"},"style":{"position":"absolute","backgroundColor":"#ffffff","opacity":0.5,"textAlign":"center"}},"tooltip":{"enabled":true,"animation":true,"borderRadius":3,"dateTimeLabelFormats":{"millisecond":"%A, %b %e, %H:%M:%S.%L","second":"%A, %b %e, %H:%M:%S","minute":"%A, %b %e, %H:%M","hour":"%A, %b %e, %H:%M","day":"%A, %b %e, %Y","week":"Week from %A, %b %e, %Y","month":"%B %Y","year":"%Y"},"footerFormat":"","padding":8,"snap":10,"headerFormat":"<span style=\"font-size: 10px\">{point.key}</span><br/>","pointFormat":"<span style=\"color:{point.color}\">●</span> {series.name}: <b>{point.y}</b><br/>","backgroundColor":"rgba(247,247,247,0.85)","borderWidth":1,"shadow":true,"style":{"color":"#333333","cursor":"default","fontSize":"12px","pointerEvents":"none","whiteSpace":"nowrap"}},"credits":true,"xAxis":[{"categories":["AUTOEFICACIA ACADÉMICA-(PROMEDIO)","PROCASTINACIÓN ACADÉMICA-(PROMEDIO)","ANSIEDAD FRENTE A EXAMEN-(BAJO)","VÍNCULOS PSICOSOCIALES-(ALTO)","ACEPTACIÓN Y CONTROL-(ALTO)","PROYECTOS-(ALTO)","AUTONOMÍA-(ALTO)","AUTOCONCEPTO SOCIAL-(ALTO)","ADAPTACIÓN FAMILIAR-(PROMEDIO)","COHESIÓN FAMILIAR-(PROMEDIO)","CAPACIDAD RESOLUTIVA-(ALTO)","EXPECTATIVA DE ÉXITO-(PROMEDIO)","AUTOCONCEPTO ACADÉMICO-(PROMEDIO)","AFRONTAMIENTO AL PROBLEMA-(ALTO)","AUTOESTIMA-(PROMEDIO)"],"index":0,"isX":true}],"yAxis":[{"title":{"text":"Percentil"},"index":0}],"series":[{"name":"","pointWidth":15,"groupPadding":1,"boderRadius":15,"boderColor":"#f78ad2","color":"#f93087","data":[70,30,10,90,90,90,70,90,50,60,90,50,50,70,40]}]}';
+    
+    
+    
+    $array= \yii\helpers\Json::decode($options);
+    var_dump($array);die();
+    
+    
+    $this->layout="reportes";
+    
+    $models= \frontend\modules\sta\models\StaDocuAlu::find()->andWhere(['id'=>[3189,3191,957]])->all();
+   foreach($models as $model){
+       
+   }
+    $codocu=$model->codocu;
+    
+    
+       /*Fin del filtro */
+     $view="/citas/reportes/reporte_".$codocu;
+     $alumno=$model->talleresdet->alumno;    
+    if($codocu=='106'){
+         $cita=Citas::findOne($model->cita_id);
+            $examenesId=$cita->examenesId();
+            //var_dump($examenesId);die();
+            $resultados= \frontend\modules\sta\models\StaResultados::find()->andWhere(['examen_id'=>$examenesId])->all();
+         $pagina=$this->render($view,['model'=>$model,'alumno'=>$alumno,'resultados'=>$resultados]);
+    
+    }
+    if($codocu=='107'){
+         $cita=Citas::findOne($model->cita_id);
+            $examenesId=$cita->examenesId();
+            //var_dump($examenesId);die();
+            //$resultados= \frontend\modules\sta\models\StaResultados::find()->andWhere(['examen_id'=>$examenesId])->all();
+         $pagina=$this->render($view,['model'=>$model,'alumno'=>$alumno,'examenesId'=>$examenesId]);
+    
+    }
+    if($codocu=='105'){
+       $cita=Citas::findOne($model->cita_id);
+            $examenesId=$cita->examenesId();
+            //var_dump($examenesId);die();
+            //$resultados= \frontend\modules\sta\models\StaResultados::find()->andWhere(['examen_id'=>$examenesId])->all();
+         $pagina=$this->render($view,['model'=>$model,'alumno'=>$alumno,'examenesId'=>$examenesId]);
+    
+    }
+   if($codocu=='104'){
+      // echo "En proceso... Disculpen las molestias";die();
+          //Solo ara el documento 104
+         $citas=Citas::find()->andWhere(['asistio'=>'1','talleresdet_id'=>$model->talleresdet_id])->orderBy('fechaprog asc')->all();
+       $pagina=$this->render($view,['model'=>$model,'alumno'=>$alumno,'citas'=>$citas]);
+    
+    }
+     //return $this->render("/citas/reportes/cabecera");
+     
+  if($codocu=='107')
+  return $pagina;
+  if($codocu=='105'){
+    if(h::userId()==7){
+        \yii::$app->response->content = $pagina;
+        $contenido=\yii::$app->response->content;
+       // echo $contenido; die();
+        $ruta= \yii::getAlias('@frontend/modules/sta/archivos/informes');
+        //\Yii::$app->response->sendFile($ruta.'/estesies.html')->send();
+         file_put_contents($ruta.'/hola23.html', $contenido);
+         
+         
+    }
+     return $pagina; 
+  }
+  
+   if($codocu=='104')
+  return $pagina;
+   $mpdf= \frontend\modules\report\Module::getPdf();
+   $mpdf->margin_header=1;
+    $mpdf->margin_footer=1;
+   $mpdf->setAutoTopMargin='stretch';
+   $mpdf->setAutoBottomMargin='stretch';
+   $mpdf->DefHTMLHeaderByName(
+  'Chapter2Header',$this->render("/citas/reportes/cabecera")
+);
+   //$mpdf->DefHTMLFooterByName('pie',$this->render("/citas/reportes/footer"));
+   $mpdf->SetHTMLHeaderByName('Chapter2Header');
+   $mpdf->WriteHTML($pagina);
+      return  $mpdf->output();
+            
+}
+   
+
+public function actionDataToGraph($id){
+      if(h::request()->isAjax){
+          
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+    $model=\frontend\modules\sta\models\StaDocuAlu::findOne($id);
+    return ['success'=>$model->dataGraph()];
+      }
+}
+
+
 }

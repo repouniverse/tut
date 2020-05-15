@@ -3,17 +3,20 @@ namespace common\widgets\linkajaxgridwidget;
 use yii\base\Widget;
 use yii;
 use yii\web\View;
+use yii\helpers\Json;
 use yii\base\InvalidConfigException;
 class linkAjaxGridWidget extends Widget
 {
     public $id;
    public $idGrilla; //Id del sectro Pjax par arefrescar luego de la accion 
+   public $otherContainers=[];
     public $evento; //tipode vento js : click, blur, change  etc
    public $family;    //familia de la clase del elemento HTML para tomarlo como selector
    public $type; //TIPO DE EVENTO AJAX  : GET POST 
    public $confirm=false; //SI VA A PREGUNTAR ANTES DE EJECUTAR
    public $question="Está seguro de efectuar esta acción?";
    public $mode='json'; //puede ser json, html
+   public $data=[];//DATA DEL AJAX
      public $divReplace=null; //puede ser json, html
     public $posicion=View::POS_HEAD;
      //
@@ -74,13 +77,17 @@ class linkAjaxGridWidget extends Widget
                         },";
       $confirm=($this->confirm)?$cad:'';
      // $mesage=yii::t('base.verbs','Are you Sure to Delete this Record ?');
+     $cadUx=(count($this->otherContainers)>0)?"  $.pjax.reload({container: '#".$this->otherContainers[0]."', async: false});  ":"";
    $cadenaJs="$('div[id=\"".$this->idGrilla."\"] [family=\"".$this->family."\"]').on( '".$this->evento."', function() { 
         // alert(this.title);
+     var yapaso=false;
+     
+    if(!yapaso){  
 $.ajax({
               url: this.title,
               
               type: '".$this->type."',
-              data:JSON.parse(this.id) ,
+              data:".((count($this->data)==0)?'JSON.parse(this.id)':Json::encode($this->data)). "    ,
               dataType: 'json',".$confirm." 
                error:  function(xhr, textStatus, error){               
                             var n = Noty('id');                      
@@ -92,7 +99,12 @@ $.ajax({
              
                //alert(typeof json['dfdfd']==='undefined');
                         var n = Noty('id');
-                         $.pjax.reload({container: '#".$this->idGrilla."', async: false});
+                        
+                           $.pjax.reload({container: '#".$this->idGrilla."', async: false});
+                           ".$cadUx."  
+                           
+                             
+
                        if ( !(typeof json['error']==='undefined') ) {
                         $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['error']);
                               $.noty.setType(n.options.id, 'error');  
@@ -105,17 +117,14 @@ $.ajax({
                           if ( !(typeof json['success']==='undefined' )) {
                         $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['success']);
                               $.noty.setType(n.options.id, 'success');  
-                             }       
-
-                           // }else{
-                          
-                           // }
+                             } 
                             
                             }
-                   
-                        //}
-                        });  "
-            . "})";
+                                        
+                        });  
+                      yapaso=true; 
+                     }      
+                        })";
        
   // echo  \yii\helpers\Html::script($stringJs);
    $this->getView()->registerJs($cadenaJs,$this->posicion);
