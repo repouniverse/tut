@@ -127,7 +127,7 @@ class SiteController extends \frontend\controllers\base\baseController
     public function actionLogin()
     {
      
-        $this->layout="install";
+        $this->layout="login";
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
@@ -408,6 +408,285 @@ Datos de caché de configuración se han actualizado');
         ]);
     }
 public function actionRutas(){
+    
+    $sesion=h::session();
+    var_dump($sesion[h::SESION_MALETIN]);die();
+    
+    
+    $ids= \frontend\modules\sta\models\StaDocuAlu::find()
+   ->select(['id'])->andWhere(['codfac'=>'FIEE'])->column();  
+  
+  
+   $model= \frontend\modules\sta\models\StaDocuAlu::purgeAttachments($ids);
+   die();
+    //$frase='hola Esta es la palabra ';
+    //echo str_replace('hola','PROCASTINA',$frase);
+    $i=1;
+    $registros=\frontend\modules\sta\models\StaDocuAlu::find()
+      ->andWhere(['>','id',4001])->andWhere(['<','id',5000])->all();
+     foreach($registros as $model){
+       $model->corrigeProcastinacion();
+       if($model->save()){
+           $i++;
+       }
+     }
+     echo $i;
+    die();
+    
+var_dump($model->attributes);
+    
+    
+    
+    die();
+    echo $this->render('prueba_grafico');
+    
+    die();
+   // $cita=\frontend\modules\sta\models\Citas::findOne(4666);
+    //$cita=New ction actionRutas(){
+    $cita=new \frontend\modules\sta\models\Citas();
+    var_dump($cita->getPrimaryKey(true)); die();
+    
+   /* $AR=['A','B','C','D','E'];    
+     array_splice($AR,1,1);
+   var_dump($AR);
+   var_dump(array_search('D',$AR));
+   
+   
+   die();*/
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+    
+    //h::session()->remove('maletin');
+    $maletin=New \common\components\Maletin();
+    $maletin->clearMaletin();
+    //var_dump(yii::$app->session['maletin']);die();
+    $maletin->addItem('cachi', 'aaa');
+    $maletin->addItem('cachi', 'eee');
+    $maletin->addItem('cachi', 'iii');
+     $maletin->addItem('cachi', 'ooo');
+      $maletin->addItem('cachi', 'uuu');
+    //var_dump(yii::$app->session['maletin']);die();
+     
+     $maletin->removeItem('cachi', 'eee');
+      $maletin->removeItem('cachi', 'ooo');
+       $maletin->addItem('Modelo', 'uno');
+        $maletin->addItem('Modelo', 'cinco');
+        $maletin->addItem('Modelo', 'siete');
+         $maletin->removeItem('Modelo', 'cinco');
+       //$maletin->addItem('OTRA_CLASE', 'A');
+       
+
+    var_dump(yii::$app->session['maletin']);die();
+        die();
+  
+
+
+// ECHO \frontend\modules\sta\models\StaGrupoflujo::porcTotal('2020I','FAUA');
+    //DIE();
+    
+    $model=\frontend\modules\sta\models\Talleresdet::findOne(2420);
+    var_dump($model->zipea()); die();
+    
+
+    
+    
+    
+    
+    
+
+   
+
+    
+    
+    
+    
+    
+     $idsFlujo= \frontend\modules\sta\models\StaFlujo::find()
+      ->select(['actividad'])->andWhere(['clase'=>'M','esevento'=>'0','codperiodo'=>'2020I'])->column();
+    echo \frontend\modules\sta\models\Talleresdet::find()->
+            select(['t.id','b.codtra','count(b.codtra) as numero'])->
+            join('INNER JOIN','{{%sta_citas}} b','t.id=b.talleresdet_id')->
+            andWhere(['flujo_id'=>$idsFlujo])->groupBy(['t.id','b.codtra'])->orderBy([
+                             't.id' => SORT_ASC,
+                            'count(b.codtra)'=>SORT_ASC
+             ])->createCommand()->getRawSql();
+   
+   $filas= \frontend\modules\sta\models\Talleresdet::find()->
+            select(['t.id','b.codtra','count(b.codtra) as numero'])->
+            join('INNER JOIN','{{%sta_citas}} b','t.id=b.talleresdet_id')->
+            andWhere(['flujo_id'=>$idsFlujo])->orderBy([
+                             't.id' => SORT_ASC,
+                            'count(b.codtra)'=>SORT_ASC
+             ])->
+            asArray()->limit(100)->all();
+    
+    print_r($filas);die();
+    
+   $tallerdet= \frontend\modules\sta\models\Talleresdet::findOne(2919);
+    $tallerdet->retiraDelPrograma(false);
+    die();
+    
+    $contenidoHtml="<b>";
+     $contenidoHtml = \Pelago\Emogrifier\CssInliner::fromHtml($contenidoHtml)->inlineCss();
+     die();
+   $model=\frontend\modules\sta\models\StaResumenasistencias::findOne(908);
+   var_dump($model->c_5,$model->c_6);
+   die();
+    //$nmax= h::gsetting('mail','NumMaxCantCorreos');
+   /*
+$correos=[  
+'hipogea@hotmail.com',
+'josealva1798@gmail.com',
+'jarym@uni.pe',
+'jjcondorip@uni.pe',
+'angel.floresrazzeto@gmail.com',
+'andres.giraldo.s@uni.pe',
+'gabrielguzmangutierrez2@gmail.com',
+'joholo1007@gmail.com',
+'dennis_22_3@hotmail.com',
+'fredqc13@gmail.com',
+'csar_sanchez@hotmail.com',
+'ronaldvega1209@gmail.com',
+'luis.aguero.f@uni.pe',
+'renzo9816vidal09@gmail.com',
+'bryan_025_@hotmail.com',
+'jchamorrotorres31@gmail.com',
+'fchaponanc@gmail.com',
+'lchavezm@uni.pe',
+'yonel060114@gmail.com',
+'oflodor_08_05@hotmail.com',
+'etespiritugonzales@gmail.com',
+'dario_8779@hotmail.com',
+'david_trilce2007@hotmail.com',
+'osje_815@hotmail.com',
+'luis_qz_134@hotmail.com',
+'simbajua03@hotmail.com',
+'baldeon2000@gmail.com',
+'fabriziovivar2@gmail.com',
+'sergio_fernandez_quispe_02@hotmail.com',
+'patrick.macahuachi9@gmail.com',
+'luceroj.mm@gmail.com',
+'lizandromezacarrera1997@hotmail.com',
+'jorgemezapariona@hotmail.com',
+'cesar_98_svp@hotmail.com',
+'gsa_999@hotmail.com',
+'arngo9821@gmail.com',
+'leonardocastropovisxd@gmail.com',
+'edisonthc@gmail.com',
+'Mark_14_47@hotmail.com',
+'jair.medina.e@uni.pe',
+'diego.nodbot@gmail.com',
+'ninkovski03@gmail.com',
+'juan.paredes@uni.pe',
+'paul.vega.8983@gmail.com',
+'terry.mallqui.p@uni.pe',
+'rrosadod@uni.pe',
+'relescanor@uni.pe',
+'aspajoalvin@gmail.com',
+'jcarlosids@hotmail.com',
+'m4rco_1116@hotmail.com',
+'hans.cauper.v@uni.pe',
+'macoto_524@hotmail.com',
+'giancarlo_gbgl@hotmail.com',
+'rhuaracar@uni.pe',
+'reyzmglml007@gmail.com',
+'joel10bm@hotmail.com',
+'anggellocancer98@gmail.com',
+'the_cube08@hotmail.com',
+'miguel.ramos.c@uni.pe',
+'brandon455569@gmail.com',
+'jean09061@hotmail.com',
+'rogervasquezleandro@gmail.com',
+'joseph.2509@hotmail.com',
+'ob_sul8@hotmail.com',
+'carlos.caiguaraico@gmail.com',
+'dcarhuazv@uni.pe',
+'jhonn.cr.2806@gmail.com',
+'pedroisaias.27@hotmail.com','juanpiero271@gmail.com',
+'robert.cumpa.c@uni.pe',
+'lito_tkm@hotmail.com',
+'brandurand01.99@gmail.com',
+'jimy_ed@hotmail.com',
+'azodneml@hotmail.com',
+'faridobregon98@gmail.com',
+'johnny_osorio@hotmail.com',
+'gustavo0412-@hotmail.com',
+'zurithriv@gmail.com',
+'kzrubio@hotmail.com',
+'dasaavedra1996@gmail.com',
+'numero369@gmail.com',
+'rvargasc@uni.pe',
+'harnoldjvp_1997@hotmail.com',
+'jhon_19943@hotmail.com',
+'juanito_elunico@hotmail.com',
+'jrzizold@gmail.com',
+'felipegch_al@hotmail.com',
+'jean.herrera.j@uni.pe',
+'victor_leo09@hotmail.com',
+'david.nuyn89@gmail.com',
+'dantefenixuni@gmail.com',
+'adoljpradov@hotmail.com',
+'alexander.15.diego@gmail.com',
+'ssar21@hotmail.com',
+'josuesaraviatasayco0@gmail.com',
+'jomevaga_96@hotmail.com',
+'texcro202@gmail.com',
+'janglass@uni.pe',
+'victor.cadillo123@gmail.com',
+'luiscp_12@hotmail.com',
+'vanhuelix30@gmail.com',
+'eduardogabinog@gmail.com',
+'jhona.gp147@gmail.com',
+'aldo.guardia.g@gmail.com',
+'christopher_97_96@hotmail.com',
+'luishtabs@gmail.com',
+'allanosr@uni.pe',
+'wg.luque@gmail.com',
+'gmonueve01@gmail.com',
+'kjmoryt18@gmail.com',
+'yojqc90@gmail.com',
+'jcramirezb@uni.pe',
+'tonyc96@hotmail.com',
+'mtomairol@uni.pe',
+'jovannijcf@gmail.com',
+'villasante.richard@gmail.com','jramirez@neotegnia.com'];
+    
+    
+    
+    $mailer = new \common\components\Mailer();
+    $message =new  \yii\swiftmailer\Message();
+    $cuerpo="<b>Buenas tardes, estamos trabajando para mejorar el servicio. Este es un test de correo, por favor no responder, disculpe las molestias</b>";
+   // var_dump($mailer->optionsTransport[0]);die();
+   $message->setSubject('Test de correo')
+            ->setFrom(['neotegnia@gmail.com'=>'Oficina de Tutoría Psicológica'])
+         ->setTo($correos)->SetHtmlBody($cuerpo);
+  //$resultado=$mailer->sendSafe($message);
+   */
+   $errores=[];
+   $errores[]=['error'=>'error1'];
+   $errores[]=['error'=>'error2'];
+   $errores[]=['error'=>'error3'];
+   $errores[]=['success'=>'success1'];
+   $errores[]=['success'=>'success2'];
+   $errores[]=['success'=>'success3'];
+var_dump(array_column($errores,'mapa'));
+   var_dump(array_column($errores,'error'));
+   var_dump(array_column($errores,'success'));
+   die();
+   
+    echo h::gsetting('mail', 'userservermail'); die();
+    
+    
+    
+    
     $ar=[1,2,3,4,5,6];
     array_map('strval', $ar);
     var_dump(array_map('strval', $ar));die();

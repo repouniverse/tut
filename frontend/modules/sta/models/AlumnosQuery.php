@@ -8,7 +8,7 @@ use frontend\modules\sta\components\ActiveQueryScope;
  *
  * @see Alumnos
  */
-class AlumnosQuery extends ActiveQueryScope
+class AlumnosQuery extends \yii\db\ActiveQuery
 {
     /*public function active()
     {

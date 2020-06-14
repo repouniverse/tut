@@ -39,7 +39,7 @@ class StaExamenesdet extends \common\models\base\modelBase
             [['examenes_id', 'test_id', 'codfac', 'valor'], 'required'],
             [['examenes_id', 'test_id', 'valor'], 'integer'],
             [['detalles'], 'string'],
-             [['codfac','valor','indicador_id','status'], 'safe'],
+             [['codfac','valor','indicador_id','status','clase','flujo_id'], 'safe'],
             [['codfac'], 'string', 'max' => 8],
             [['codfac'], 'exist', 'skipOnError' => true, 'targetClass' => Facultades::className(), 'targetAttribute' => ['codfac' => 'codfac']],
             [['examenes_id'], 'exist', 'skipOnError' => true, 'targetClass' => Examenes::className(), 'targetAttribute' => ['examenes_id' => 'id']],
@@ -109,6 +109,13 @@ class StaExamenesdet extends \common\models\base\modelBase
         $this->puntaje=$this->testdet->puntaje($this->valor,$arrayCalificaciones);
        return $this->save();
     }
-    
+ public function beforeSave($insert) {
+        parent::beforeSave($insert);
+        if($insert){
+             $this->clase= \frontend\modules\sta\staModule::CLASE_RIESGO;
+            
+        }
+        return true ;
+    }   
     
 }

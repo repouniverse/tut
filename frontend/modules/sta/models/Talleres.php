@@ -77,7 +77,7 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
              [['descripcion','duracioncita','codfac','codperiodo','codtra','codtra_psico','fopen','correo'], 'required'],
             [['codfac'], 'string', 'max' => 8],
             [['descripcion'], 'string', 'max' => 40],
-            [['tolerancia','duracioncita','correo'], 'safe'],
+            [['clase','tolerancia','duracioncita','correo'], 'safe'],
             [['correo'], 'email'],
             [['duracioncita'], 'string', 'max' => 5],
             [['codtra', 'codtra_psico', 'codperiodo'], 'string', 'max' => 6],
@@ -160,6 +160,8 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
     {
         return $this->hasMany(Rangos::className(), ['talleres_id' => 'id']);
     }
+    
+     
 
     /**
      * {@inheritdoc}
@@ -300,6 +302,7 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
        
         if($insert){
             //$this->prefijo=$this->codfac;
+           $this->clase= \frontend\modules\sta\staModule::CLASE_RIESGO;
            $this->resolveCodocu();
            IF(empty($this->tolerancia))
                $this->tolerancia='0.1';
@@ -507,7 +510,8 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
                         ]);
      }
    
- public function nAlumnos(){
+ public  function nAlumnos(){
+   //return self::find()->andWhere(['codfac'=>$this->codfac,'codperiodo'=>$this->codperiodo])->count();
    return Aluriesgo::studentsInRiskByFacQuery($this->codfac)->count();  
    
  } 
@@ -753,7 +757,8 @@ private function prepareAttributesCreateResumen($tallerdet,$citas){
 
 
  private function prepareAttributesUpdateResumen($tallerdet,$citas){
-    
+     yii::error('**************************************');
+    yii::error($citas);
    // $alumno=$tallerdet->alumno;
    /* $base= [
         'codalu'=>$alumno->codalu,
@@ -786,7 +791,9 @@ private function prepareAttributesCreateResumen($tallerdet,$citas){
      
     $adicional=[];
     //var_dump($citas);die();
-    $base=['n_informe'=>$tallerdet->nInformeEditado(),
+    $base=[
+        'n_informe'=>$tallerdet->nInformeEditado(),
+        'codtra'=>$tallerdet->codtra,
         'c_21'=>count($citas),
         'tabril'=>$abril,
         'tmarzo'=>$marzo,
@@ -798,7 +805,8 @@ private function prepareAttributesCreateResumen($tallerdet,$citas){
     
     $baseContadorTutorias=3;
     $baseContadorTalleres=15;
-    $taller_tipo='x';
+    $contenido='';
+    $control_orden='x';
     $memoria='';
     foreach($citas as $cita){
         if($cita['flujo_id']==1  ){
@@ -824,33 +832,94 @@ private function prepareAttributesCreateResumen($tallerdet,$citas){
                $adicional['c_'.$baseContadorTutorias]=self::SwichtFormatDate($cita['fechaprog'],'datetime',true);    
                  
                $baseContadorTutorias++; 
-            }elseif($cita['flujo_id']==5){/*Evaluacion de salida */
+            }elseif($cita['flujo_id']==7){/*Evaluacion de salida */
                
                 $adicional['c_20']=self::SwichtFormatDate($cita['fechaprog'],'datetime',true);    
                   
             }else{/*El resto  $cita['flujo_id']=   15,16,17 son talleres */
-               // yii::error('La cita es');
-              // yii::error($cita);
+                yii::error('La cita es');
+               yii::error($cita);
+                $eventosSesion= StaEventosSesiones::findOne($cita['codaula']+0);
+              if(!is_null($eventosSesion)){
+                  $evento=$eventosSesion->eventos;
+                 $ordenEvento=$evento->ordenTaller();
+                 yii::error('ordenevento '.$evento->numero);
+                     yii::error($ordenEvento);
+                if( $ordenEvento > 0 and $ordenEvento < 7 ){ 
+                           if($control_orden ==$ordenEvento){
+                               yii::error('sigue igual rellanando campo  '.'c_'.($baseContadorTalleres-1+$ordenEvento));
+                               yii::error($memoria.'-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5));
+                                $adicional['c_'.($baseContadorTalleres-1+$ordenEvento)]=$memoria.'-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+                           }else{
+                               $memoria='';
+                                yii::error('difernete rellanando campo  '.'c_'.($baseContadorTalleres-1+$ordenEvento));
+                                yii::error(substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5));
+                                $adicional['c_'.($baseContadorTalleres-1+$ordenEvento)]=substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
                
-               if($taller_tipo ==$cita['flujo_id']){
-                   //yii::error(StaResumenasistencias::findOne(['tallerdet_id'=>$cita['talleresdet_id']])->c_15);
-                   //$anterior=substr(StaResumenasistencias::findOne(['tallerdet_id'=>$cita['talleresdet_id']])->{'c_'.($baseContadorTalleres-1)},0,5);
-                 
-                  // yii::error('anterior :   '.$anterior);
-                   //yii::error($anterior);
-                   $adicional['c_'.($baseContadorTalleres-1)]=$memoria.'-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);   
-                     //yii::error('adicional  :  '.$anterior.'-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5));
-                   
-               }else{
-                  
-                   // yii::error('Colocando en c'.$baseContadorTalleres.'El valor de '.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5));
-                   $adicional['c_'.$baseContadorTalleres]=substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
-                
-                   $baseContadorTalleres++ ;   
-                   // yii::error('aumentado la base a '.$baseContadorTalleres);
-               }
-                $memoria=substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
-                $taller_tipo= $cita['flujo_id'];
+                                //$contenido.='-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                                // $baseContadorTalleres++;
+                             }
+                      
+                           $memoria.=(strlen($memoria)>0)?'-':''.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                           $control_orden= $ordenEvento; 
+                }
+                if($ordenEvento==7){
+                     if($control_orden ==$ordenEvento){
+                                $adicional['c_30']=$memoria.'-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+                           }else{
+                               $memoria='';
+                                $adicional['c_30']=substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+               
+                                //$contenido.='-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                                // $baseContadorTalleres++;
+                             }
+                      
+                           $memoria.=(strlen($memoria)>0)?'-':''.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                           $control_orden= $ordenEvento; 
+                }
+                if($ordenEvento==8){
+                     if($control_orden ==$ordenEvento){
+                                $adicional['c_31']=$memoria.'-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+                           }else{
+                               $memoria='';
+                                $adicional['c_31']=substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+               
+                                //$contenido.='-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                                // $baseContadorTalleres++;
+                             }
+                      
+                           $memoria.=(strlen($memoria)>0)?'-':''.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                           $control_orden= $ordenEvento; 
+                }
+                 if($ordenEvento==9){
+                     if($control_orden ==$ordenEvento){
+                                $adicional['c_32']=$memoria.'-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+                           }else{
+                               $memoria='';
+                                $adicional['c_32']=substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+               
+                                //$contenido.='-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                                // $baseContadorTalleres++;
+                             }
+                      
+                           $memoria.=(strlen($memoria)>0)?'-':''.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                           $control_orden= $ordenEvento; 
+                }
+                if($ordenEvento==10){
+                     if($control_orden ==$ordenEvento){
+                                $adicional['c_33']=$memoria.'-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+                           }else{
+                               $memoria='';
+                                $adicional['c_33']=substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+               
+                                //$contenido.='-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                                // $baseContadorTalleres++;
+                             }
+                      
+                           $memoria.=(strlen($memoria)>0)?'-':''.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                           $control_orden= $ordenEvento; 
+                }
+              } 
               
              
             }
@@ -869,7 +938,13 @@ private function prepareAttributesCreateResumen($tallerdet,$citas){
      $talleresdet=Talleresdet::except()->andWhere(['talleres_id'=>$this->id,'codfac'=>$this->codfac])->all();
      foreach($talleresdet as $tallerdet){
           //foreach($talleresdet as $tallerdet){
-              $citas=$tallerdet->getCitas()->select(['id','talleresdet_id','fechaprog','flujo_id','activo'])->andWhere(['asistio'=>'1','activo'=>'1'])->orderBy('flujo_id ASC')->asArray()->all();
+              $citas=$tallerdet->getCitas()->select(['id','talleresdet_id','fechaprog','flujo_id','activo','codaula'])->
+                      andWhere(['asistio'=>'1','activo'=>'1'])->
+                     // andWhere(['id'=>[1036,1052,3380,4468,4479,4697]])->
+                      orderBy([
+  //'flujo_id' => SORT_ASC,
+  'codaula'=>SORT_ASC
+             ])->asArray()->all();
             $registro=StaResumenasistencias::findOne(['tallerdet_id'=>$tallerdet->id]);
               if(is_null($registro)){
                $attributes=$this->prepareAttributesCreateResumen($tallerdet, $citas); 
@@ -925,7 +1000,31 @@ public function correosProgramaFaltanList($delimiter=';'){
    }
    return substr($lista,1); 
   
- }  
+ } 
+
+public function sincerarPsicologo(){
+  
+    $idsFlujo= \frontend\modules\sta\models\StaFlujo::find()
+      ->select(['actividad'])->andWhere(['clase'=>'M','esevento'=>'0','codperiodo'=>'2020I'])->column();
+   $filas= \frontend\modules\sta\models\Talleresdet::find()->
+            select(['t.id','b.codtra','count(b.codtra) as numero'])->
+            join('INNER JOIN','{{%sta_citas}} b','t.id=b.talleresdet_id')->
+            andWhere(['flujo_id'=>$idsFlujo])->andWhere(['activo'=>'0'])->
+           groupBy(['t.id','b.codtra'])->orderBy([
+                             't.id' => SORT_ASC,
+                            'count(b.codtra)'=>SORT_ASC
+             ])->
+            asArray()->all();
+   foreach($filas as $fila){
+      // yii::error('sincerando '.$fila['id']);
+       \frontend\modules\sta\models\Talleresdet::updateAll(
+            ['codtra'=> $fila['codtra']],
+            ['id'=>$fila['id']]
+               );
+       }
+    return true;
+    
+  }  
  
 }
 

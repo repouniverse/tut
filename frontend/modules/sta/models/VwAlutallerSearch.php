@@ -152,4 +152,45 @@ class VwAlutallerSearch extends VwAlutaller
            // ->andFilterWhere(['like', 'codperiodo', $this->codperiodo]);
         return $dataProvider;
     }
+    
+     public function searchByPsicologo($params,$talleres_id,$codtra)
+    {
+        $query = VwAlutaller::except();
+
+        // add conditions that should always apply here
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'pagination'=>['pageSize'=>10],
+        ]);
+
+        $this->load($params);
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to return any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+        // grid filtering conditions
+        $query->andFilterWhere(['like', 'ap', $this->ap])                
+        ->andWhere(['codtra'=> $codtra])
+         ->andWhere(['talleres_id'=>$talleres_id])
+                 ->andFilterWhere(['like', 'am', $this->am])
+            ->andFilterWhere(['like', 'dni', $this->dni])
+           
+           ->andFilterWhere(['like', 'correo', $this->correo])
+                 ->andFilterWhere(['like','cantidad', $this->cantidad])
+            ->andFilterWhere(['like', 'codalu', $this->codalu])
+            //->andFilterWhere(['like', 'dni', $this->dni])
+            ->andFilterWhere(['like', 'nombres', $this->nombres])
+                 ->andFilterWhere(['like', 'celulares', $this->celulares])
+            //->andFilterWhere(['like', 'nomcur', $this->nomcur])
+          ->andFilterWhere(['like', 'codfac', $this->codfac]);
+           
+            //->andFilterWhere(['like', 'nomcur', $this->nomcur])
+        //  ->andFilterWhere(['like', 'codfac', $this->codfac])
+           // ->andFilterWhere(['like', 'codperiodo', $this->codperiodo]);
+        return $dataProvider;
+    }
 }

@@ -124,7 +124,11 @@ return [
             'class'=>'common\components\ParametersGeneral',
         ],
         
-        
+        'zipper' => [
+            'class' => 'common\components\Zipper', //required
+            'type' => 'tar.gz', //or 'zip' (default), 'tar', 'tar.gz', 'tar.bz2'
+           // 'password' => 'password12345', //optional, only for 7zip type
+        ],
          'assetManager' => [
         'bundles' => [
             

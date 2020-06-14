@@ -43,7 +43,9 @@ $this->params['breadcrumbs'][] = Yii::t('sta.labels', 'Editar');
             <?php if(!$model->asistio && !$vencida){
               echo Html::button('<span class="fa fa-check"></span>   '.Yii::t('sta.labels', 'Confirmar asistencia'), ['id'=>'btn-conf-asistencia','class' => 'btn btn-warning']);
                 } ?>
-            
+             <?php if($model->asistio && !$vencida){
+              echo Html::button('<span class="fa fa-undo"></span>   '.Yii::t('sta.labels', 'Deshacer asistencia'), ['id'=>'btn-undo-asistencia','class' => 'btn btn-danger']);
+                } ?>
                 <?php 
                
                

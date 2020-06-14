@@ -39,7 +39,7 @@ if(!$this->existsTable($table)) {
         'detalles_secre'=>$this->text()->append($this->collateColumn()),
          'detalles_indicadores'=>$this->text()->append($this->collateColumn()),
          'detalles_tareas_pend'=>$this->text()->append($this->collateColumn()),
-         
+             'clase'=>$this->char(1)->notNull()->append($this->collateColumn()), //QUE CALSE DE TALLERS 
 //'detalles_psico'=>$this->text()->append($this->collateColumn()),
          'codaula'=>$this->string(10)->append($this->collateColumn()),
         'activo'=>$this->char(1)->notNull()->append($this->collateColumn()),

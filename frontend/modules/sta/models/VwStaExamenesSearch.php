@@ -17,7 +17,7 @@ class VwStaExamenesSearch extends VwStaExamenes
     public function rules()
     {
         return [
-           [[], 'safe'],
+           [['codfac','codalu','codperiodo','codbateria','codtest'], 'safe'],
      
         ];
     }
@@ -40,7 +40,7 @@ class VwStaExamenesSearch extends VwStaExamenes
      */
     public function search($params)
     {
-        $query = VwAlutaller::find();
+        $query = VwStaExamenes::find();
 
         // add conditions that should always apply here
 
@@ -57,20 +57,13 @@ class VwStaExamenesSearch extends VwStaExamenes
         }
 
         // grid filtering conditions
-        $query->andFilterWhere(['like', 'nombres', $this->nombres])
-            ->andFilterWhere(['like', 'ap', $this->ap])
-              ->andFilterWhere(['like', 'am', $this->am])
-                 ->andFilterWhere(['like','cantidad', $this->cantidad])
-            ->andFilterWhere(['like', 'dni', $this->dni])
-           // ->andFilterWhere(['like', 'nombres', $this->nombres])
-           ->andFilterWhere(['like', 'correo', $this->correo])
-            ->andFilterWhere(['like', 'codalu', $this->codalu])
-            //->andFilterWhere(['like', 'dni', $this->dni])
-            //->andFilterWhere(['like', 'domicilio', $this->domicilio])
-            ->andFilterWhere(['like', 'celulares', $this->celulares])
-            //->andFilterWhere(['like', 'nomcur', $this->nomcur])
-          ->andFilterWhere(['like', 'codfac', $this->codfac])
-        ->andFilterWhere(['like', 'codtra', $this->codtra]);
+        $query->andFilterWhere(['codfac'=>$this->codfac])->
+            andFilterWhere(['codalu'=>$this->codalu])
+              ->andFilterWhere(['codigotra'=>$this->codigotra])
+                  ->andFilterWhere(['codtest'=>$this->codtest])
+                 ->andFilterWhere(['codperiodo'=>$this->codperiodo])
+                 ->andFilterWhere(['codbateria'=>$this->codbateria])
+                 ;
           //  ->andFilterWhere(['like', 'codperiodo', $this->codperiodo]);
 
         return $dataProvider;

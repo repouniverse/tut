@@ -9,6 +9,7 @@ use frontend\modules\sta\models\Tallerpsico;
 use frontend\modules\sta\models\RangosSearch;
 use frontend\modules\sta\models\TalleresSearch;
 use frontend\modules\sta\models\VwAlutaller;
+
 use frontend\modules\sta\models\StaVwCitasSearch;
 use frontend\modules\sta\models\VwStaTutores;
 use frontend\modules\sta\models\Alumnos;
@@ -560,6 +561,7 @@ public function actionMakeCitaByStudent(){
         $model= Tallerpsico::findOne($id);
         $datos=[];
         $error=false; 
+         yii::error(date('Y-m-d H:i:s'));
       //var_dump($fecha);die();
        // print_r($model->getTalleresdet($codalu)->attributes);
         //var_dump($model->attributes);die();
@@ -575,7 +577,7 @@ public function actionMakeCitaByStudent(){
              $error=true; $datos['error']=yii::t('sta.errors','La fecha {fecha} suministrada no tiene el formato adecuado ',['fecha'=>$fecha]);
          }
          
-        
+         yii::error(date('Y-m-d H:i:s'));
          
         if(!$error) { //Sio no hay errores
             $codigotra=$model->taller->psicologoPorDia(\Carbon\Carbon::createFromFormat(\common\helpers\timeHelper::formatMysql(),$fecha));
@@ -589,12 +591,15 @@ public function actionMakeCitaByStudent(){
                 
             ];
            // var_dump($fecha,$model::_FDATETIME,$model::SwichtFormatDate($fecha,$model::_FDATETIME,true));die();
-           $cita=New Citas();
+         yii::error('creando la cita'.date('Y-m-d H:i:s'));
+            $cita=New Citas();
            $cita->setScenario(Citas::SCE_CREACION_BASICA);
            $cita->attributes=$attributes;
+           
+            yii::error('obteniendo la etapa '.date('Y-m-d H:i:s'));
            $cita->flujo_id=$cita->obtenerEtapaId(); //Aquis e autoclifica en que tepad esta 
             if($cita->save()){
-                
+                 yii::error('grabo'.date('Y-m-d H:i:s'));
                if(h::gsetting('sta','notificacitasmail')){
                    $cita->enviacorreo();
                }
@@ -602,12 +607,12 @@ public function actionMakeCitaByStudent(){
               $datos['success']=yii::t('sta.errors','Se ha creado la cita {numero} satisfactoriamente',['numero'=>$cita->numero]);
                 
             }else{
-               var_dump($cita->getErrors());die();
+             //  var_dump($cita->getErrors());die();
                 /*$mod=new Citas();
                 $mod->setScenario(Citas::SCE_CREACION_BASICA);
                 $mod->setAttributes($attributes);
                 $mod->validate();*/
-              $datos['error']=yii::t('sta.errors','Hubo un problema interno al grabar el registro de las citas : '.$cita->getFirstError());
+              $datos['error']=yii::t('sta.errors','Hubo un problema : '.$cita->getFirstError());
                 UNSET($cita);
                // RETURN $datos;
             }
@@ -1070,8 +1075,6 @@ public function actionBalanceEventos($id){
   } 
 
 public function actionResultados(){
-
-        
         
         $searchModel = new \frontend\modules\sta\models\VwStaResultadosSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -1092,4 +1095,139 @@ public function actionInformes(){
         ]);
 }
 
-}
+public function actionCreateRegular()
+    {
+        $model = new \frontend\modules\sta\models\Talleres_n();
+        var_dump($model->load(Yii::$app->request->post()));
+       
+        if ($model->load(Yii::$app->request->post()) ) {
+             if($model->save()){
+                 return $this->redirect(['view', 'id' => $model->id]);
+             }else{
+                 print_r($model->getErrors());DIE();
+             }
+            
+        }ELSE{
+            
+           /* PRINT_R($model->getErrors());
+            die();*/
+        }
+
+        return $this->render('create', [
+            'model' => $model,
+        ]);
+    }
+
+  public function actionDownloadInformesByAlumno($id){      
+    $model= \frontend\modules\sta\models\Talleresdet::findOne($id);
+      $mpdf = new \Mpdf\Mpdf();
+      $routes=[];
+    foreach($model->documentos as $documento){
+         
+     
+         if($documento->hasAttachments()){
+             foreach($documento->files as $file){
+                 
+            
+             $route=$file->path;
+              $routes[]=$route;
+             //$mpdf= \frontend\modules\report\Module::getPdf(); 
+                    $mpdf->AddPage();
+                    $mpdf->SetImportUse();
+                    $pagecount = $mpdf->SetSourceFile($route);
+                     yii::error('numero de paginas   :'.$pagecount   );
+         if ($pagecount > 0) {
+         
+             for ($k = 1; $k <= $pagecount; $k++) {
+                  yii::error('bucle k');
+                   yii::error($k);
+                   
+                 $tplId = $mpdf->ImportPage($k);
+                 $mpdf->UseTemplate($tplId);
+                 if ($k < $pagecount) {
+                     $mpdf->AddPage();
+                 }
+             }
+         }
+         }
+         }
+         
+            /*$zip = new \ZipArchive();
+            $zip->open(\yii::getAlias('@frontend/web/img_repo/e1/primito.tar'), ZipArchive::CREATE);  
+             foreach($routes as $route){
+               $zip->addFile($route, basename($route));  
+             *  $zip->close();
+             }*/
+             
+// $zip->addFile('fonts/Monoton/Monoton-Regular.ttf', 'Monoton-Regular.ttf');
+            //$zip->addFile('fonts/Monoton/OFL.txt', 'license.txt');
+           
+            
+        // $tarArchive = Yii::$app->zipper->create(\yii::getAlias('@frontend/web/img_repo/e1/primito.tar'), $routes, true, 'tar');
+          $documento->logAudit(\common\behaviors\AccessDownloadBehavior::ACCESS_DOWNLOAD);
+        //unlink($route);
+       } 
+        
+      //return  $pdf->output('/home/neotegni/public_html/sigi/frontend/uploads/pdfs/pd_grandazo.pdf', \Mpdf\Output\Destination::FILE);
+       return $mpdf->Output($model->alumno->codalu.'_'.$model->alumno->ap.'.pdf',\Mpdf\Output\Destination::DOWNLOAD);
+         
+     }
+     
+     public function actionSincerarPsicologos($id){
+       if(h::request()->isAjax){
+            h::response()->format = \yii\web\Response::FORMAT_JSON;
+           $model=$this->findModel($id);
+           $model->sincerarPsicologo();
+           return ['success'=>yii::t('sta.labels','Se han sincerado los Psicólogos')];
+       }
+         
+     }
+     
+    public function actionExamenes(){
+
+        
+        
+        $searchModel = new \frontend\modules\sta\models\VwStaExamenesSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('index_examenes', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }  
+     
+   public function actionEventos(){
+        $searchModel = new \frontend\modules\sta\models\VwStaEventosSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('index_eventos', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+   }
+  
+   public function actionZipearInformes(){
+       $sesion=h::session();
+     
+       if($sesion->has(h::SESION_MALETIN)){
+           $datos=array_map('intval',$sesion[h::SESION_MALETIN]);
+           
+           $sesion[h::SESION_MALETIN]=[];
+           $ruta=\frontend\modules\sta\models\StaDocuAlu::zipeaVariosIds($datos);
+            $info= pathinfo($ruta);
+          if(is_file($ruta)){
+             return Yii::$app->response->sendFile($ruta, $info['filename'].'.'.$info['extension']);  
+          }else{
+              echo yii::t('sta.labels','No se encontraron archivos que descargar'); die();
+          }
+            
+            //echo $ruta; die();
+            //echo $info['filename'];die();
+        
+           
+       }
+   }
+   
+   
+  }
+

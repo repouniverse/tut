@@ -44,6 +44,17 @@ use yii\helpers\Html;
     
     
     <body class="<?= \dmstr\helpers\AdminLteHelper::skinClass() ?>">
+    <?php 
+    
+          $this->registerJs("$(window).on('load', function () {
+    $('#page-loader').delay(1).fadeOut('slow');
+});", \yii\web\View::POS_HEAD);  ?>
+        
+      
+      <div id="page-loader"><span class="preloader-interior"></span></div>
+     
+        
+        
     <?php $this->beginBody(); ?>
     <div class="wrapper">
 

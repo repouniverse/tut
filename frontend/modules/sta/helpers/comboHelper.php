@@ -11,6 +11,7 @@ namespace frontend\modules\sta\helpers;
 use common\helpers\ComboHelper as Combito;
 use common\helpers\h;
 use yii\helpers\ArrayHelper;
+use frontend\modules\sta\models\UserFacultades;
 class comboHelper extends Combito
 {
      public static function getCboFacultades(){
@@ -70,6 +71,31 @@ class comboHelper extends Combito
  return $compilado;
         
     }
+   
+    
+public static function getCboTutoresByFac(){
+    $facultades=UserFacultades::filterFacultades();
+         $psicologos= \frontend\modules\sta\models\Tallerpsico::find()
+                 ->select(['codtra'])
+                 ->where(['codfac'=>$facultades])->asArray()->all();
+ $codigos=ArrayHelper::getColumn($psicologos, 'codtra');
+ //var_dump($id,$codigos,'o');die();
+ 
+ $trabajadores=\common\models\masters\Trabajadores::find()->select(['codigotra','ap','am','nombres'])->
+                where(['in',
+              'codigotra', $codigos
+               ])->asArray()->all();
+ $compilado=[];
+//var_dump($trabajadores);die();
+ foreach($trabajadores as $trabajador){
+    // $compilado[]=[$trabajador['codigotra']=>$trabajador['ap'].$trabajador['am'].$trabajador['nombres']];
+     $compilado[$trabajador['codigotra']]=$trabajador['codigotra'].'-'.$trabajador['ap'].'-'.$trabajador['am'].'-'.$trabajador['nombres'];
+ }
+  
+ return $compilado;
+        
+    }
+    
     
     /*
      * Devuelve todos los testPiscologicos
@@ -103,7 +129,17 @@ class comboHelper extends Combito
                ])->all(),
                 'codtest','descripcion');
     
-    }    
+    }  
+    public static function getCboTestByBateria($codbateria){
+      
+        return ArrayHelper::map(
+               \frontend\modules\sta\models\Test::find()->
+                where(['codbateria'=>$codbateria])->all(),
+                'codtest','descripcion');
+    
+    }  
+    
+    
   
     public static function geCboRankTutor(){
         return ['A'=>'Buena asistencia y Rendimiento',
@@ -134,7 +170,7 @@ class comboHelper extends Combito
     from(['{{%sta_citas}} a'])->
       where([
           'talleresdet_id'=>$talleresdet_id,
-          
+          'asistio'=>'1'
               ])->innerJoin('{{%sta_examenes}} b','a.id=b.citas_id')
              ->groupBy(['id','numero']);
           
@@ -149,7 +185,7 @@ class comboHelper extends Combito
     
 return ArrayHelper::map( \frontend\modules\sta\models\StaFlujo::find()-> 
       where(['codperiodo'=>$codperiodo,'esevento'=>'1'])->all(),
-            'id','proceso'); 
+            'actividad','proceso'); 
     }
  
     public static function getCboFlujoEvaluaciones($codperiodo=null){
@@ -205,6 +241,17 @@ return ArrayHelper::map( \frontend\modules\sta\models\StaFlujo::find()->
 return ArrayHelper::map( \frontend\modules\sta\models\StaFlujo::find()-> 
       where(['codperiodo'=>$codperiodo,'actividad'=>$ids])->all(),
             'id','proceso'); 
+    }
+    
+     public static function getCboDocusSta($codperiodo=null){
+    if(is_null($codperiodo)){
+         $codperiodo=\frontend\modules\sta\staModule::getCurrentPeriod();
+    }  
+  
+return ArrayHelper::map(  \common\models\masters\Documentos::find()->
+        select(['codocu','desdocu'])-> 
+     andWhere(['codocu'=> \frontend\modules\sta\staModule::docCodes()])->all(),
+            'codocu','desdocu'); 
     }
 }
 

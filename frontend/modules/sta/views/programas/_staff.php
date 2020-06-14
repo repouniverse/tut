@@ -102,7 +102,48 @@ use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
  $url= Url::to(['agrega-psico','id'=>$model->id,'gridName'=>'grilla-staff','idModal'=>'buscarvalor']);
    echo  Html::button(yii::t('base.verbs','Agregar Psicólogo'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Tutor'),'id'=>'btn_contacts', 'class' => 'botonAbre btn btn-success']); 
 ?> 
+    
+     <?php 
+              echo Html::button('<span class="fa fa-check"></span>   '.Yii::t('sta.labels', 'Sincerar Alumnos'), ['id'=>'btn-sincerar','class' => 'btn btn-warning']);
+      ?>
 </div>
+<?php $this->registerJs("
+         
+$('#btn-sincerar').on( 'click', function(){    
+  $.ajax({ 
+  
+   method:'post',    
+      url: '".\yii\helpers\Url::toRoute(['/sta/programas/sincerar-psicologos','id'=>$model->id])."',
+   delay: 250,
+ data: {id:".$model->id."},
+             error:  function(xhr, textStatus, error){               
+                            var n = Noty('id');                      
+                              $.noty.setText(n.options.id, error);
+                              $.noty.setType(n.options.id, 'error');       
+                                }, 
+              success: function(json) {  
+                        var n = Noty('id');
+                       if ( !(typeof json['error']==='undefined') ) {
+                                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-trash\'></span>      '+ json['error']);
+                              $.noty.setType(n.options.id, 'error'); 
+                              }
+                         if ( !(typeof json['success']==='undefined') ) {
+                                        $.noty.setText(n.options.id, json['success']);
+                             $.noty.setType(n.options.id, 'success');
+                              } 
+                               if ( !(typeof json['warning']==='undefined') ) {
+                                        $.noty.setText(n.options.id, json['warning']);
+                             $.noty.setType(n.options.id, 'warning');
+                              } 
+                              $.pjax.defaults.timeout = false;  
+                       // $.pjax.reload({container: '#grilla-minus'});
+                        },
+   cache: true
+  })
+ }
+ 
+);",\yii\web\View::POS_END);  
+  ?>
   
        
 

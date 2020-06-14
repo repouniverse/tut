@@ -41,7 +41,7 @@ class StaConvocatoria extends \common\models\base\modelBase
             [['talleresdet_id'], 'integer'],
             [['codfac', 'canal'], 'required'],
             [['detalle'], 'string'],
-             [['canal','fecha','resultado'], 'safe'], 
+             [['canal','fecha','resultado','clase'], 'safe'], 
             [['codfac'], 'string', 'max' => 8],
             [['canal'], 'string', 'max' => 3],
            // [['resultado'], 'string', 'max' => 1],
@@ -89,4 +89,14 @@ class StaConvocatoria extends \common\models\base\modelBase
     {
         return new StaConvocatoriaQuery(get_called_class());
     }
+     public function beforeSave($insert) {
+       if($insert){            
+          $this->clase= \frontend\modules\sta\staModule::CLASE_RIESGO;
+          
+       }
+           
+        //$this->resolveDuration();
+        return parent::beforeSave($insert);
+       
+    } 
 }

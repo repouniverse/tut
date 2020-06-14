@@ -8,6 +8,9 @@ use frontend\modules\sta\models\Examenes;
 use frontend\modules\sta\models\StaResultados;
 use frontend\modules\sta\models\StaPercentiles;
 use common\models\masters\Trabajadores;
+use \common\helpers\FileHelper;
+use common\behaviors\FileBehavior;
+use common\behaviors\AccessDownloadBehavior;
 use Yii;
  use common\helpers\timeHelper;
   use common\helpers\h;
@@ -58,6 +61,24 @@ class Talleresdet extends \common\models\base\modelBase
         return $scenarios;
     }
     
+    public function behaviors()
+         {
+                return [
+		'AccessDownloadBehavior' => [
+			'class' => AccessDownloadBehavior::className()
+		],
+		'fileBehavior' => [
+			'class' => FileBehavior::className()
+		],
+                    'auditoriaBehavior' => [
+			'class' => '\common\behaviors\AuditBehavior' ,
+                               ],
+		
+                    ];
+        }
+    
+    
+    
     /**
      * {@inheritdoc}
      */
@@ -67,7 +88,7 @@ class Talleresdet extends \common\models\base\modelBase
             [['talleres_id', 'codalu'], 'required'],
             [['talleres_id'], 'integer'],
             [['detalles'], 'string'],
-            [['rank_psico','rank_tutor','status','codtra'], 'safe'],
+            [['rank_psico','rank_tutor','status','codtra','clase','codocu'], 'safe'],
             [['codalu'], 'string', 'max' => 14],
             [['fingreso'], 'string', 'max' => 10],
             [['codtra'], 'string', 'max' => 6],
@@ -153,19 +174,26 @@ public function getTrabajador()
      * cREA REGISTROS DE DOCUMENTOS 
      */
     public function generaDocumentos(){
+        
+   $orden=(StaDocuAlu::find()->where([
+        'talleresdet_id'=>$this->id,
+       // 'codocu'=>$this->codocu,
+        ])->count()>0)?2:1;
+
         $codes=staModule::docCodes();
+       
         foreach($codes as $code){
-            StaDocuAlu::firstOrCreateStatic([
+           if(!($orden==2 && $code==104)){
+              StaDocuAlu::firstOrCreateStatic([
                 'talleresdet_id'=>$this->id,
                 'codocu'=>$code,
+                'orden'=>$orden,
                  'codfac'=>$this->codfac,
                  'status'=>Aluriesgo::FLAG_NORMAL,
-                    ]);
+                    ]); 
+           }
+            
         }
-        
-        
-        
-        
         
     }
     
@@ -323,45 +351,49 @@ public function nInformeEditado(){
  */
 public function retiraDelPrograma($retiro=true){  
     $flag=($retiro)?Aluriesgo::FLAG_RETIRADO: Aluriesgo::FLAG_NORMAL;
+    YII::ERROR('eL FALG ES  '.$flag);
     $flagCita=($retiro)?'0':'1';
     $codperiodo=$this->talleres->codperiodo;
     $citasid=$this->idCitas();
-    
+    yii::error($citasid);
  if($codperiodo == staModule::getCurrentPeriod()){
        $transaccion=$this->getDb()->beginTransaction(\yii\db\Transaction::SERIALIZABLE);
     /*Mofiicando latabla ALurieso*/
      Aluriesgo::updateAll(
             ['status'=> $flag],
             ['codalu'=>$this->codalu,'codperiodo'=>$codperiodo]);
-    /*Mofiicando latabla Tllerdet*/ 
+    /*Mofiicando latabla Tallerdet*/ 
     self::updateAll(
             ['status'=> $flag],
             ['codalu'=>$this->codalu]);
-    /*Mofiicando latabla Tllerdet*/ 
+    /*Mofiicando latabla Citas*/ 
      Citas::updateAll(
             ['activo'=> $flagCita],
             [
                 'talleresdet_id'=>$this->id,
               
               ]);
-     
+     /*Modificando la hoja de asistencia*/
               StaResumenasistencias::deleteAll(['codalu'=>$this->codalu]);
-              
+      /*Modificando la tabla de informes*/              
               StaDocuAlu::updateAll(['status'=> $flag], ['talleresdet_id'=> $this->talleres_id]);
-     //$citasid=['1163','1166'];
-     $idExamenes=Examenes::find()->select(['id'])->andWhere(['citas_id'=>$citasid])->column();
-     //var_dump($citasid,Examenes::find()->select(['id'])->andWhere(['citas_id'=>$citasid])->createCommand()->getRawSql());
-     Examenes::updateAll( ['status'=> $flag], ['id'=>$idExamenes]);
-     StaExamenesdet::updateAll(['status'=> $flag], ['examenes_id'=>$idExamenes]);
-     //$transaccion->rollback();
-     //var_dump($citasid,$idExamenes);die();
-     
-   
-   
-     //$this->status=$flag;
-     //$this->save();
-    /* Despuesd e ahacer estas actulizaciones */
+    //ECHO Examenes::find()->complete()->select(['id'])->andWhere(['citas_id'=>$citasid])->createCommand()->getRawSql();
     
+    /*Sacando el id de los examenes, observe que
+     * se usa la funcion complete de activeQueryStatus
+     * Esto para evitar el filtro de 'R' cuando querramos 
+     * revertir un retiro
+     */
+    $idExamenes=Examenes::find()->complete()->select(['id'])->andWhere(['citas_id'=>ARRAY_MAP('intval',$citasid)])->column();
+      /*Actualizando la tabla Examenes*/
+    
+      YII::ERROR($idExamenes);
+     Examenes::updateAll( ['status'=> $flag], ['id'=>$idExamenes]);
+      /*Actualizando la tabla Detalle examenes*/
+     StaExamenesdet::updateAll(['status'=> $flag], ['examenes_id'=>$idExamenes]);
+       /*Actualizando la tabla Resultados*/
+       StaResultados::updateAll(['status'=> $flag], ['examen_id'=>$idExamenes]);
+     
     $transaccion->commit();
     return true;
  }else{
@@ -418,7 +450,33 @@ public function hasPerformedFirstExamen(){
 }
  
 
+public function beforeSave($insert) {
+        parent::beforeSave($insert);
+        if($insert){
+            $this->codocu='411';
+             $this->clase= \frontend\modules\sta\staModule::CLASE_RIESGO;
+            
+        }
+        return true ;
+    }
 
-
- 
+/*
+ * Zipea los adjuntos de STADOCUENTOS 
+ * Y LO GUARAD COO AFJUNTO 
+ */
+    
+public function zipea(){
+    $zip=New \ZipArchive();  
+    $rutaTemp=\yii::getAlias('@frontend/web/img_repo/temp/'. uniqid().'.zip');
+    $zip->open($rutaTemp, \ZipArchive::CREATE);
+    foreach ($this->documentos as $documento){
+       If(!is_null($model->rutaZip())){
+            $zip->addFile($model->rutaZip()); 
+        }
+    }
+    $zip->close();
+    return $rutaTemp;
+}
+    
+    
 }

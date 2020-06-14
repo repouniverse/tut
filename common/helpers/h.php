@@ -134,6 +134,12 @@ class h {
        
     }
     
+    public static function nSetting($key){
+     return  \yii2mod\settings\models\SettingModel::find()->where(['key'=>$key])->count();
+       
+    }
+    
+    
     
     public static function UserLongName(){
         return yii::$app->user->getProfile()->names;

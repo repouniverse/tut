@@ -30,6 +30,7 @@ if(!$this->existsTable($table)) {
         'codist'=>$this->string(9)->append($this->collateColumn()),
         'codprov'=>$this->string(6)->append($this->collateColumn()),
         'codep'=>$this->string(3)->append($this->collateColumn()),
+         'codperingreso'=>$this->string(9)->append($this->collateColumn()),
          'sexo'=>$this->char(1)->append($this->collateColumn()),
        /*'celulares'=>$this->string(23)->append($this->collateColumn()),
          'fijos'=>$this->string(19)->append($this->collateColumn()),

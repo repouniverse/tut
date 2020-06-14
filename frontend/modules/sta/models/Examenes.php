@@ -47,8 +47,9 @@ class Examenes extends modelSensibleAccess
         return [
             [['citas_id', 'codtest'], 'required'],
             [['citas_id'], 'integer'],
-             [['fnotificacion','virtual','codfac','reporte_id','status'],'safe'],
+             [['fnotificacion','virtual','codfac','reporte_id','status','flujo_id'],'safe'],
             [['detalles'], 'string'],
+             [['clase'], 'safe'],
             [['codtest'], 'string', 'max' => 8],
             [['codtest'], 'exist', 'skipOnError' => true, 'targetClass' => Test::className(), 'targetAttribute' => ['codtest' => 'codtest']],
             [['citas_id'], 'exist', 'skipOnError' => true, 'targetClass' => Citas::className(), 'targetAttribute' => ['citas_id' => 'id']],
@@ -141,7 +142,8 @@ class Examenes extends modelSensibleAccess
            'codfac'=>$this->codfac,
           'test_id'=>$detalle->id,
           'indicador_id'=>$idIndi,
-          'status'=> Aluriesgo::FLAG_NORMAL
+          'status'=> Aluriesgo::FLAG_NORMAL,
+          'flujo_id'=>$this->flujo_id
                    ];
           
       $verifyAttributes=[
@@ -309,6 +311,10 @@ class Examenes extends modelSensibleAccess
   
  }
  
-
+public function beforeSave($insert) {
+    parent::beforeSave($insert);
+     $this->clase= \frontend\modules\sta\staModule::CLASE_RIESGO;
+     return true;
+}
  
 }

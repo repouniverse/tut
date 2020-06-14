@@ -18,8 +18,9 @@ $tipo=h::user()->profile->tipo;
 <div class="citas-form">
   <div class="box-body">
     <?php $form = ActiveForm::begin([
-       //'enableAjaxValidation'=>true,
-   // 'fieldClass'=>'\common\components\MyActiveField'
+       'id'=>'formulario_cita',
+      // 'enableAjaxValidation'=>true,
+    //'fieldClass'=>'\common\components\MyActiveField'
     ]); ?>
       <div class="box-header">
         <div class="col-md-12">
@@ -58,7 +59,7 @@ $tipo=h::user()->profile->tipo;
   
   <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
       <?php 
-      echo $form->field($model, 'fechaprog')->textInput(['disabled' =>true]);
+      echo $form->field($model, 'fechaprog',['enableAjaxValidation'=>true])->textInput(['disabled' =>true]);
         /*echo $form->field($model, 'fechaprog')->widget(
         DateTimePicker::classname(), [
          'name' => 'finicio',
@@ -81,7 +82,7 @@ $tipo=h::user()->profile->tipo;
        echo $form->field($model, 'finicio')->textInput(['disabled' =>true]);
          
       }else{
-         echo $form->field($model, 'finicio')->widget(
+         echo $form->field($model, 'finicio',['enableAjaxValidation'=>true])->widget(
         DateTimePicker::classname(), [
          'name' => 'finicio',
             'language' => h::app()->language,
@@ -103,7 +104,7 @@ $tipo=h::user()->profile->tipo;
        echo $form->field($model, 'ftermino')->textInput(['disabled' =>true]);
          
       }else{
-        echo $form->field($model, 'ftermino')->widget(
+        echo $form->field($model, 'ftermino',['enableAjaxValidation'=>true])->widget(
         DateTimePicker::classname(), [
          'name' => 'ftermino',
             'language' => h::app()->language,
@@ -239,14 +240,16 @@ $tipo=h::user()->profile->tipo;
                                 $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-ok-sign\'></span>' + json['success']);
                              $.noty.setType(n.options.id, 'success');
                              $('#btn-conf-asistencia').hide();
-                              $.pjax.reload({container: '#botones-examenes',async:false});
+                             $('#btn-undo-asistencia').show();
+                            
                               $.pjax.reload({container: '#check-asistencia-cita',async:false});
                               } 
                                if ( !(typeof json['warning']==='undefined') ) {
                                         $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-info-sign\'></span>' +json['warning']);
                              $.noty.setType(n.options.id, 'warning');
                              $('#btn-conf-asistencia').hide();
-                             $.pjax.reload({container: '#botones-examenes'});
+                              $('#btn-undo-asistencia').show();
+                            
                               $.pjax.reload({container: '#check-asistencia-cita'});
                               } 
                               
@@ -255,4 +258,49 @@ $tipo=h::user()->profile->tipo;
                         });
              })", View::POS_READY);
 ?>
+<?php
+ $this->registerJs("$('#btn-undo-asistencia').on( 'click', function() { 
+      //alert(this.id);
+      $.ajax({
+              url: '".Url::toRoute(['ajax-revert-asistencia'])."', 
+              type: 'get',
+              data:{id:".$model->id."},
+              dataType: 'json', 
+               error:  function(xhr, textStatus, error){               
+                            var n = Noty('id');                      
+                              $.noty.setText(n.options.id, error);
+                              $.noty.setType(n.options.id, 'error');       
+                                },  
+            success: function(json) {  
+                  
+                        var n = Noty('id');
+                       if ( !(typeof json['error']==='undefined') ) {
+                      
+                   $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-remove-sign\'></span>      '+ json['error']);
+                              $.noty.setType(n.options.id, 'error'); 
+                              }
+                         if ( !(typeof json['success']==='undefined') ) {
+                                    
+                                $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-ok-sign\'></span>' + json['success']);
+                             $.noty.setType(n.options.id, 'success');
+                             $('#btn-undo-asistencia').hide();
+                              $('#btn-conf-asistencia').show();
+                            
+                              $.pjax.reload({container: '#check-asistencia-cita',async:false});
+                              } 
+                               if ( !(typeof json['warning']==='undefined') ) {
+                                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-info-sign\'></span>' +json['warning']);
+                             $.noty.setType(n.options.id, 'warning');
+                             $('#btn-undo-asistencia').hide();
+                              $('#btn-conf-asistencia').show();
+                            
+                              $.pjax.reload({container: '#check-asistencia-cita'});
+                              } 
+                              
+                      
+                        },
+                        });
+             })", View::POS_READY);
+?>    
+    
 </diV>

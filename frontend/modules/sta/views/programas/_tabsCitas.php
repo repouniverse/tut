@@ -47,12 +47,12 @@ echo \common\widgets\spinnerWidget\spinnerWidget::widget();
         ],
         [
             'label' =>'<i class="glyphicon glyphicon-calendar"></i> '. yii::t('base.names','Programación'), //$this->context->countDetail() obtiene el contador del detalle
-            'content'=> $this->render('_tab_calendario',['codalu'=>$codalu,'codperiodo'=>$codperiodo,'idalu'=>$model->id,'modelPsico'=>$modelPsico,  'items'=>[['name'=>$codalu,'color'=>$color]],'citasPendientes'=>$citasPendientes,'model'=>$modelPsico]),
+            'content'=> $this->render('_tab_calendario',['modelTallerdet'=>$modelTallerdet,'codalu'=>$codalu,'codperiodo'=>$codperiodo,'idalu'=>$model->id,'modelPsico'=>$modelPsico,  'items'=>[['name'=>$codalu,'color'=>$color]],'citasPendientes'=>$citasPendientes,'model'=>$modelPsico]),
             'active' => false,
              'options' => ['id' => 'myy6nID4'],
         ],
       [
-            'label' =>'<i class="glyphicon glyphicon-calendar"></i> '. yii::t('base.names','Documentos'), //$this->context->countDetail() obtiene el contador del detalle
+            'label' =>'<i class="glyphicon glyphicon-folder-open"></i>   '. yii::t('base.names','Documentos'), //$this->context->countDetail() obtiene el contador del detalle
             'content'=> $this->render('_tab_documentos',['model'=>$modelTallerdet]),
             'active' => false,
              'options' => ['id' => 'mxx4ID4'],

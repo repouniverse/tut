@@ -63,7 +63,11 @@
         "kartik-v/yii2-editors": "@dev",
         "kartik-v/yii2-krajee-base": "dev-master",
         "franciscomaya/yii2-sceditor": "dev-master",
-        "2amigos/yii2-ckeditor-widget": "*"
+        "2amigos/yii2-ckeditor-widget": "^2.2",
+        "bizley/quill": "^2.0",
+        "rikcage/yii2-sceditor": "*",
+        "johnson/yii2-webcam": "*",
+        "pelago/emogrifier": "^3.1"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

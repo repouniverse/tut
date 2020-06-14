@@ -636,4 +636,58 @@ return array (
       '@kartik/grid' => $vendorDir . '/kartik-v/yii2-grid/src',
     ),
   ),
+  'franciscomaya/yii2-sceditor' => 
+  array (
+    'name' => 'franciscomaya/yii2-sceditor',
+    'version' => '9999999-dev',
+    'alias' => 
+    array (
+      '@franciscomaya/sceditor' => $vendorDir . '/franciscomaya/yii2-sceditor',
+    ),
+  ),
+  '2amigos/yii2-ckeditor-widget' => 
+  array (
+    'name' => '2amigos/yii2-ckeditor-widget',
+    'version' => '2.2.0.0',
+    'alias' => 
+    array (
+      '@dosamigos/ckeditor' => $vendorDir . '/2amigos/yii2-ckeditor-widget/src',
+    ),
+  ),
+  'kartik-v/yii2-editors' => 
+  array (
+    'name' => 'kartik-v/yii2-editors',
+    'version' => '9999999-dev',
+    'alias' => 
+    array (
+      '@kartik/editors' => $vendorDir . '/kartik-v/yii2-editors/src',
+    ),
+  ),
+  'bizley/quill' => 
+  array (
+    'name' => 'bizley/quill',
+    'version' => '2.6.1.0',
+    'alias' => 
+    array (
+      '@bizley/quill' => $vendorDir . '/bizley/quill/src',
+    ),
+  ),
+  'rikcage/yii2-sceditor' => 
+  array (
+    'name' => 'rikcage/yii2-sceditor',
+    'version' => '0.0.1.0',
+    'alias' => 
+    array (
+      '@rikcage/sceditor' => $vendorDir . '/rikcage/yii2-sceditor',
+    ),
+  ),
+  'johnson/yii2-webcam' => 
+  array (
+    'name' => 'johnson/yii2-webcam',
+    'version' => '0.0.1.0',
+    'alias' => 
+    array (
+      '@Johnson' => $vendorDir . '/johnson/yii2-webcam',
+    ),
+  ),
 );

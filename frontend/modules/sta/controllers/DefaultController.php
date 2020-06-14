@@ -3,6 +3,7 @@
 namespace frontend\modules\sta\controllers;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
+use frontend\modules\sta\models\VwAlutallerSearch;
 use yii;
 use common\helpers\h;
 use common\models\User;
@@ -48,30 +49,6 @@ class DefaultController extends Controller
     $query=\frontend\modules\sta\models\StaResumenasistencias::
      find()->where(['codperiodo'=>$codperiodo]);
     
-    $exp = new yii\db\Expression("SUBSTR(c_1,1, 1) >='0' and SUBSTR(c_1,1, 1) <>'@'");
-    $examenes=\frontend\modules\sta\models\StaResumenasistencias::
-     find()->where(['codperiodo'=>$codperiodo])->select(['count(c_1) as nexam'])->
-            andWhere($exp)
-            ->groupBy('codfac')->asArray()->all();
-   /* var_dump(\frontend\modules\sta\models\StaResumenasistencias::
-     find()->where(['codperiodo'=>$codperiodo])->select(['count(c_1) as nexam'])->
-            andWhere(['>','c_1',substr($codperiodo,0,4).'-01-01'])
-            ->groupBy('codfac')->createCommand()->getRawSql());die();*/
-    //var_dump($query->select(['count(c_1) as nexam'])->
-    //andWhere(['>','c_1',substr($codperiodo,0,4).'-01-01'])
-    //->groupBy('codfac')->createCommand()->getRawSql());die();
-    $informes=\frontend\modules\sta\models\StaResumenasistencias::
-     find()->where(['codperiodo'=>$codperiodo])->select(['count(n_informe) as ninforme'])->
-            andWhere(['>=','n_informe',3])->groupBy('codfac')->
-            asArray()->all();
-   
-    
-    
-    
-    $totales=\frontend\modules\sta\models\StaResumenasistencias::
-     find()->where(['codperiodo'=>$codperiodo])->select(['count(*) as ntotal','codfac'])->
-    groupBy('codfac')->asArray()->all();
-    
     
    
  $userLogin=(new \yii\db\Query())->select("count(*) as nlogin , b.username") ->  
@@ -83,14 +60,9 @@ class DefaultController extends Controller
     from("{{%activerecordlog}} a")->groupBy('username')->orderBy('count(*) desc')->all();
 
    
-    $indiAvances=[
-        'facultades'=>array_column($totales,'codfac'),
-        'ntotales'=>array_map('intval',array_column($totales,'ntotal')),
-         'informes'=>array_map('intval',array_column($informes,'ninforme')),
-        'examenes'=>array_map('intval',array_column($examenes,'nexam'))
-        ];
+    $indiAvances= \frontend\modules\sta\components\Indicadores::IndiAvances($codperiodo);
     //print_r($indiAvances['examenes']);die();
-    
+   //  $indiAvances=\frontend\modules\sta\components\Indicadores::IndiAvanceByFac('FAUA','2020I');
   return   $this->render('index',
           [
               'indiAvances'=>$indiAvances,
@@ -261,7 +233,7 @@ class DefaultController extends Controller
       }else{
          $codfac=h::user()->getFirstFacultad(); 
       }
-      
+      $codperiodo= \frontend\modules\sta\staModule::getCurrentPeriod();
       
      // $provider = \frontend\modules\sta\models\StaVwCitasSearch::searchByPsicoToday($codfac/*,$fecha*/);
        $provider = \frontend\modules\sta\models\StaVwCitasSearch::searchByDay($codfac,$fecha);
@@ -289,15 +261,41 @@ class DefaultController extends Controller
             putColorThisCodalu(
                    $tallerPsico->eventosPendientes(),'',null);
     
-    
-     return $this->render('psicologo',[
+     $tallerId= \frontend\modules\sta\models\Talleres::findOne(['codfac'=>$codfac,'codperiodo'=>$codperiodo])->id;
+     /*
+      * aQUI SELECCIONAMOS LOS ALUMNOS DE ESTE PSICOLOGO
+      */
+    $searchAlumnos = new VwAlutallerSearch();
+        $providerAlu = $searchAlumnos->searchByPsicologo(
+                h::request()->queryParams,$tallerId,$codtra);
+     
+     
+     
+     
+    /*if(h::userId()==51 or h::userId()==7 ){*/
+        
+         return $this->render('panelPsicologo',[
+         'fecha'=>$fecha,
+         'providerAlu' =>$providerAlu, 
+              'provider' =>$provider, 
+              'searchAlumnos' => $searchAlumnos,
+          'citasPendientes'=> $citasPendientes,
+          'codperiodo'=> $codperiodo,
+             'codfac'=>$codfac,
+               'codtra'=>$codtra
+                  
+     ]);  
+   /* }else{
+      return $this->render('psicologo',[
          'fecha'=>$fecha,
          'provider' =>$provider,
          
           'citasPendientes'=> $citasPendientes,
           'codperiodo'=>  \frontend\modules\sta\staModule::getCurrentPeriod(),
                   
-     ]);
+     ]);  
+    }*/
+     
       
   }
    public function actionPanelSecretaria(){
@@ -662,6 +660,73 @@ public function actionBuscaAlumno(){
      
         }
      }
+}
+
+public function actionPanelCoordinacion(){
+    return $this->render('coordinacion');
+    
+}
+
+public function actionCoordinacionPsicologos(){
+   $codperiodo= \frontend\modules\sta\staModule::getCurrentPeriod();
+   $idtalleres= \frontend\modules\sta\models\Talleres::find()-> 
+    select(['id'])->andWhere(['codperiodo'=>$codperiodo])-> column();  
+ 
+   
+  $psicologos= Tallerpsico::find()->
+    andWhere(['talleres_id'=>$idtalleres])->all();  
+   return $this->render('coord_psico',['psicologos'=>$psicologos,'codperiodo'=>$codperiodo]);  
+  
+}
+
+public function actionPanelCoord(){
+    $codperiodo= \frontend\modules\sta\staModule::getCurrentPeriod();
+    $codperiodo= \frontend\modules\sta\staModule::getCurrentPeriod();
+   $idtalleres= \frontend\modules\sta\models\Talleres::find()-> 
+    select(['id'])->andWhere(['codperiodo'=>$codperiodo])-> column();  
+ 
+   
+  $psicologos= Tallerpsico::find()->
+    andWhere(['talleres_id'=>$idtalleres])->all();  
+  return  $this->render('coord_panel',['psicologos'=> $psicologos,'codperiodo'=>$codperiodo]);
+}
+
+public function actionCantidadesEnRiesgo(){
+    $this->layout="install";
+    $codperiodo=h::request()->
+    get('codperiodo',\frontend\modules\sta\staModule::getCurrentPeriod());
+    
+   $cantidades= \frontend\modules\sta\components\Indicadores::cantidades($codperiodo);
+  return  $this->render('modal_cantidades',['codperiodo'=>$codperiodo,'cantidades'=>$cantidades]);
+}
+
+public function actionAtenciones(){
+    $this->layout="install";
+    $codperiodo=h::request()->
+    get('codperiodo',\frontend\modules\sta\staModule::getCurrentPeriod());
+    
+   $cantidades= \frontend\modules\sta\components\Indicadores::cantidadAtenciones($codperiodo);
+   return  $this->render('modal_atenciones',['codperiodo'=>$codperiodo,     
+       'cantidades'=> $cantidades,
+          ]);
+}
+
+
+public function actionExamenes(){
+    $this->layout="install";
+    $codperiodo=h::request()->
+    get('codperiodo',\frontend\modules\sta\staModule::getCurrentPeriod());
+    
+   $cantidades= \frontend\modules\sta\components\Indicadores::cantidades($codperiodo);
+   $cantidadesNoEvaluadas=\frontend\modules\sta\components\Indicadores::cantidadesNoEvaluadas($codperiodo);
+   $facultades=array_column($cantidades,'codfac');
+   $nevaluados=array_column($cantidades,'nalumnos');
+   $nNoEvaluados=array_column($cantidadesNoEvaluadas,'nalumnos');
+  return  $this->render('modal_evaluaciones',['codperiodo'=>$codperiodo,
+      'facultades'=>$facultades,
+      'nevaluados'=>$nevaluados,
+       'nNoEvaluados'=> $nNoEvaluados,
+          ]);
 }
 
 }

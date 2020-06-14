@@ -1,6 +1,7 @@
 <?php
 namespace frontend\modules\sta\components;
 use frontend\modules\sta\models\UserFacultades;
+use frontend\modules\sta\staModule;
 use common\helpers\h;
 /* 
  * Esta clase es la que efectua los filtros por facultad segun 
@@ -17,7 +18,7 @@ class ActiveQueryScope extends \yii\db\ActiveQuery
        //$this->andWhere([ 'in', 'codfac',['FIM','FIP'] ]);
       $this->alias('t')->andWhere(['in',
               't.codfac', UserFacultades::filterFacultades()
-               ]);
+               ])->andWhere(['t.clase'=> staModule::CLASE_RIESGO]);
         parent::init();
     }
     // HOLA MODIFICANDO

@@ -120,6 +120,7 @@ class ComposerStaticInitdb0b409cd7b5708c1b63db5a098648e5
         array (
             'ruskid\\csvimporter\\' => 19,
             'rmrevin\\yii\\fontawesome\\' => 24,
+            'rikcage\\sceditor\\' => 17,
             'reportico\\reportico\\' => 20,
         ),
         'p' => 
@@ -171,6 +172,7 @@ class ComposerStaticInitdb0b409cd7b5708c1b63db5a098648e5
             'kartik\\form\\' => 12,
             'kartik\\file\\' => 12,
             'kartik\\export\\' => 14,
+            'kartik\\editors\\' => 15,
             'kartik\\editable\\' => 16,
             'kartik\\dynagrid\\' => 16,
             'kartik\\dialog\\' => 14,
@@ -193,9 +195,14 @@ class ComposerStaticInitdb0b409cd7b5708c1b63db5a098648e5
         array (
             'himiklab\\colorbox\\' => 18,
         ),
+        'f' => 
+        array (
+            'franciscomaya\\sceditor\\' => 23,
+        ),
         'd' => 
         array (
             'drsdre\\wizardwidget\\' => 20,
+            'dosamigos\\ckeditor\\' => 19,
             'dosamigos\\chartjs\\' => 18,
             'dmstr\\' => 6,
         ),
@@ -206,6 +213,7 @@ class ComposerStaticInitdb0b409cd7b5708c1b63db5a098648e5
         'b' => 
         array (
             'buttflattery\\formwizard\\' => 24,
+            'bizley\\quill\\' => 13,
         ),
         'W' => 
         array (
@@ -240,6 +248,7 @@ class ComposerStaticInitdb0b409cd7b5708c1b63db5a098648e5
             'Psr\\Container\\' => 14,
             'Prophecy\\' => 9,
             'PhpOffice\\PhpSpreadsheet\\' => 25,
+            'Pelago\\' => 7,
         ),
         'O' => 
         array (
@@ -249,6 +258,10 @@ class ComposerStaticInitdb0b409cd7b5708c1b63db5a098648e5
         array (
             'Mpdf\\' => 5,
             'Matrix\\' => 7,
+        ),
+        'J' => 
+        array (
+            'Johnson\\' => 8,
         ),
         'G' => 
         array (
@@ -382,6 +395,10 @@ class ComposerStaticInitdb0b409cd7b5708c1b63db5a098648e5
         'rmrevin\\yii\\fontawesome\\' => 
         array (
             0 => __DIR__ . '/..' . '/rmrevin/yii2-fontawesome',
+        ),
+        'rikcage\\sceditor\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/rikcage/yii2-sceditor',
         ),
         'reportico\\reportico\\' => 
         array (
@@ -529,6 +546,10 @@ class ComposerStaticInitdb0b409cd7b5708c1b63db5a098648e5
         array (
             0 => __DIR__ . '/..' . '/kartik-v/yii2-export/src',
         ),
+        'kartik\\editors\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/kartik-v/yii2-editors/src',
+        ),
         'kartik\\editable\\' => 
         array (
             0 => __DIR__ . '/..' . '/kartik-v/yii2-editable/src',
@@ -589,9 +610,17 @@ class ComposerStaticInitdb0b409cd7b5708c1b63db5a098648e5
         array (
             0 => __DIR__ . '/..' . '/himiklab/yii2-colorbox-widget',
         ),
+        'franciscomaya\\sceditor\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/franciscomaya/yii2-sceditor',
+        ),
         'drsdre\\wizardwidget\\' => 
         array (
             0 => __DIR__ . '/..' . '/drsdre/yii2-wizardwidget',
+        ),
+        'dosamigos\\ckeditor\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/2amigos/yii2-ckeditor-widget/src',
         ),
         'dosamigos\\chartjs\\' => 
         array (
@@ -608,6 +637,10 @@ class ComposerStaticInitdb0b409cd7b5708c1b63db5a098648e5
         'buttflattery\\formwizard\\' => 
         array (
             0 => __DIR__ . '/..' . '/buttflattery/yii2-formwizard/src',
+        ),
+        'bizley\\quill\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/bizley/quill/src',
         ),
         'Webmozart\\Assert\\' => 
         array (
@@ -709,6 +742,10 @@ class ComposerStaticInitdb0b409cd7b5708c1b63db5a098648e5
         array (
             0 => __DIR__ . '/..' . '/phpoffice/phpspreadsheet/src/PhpSpreadsheet',
         ),
+        'Pelago\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/pelago/emogrifier/src',
+        ),
         'Opis\\Closure\\' => 
         array (
             0 => __DIR__ . '/..' . '/opis/closure/src',
@@ -720,6 +757,10 @@ class ComposerStaticInitdb0b409cd7b5708c1b63db5a098648e5
         'Matrix\\' => 
         array (
             0 => __DIR__ . '/..' . '/markbaker/matrix/classes/src',
+        ),
+        'Johnson\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/johnson/yii2-webcam',
         ),
         'GuzzleHttp\\Psr7\\' => 
         array (

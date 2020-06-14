@@ -95,9 +95,13 @@ class Tallerpsico extends \common\models\base\modelBase
      */
     public function getTaller()
     {
+       
+        
         return $this->hasOne(Talleres::className(), ['id' => 'talleres_id']);
     }
 
+    
+   
     /*public function getCitas()
     {
         return $this->hasMany(Citas::className(), ['talleres_id'=>'id','codtra'=>$this->codtra]);

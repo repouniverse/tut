@@ -18,8 +18,9 @@ use frontend\modules\sta\staModule;
   <div class="box-body">               
 <?php
   IF(staModule::getCurrentPeriod()==$codperiodo){?>
-    <div class="alert alert-info"><span class="fa fa-book-reader"></span><?='    '.$modelPsico->trabajador->fullName()?></div>
-     
+    
+    <div class="alert alert-info"><span class="fa fa-book-reader"></span><?='    '.$modelTallerdet->trabajador->fullName()?></div>
+    
       
         
             
@@ -56,6 +57,7 @@ echo CalendarScheduleWidget::widget([
         'createCallback' => new JsExpression($jsCreateCallback)
     ],
     'fullCalendarOptions' => [
+      
         
        /*  'validRange'=>[
                 'start'=>'2019-11-05',

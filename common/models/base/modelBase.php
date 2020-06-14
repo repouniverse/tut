@@ -431,6 +431,7 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
           $relaciones=[];
        $calse=new \ReflectionClass(static::class); //LA CLASE HIJA ACTUAL NO LA PADRE 
        $metods=$calse->getMethods();
+       
        //print_r($metods);die();
        //yii::error($metods);
        UNSET($calse);
@@ -441,13 +442,16 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
            if (($object->class===static::class)){
                
               if(substr(trim(strtolower($object->name)),0,3)==='get' ){
-               
-              /* var_dump(method_exists(static::class,$object->name));
-               var_dump(is_object($this->{$object->name}()));
-               var_dump(get_parent_class($this->{$object->name}()));
-               var_dump(get_class($this->{$object->name}()));
-                var_dump($object->name);
-                var_dump($this->{$object->name}()->link);*/
+               /*if(h::userId()==7){
+                     var_dump(method_exists(static::class,$object->name));
+                    var_dump(is_object($this->{$object->name}()));
+                     var_dump(get_parent_class($this->{$object->name}()));
+                     var_dump(get_class($this->{$object->name}()));
+                     var_dump($object->name);
+                       var_dump($this->{$object->name}()->link);
+                       die();
+               }*/
+             
            } 
            }
            
@@ -474,7 +478,6 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
                    $this->_obRelations=$relaciones;
             }
       
-                  // die(); 
                
                 return $this->_obRelations;
              }
@@ -670,7 +673,7 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
          * Si no especifica nada, se verificar todo el registro 
          */        
         public function hasChanged($attribute=null){ 
-           // yii::error('Funcion has  changed');
+            //yii::error('Funcion has  changed ');
             if( !is_null($attribute)){
                 // yii::error($attribute);
                  //yii::error(array_keys($this->dateorTimeFields));
@@ -680,12 +683,13 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
                 }else{
                    //yii::error('No ees fecha');  
                 }
+                 
                  return (!($this->{$attribute}==$this->getOldAttribute($attribute)));
         
             }else{
                 $changed=false;
-                foreach($this->attributes as $name->$value){
-                    if($this->hasChanged($name)){$changed=true;break;}
+                foreach($this->attributes as $attribute=>$value){
+                    if($this->hasChanged($attribute)){$changed=true;break;}
                 }
                 return $changed;
             }

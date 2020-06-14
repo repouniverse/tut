@@ -31,6 +31,7 @@ if(!$this->existsTable($table)) {
          'codfac'=>$this->string(8)->notNull()->append($this->collateColumn()),
          'fnotificacion'=>$this->string(20)->notNull()->append($this->collateColumn()),
          'detalles'=>$this->text()->append($this->collateColumn()),
+            'clase'=>$this->char(1)->notNull()->append($this->collateColumn()), //QUE CALSE DE TALLERS 
         ],$this->collateTable());
   
   /*  $this->addForeignKey($this->generateNameFk($table), $table,

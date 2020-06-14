@@ -26,7 +26,7 @@ if(!$this->existsTable($table)) {
         'fopen'=>$this->char(10)->notNull()->append($this->collateColumn()),
          'fclose'=>$this->char(10)->notNull()->append($this->collateColumn()),
           'finicitas'=>$this->char(10)->notNull()->append($this->collateColumn()),
-          
+           'clase'=>$this->char(1)->notNull()->append($this->collateColumn()), //QUE CALSE DE TALLERS 
         'codcur'=>$this->string(10)->notNull()->append($this->collateColumn()),
           'activa'=>$this->char(1)->append($this->collateColumn()),
          'codperiodo'=>$this->string(6)->notNull()->append($this->collateColumn()),

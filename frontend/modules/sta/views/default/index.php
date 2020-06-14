@@ -122,7 +122,7 @@ foreach($etapas as $clave=>$valor){
            <div class="panel panel-success">
                <div class="panel-heading"><h3 class="panel-title" >COORDINACIÓN</h3></div> 
                <div class="panel-body">
-          <a href="<?=\yii\helpers\Url::to(["/sta/default/resumen-facultad",'codfac'=>'FIA'])  ?>"><span class="info-box-icon bg-yellow-gradient"><i class="fa fa-sitemap"></i></span></a>
+          <a href="<?=\yii\helpers\Url::to(["/sta/default/panel-coord",'codfac'=>'FIA'])  ?>"><span class="info-box-icon bg-yellow-gradient"><i class="fa fa-sitemap"></i></span></a>
            </div> 
                </div> 
         </div> 

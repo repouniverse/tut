@@ -7,7 +7,7 @@ use frontend\modules\sta\components\ActiveQueryScope;
  *
  * @see Aulas
  */
-class AulasQuery extends ActiveQueryScope
+class AulasQuery extends yii\db\ActiveQuery
 {
     /*public function active()
     {

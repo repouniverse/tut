@@ -2,6 +2,7 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use common\helpers\h;
+ use yii\widgets\Pjax;
 /* @var $this \yii\web\View */
 /* @var $content string */
 ?>
@@ -22,16 +23,18 @@ use common\helpers\h;
         <div class="navbar-custom-menu">
 
             <ul class="nav navbar-nav">
-               
+                 
                <?php 
                //if(!h::UserIsGuest())
                require('mailbox.php');
                ?> 
                <?php require('alertperiod.php');   ?> 
+                 
                <?php require('maletin.php');   ?>
+                
              <?php require('notificaciones.php');   ?>
-             <?php /*require('tasks.php'); */  ?>
-              <?php /*require('historial.php');*/   ?>
+             
+            
                 <!-- User Account: style can be found in dropdown.less -->
 
                 <li class="dropdown user user-menu">

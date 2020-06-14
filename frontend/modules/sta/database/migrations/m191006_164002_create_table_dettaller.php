@@ -19,6 +19,7 @@ if(!$this->existsTable($table)) {
     $this->createTable($table,  [
          'id'=>$this->primaryKey(),
        // 'aluriesgo_id'=>$this->integer(11)->notNull(),
+            'clase'=>$this->char(1)->notNull()->append($this->collateColumn()), //QUE CALSE DE TALLERS 
         'talleres_id'=>$this->integer(11)->notNull(),
         'codalu'=>$this->string(14)->notNull()->append($this->collateColumn()),
         'fingreso'=>$this->char(10)->append($this->collateColumn()),

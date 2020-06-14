@@ -41,9 +41,18 @@ $mpdf = new \Mpdf\Mpdf([
     ]),
     'fontdata' => $fontData + [
         'cour' => [
-            'R' => 'cour.ttf',
-            'I' => 'CourierITALIC.ttf',
-        ]
+            'R' => 'Courier.ttf',
+            
+        ],
+        'helvetica' => [
+            'R' => 'Helvetica.ttf',
+            'I' => 'VerdanaBOLD.ttf',
+        ],
+        'verdana' => [
+            'R' => 'Verdana.ttf',
+            'B' => 'VerdanaBOLD.ttf',
+        ],
+        
     ],
     //'default_font' => 'cour'
 ]);
@@ -55,8 +64,10 @@ $mpdf = new \Mpdf\Mpdf([
            'SetHeader'=>[($model->tienecabecera)?$header:''], 
             'SetFooter'=>[($model->tienepie)?'{PAGENO}':''],
         ];*/
-           $mpdf->simpleTables = true;
-                 $mpdf->packTableData = true;
+           
+                  
+           $mpdf->simpleTables = false;
+                $mpdf->packTableData = true;
            //$mpdf->showImageErrors = true;
            $mpdf->curlAllowUnsafeSslRequests = true; //Permite imagenes de url externas
          return $mpdf;

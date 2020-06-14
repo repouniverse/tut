@@ -219,11 +219,25 @@ class FileHelper extends FileHelperOriginal {
   return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . @$sz[$factor];
 }
  
-   
+public static function extensionFile($filePath,$conpunto=false){
+    
+  if ((strpos($filePath, '\\')>0) or (strpos($filePath, '/')>0)){
+      $path_parts = pathinfo($filePath);
+       return  (($conpunto)?'.':'').$path_parts['extension'];
+  }else{
+     if(strpos($filePath,'.')>0){
+         return (($conpunto)?'.':'').strrev(substr(strrev($filePath),0,strpos(strrev($filePath),'.'))); 
+     }else{
+         return '';
+     }
+    
+  }
+    
+}
 
 
 public static function extDocs(){
-    return array('ppt','pptx','doc','docx','xls','xlsx','pdf','jpg','jpeg','png'); 
+    return array('rar','ppt','pptx','doc','docx','xls','xlsx','pdf','jpg','jpeg','png'); 
 }
 
 public static function extIconsDocs(){
@@ -266,5 +280,16 @@ public function UrlImage($path,$internal=true){
  }
   
 }
+
+/*Reemplaza una 
+ * funci
+ */
+ public static function replaceSlashesPath($pathClass,$sinSlashes=true){
+    $character='_';
+    $slash='\\';    
+    return ($sinSlashes)?str_replace($slash,$character,$pathClass):str_replace($character,$slash,$pathClass);
+    
+  }
+
 
 }

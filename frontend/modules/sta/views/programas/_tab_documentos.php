@@ -3,7 +3,7 @@
  use frontend\modules\sta\models\StaDocuAluSearch;
   use frontend\modules\sta\models\StaDocuAlu;
  use yii\widgets\Pjax;
- use yii\grid\GridView;
+ use kartik\grid\GridView;
  use yii\helpers\Html;
   use yii\helpers\Url;
  //use frontend\modules\sta\models\ExamenesSearch;
@@ -15,8 +15,10 @@
             <div class="row">     
          <?php //$url= \yii\helpers\Url::to(['agrega-documento','id'=>$model->id,'gridName'=>'grilla-docus','idModal'=>'buscarvalor']);
       ?>
-       <?= \yii\helpers\Html::button('<span class="fa fa-book-reader"></span>   '.Yii::t('sta.labels', 'Agregar documento'), ['id'=>'btn-add-docus','class' => 'btn btn-warning'])?>
-          
+       <?= \yii\helpers\Html::button('<span class="fa fa-folder-plus"></span>   '.Yii::t('sta.labels', 'Generar documentos'), ['id'=>'btn-add-docus','class' => 'btn btn-warning'])?>
+         <?php $url=Url::to([$this->context->id.'/download-informes-by-alumno','id'=>$model->id]);
+             echo Html::a('<span class="fa fa-file-download"></span>   '.Yii::t('sta.labels', 'Descargar informes'),$url,['class' => 'btn btn-success']);
+           ?>   
              </div>
             </div>
         </div>
@@ -34,27 +36,13 @@
                  [
                 'class' => 'yii\grid\ActionColumn',
                 //'template' => Helper::filterActionColumn(['view', 'activate', 'delete']),
-            'template' => '{edit}{attach}{pdf}{grafico}',
+            'template' => '{edit}{pdf}{grafico}',
                'buttons' => [
                   /* 'delete' => function ($url,$model) {
 			   $url = \yii\helpers\Url::toRoute($this->context->id.'/deletemodel-for-ajax');
                               return \yii\helpers\Html::a('<span class="btn btn-danger glyphicon glyphicon-trash"></span>', '#', ['title'=>$url,/*'id'=>$model->codparam,'family'=>'pinke','id'=>\yii\helpers\Json::encode(['id'=>$model->id,'modelito'=> str_replace('@','\\',get_class($model))]),/*'title' => 'Borrar']);
                             },*/
-                    'attach' => function($url, $model) {  
-                         $url=\yii\helpers\Url::toRoute(['/finder/selectimage','isImage'=>false,'idModal'=>'imagemodal','modelid'=>$model->id,'nombreclase'=> str_replace('\\','_',get_class($model))]);
-                        $options = [
-                            'title' => Yii::t('sta.labels', 'Subir Archivo'),
-                            //'aria-label' => Yii::t('rbac-admin', 'Activate'),
-                            //'data-confirm' => Yii::t('rbac-admin', 'Are you sure you want to activate this user?'),
-                            'data-method' => 'get',
-                            //'data-pjax' => '0',
-                        ];
-                        return Html::button('<span class="glyphicon glyphicon-paperclip"></span>', ['href' => $url, 'title' => 'Editar Adjunto', 'class' => 'botonAbre btn btn-success']);
-                        //return Html::a('<span class="btn btn-success glyphicon glyphicon-pencil"></span>', Url::toRoute(['view-profile','iduser'=>$model->id]), []/*$options*/);
-                     
-                        
-                        },
-                        
+                    
                         'edit' => function ($url,$model) {
 			   $url = \yii\helpers\Url::toRoute(['/sta/programas/edita-docu','id'=>$model->id,'gridName'=>'grid_docu','idModal'=>'buscarvalor']);
 
@@ -69,12 +57,23 @@
                         'grafico' => function ($url,$model) {
 			   $url = \yii\helpers\Url::to(['/sta/citas/data-to-graph','id'=>$model->id]);
                               if($model->cita_id > 0 or $model->codocu=='104')
-                              return \yii\helpers\Html::a('<span class="btn btn-success fa fa-hammer"></span>','#', ['id'=>$model->id,'title'=>$url,'family'=>'pinke']);
+                              return \yii\helpers\Html::a('<span class="btn fa fa-cogs"></span>', 'javascript:void()', ['id'=>$model->id,'title'=>$url,'family'=>'pinke']);
                               return '';
                              } 
                          
                     ]
                 ],
+             [
+                'class' => 'kartik\grid\ExpandRowColumn',
+                'width' => '50px',
+                'value' => function ($model, $key, $index, $column) {
+                            return GridView::ROW_COLLAPSED;
+                                },
+                     'detailUrl' =>Url::toRoute(['/sta/citas/ajax-show-log-informes']),
+                    //'headerOptions' => ['class' => 'kartik-sheet-style'], 
+                    'expandOneOnly' => true
+                ],                
+                            
             [
               'attribute' => 'codocu',
                   //'header'=>'Código',
@@ -106,13 +105,25 @@
                        }
                      }
                     ],
-                [
-              'attribute' => 'detalle',
+                /*[
+              'attribute' => 'Etapa',
                //'format'=>'raw',
                 'value' => function ($model) {
-                    return substr($model->detalle,0,30).'...';
+                    if(!empty($model->cita_id))
+                    return $model->cita->flujo->proceso;
                    },
-                    ],
+                    ],*/
+                  ['attribute' => 'orden',],
+                 [
+           
+            'attribute' => 'audit',
+           'format'=>'raw',
+            //'width' => '310px',
+            'value'=>function($model){
+               return common\widgets\auditwidget\auditWidget::widget(['model'=>$model]);                    
+            }
+                      ],          
+                           
                 [
               'attribute' => '',
                'format'=>'raw',
@@ -205,7 +216,7 @@
             data :  {urlimagen: resulta2,identidad:identi},
             success: function(data2){
             $.pjax.reload({container: '#grid_docu',timeout:3000});
-                 console.log(data2); // Debería imprimir {ajax2: true}
+               
                         },
                error : function(xhr,errmsg,err) {
                          console.log(xhr.status + ': ' + xhr.responseText);

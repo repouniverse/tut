@@ -349,6 +349,7 @@ if (h::request()->isAjax && $model->load(h::request()->post())) {
   } 
   
   public function actionRetiraDelPrograma($id){
+      
      $registro= \frontend\modules\sta\models\Talleresdet::findOne($id);
        if(!is_null($registro)){
            $model=New \frontend\modules\sta\models\StaRetiros();
@@ -368,6 +369,7 @@ if (h::request()->isAjax && $model->load(h::request()->post())) {
              Yii::$app->session->setFlash('success',yii::t('sta.labels','Se ha efectuado el retiro, pero si lo deseas puedes reforzar el retiro ocn algún documento'));
             return $this->redirect(['update-retira-del-programa','id'=>$model->id]);
            }
+           
         return $this->render('crea_retiro', [
             'model' => $model,
             //'verbo'=>'Adicional'
@@ -378,6 +380,7 @@ if (h::request()->isAjax && $model->load(h::request()->post())) {
   
   
   public function actionUpdateRetiraDelPrograma($id){
+       
      $model= \frontend\modules\sta\models\StaRetiros::findOne($id);
        if(!is_null($model)){          
             if (h::request()->isAjax && $model->load(h::request()->post())) {
@@ -390,6 +393,7 @@ if (h::request()->isAjax && $model->load(h::request()->post())) {
              Yii::$app->session->setFlash('success',yii::t('sta.labels','Se ha efectuado el retiro'));
             return $this->redirect(['programas/update','id'=>$model->tallerdet->talleres->id]);
            }
+          
         return $this->render('crea_retiro', [
             'model' => $model,
             //'verbo'=>'Adicional'

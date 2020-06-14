@@ -331,6 +331,8 @@ public static function cursosByStudentPeriodProvider($codalu,$codperiodo){
  
  public function beforeSave($insert){
      if($insert){
+          $this->clase= \frontend\modules\sta\staModule::CLASE_RIESGO;
+        
       if(IN_ARRAY($this->getScenario(),[self::SCENARIO_REGISTER,self::SCENARIO_REGISTER_NORMAL])) {
           $this->codcar=$this->alumno->codcar;
           //$this->status=self::FLAG_INCORPORADO;

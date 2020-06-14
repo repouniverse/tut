@@ -7,7 +7,7 @@ use frontend\modules\sta\components\ActiveQueryScope;
  *
  * @see Tallerpsico
  */
-class TallerpsicoQuery extends ActiveQueryScope
+class TallerpsicoQuery extends \yii\db\ActiveQuery
 {
     /*public function active()
     {

@@ -7,7 +7,7 @@ use frontend\modules\sta\widgets\cboperiodos\cboperiodos;
 use frontend\modules\sta\helpers\comboHelper;
 use common\widgets\selectwidget\selectWidget;
 use common\helpers\h;
- use kartik\date\DatePicker;
+
 /* @var $this yii\web\View */
 /* @var $model frontend\modules\sta\models\CitasSearch */
 /* @var $form yii\widgets\ActiveForm */

@@ -15,7 +15,9 @@ use yii;
 class Mailer extends Correo
 {
    use \common\traits\baseTrait;
-    /**
+   
+   private $_opcionesTransport=null; //CREADA PARA ALMAECNAR LOS SETTINGS 
+   /**
      * @var string message default class name.
      */
     public $messageClass = 'yii\swiftmailer\Message';
@@ -43,7 +45,7 @@ class Mailer extends Correo
        // yii::$app->settings->set('section', 'key', 1258.5);
         //yii::error(static::arrayConfig());
         //var_dump(static::arrayConfig());die();
-        $this->_transport=static::arrayConfig();
+        $this->_transport=$this->optionsTransport[0];
         
         return parent::init();
     }
@@ -214,25 +216,169 @@ class Mailer extends Correo
      * getIfNotPutSetting())
      */
     private static function arrayConfig(){
-        RETURN [
+        
+    }
+    
+    /*
+     * Cambioa la configuración de la cuenta
+     * de correo según otras alatenativa que enuentra enla tabla settings
+     */
+    public function swichtConfigCorreo(){
+       
+        
+    }
+    
+    public function getOptionsTransport(){
+      if(is_null($this->_opcionesTransport)){
+         $cantidad=self::nOpcionesMail();
+         
+        if($cantidad==0){
+            RETURN [
             'class' => 'Swift_SmtpTransport',
-              'host' => h::getIfNotPutSetting(
-                      'mail','servermail',
-                      Yii::$app->params['servermail']
-                      ),
-               'username' => h::getIfNotPutSetting(
-                       'mail','userservermail',
-                       Yii::$app->params['userservermail']),
-               'password' => h::getIfNotPutSetting(
-                       'mail','passworduserservermail',
-                       Yii::$app->params['passworduserservermail']),
-               'port' =>h::getIfNotPutSetting(
-                       'mail','portservermail',
-                       Yii::$app->params['portservermail']),
+              'host' =>Yii::$app->params['servermail'],
+               'username' =>Yii::$app->params['userservermail'],
+               'password' => Yii::$app->params['passworduserservermail'],
+               'port' =>Yii::$app->params['portservermail'],
                   'encryption' => 'ssl',
+                  'streamOptions'=>['ssl' =>['allow_self_signed' => true,'verify_peer_name' => false, 'verify_peer' => false]],
+              ]; 
+        }
+        $options=[];
+         for ($i = 0; $i < $cantidad; $i++) {
+            // yii::error('Recorriendo '.$i);
+             $cad=($i==0)?'':$i.'';
+                
+         $options[]=[
+             'class' => 'Swift_SmtpTransport',
+           'host'=>h::gsetting('mail'.$cad,'servermail'),
+            'username'=>h::gsetting('mail'.$cad,'userservermail'),
+            'password'=>h::gsetting('mail'.$cad,'passworduserservermail'),
+            'port'=>h::gsetting('mail'.$cad,'portservermail'),
+              'encryption' => 'ssl',
                     //'SMTPAuth' => true,
               /*Esta line ase agergo apra que funcione en localhost */
-                  'streamOptions'=>['ssl' =>['allow_self_signed' => true,'verify_peer_name' => false, 'verify_peer' => false]],
-        ];
+             'streamOptions'=>['ssl' =>['allow_self_signed' => true,'verify_peer_name' => false, 'verify_peer' => false]], 
+         ];
+            
+             }
+             $this->_opcionesTransport= $options;
+            return $this->_opcionesTransport;
+      }else{
+        return $this->_opcionesTransport;  
+      }
+        
+         
+          }
+          
+      public static function nOpcionesMail(){
+          return h::nSetting('servermail');
+          
+      }
+      
+      private function currentOptionTransport(){
+         
+          $cuenta=$this->transport->getUsername();
+          $orden=array_search($cuenta,array_column($this->optionsTransport,'username'));
+         // yii::error('this->optionsTransport');
+          //yii::error($this->optionsTransport);
+         // yii::error('array_column');
+         // yii::error(array_column($this->optionsTransport,'username'));
+         //  yii::error('orden');
+         // yii::error($orden);
+          return ($orden)?$orden:0;
+      }
+      
+      public function nextOptionTransport($secuencia=null){
+        if(!is_null($secuencia)){
+            if(is_int($secuencia) && ($secuencia>0) && $secuencia <=self::nOpcionesMail()-1){
+              return $this->optionsTransport[$secuencia];   
+            }else{
+               throw new InvalidConfigException(yii::t('base.errors','No existe la secuencia de correo introducida')); 
+            }
+        }else{
+           $cantidad=$this->nOpcionesMail();
+         $current=$this->currentOptionTransport();
+        // yii::error('El índice current es el');
+         // yii::error($current);
+         if( $current >= $cantidad-1){
+             $current=0;
+         }
+         return $this->optionsTransport[$current+1]; 
+        }
+         
+      }
+      
+      
+      public function nextTransport($secuencia=null){
+           //yii::error('L siguiente opcion es ');
+          //ii::error($this->nextOptionTransport($secuencia));
+          $this->setTransport($this->nextOptionTransport($secuencia));
+      }
+      
+      
+      /*
+       * esta funcion se hizo para superar la valla del Gmail
+       * del maximo 100 direcciones por envio
+       * Lo que hace es partir el array de desatinatarios 
+       * y enviarlos por partes 
+       * para elo usando corro alternativo 
+       * usando par aesto la funcion nextTransport() que 
+       * cambia la configuracion del correo en el objeto transport
+       * 
+       */
+      
+      public function sendSafe($message){
+        $nmax= h::gsetting('mail','NumMaxCantCorreos');
+        $ndirecciones=count($message->to);
+         $errores=[];
+         if($ndirecciones > $nmax){
+             $arreglo= array_chunk(array_keys($message->to), $nmax);
+             
+             foreach($arreglo as $clave=>$fragmento){                 
+                 $message->setTo($fragmento);                
+                 try {
+                      $result =   $this->send($message);
+                        if($result){
+                            $errores[]=['success'=>'Se envió el correo'];
+                            }else{
+                             $errores[]=['error'=>yii::t('sta.errors','El correo no se logró enviar')];
+                             }          
+                       } catch (\Swift_TransportException $Ste) {                              
+                          $errores[]=['errorMail'=>$Ste->getMessage()];
+                    }
+                $this->nextTransport();
+             }             
+         }else{
+                 try {
+                      $result =   $this->send($message);
+                        if($result){
+                            $errores[]=['success'=>'Se envió el correo '];
+                            }else{
+                              $errores[]=['error'=>yii::t('sta.errors','El correo no se logró enviar')];
+                             }
+          
+                       } catch (\Swift_TransportException $Ste) {                              
+                          $errores[]=['error'=>$Ste->getMessage()];
+                    }
+         }
+         $mensajes=[];
+         $colexitos=array_column($errores,'success');
+           $colerrors=array_column($errores,'error');
+            $colerrorsSMTP=array_column($errores,'errorMail');
+            if(count($colerrorsSMTP)>0){
+               $mensajes['error']=$colerrorsSMTP[0];  
+            }
+            elseif(count($colerrors)==0 && count($colexitos)> 0 ){
+               $mensajes['success']=$colexitos[0];        
+            }else{                
+               $mensajes['warning']=yii::t('sta.errors','Hubo errores al enviar el mensaje');  
+            }
+         
+        return $mensajes;
+      }
+     
+     
+    
+      
     }
-}
+

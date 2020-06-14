@@ -19,6 +19,10 @@ use yii;
  */
 class staModule extends \yii\base\Module
 {
+    const CLASE_RIESGO='M';
+    const CLASE_REGULAR='N';
+    
+    
     const USER_ALUMNO='10';
     const USER_OTROS='20';
     const RESPONSE_SUCCESS_CODE=200;
@@ -26,12 +30,15 @@ class staModule extends \yii\base\Module
     const LEVEL_ACCESS_PROFILE_BAJO='bajo';
     const LEVEL_ACCESS_PROFILE_MEDIO='medio';
     const LEVEL_ACCESS_PROFILE_ALTO='alto';
+   
+    
     const PROFILE_INVITADO='10';
      const PROFILE_TUTOR_ACADEMICO='20';
        const PROFILE_PSICOLOGO='30';
      const PROFILE_ASISTENTE='40';
        const PROFILE_AUTORIDAD='50';
       const PROFILE_ADMIN='60';
+      
       
  public STATIC  $tipos=[
      self::LEVEL_ACCESS_PROFILE_BAJO=>[

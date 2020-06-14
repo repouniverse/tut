@@ -20,7 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h4><?= Html::encode($this->title) ?></h4>
     <div class="box box-success">
      <div class="box-body">
-    <?php Pjax::begin(['id'=>'listado_citas']); ?>
+    <?php Pjax::begin(['id'=>'listado_citas','timeout'=>false]); ?>
     <?php  echo $this->render('_search', ['model' => $searchModel]); ?>
          <hr/>
     

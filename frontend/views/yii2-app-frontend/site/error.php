@@ -25,7 +25,7 @@ $this->title = $name;
                 ?>
             <p>
                 No tiene permitido acceder a esta dirección; consulte con el administrador
-                de la aplicación, o solicite los privilegios que correpsondan. Puedes  <a href='<?= Yii::$app->homeUrl ?>'>Volver al inicio</a> 
+                de la aplicación, o solicite los privilegios que correspondan. Puedes  <a href='<?= Yii::$app->homeUrl ?>'>Volver al inicio</a> 
             </p>
             <?php  } elseif($exception->statusCode=='404'){
                ?>
