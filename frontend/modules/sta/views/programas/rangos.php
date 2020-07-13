@@ -5,14 +5,17 @@ use yii\widgets\Pjax;
 use frontend\modules\sta\models\StaVwCitas;
 
 ?>
-
-
+ <?php
+ $url= Url::to(['crear-rango','id'=>$model->id,'gridName'=>'grilla-rangos','idModal'=>'buscarvalor']);
+   echo  Html::button(yii::t('base.verbs','Agregar Rango'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Tutor'),'id'=>'btn_crear_rangos', 'class' => 'botonAbre btn btn-success']); 
+?> 
     
+    
+
    <br>
-<p class="text-green"><b><span class="fa fa-list-ul"></span><?='      '.yii::t('sta.labels','Distribución de horarios')?></p></b>
 
 
-    <?php Pjax::begin(['id'=>'grilla-rangos']); ?>
+    <?php Pjax::begin(['id'=>'grilla-rangos','timeout'=>false]); ?>
    
     <?php 
      echo GridView::widget([

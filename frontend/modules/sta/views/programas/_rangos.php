@@ -16,10 +16,16 @@ use kartik\widgets\TimePicker;
       <div class="box-header">
         <div class="col-md-12">
             <div class="form-group no-margin">
-            <?= \common\widgets\buttonsubmitwidget\buttonSubmitWidget::widget(
+            <?php 
+            if($model->isNewRecord){
+                $url=\yii\helpers\Url::to(['/sta/programas/crear-rango','id'=>$idTaller]);
+            }else{
+                $url=\yii\helpers\Url::to(['/sta/programas/edit-rango','id'=>$id]);
+            }
+            echo \common\widgets\buttonsubmitwidget\buttonSubmitWidget::widget(
                   ['idModal'=>$idModal,
                     'idForm'=>'form-rango',
-                      'url'=> \yii\helpers\Url::to(['/sta/programas/edit-rango','id'=>$id]),
+                      'url'=> $url,
                      'idGrilla'=>$gridName, 
                       ]
                   )?>
@@ -29,7 +35,18 @@ use kartik\widgets\TimePicker;
       <div class="box-body">
     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
       <?PHP
-     echo $form->field($model, 'nombredia')->textInput(['disabled'=>true]);
+      if($model->isNewRecord){
+           echo $form->field($model, 'dia')->
+            dropDownList(common\helpers\timeHelper::daysOfWeek() ,
+                    ['prompt'=>'--'.yii::t('base.verbs','Escoja un valor')."--",
+                    // 'class'=>'probandoSelect2',
+                      //'disabled'=>($model->isBlockedField('codpuesto'))?'disabled':null,
+                        ]
+                    )->label(yii::t('sta.labels','Día')) ;
+      }else{
+          echo $form->field($model, 'nombredia')->textInput(['disabled'=>true]);
+      }
+     
       ?>
   </div>   
     <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
@@ -54,6 +71,10 @@ use kartik\widgets\TimePicker;
   </div>
  <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
       <?= $form->field($model, 'activo')->checkbox([]) ?>
+
+  </div>
+  <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
+      <?= $form->field($model, 'skipferiado')->checkbox([]) ?>
 
   </div>
    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">

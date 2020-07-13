@@ -7,7 +7,7 @@ use common\models\Profile;
 use yii\helpers\Html;
 use yii;
 use yii\web\User as UserOriginal;
-
+use Carbon\Carbon;
 
 class User extends UserOriginal {
     
@@ -104,8 +104,14 @@ class User extends UserOriginal {
  * Ultima vez que logueo
  * 
  */
-     public function lastLogin(){
-         return Useraudit::lastLogin($this->id);
+     public function lastLogin($carbon=false){
+         $fecha=Useraudit::lastLogin($this->id); 
+        if($carbon){
+            return Carbon::createFromFormat(\common\helpers\timeHelper::formatMysqlDateTime(), $fecha);
+        }else{
+          return  $fecha;
+        }
+         
      }       
 
     public function lastLoginForHumans(){
@@ -204,6 +210,12 @@ public function getFirstFacultad(){
 
 public function getFacultades(){
  return  \frontend\modules\sta\models\UserFacultades::find()->select(['codfac'])->where(['user_id'=>$this->id,'activa'=>'1'])->asArray()->column();   
+}
+
+public function isMultiFacultad(){
+    return (\frontend\modules\sta\models\UserFacultades::find()->
+            where(['user_id'=>$this->id,'activa'=>'1'])->
+            count()>1)?true:false;   
 }
 
 }

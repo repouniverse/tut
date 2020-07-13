@@ -7,7 +7,7 @@ namespace frontend\modules\sta\models;
  *
  * @see Rangos
  */
-class RangosQuery extends \yii\db\ActiveQuery
+class RangosQuery extends  \frontend\modules\sta\components\ActiveQueryScope
 {
     /*public function active()
     {

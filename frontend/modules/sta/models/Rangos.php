@@ -21,7 +21,7 @@ use common\helpers\RangeDates;
 class Rangos extends \common\models\base\modelBase
 {
    const SCENARIO_HORAS='horas';
-    public $booleanFields=['activo'];
+    public $booleanFields=['activo','skipferiado'];
     public $dateorTimeFields=[
         'hinicio'=>self::_FHOUR,
         'hfin'=>self::_FHOUR];
@@ -41,7 +41,19 @@ class Rangos extends \common\models\base\modelBase
         return [
             [['talleres_id', 'dia', 'hinicio', 'hfin', 'tolerancia','nombredia'], 'required'],
             [['talleres_id', 'dia'], 'integer'],
-            [['hinicio','hfin','activo','codtra'], 'safe','on'=>self::SCENARIO_HORAS],
+            [['skipferiado','dia'], 'safe'],
+            /*['codtra', 'unique', 'targetAttribute' => 
+                 ['codtra','dia', 'codperiodo','codfac'],
+              'message'=>yii::t('sta.errors',
+                      'Esta combinacion de valores {codfac}-{dia}-{codperiodo}-{codtra} ya existe',
+                      ['codfac'=>$this->getAttributeLabel('codfac'),
+                        'dia'=>$this->getAttributeLabel('dia'),
+                          'codperiodo'=>$this->getAttributeLabel('codperiodo'),
+                          'codtra'=>$this->getAttributeLabel('codtra')
+                          ]
+                      )
+                ],*/
+            [['hinicio','hfin','activo','codtra','codperiodo','codfac','skipferiado'], 'safe','on'=>self::SCENARIO_HORAS],
              [['hinicio','hfin'], 'validateHoras','on'=>self::SCENARIO_HORAS],
             [['hinicio', 'hfin'], 'string', 'max' => 5],
             [['talleres_id'], 'exist', 'skipOnError' => true, 'targetClass' => Talleres::className(), 'targetAttribute' => ['talleres_id' => 'id']],
@@ -60,13 +72,14 @@ class Rangos extends \common\models\base\modelBase
             'hinicio' => Yii::t('sta.labels', 'Hinicio'),
             'hfin' => Yii::t('sta.labels', 'Hfin'),
             'tolerancia' => Yii::t('sta.labels', 'Tolerancia'),
+             'skipferiado' => Yii::t('sta.labels', 'Saltar Feriado'),
         ];
     }
     
       public function scenarios()
     {
         $scenarios = parent::scenarios(); 
-        $scenarios[self::SCENARIO_HORAS] = ['hinicio','hfin','activo','codtra'];
+        $scenarios[self::SCENARIO_HORAS] = ['hinicio','hfin','activo','codtra','dia','skipferiado'];
        // $scenarios[self::SCENARIO_REGISTER] = ['username', 'email', 'password'];
         return $scenarios;
     }
@@ -128,5 +141,17 @@ class Rangos extends \common\models\base\modelBase
         ]);
       RETURN $rango;
   }  
-    
+  
+ public function beforeSave($insert) {
+     if($insert){
+        
+         $this->clase= \frontend\modules\sta\staModule::CLASE_RIESGO;
+        $this->codperiodo= \frontend\modules\sta\staModule::getCurrentPeriod();
+        $this->codfac=$this->talleres->codfac;
+        $this->nombredia= \common\helpers\timeHelper::daysOfWeek()[$this->dia];
+        $this->tolerancia=0.1;
+     }
+     return parent::beforeSave($insert);
+ }
+  
 }

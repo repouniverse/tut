@@ -26,13 +26,18 @@ use common\widgets\linkajaxgridwidget\linkAjaxGridWidget;
          
          [
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{delete}{view}',
+                'template' => '{delete}{view}{update}',
                 'buttons' => [
                    
                          'view' => function ($url,$model) {
 			    $url= Url::to(['cambio-psicologo','id'=>$model->id,'gridName'=>'grilla-staff','idModal'=>'buscarvalor']);
                              //echo  Html::button(yii::t('base.verbs','Modificar Rangos'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Tutor'),'id'=>'btn_contacts', 'class' => 'botonAbre btn btn-success']); 
-                            return Html::a('<span class="btn btn-danger btn-sm glyphicon glyphicon-pencil"></span>', $url, ['class'=>'botonAbre']);
+                            return Html::a('<span class="btn btn-warning btn-sm glyphicon glyphicon-retweet"></span>', $url, ['class'=>'botonAbre']);
+                            },
+                          'update' => function ($url,$model) {
+			    $url= Url::to(['edita-taller-psico','id'=>$model->id,'gridName'=>'grilla-staff','idModal'=>'buscarvalor']);
+                             //echo  Html::button(yii::t('base.verbs','Modificar Rangos'), ['href' => $url, 'title' => yii::t('sta.labels','Agregar Tutor'),'id'=>'btn_contacts', 'class' => 'botonAbre btn btn-success']); 
+                            return Html::a('<span class="btn btn-success btn-sm glyphicon glyphicon-pencil"></span>', $url, ['class'=>'botonAbre']);
                             },
                          'delete' => function ($url,$model) {
 			    $url = Url::toRoute($this->context->id.'/ajax-detach-psico',['id'=>$model->id]);

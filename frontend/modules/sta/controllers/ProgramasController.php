@@ -581,7 +581,7 @@ public function actionMakeCitaByStudent(){
          
         if(!$error) { //Sio no hay errores
             $codigotra=$model->taller->psicologoPorDia(\Carbon\Carbon::createFromFormat(\common\helpers\timeHelper::formatMysql(),$fecha));
-            
+            $nombre= \common\models\masters\Trabajadores::findOne(['codigotra'=>$codigotra])->fullName();
             $attributes=[
                 'talleres_id'=>$model->talleres_id,
                 'talleresdet_id'=>$model->modelTalleresdet($codalu)->id,
@@ -604,7 +604,7 @@ public function actionMakeCitaByStudent(){
                    $cita->enviacorreo();
                }
                
-              $datos['success']=yii::t('sta.errors','Se ha creado la cita {numero} satisfactoriamente',['numero'=>$cita->numero]);
+              $datos['success']=yii::t('sta.errors','Se ha creado la cita {numero} con {psico} satisfactoriamente',['psico'=>$nombre,'numero'=>$cita->numero]);
                 
             }else{
              //  var_dump($cita->getErrors());die();
@@ -1177,8 +1177,8 @@ public function actionCreateRegular()
        if(h::request()->isAjax){
             h::response()->format = \yii\web\Response::FORMAT_JSON;
            $model=$this->findModel($id);
-           $model->sincerarPsicologo();
-           return ['success'=>yii::t('sta.labels','Se han sincerado los Psicólogos')];
+           $cantidad=$model->sincerarPsicologo();
+           return ['success'=>yii::t('sta.labels','Se han sincerado los Psicólogos en {nalu} alumnos',['nalu'=>$cantidad])];
        }
          
      }
@@ -1213,14 +1213,15 @@ public function actionCreateRegular()
            $datos=array_map('intval',$sesion[h::SESION_MALETIN]);
            
            $sesion[h::SESION_MALETIN]=[];
-           $ruta=\frontend\modules\sta\models\StaDocuAlu::zipeaVariosIds($datos);
+            echo $this->renderPartial('refrescamaletin');
+            $ruta=\frontend\modules\sta\models\StaDocuAlu::zipeaVariosIds($datos);
             $info= pathinfo($ruta);
           if(is_file($ruta)){
              return Yii::$app->response->sendFile($ruta, $info['filename'].'.'.$info['extension']);  
           }else{
               echo yii::t('sta.labels','No se encontraron archivos que descargar'); die();
           }
-            
+          
             //echo $ruta; die();
             //echo $info['filename'];die();
         
@@ -1228,6 +1229,99 @@ public function actionCreateRegular()
        }
    }
    
+  public function actionAjaxCalcularPeriodo($id){
+      if(h::request()->isAjax){
+          $model=$this->findModel($id);
+          return $model->frecuencia();
+      }
+  }
    
+  
+   public function actionCrearRango($id){
+     $this->layout = "install";
+        $model = New Rangos();
+        $datos=[];
+        $modelTaller= Talleres::findOne($id);
+        if(is_null($modelTaller)){
+            //Si es error buttonSubmitWidget::OP_TERCERA
+            //lanza un NOTY msg de error
+            return ['success'=>buttonSubmitWidget::OP_TERCERA,'msg'=>$datos];
+        }
+        $model->talleres_id=$modelTaller->id;
+      
+        if(h::request()->isPost){
+            $model->setScenario(Rangos::SCENARIO_HORAS);
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>buttonSubmitWidget::OP_SEGUNDA,'msg'=>$datos];  
+            }else{
+                $model->save();
+                
+                  return ['success'=>buttonSubmitWidget::OP_PRIMERA,'id'=>$model->talleres_id];
+            }
+        }else{
+            //var_dump($model->attributes);die();
+           return $this->renderAjax('_rangos', [
+                        'model' => $model,
+                        'idTaller' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                        //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+       
+  } 
+  
+  public function actionEditaTallerPsico($id){
+      $model=Tallerpsico::findOne($id);
+      
+       $this->layout = "install";
+       
+        $datos=[];
+        if(is_null($model)){
+            //Si es error buttonSubmitWidget::OP_TERCERA
+            //lanza un NOTY msg de error
+            return ['success'=>buttonSubmitWidget::OP_TERCERA,'msg'=>$datos];
+        }
+        
+      
+        if(h::request()->isPost){
+            $model->setScenario($model::SCENARIO_PERSONALIZACION);
+            $model->load(h::request()->post());
+             h::response()->format = \yii\web\Response::FORMAT_JSON;
+            $datos=\yii\widgets\ActiveForm::validate($model);
+            if(count($datos)>0){
+               return ['success'=>buttonSubmitWidget::OP_SEGUNDA,'msg'=>$datos];  
+            }else{
+                $model->save();
+                
+                  return ['success'=>buttonSubmitWidget::OP_PRIMERA,'id'=>$model->id];
+            }
+        }else{
+            //var_dump($model->attributes);die();
+           return $this->renderAjax('_psico_edit', [
+                        'model' => $model,
+                        'id' => $id,
+                        'gridName'=>h::request()->get('gridName'),
+                        'idModal'=>h::request()->get('idModal'),
+                        //'cantidadLibres'=>$cantidadLibres,
+          
+            ]);  
+        }
+  }
+   
+  public function actionModalMatrizIndicadores($id){
+      $this->layout="install";
+      $model= \frontend\modules\sta\models\Talleresdet::findOne($id);
+      if(!is_null($model)){
+        return  $this->render('_modal_matriz_indicadores',['model'=>$model]);
+      }
+  }
+  
+  
+  
   }
 

@@ -77,7 +77,7 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
              [['descripcion','duracioncita','codfac','codperiodo','codtra','codtra_psico','fopen','correo'], 'required'],
             [['codfac'], 'string', 'max' => 8],
             [['descripcion'], 'string', 'max' => 40],
-            [['clase','tolerancia','duracioncita','correo'], 'safe'],
+            [['clase','tolerancia','duracioncita','correo','periodo'], 'safe'],
             [['correo'], 'email'],
             [['duracioncita'], 'string', 'max' => 5],
             [['codtra', 'codtra_psico', 'codperiodo'], 'string', 'max' => 6],
@@ -338,6 +338,8 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
                         'nombredia'=>$day,
                          'talleres_id'=>$id,
                         'dia'=>$key,
+                        'codperiodo'=>$this->codperiodo,
+                         'codperiodo'=>$this->codfac,
                         'hinicio'=> h::getIfNotPutSetting('sta','horainicio','09:00', SettingType::STRING_TYPE),
                         'hfin'=> h::getIfNotPutSetting('sta','horafin','17:00', SettingType::STRING_TYPE),
                         'tolerancia'=> h::getIfNotPutSetting('sta','tolerancia',0.1, SettingType::FLOAT_TYPE),
@@ -614,10 +616,25 @@ public function codPsicologos($except=[]){
  public function psicologoPorDia(\Carbon\Carbon $fecha){
      //$fecha->format(\common\helpers\timeHelper::formatMysql())
      //var_dump($fecha->dayOfWeek);die();
-    $codtra= $this->getRanges()->select(['codtra'])->where(['dia'=>$fecha->dayOfWeek])->scalar();
-    if($codtra===null){
-        return false;
-    }
+     $query=$this->getRanges()->where(['dia'=>$fecha->dayOfWeek]);
+     $cuantosHay=$query->count();
+     if($cuantosHay > 1){//hay que desambiguar 
+         $profile=h::user()->profile;
+        if($profile->tipo== \frontend\modules\sta\staModule::PROFILE_PSICOLOGO){
+            return $profile->codtra;
+        }else{ //si es secretaria u otro
+            $sesion=h::session();
+            if($sesion->has('psico_por_dia')){
+                return $sesion['psico_por_dia'];
+            }else{
+                return null;
+            }
+        }
+     }elseif($cuantosHay==0){
+         return null;
+     }else{
+       $codtra=$query->select(['codtra'])->scalar();  
+     }
     return $codtra;     
  }
  
@@ -830,8 +847,14 @@ private function prepareAttributesCreateResumen($tallerdet,$citas){
             }elseif($cita['flujo_id']==3){/*Tutorias */
                
                $adicional['c_'.$baseContadorTutorias]=self::SwichtFormatDate($cita['fechaprog'],'datetime',true);    
-                 
-               $baseContadorTutorias++; 
+                if($baseContadorTutorias==12) {
+                     $baseContadorTutorias=37;
+                }else{
+                    $baseContadorTutorias++; 
+                }
+               
+               
+               
             }elseif($cita['flujo_id']==7){/*Evaluacion de salida */
                
                 $adicional['c_20']=self::SwichtFormatDate($cita['fechaprog'],'datetime',true);    
@@ -919,6 +942,36 @@ private function prepareAttributesCreateResumen($tallerdet,$citas){
                            $memoria.=(strlen($memoria)>0)?'-':''.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
                            $control_orden= $ordenEvento; 
                 }
+                 if($ordenEvento==11){
+                     if($control_orden ==$ordenEvento){
+                                $adicional['c_34']=$memoria.'-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+                           }else{
+                               $memoria='';
+                                $adicional['c_34']=substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+               
+                                //$contenido.='-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                                // $baseContadorTalleres++;
+                             }
+                      
+                           $memoria.=(strlen($memoria)>0)?'-':''.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                           $control_orden= $ordenEvento; 
+                }
+                if($ordenEvento==12){
+                     if($control_orden ==$ordenEvento){
+                                $adicional['c_35']=$memoria.'-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+                           }else{
+                               $memoria='';
+                                $adicional['c_35']=substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+               
+                                //$contenido.='-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                                // $baseContadorTalleres++;
+                             }
+                      
+                           $memoria.=(strlen($memoria)>0)?'-':''.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                           $control_orden= $ordenEvento; 
+                }
+                
+                
               } 
               
              
@@ -1003,28 +1056,59 @@ public function correosProgramaFaltanList($delimiter=';'){
  } 
 
 public function sincerarPsicologo(){
-  
-    $idsFlujo= \frontend\modules\sta\models\StaFlujo::find()
-      ->select(['actividad'])->andWhere(['clase'=>'M','esevento'=>'0','codperiodo'=>'2020I'])->column();
-   $filas= \frontend\modules\sta\models\Talleresdet::find()->
-            select(['t.id','b.codtra','count(b.codtra) as numero'])->
-            join('INNER JOIN','{{%sta_citas}} b','t.id=b.talleresdet_id')->
-            andWhere(['flujo_id'=>$idsFlujo])->andWhere(['activo'=>'0'])->
-           groupBy(['t.id','b.codtra'])->orderBy([
-                             't.id' => SORT_ASC,
-                            'count(b.codtra)'=>SORT_ASC
-             ])->
-            asArray()->all();
-   foreach($filas as $fila){
-      // yii::error('sincerando '.$fila['id']);
-       \frontend\modules\sta\models\Talleresdet::updateAll(
-            ['codtra'=> $fila['codtra']],
-            ['id'=>$fila['id']]
-               );
+     $contador=0;
+    foreach($this->alumnos as $tallerdet){
+       $fila= $tallerdet->getCitas()->select(['count(*) as cant','codtra'])
+                ->andWhere([
+                    'asistio'=>'1',
+                    'flujo_id'=> StaFlujo::idsFlujosNoEventos(),
+                    //'cos'
+                        ])
+                ->groupBy(['codtra'])->orderBy(['count(*)'=>SORT_DESC,'fechaprog'=>SORT_DESC])->one();
+      
+       if(!is_null($fila)){
+           ///yii::error('identidad '.$tallerdet->id);
+            //yii::error('correpsonde  '.$fila->codtra);
+           if($tallerdet->codtra <> $fila->codtra){
+               yii::error('diferentes en '.$tallerdet->id.' '.$fila->codtra.' con  '.$tallerdet->codtra);
+             $tallerdet->codtra=$fila->codtra ;
+             $tallerdet->save();  
+             $contador++;
+           }
+           
        }
-    return true;
+                
+    }
+    
+   
+    return $contador;
     
   }  
+  /*
+   * Obtiene la fercuencia de atenciones 
+   * en dias , de lso dros estaditicaos
+   */
+  public function frecuencia(){
+      $alumnos=$this->alumnos;
+      $cantidad=count($alumnos);
+      $acumulado=0;
+     foreach($alumnos as $alumno){
+         $acumulado+=$alumno->frecuencia();
+     }
+     if($cantidad==0) {
+         return 0;
+     }  
+     return round($acumulado/$cantidad,0);
+  }
  
+  
+  public function TallerPsicoOne($codtra){
+     return Tallerpsico::findOne(['codtra'=>$codtra,'talleres_id'=>$this->id]);
+  }
+  
+  
+  
+  
+  
 }
 

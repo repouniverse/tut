@@ -947,7 +947,7 @@ public function actionReportInfPsicologico($id){
     
     $rutaTemporal=\yii::getAlias('@frontend/modules/sta/archivos/informes/');
     if(is_null($model))
-   throw new NotFoundHttpException(Yii::t('sta.labels', 'No se encontro ningun registro con el id '.$id));
+   throw new NotFoundHttpException(Yii::t('sta.labels', 'No se encontro ningun registro con el Cid '.$id));
    $codocu=$model->codocu;
     
     
@@ -1380,5 +1380,9 @@ public function  actionAjaxShowLogInformes(){
             }
   
        }
+       
+public function actionAsistenciasTalleres(){
+    return $this->render('resumen_asistencias_taller');
+}
 
 }

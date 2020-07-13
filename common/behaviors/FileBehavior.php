@@ -1,7 +1,7 @@
 <?php
 
 namespace common\behaviors;
-
+use yii\web\UploadedFile;
 use nemmo\attachments\behaviors\FileBehavior as Fileb;
 use nemmo\attachments\models\File;
 use common\helpers\FileHelper;
@@ -21,7 +21,7 @@ class FileBehavior extends Fileb {
      * con la info de archivos adjuntos filtrados por la extension
      * que  usted desea
      */
-
+CONST FIRE_METHOD='triggerUpload';
     public function getFilesByExtension($ext = null) {
         if (is_null($ext))
             throw new \yii\base\Exception(Yii::t('base.errors', 'The extension parameter is null'));
@@ -196,5 +196,33 @@ class FileBehavior extends Fileb {
         }
         return $cad;
     }
+    
+    
+ /*Sobre escribe al metodo del la clase original */
+    public function saveUploads($event)
+    {
+        $files = UploadedFile::getInstancesByName('UploadForm[file]');
 
+        if (!empty($files)) {
+            foreach ($files as $file) {
+                //echo get_class($file); die();
+                //echo (is_dir($this->getModule()->getUserDirPath()))?"si":"no"; die();
+                if (!$file->saveAs($this->getModule()->getUserDirPath() . $file->name)) {
+                    throw new \Exception(\Yii::t('yii', 'File upload failed.'));
+                }
+            }
+        }
+
+        $userTempDir = $this->getModule()->getUserDirPath();
+        foreach (FileHelper::findFiles($userTempDir) as $file) {
+            if (!$this->getModule()->attachFile($file, $this->owner)) {
+                throw new \Exception(\Yii::t('yii', 'File upload failed.'));
+            }
+        }
+        rmdir($userTempDir);
+        if($this->owner->hasMethod(self::FIRE_METHOD)){
+            $this->{self::FIRE_METHOD}();
+        }
+    }
+    
 }

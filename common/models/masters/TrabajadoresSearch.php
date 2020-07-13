@@ -73,4 +73,15 @@ class TrabajadoresSearch extends Trabajadores
 
         return $dataProvider;
     }
+    
+    public function searchByCodes($codes)
+    {
+        $query = Trabajadores::find();
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+        // grid filtering conditions
+        $query->andWhere(['codigotra'=>$codes]);
+        return $dataProvider;
+    }
 }

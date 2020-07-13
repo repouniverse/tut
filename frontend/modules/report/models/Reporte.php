@@ -16,7 +16,7 @@ class Reporte extends baseReporte
     /**
      * {@inheritdoc}
      */
-    
+     public $booleanFields=['tienelogo','tienepie','comercial','tienecabecera'];
     public $imagen;
     public $hardFields=['codocu','modelo'];
     public $routesSplit=[];//array para almacenar las rutas de los archivos picados 
@@ -362,7 +362,8 @@ class Reporte extends baseReporte
     }
      private function McontentReport($id, $idfiltro){
        //$model=$this->findModel($id); 
-       $logo=($this->tienelogo)?$this->MputLogo($id, $idfiltro):''; 
+        
+       $logo=(!$this->tienelogo)?$this->MputLogo($id, $idfiltro):''; 
        $cabecera=$this->putCabecera($id,$idfiltro,$this->campofiltro);
       $contenidoSinGrilla=$logo.$cabecera; 
       $npaginas=$this->numeroPaginas($idfiltro);

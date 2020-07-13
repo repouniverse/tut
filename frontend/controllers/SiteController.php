@@ -1,6 +1,6 @@
 <?php
 namespace frontend\controllers;
-
+   use Carbon\Carbon;
 use Yii;
 use yii\base\InvalidParamException;
 use yii\web\BadRequestHttpException;
@@ -126,11 +126,13 @@ class SiteController extends \frontend\controllers\base\baseController
      */
     public function actionLogin()
     {
-     
+      
         $this->layout="login";
         if (!Yii::$app->user->isGuest) {
+            yii::error('es logueadp');
             return $this->goHome();
         }
+       
  //Yii::info(" paracopmrobar   ", __METHOD__);  
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
@@ -409,6 +411,134 @@ Datos de caché de configuración se han actualizado');
     }
 public function actionRutas(){
     
+    $model= \frontend\modules\sta\models\Talleresdet::findOne(2298);
+   print_r($model->indicadoresMatriz());
+   die();
+    
+    
+    
+    
+    $taller=63;
+    $citas=\frontend\modules\sta\models\Citas::find()-> 
+          andWhere([
+              'talleres_id'=>$taller,
+              'asistio'=>'1',
+              'flujo_id'=> \frontend\modules\sta\models\StaFlujo::idsFlujosEventos()])->all();
+    foreach($citas as $cita){
+        yii::error('registrando ');
+         yii::error($cita->numero);
+        $cita->registraIndicadorTrabajado();
+    }
+    die();
+    $model= \frontend\modules\sta\models\Citas::findOne(5699);
+    $model->registraIndicadorTrabajado();
+    die();
+    
+   
+    
+    
+    /*$period = \CarbonPeriod::since(
+                     '2020-07-07 09:00:00' )->minutes(30)->
+                     until(
+                       '2020-07-07 11:00:00');*/
+    
+           $carbon= Carbon::now();
+    //echo $carbon->dayOfWeek;
+    for ($i = 1; $i <= 10; $i++) {
+     echo $carbon->addDay(1)->dayOfWeek."<br>";
+       }
+    
+    die();
+           
+           
+           
+           
+    
+    foreach($period as $rato){
+        var_dump($rato);
+    }
+    die();
+    
+     $cita=New \frontend\modules\sta\models\Citas();
+         $cita->talleres_id=50;
+          $cita->fechaprog='09/07/2020 10:30:45';
+          $cita->codtra='760020';
+           yii::error('el codtra de la cita');    
+            yii::error($cita->codtra);   
+          if(!$cita->isInJourney()){
+              yii::error('agregado erro');
+            //$this->addError('fechaprog',yii::t('sta.errors','La fecha está fuera del horario de trabajo, verifique los horarios del programa'));
+            
+          }
+           yii::error('paso',__FUNCTION__);
+    die();
+    
+    
+    $model= \frontend\modules\sta\models\Rangos::findOne(30);
+    $carbon= \Carbon\Carbon::createFromFormat('Y-m-d','2020-07-07');
+    var_dump($model->range($carbon));die();
+    
+    
+    
+    ECHO date('Y');
+    $CAB=null;
+    if($CAB){
+        echo "uno";
+    }else{
+       echo "dos"; 
+    }
+    
+    $CAB=false;
+    if($CAB){
+        echo "tres";
+    }else{
+       echo "cuatro"; 
+    }
+    die();
+   $carbon=h::user()->lastLogin(true);
+   var_dump($carbon);die();
+    
+  $model=  \frontend\modules\sta\models\StaEventos::findOne(256);
+  foreach($model->detalles as $detalle){
+      if(in_array($detalle->codalu,[
+          '20171459B','20150398D',
+          '20162722F','20170540K',
+          '20171548E','20150489J',
+           '20141402B','20160516J',
+           '20171560E','20134032I',
+           '20190447F','20190405A',
+           '20130365C','20151423B',
+           '20140448I','20190605K',
+      ])){
+         $res= $detalle->createCita('760017',
+                  '29/06/2020 11:00:00',
+                  10,
+                  true,
+                  133);
+         if(is_object($res)){
+             echo $res->numero;
+         }
+      }
+      
+  }
+    
+    die();
+    
+  $model=\frontend\modules\sta\models\Talleres::findOne(53);
+  echo $model->frecuencia();
+    die();
+    
+    return $this->render('_prueba_grafico');
+    die();
+    
+   $model= \frontend\modules\sta\models\Talleresdet::findOne(3287);
+ //  var_dump(get_class($model->getCitas()));
+   $model->retiraDelPrograma(true);
+   die();
+    
+    
+    var_dump(h::user()->isMultiFacultad());
+    die();
     $sesion=h::session();
     var_dump($sesion[h::SESION_MALETIN]);die();
     

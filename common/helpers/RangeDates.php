@@ -8,7 +8,7 @@ use yii;
  
 
 class RangeDates extends \yii\base\Component{
-    
+    use \common\traits\timeTrait;
      const ESCALE_SECONDS='Seconds';
     const ESCALE_MINUTES='Minutes';
     const ESCALE_HOURS='Hours';
@@ -22,7 +22,7 @@ class RangeDates extends \yii\base\Component{
    * para la verificación de los decalajes, en decimales
    */  
     
-   public $tolerance=0.1; //10%
+   public $tolerance=0.0; //10%
    /*
     * Array de fechas 
     * [Carbon finicio,Carbon ftermino]
@@ -37,7 +37,16 @@ class RangeDates extends \yii\base\Component{
     */
    public $scale=self::ESCALE_MINUTES;
    
+   /*
+    * Array de subRangos, e sdecir 
+    * dentro de rANGE HAY OTROS OBJETOS RANGE
+    */
+   public $subRanges=[];
    
+   /*
+    * Determina si puedne coexistir subrnagos que se cruzan en el horario 
+    */
+   public $isPossibleInterference=false;
    
    
     public function __construct(Array $dates){
@@ -75,7 +84,77 @@ class RangeDates extends \yii\base\Component{
        return 'diffIn'.$this->scale;
    }
    
+   
+  /*
+   * Agrega unsibrango 
+   * verdficanod primero si hay esacio para el 
+   */
+   public function pushRange(RangeDates $range){
+       if($this->isPossibleInSubRanges($range)){
+           $this->subRanges[]=$range;
+       }ELSE{
+           return false;
+       }
+       
+   }
+   
+   
+   /*
+    * verifica que un rango puede incluirse en 
+    * el subrango, sin cruces
+    */
+   public function isPossibleInSubRanges(RangeDates $range){
+        $hayCruce=false;
+      if($this->isPossibleInterference){
+        return true; 
+      } else{
+          /*Verificamos primero que este entre los bordes   */
+          if($this->isRangeIntoOtherRange($range, $this)){
+               /*Ahora Verificamos que nos e curce con otreos subrangos que ya existen   */
+          foreach($this->subRanges as $rangoInterno){
+                
+                 if($this->isRangeIntoOtherRange($range,$rangoInterno)){
+                    $haycruce=true;break;
+                 }
+                 
+               }
+             if(!$haycruce){
+                 //$this->subRanges[]=$range; 
+                  return true;
+                 
+             }else{
+                 return false;
+             }
+             
+          }else{
+              return false;
+          }
+          
+      }
+   }
+   
+   /*
+    * Busca el primer  lugar libre, según los surangos que tenga
+    * subrabgos, si este rango no tiene subrangos entonce 
+    * siempre devuelve falso
+    * Si no encuentra lugar libre decuelve null
+    * @intervalo: integer valor de tiempo emdido en la proprieda scale
+    * por eemplo si pones 5 , y la esca es MINUTES, es 5 minutos
+    * return   Rango con las fronteras del primer lugar libre que encuentra
+    */
+  public function findFirstFreePlace($intervalo){
+      if(count($this->subRanges)==0)return null;
+      $rango=static::class();
+      foreach($this->subRanges as $rango){
+          
+      }
+  } 
+   
+   
+   
 }
    
+
+
   
    

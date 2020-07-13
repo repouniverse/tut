@@ -108,6 +108,7 @@ class Talleresdet extends \common\models\base\modelBase
             'codalu' => Yii::t('sta.labels', 'Codalu'),
             'fingreso' => Yii::t('sta.labels', 'Fingreso'),
             'detalles' => Yii::t('sta.labels', 'Detalles'),
+             'periodo' => Yii::t('sta.labels', 'Period (dias)'),
             'codtra' => Yii::t('sta.labels', 'Codtra'),
             'detalle_tutor' => Yii::t('sta.labels', 'Detalles'),
             'rank_tutor' => Yii::t('sta.labels', 'Calificación'),
@@ -354,8 +355,8 @@ public function retiraDelPrograma($retiro=true){
     YII::ERROR('eL FALG ES  '.$flag);
     $flagCita=($retiro)?'0':'1';
     $codperiodo=$this->talleres->codperiodo;
-    $citasid=$this->idCitas();
-    yii::error($citasid);
+    $citasid=$this->idCitas(true); //TRUE POR SI ACASO AGARRA LOS RETIRADOS TAMBIEN
+    //yii::error($citasid);
  if($codperiodo == staModule::getCurrentPeriod()){
        $transaccion=$this->getDb()->beginTransaction(\yii\db\Transaction::SERIALIZABLE);
     /*Mofiicando latabla ALurieso*/
@@ -386,12 +387,12 @@ public function retiraDelPrograma($retiro=true){
      */
     $idExamenes=Examenes::find()->complete()->select(['id'])->andWhere(['citas_id'=>ARRAY_MAP('intval',$citasid)])->column();
       /*Actualizando la tabla Examenes*/
-    
-      YII::ERROR($idExamenes);
+      
      Examenes::updateAll( ['status'=> $flag], ['id'=>$idExamenes]);
       /*Actualizando la tabla Detalle examenes*/
      StaExamenesdet::updateAll(['status'=> $flag], ['examenes_id'=>$idExamenes]);
        /*Actualizando la tabla Resultados*/
+       
        StaResultados::updateAll(['status'=> $flag], ['examen_id'=>$idExamenes]);
      
     $transaccion->commit();
@@ -410,9 +411,14 @@ public function retiraDelPrograma($retiro=true){
  }
  
  
- public function idCitas(){
+ public function idCitas($complete=false){
     // VAR_DUMP($this->getCitas()->select(['id']));DIE();
-     return $this->getCitas()->select(['id'])->column();
+     if($complete){
+       return $this->getCitas()->select(['id'])->column();  
+     }else{
+        return $this->getCitas()->complete()->select(['id'])->column();    
+     }
+     
  }
  
 public function hasPerformedFirstExamen(){
@@ -479,4 +485,296 @@ public function zipea(){
 }
     
     
+public function frecuencia(){
+    $codperiodo=$this->talleres->codperiodo;
+    
+    $citas=$this->getCitas()->andWhere([
+        'flujo_id'=>StaFlujo::idsFlujosNoEventos($codperiodo)
+            ])->all();
+    $totales=count($citas);
+    $acumulado=0;
+    foreach($citas as $cita){
+        
+        $acumulado+=$cita->diasPasadosUltimaCitaByTutoria();
+        yii::error('dias pasadosd '.$acumulado);
+    }
+    if($totales ==0 )
+      $promedio=0;
+    if($totales >0 )
+      $promedio=round($acumulado/$totales,1);
+    return $promedio;
+}
+
+/*SACA EL RECORD DE INDICADORES BAJOS
+ * @flujo_id: 1 o 7 eavluacion inicial o evaluación final 
+ * NO se necesita filtrar pediodo porque ya tiene 
+ * el id del taller filtrado
+ *  */
+ 
+public function indicadoresBajos($flujo_id){
+   RETURN VwStaResultados::find()->select([
+        'nombre','categoria','puntaje_total','percentil','indicador_id'
+    ]
+            )->
+    andWhere([
+        'talleresdet_id'=>$this->id,
+         'flujo_id'=>$flujo_id,
+        'categoria'=> StaPercentiles::CALIFICACION_BAJO,
+        'invertido'=>NULL,
+        ])->OrWhere([
+            'talleresdet_id'=>$this->id,
+         'flujo_id'=>$flujo_id,
+         'invertido'=>'1',
+        'categoria'=> StaPercentiles::CALIFICACION_ALTO,
+            ])->asArray()->all();
+    
+}
+
+
+
+/*SACA EL RECORD DE TODOS LOS INDICADORES EVALUADOS, OSEA LOS RESULTADOS 
+ * EN UN ARRAY 
+ * @flujo_id: 1 o 7 eavluacion inicial o evaluación final 
+ * NO se necesita filtrar pediodo porque ya tiene 
+ * el id del taller filtrado
+ *  */
+ 
+public function IndicadoresResultados($flujo_id){
+   RETURN VwStaResultados::find()->select([
+        'nombre','categoria','puntaje_total','percentil','indicador_id'
+    ]
+            )->
+    andWhere([
+        'talleresdet_id'=>$this->id,
+         'flujo_id'=>$flujo_id,
+       // 'categoria'=> StaPercentiles::CALIFICACION_BAJO,
+        //'invertido'=>NULL,
+        ])->asArray()->all();
+    
+}
+
+/*SACA EL RECORD DE TODOS LOS INDICADORES TRABAJADOS
+ * EN CITAS 
+ * EN UN ARRAY 
+ * @flujo_id: 1 o 7 eavluacion inicial o evaluación final 
+ * NO se necesita filtrar pediodo porque ya tiene 
+ * el id del taller filtrado
+ *  */
+ 
+public function IndicadoresEnCitas(){
+    $idsIndicadores= StaCitaIndicadores::find()->select(['indicador_id'])->
+           andWhere(['talleresdet_id'=>$this->id])->column();
+   RETURN VwStaResultados::find()->select([
+        'nombre','categoria','puntaje_total','percentil','indicador_id'
+    ]
+            )->
+    andWhere([
+        'talleresdet_id'=>$this->id,
+         //'flujo_id'=>$flujo_id,
+        'indicador_id'=>$idsIndicadores,
+       // 'categoria'=> StaPercentiles::CALIFICACION_BAJO,
+        //'invertido'=>NULL,
+        ])->asArray()->all();
+    
+}
+/*SACA EL RECORD DE INDICADORES BAJOS
+ *  Y DE ESTOS QUE SE HAN TRABAJADO*/
+ 
+public function indicadoresMatriz(){
+    
+    $flujoId=StaFlujo::firstEvaluacionFlujoId();
+   $IndicadoresBajos=$this->indicadoresBajos($flujoId);
+   $indicadoresFaltantes=VwStaResultados::find()->select([
+        'nombre','categoria','puntaje_total','percentil','indicador_id'
+    ]
+            )->
+    andWhere([
+        'talleresdet_id'=>$this->id,
+        ])->andWhere(
+            ['in',
+            'indicador_id',
+            array_column($this->IndicadoresEnCitas(),'indicador_id')
+            ])->andWhere(
+            ['not in',
+            'indicador_id',
+            array_column($IndicadoresBajos,'indicador_id')
+            ])->asArray()->all();
+   $total=[];
+    foreach($IndicadoresBajos as $fila){
+        $fila['PRIO']='A';
+        $total[]=$fila;
+    }
+    foreach($indicadoresFaltantes as $fila2){
+         $fila2['PRIO']='B';
+          $total[]=$fila2;
+    }
+  //yii::error($IndicadoresBajos);
+  /*yii::error($indicadoresFaltantes);
+   yii::error($total);*/
+   //$IndicadoresTRabajados
+   //$IndicadoresResultados=$this->IndicadoresResultados($flujoId);
+  $trabajados= StaCitaIndicadores::find()->
+           andWhere(['talleresdet_id'=>$this->id])->all();
+$citas=$this->getCitas()->andWhere(['asistio'=>'1'])->all();
+  $final=[];
+   foreach($total as $indicador){
+       
+       $t=1;
+       $ta=1;
+       foreach($citas as $cita){
+                             $flujo=$cita->flujo_id; 
+                            if(in_array($flujo,StaFlujo::idsFlujosEventos())){
+                                $cabecera='TALLER_'.$ta;
+                                $ta++;
+                                }else{
+                                    $cabecera='TUTORIA_'.$t;
+                                    $t++;
+                                }
+           
+              if($cita->getIndicadores()->andWhere([
+                 'indicador_id'=>$indicador['indicador_id']])->exists()){
+                  $indicador[$cabecera]='X';//'<i style="color:#30cf03;font-size:16px;"><span class="fa fa-check"></span></i>';
+               }else{
+                 $indicador[$cabecera]='';
+               }   
+            }
+      
+      $final[]=$indicador;
+   }
+   yii::error($final);
+       return $final;    
+}
+/*
+ * Coloca un puntaje según el tiemo pasado
+ * desde su ultim a cita de tutora, mientras mas necesite ser 
+ * citad mayor sera su puntaje
+ * 
+ */
+public function calculatePesoToProgramar(){
+    //Sacando la cita proxima 
+    $query=$this->getCitas()->andWhere([
+        'flujo_id'=>StaFlujo::idsFlujosNoEventos($codperiodo)
+            ]);
+    //cita ultima 
+    $puntaje=0;
+   $lastCita=$query->andWhere(['<', 'finicio',
+                date(timeHelper::formatMysqlDateTime())
+                ])->andWhere(['asistio'=>'1'])->orderBy(['finicio'=>SORT_DESC])->one();
+   if(is_null($lastCita)){
+       $puntaje+=1000;
+   }else{       
+       $dias=$this->CarbonNow()->diffInDays($lastCita->toCarbon('finicio'));        
+      $puntaje+=$dias;
+   }
+    //cita proxima
+    $nextCita=$query->andWhere(['>', 'fechaprog',
+                date(timeHelper::formatMysqlDateTime())
+                ])->orderBy(['fechaprog'=>SORT_ASC])->one();
+     if(is_null($nextCita)){
+       $puntaje+=1000;
+      }else{       
+       $dias=$nextCita->toCarbon('fechaprog')->diffInDays($this->CarbonNow());        
+      $puntaje+=$dias;
+      }
+   return $puntaje;
+}
+
+public function nAsistenciasTutorias(){
+      // $horas=h::gsetting('sta', 'nhorasreprogramacion');
+      // $limite=self::CarbonNow()->subHours($horas)->format(timeHelper::formatMysql());
+      return $this->getCitas()->
+              andWhere([
+                  'asistio'=>'1',
+                  'flujo_id'=>StaFlujo::idsFlujosNoEventos()
+                      ])->count();
+      echo $this->getCitas()->
+              andWhere([
+                  'asistio'=>'1',
+                  'flujo_id'=>StaFlujo::idsFlujosNoEventos()
+                      ])->createCommand()->getRawSql();
+  }
+  
+/*
+ * Saca el indicador de asistencias 
+ * pero incluye tambien a las reprogramaciones
+ * 
+ * i= # de asistencias - # reprogramaciones /#citas totales hechas
+ */
+  
+public function IAsistencias(){
+    
+    $ncitasTotales=$this->getCitas()->count();
+    $IdsCitas=$this->getCitas()->select(['id'])->column();
+    if($ncitasTotales>0){
+        $nReprogramaciones= $this->nReprogramaciones();
+       // var_dump($ncitasTotales,$nReprogramaciones,$this->asistencias());die();
+        return round(($this->asistencias()-$nReprogramaciones)*100/$ncitasTotales,2);
+    }else{
+        return 0;
+    }
+}  
+
+
+public function nReprogramaciones(){
+    
+    $IdsCitas=$this->getCitas()->select(['id'])->andWhere([
+            'activo'=>'1',
+              'asistio'=>'1',
+                ])->column();   
+        return  StaCitaLog::find()->andWhere([
+            'citas_id'=>$IdsCitas
+                ])->count();
+}
+
+/*
+ * Saca el indicador de avance de tutoprias 
+ * 
+ * 
+ * i= # de tutorias con aisitencia/ # frecuencia promedio de tutorias hechas a lso alumnos por ese pisoclo en esa facultad
+ */
+  
+public function ITutoriasAvance(){
+    $query= Citas::find()->andWhere([
+        'codtra'=>$this->codtra,
+        //'talleres_id'=>$this->talleres_id,
+        'asistio'=>'1',
+        'flujo_id'=>StaFlujo::idsFlujosNoEventos()
+    ]);
+    
+    $totalTutoriasPsicologo=$query->andWhere(['talleres_id'=>$this->talleres_id,])->count();
+    $totalAlumnosPsicologo= self::find()->andWhere([
+        'codtra'=>$this->codtra,
+        'talleres_id'=>$this->talleres_id,
+        ])->count();
+    if($totalAlumnosPsicologo >0){
+       
+       $promedio=round($totalTutoriasPsicologo/$totalAlumnosPsicologo,2);
+       $datos=$query->select(['count(*) as cantidad'])->
+       groupBy(['talleresdet_id'])->column();
+    
+       $desviacion=\Yii::$app->db->createCommand(
+              "SELECT FORMAT(STDDEV_SAMP(cantidad),2)
+FROM (SELECT talleresdet_id, count(*) cantidad
+FROM {{%sta_citas}}
+WHERE talleres_id = ".$this->talleres_id." and asistio='1' and flujo_id in (2,3)
+GROUP BY talleresdet_id) t;"
+               )
+               ->queryScalar();
+       
+       $maximo_valor=max($datos);
+      // VAR_DUMP($maximo_valor);die();
+       $asistencias=$this->nAsistenciasTutorias();
+       return [
+           'min'=>0,
+           'medio'=>($promedio)*100/100,
+           'bueno'=>($promedio+$desviacion)*100/100,
+           'max'=>max([$maximo_valor,$asistencias]),
+            'valor'=>$asistencias*100/100,
+       ];
+    }else{
+        return 0;
+    }
+    
+}
+  
 }

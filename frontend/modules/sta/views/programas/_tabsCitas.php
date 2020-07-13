@@ -27,7 +27,7 @@ echo \common\widgets\spinnerWidget\spinnerWidget::widget();
 <?php
 
  echo $this->render('/alumnos/auxiliares/_form_view_alu_basico',
-               ['model'=>$model,
+               ['model'=>$model,'modelTallerdet'=>$modelTallerdet
                 ]);
 
 ?>

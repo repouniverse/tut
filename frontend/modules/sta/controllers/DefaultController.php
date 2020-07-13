@@ -217,23 +217,25 @@ class DefaultController extends Controller
       $formato= \common\helpers\timeHelper::formatMysqlDate();
       $fechadefaultHoy=Aluriesgo::CarbonNow()->format($formato);
      $fecha=h::request()->get('fecha',$fechadefaultHoy );
-     
+      $codperiodo= \frontend\modules\sta\staModule::getCurrentPeriod();
      $verifFecha=\common\helpers\timeHelper::IsFormatMysqlDate($fecha);
      //var_dump($verifFecha);die();
     $fecha=($verifFecha)?$fecha:$fechadefaultHoy;
      $nombresesion='correos_'.h::userId();
-      //$codfac=h::user()->getFirstFacultad();
-     
+      //$codfac=h::user()->getFirstFacultad();     
       $codtra=h::user()->profile->codtra;
-      $registro=\frontend\modules\sta\models\Rangos::findOne(['codtra'=>$codtra,'dia'=>date('w')]);
-      
+      $registro=\frontend\modules\sta\models\Rangos::findOne(['codtra'=>$codtra,'codperiodo'=>$codperiodo,'dia'=>date('w')]);
+            
       if(!is_null($registro)){
          
        $codfac= $registro->talleres->codfac; 
       }else{
          $codfac=h::user()->getFirstFacultad(); 
       }
-      $codperiodo= \frontend\modules\sta\staModule::getCurrentPeriod();
+      
+     
+      
+      
       
      // $provider = \frontend\modules\sta\models\StaVwCitasSearch::searchByPsicoToday($codfac/*,$fecha*/);
        $provider = \frontend\modules\sta\models\StaVwCitasSearch::searchByDay($codfac,$fecha);
@@ -254,7 +256,6 @@ class DefaultController extends Controller
       } else{
           $sesion->remove($nombresesion);
       }
-      
       $tallerPsico=New Tallerpsico();
      $tallerPsico->codfac=$codfac;
      $citasPendientes=$tallerPsico->
@@ -262,17 +263,13 @@ class DefaultController extends Controller
                    $tallerPsico->eventosPendientes(),'',null);
     
      $tallerId= \frontend\modules\sta\models\Talleres::findOne(['codfac'=>$codfac,'codperiodo'=>$codperiodo])->id;
+     
      /*
       * aQUI SELECCIONAMOS LOS ALUMNOS DE ESTE PSICOLOGO
       */
     $searchAlumnos = new VwAlutallerSearch();
         $providerAlu = $searchAlumnos->searchByPsicologo(
                 h::request()->queryParams,$tallerId,$codtra);
-     
-     
-     
-     
-    /*if(h::userId()==51 or h::userId()==7 ){*/
         
          return $this->render('panelPsicologo',[
          'fecha'=>$fecha,
@@ -298,6 +295,202 @@ class DefaultController extends Controller
      
       
   }
+  
+  public function actionPanelInicio(){
+    
+     $codfac=$this->resolveFacultad();
+     if(strlen($codfac)>10){
+         return $codfac;
+     }
+      
+     $fecha=$this->resolveFecha();
+     $codperiodo= \frontend\modules\sta\staModule::getCurrentPeriod();
+      
+     $nombresesion='correos_'.h::userId();
+     
+     //$codtra=h::user()->profile->codtra;
+     
+     /////if(h::userId()==51){
+         $codtra=$this->resolveCodtra($codfac,$codperiodo,$fecha);
+         //var_dump($codtra);die();
+     //}else{
+        // $codtra=h::user()->profile->codtra;
+     ///}
+     $provider = \frontend\modules\sta\models\StaVwCitasSearch::searchByDay($codfac,$fecha);
+     $sesion=h::session();
+      if(!(date(\common\helpers\timeHelper::formatMysqlDate())==$fecha)){      
+         $sesion[$nombresesion]=$this->correosDeAlumnosHoy($fecha, $provider); 
+      } else{
+          $sesion->remove($nombresesion);
+      }
+      $citasPendientes=$this->citaspendientes($codfac);
+      /*
+      * aQUI SELECCIONAMOS LOS ALUMNOS DE ESTE PSICOLOGO
+      */
+      //var_dump($codtra);die();
+       $tallerId= \frontend\modules\sta\models\Talleres::findOne(['codfac'=>$codfac,'codperiodo'=>$codperiodo])->id;
+      $searchAlumnos = new VwAlutallerSearch();
+        $providerAlu = $searchAlumnos->searchByPsicologo(
+                h::request()->queryParams,$tallerId,$codtra);
+         return $this->render('panelPsicologo',[
+         'fecha'=>$fecha,
+         'providerAlu' =>$providerAlu, 
+              'provider' =>$provider, 
+              'searchAlumnos' => $searchAlumnos,
+          'citasPendientes'=> $citasPendientes,
+          'codperiodo'=> $codperiodo,
+             'codfac'=>$codfac,
+               'codtra'=>$codtra
+                  
+     ]);  
+   /* }else{
+      return $this->render('psicologo',[
+         'fecha'=>$fecha,
+         'provider' =>$provider,
+         
+          'citasPendientes'=> $citasPendientes,
+          'codperiodo'=>  \frontend\modules\sta\staModule::getCurrentPeriod(),
+                  
+     ]);  
+    }*/
+     
+     
+     
+     
+     
+  }
+  /*
+   * Esta funcion resuleve el codtra
+   * si es secretaria intenta asigar un 
+   * psicologo para eso se vale de la facultad
+   * debe llmarse despue de hacer resolveFacultad
+   * 
+   */
+  private function resolveCodtra($codfac,$codperiodo,$fecha){  
+      
+            
+      if(h::user()->profile->tipo== \frontend\modules\sta\staModule::PROFILE_PSICOLOGO){
+          //var_dump(h::user()->profile->codtra);die();
+          $codtra=h::user()->profile->codtra;
+           
+          return $codtra;
+      }elseif(h::user()->profile->tipo== \frontend\modules\sta\staModule::PROFILE_ASISTENTE){
+           $sesion=h::session();
+           if($sesion->has('psico_por_dia')){              
+               return $sesion['psico_por_dia'];
+           }else{
+                $dia= \Carbon\Carbon::createFromFormat(
+               \common\helpers\timeHelper::formatMysqlDate(),
+                      $fecha)->dayOfWeek;             
+          /*Intentamos encotrar el psicolo par aeste dia*/
+                $query=\frontend\modules\sta\models\Rangos::find()->where([
+                    'codfac'=>$codfac,
+                    'codperiodo'=>$codperiodo,
+                    'dia'=>$dia
+                    ]);
+                $cuantosHay=$query->count();  
+                           
+            if($cuantosHay >1 ){                 
+                 $this->redirect(['seleccionar-psicologo','codfac'=>$codfac,'codperiodo'=>$codperiodo]);
+            }               
+          $codtra=\frontend\modules\sta\models\Rangos::find()->
+             select(['codtra'])->andWhere(['codfac'=>$codfac,'codperiodo'=>$codperiodo,'dia'=>$dia]
+              )->scalar();
+              if(IS_NULL($codtra) OR $codtra==false)
+                    throw new BadRequestHttpException(yii::t('base.errors','Falta asignar psicólogo a esta facultad'));  
+            }
+           
+       return $codtra;
+      }else{
+           throw new BadRequestHttpException(yii::t('base.errors','Accedió a esta ruta con un perfil no adecuado  '));  
+          
+      }
+  }
+  
+  private function citaspendientes($codfac){
+      $tallerPsico=New Tallerpsico();
+     $tallerPsico->codfac=$codfac;
+     return $tallerPsico->
+            putColorThisCodalu(
+                   $tallerPsico->eventosPendientes(),'',null);
+  }
+  
+  private function correosDeAlumnosHoy($fecha,$provider){
+      $correos=[];
+        $models=$provider->getModels();
+        foreach($models as $model){
+          $correos[$model->codalu]=[
+              'correo'=>$model->correo,
+              'nombres'=>$model->ap.'-'.$model->am.'-'.$model->nombres,
+              'numerocita'=>$model->numerocita,
+              'fechaprog'=>$model->fechaprog,
+              ];
+         }
+         return $correos;      
+  }
+  
+  private function resolveFecha(){
+      $formato= \common\helpers\timeHelper::formatMysqlDate();
+      $fechadefaultHoy=Aluriesgo::CarbonNow()->format($formato);
+      $fecha=h::request()->get('fecha',$fechadefaultHoy);
+      //$codperiodo= \frontend\modules\sta\staModule::getCurrentPeriod();
+     $verifFecha=\common\helpers\timeHelper::IsFormatMysqlDate($fecha);
+     //var_dump($verifFecha);die();
+     return ($verifFecha)?$fecha:$fechadefaultHoy;
+  }
+  
+  public function resolveFacultad(){
+      
+      $codperiodo= \frontend\modules\sta\staModule::getCurrentPeriod();
+      /*Primero verificamos si se pado el parametro codfac*/
+      //var_dump( h::request()->get());die();
+     if(!is_null(h::request()->get('codfac'))){
+        //var_dump(h::request()->get('codfac'),h::user()->facultades);die();
+         if(in_array(h::request()->get('codfac'),h::user()->facultades)){
+             /*Si este parametro es correcto y coincide con las facultades del usuario, perfecto*/
+             return h::request()->get('codfac');
+         }else{/*Si no coi ndiice con ninguna facultad asiganda siomplente  arrojamos un error*/
+            //var_dump(\yii\helpers\Url::current(),h::request()->get('codfac'),h::user()->facultades);die();
+             return  $this->render('error_facultad');  
+         }         
+     }else{ //*Si no se paso el parametro buscamos el codfac por otros medios
+         /*Primero averiguamos si el día de hoy tiene asignado una atención 
+          * segun los horaros definidos en la tabla RANGOS 
+          */
+       
+      $codtra=h::user()->profile->codtra;
+      $facultadesAutorizadas=h::user()->facultades;
+      $codfac=\frontend\modules\sta\models\Rangos::find()->
+             select(['codfac'])->
+              andWhere(
+              ['codtra'=>$codtra,'codperiodo'=>$codperiodo,
+                'codfac'=>$facultadesAutorizadas,'dia'=>date('w')]
+              )->scalar();
+     
+        if($codfac){  
+             
+             $codfac= $codfac; 
+           }else{ /*Si no lo 
+              * encontró es porque:
+            *   1)  Es un invitado viene de otra facultad
+                Así que debemos darle a escoger a qué facultad quiere ir 
+            *   2) ó el día de hoy no tiene programado donde atender  y debemos
+            *     darle esta opción
+            */ 
+               
+             /*PARA ESTO ABORDAMOS DE LA SIGUIENTE MANERA */  
+           if(h::user()->isMultiFacultad()){ /*Si es invitado es multifacultad de hecho*/
+                return $this->render('invitado',['facultades'=>$facultadesAutorizadas]);
+           }else{ /*Em otro caso sacar su unica facultad*/
+               $codfac=h::user()->firstFacultad;
+           }
+          
+         }
+         return $codfac;
+     }
+  }
+  
+  
    public function actionPanelSecretaria(){
       $formato= \common\helpers\timeHelper::formatMysqlDate();
       $fechadefaultHoy=Aluriesgo::CarbonNow()->format($formato);
@@ -337,7 +530,7 @@ class DefaultController extends Controller
      return $this->render('psicologo',[
          'fecha'=>$fecha,
          'provider' =>$provider,
-         
+         'codfac'=>$codfac,
           'citasPendientes'=> $citasPendientes,
           'codperiodo'=>  \frontend\modules\sta\staModule::getCurrentPeriod(),
                   
@@ -727,6 +920,37 @@ public function actionExamenes(){
       'nevaluados'=>$nevaluados,
        'nNoEvaluados'=> $nNoEvaluados,
           ]);
+}
+
+public function actionSeleccionarPsicologo(){
+    $codfac=h::request()->get('codfac');
+    $codperiodo=h::request()->get('codperiodo');
+    $trabajadores= \frontend\modules\sta\models\Rangos::find()
+       ->select(['codtra'])->andWhere(['codfac'=>$codfac,'codperiodo'=>$codperiodo])->column();
+    /*var_dump(\frontend\modules\sta\models\Rangos::find()
+       ->select(['codtra'])->andWhere(['codfac'=>$codfac,'codperiodo'=>$codperiodo])->createCommand()->getRawSql());die();
+   */$tra=new \common\models\masters\TrabajadoresSearch();
+   //var_dump( $trabajadores);die();
+       $dataProvider=$tra->searchByCodes($trabajadores);
+       
+    return $this->render('seleccionar_psico',['dataProvider'=>$dataProvider]);
+    
+}
+
+public function actionSesionSelectPsicologo(){
+    
+    $psico=h::request()->get('codtra');
+    //var_dump($psico);die();
+    $model= \common\models\masters\Trabajadores::findOne(['codigotra'=>$psico]);
+    if(!is_null($model)){
+       $sesion=h::session();
+       $sesion['psico_por_dia']=$psico;
+       
+      return   $this->redirect(['panel-inicio']);
+    }else{
+        echo "mal valor"; die();
+    }
+    
 }
 
 }

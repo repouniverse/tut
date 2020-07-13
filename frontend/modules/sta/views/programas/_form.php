@@ -120,9 +120,15 @@ use common\helpers\h;
                             ]) ?>
 
  </div>
-  <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-     <?= $form->field($model, 'fclose')->textInput(['maxlength' => true,'disabled'=>true]) ?>
+  <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12">
+     <?= $form->field($model, 'periodo')->textInput(['maxlength' => true]) ?>
 
+ </div>
+ <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12">
+     <label class="control-label"> </label>
+     <?php
+       echo Html::button('<span class="fa fa-calendar"></span>   '.Yii::t('sta.labels', ''), ['id'=>'btn-periodo','class' => 'btn btn-success']);
+         ?> 
  </div>
   <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
      <?= $form->field($model, 'tolerancia')->textInput(['maxlength' => true]) ?>
@@ -152,3 +158,29 @@ use common\helpers\h;
 
 </div>
     </div>
+<?php $this->registerJs("
+         
+$('#btn-periodo').on( 'click', function(){    
+  $.ajax({ 
+  
+   method:'post',    
+      url: '".\yii\helpers\Url::toRoute(['/sta/programas/ajax-calcular-periodo','id'=>$model->id])."',
+   delay: 250,
+ data: {id:".$model->id."},
+             error:  function(xhr, textStatus, error){               
+                            var n = Noty('id');                      
+                              $.noty.setText(n.options.id, error);
+                              $.noty.setType(n.options.id, 'error');       
+                                }, 
+              success: function(data) {  
+                      $('#talleres-periodo').val(data);
+                        },
+   cache: true
+  })
+ }
+ 
+);",\yii\web\View::POS_END);  
+  ?>
+  
+       
+

@@ -1,6 +1,6 @@
 <?php
 namespace frontend\modules\sta\components;
-
+use frontend\modules\sta\models\Facultades;
 use common\helpers\h;
 /* 
  * Esta clase es la que efectua los filtros por facultad segun 

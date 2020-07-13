@@ -37,7 +37,7 @@ use dmstr\widgets\Alert;
 
 <footer class="main-footer">
     <div class="pull-right hidden-xs">
-        <b><SPAN style="font-size:10px;">Versión </b><span style="color:#008d4c;" >2.0.9.8</span> 
+        <b><SPAN style="font-size:10px;">Versión </b><span style="color:#008d4c;" >2.1.2.0</span> 
     </div>
     Minerva ®
 </footer>

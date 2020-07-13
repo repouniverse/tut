@@ -198,7 +198,7 @@ $tipo=h::user()->profile->tipo;
       <?php echo $this->render('_indicadores',['model'=>$model]);    ?>
   </div>
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-     <?= $form->field($model, 'detalles_indicadores')->textArea(['rows' => 4,'disabled'=>!$model->isEditableField( 'detalles_indicadores', $tipo)]) ?>
+     <?= $form->field($model, 'detalles_indicadores')->textArea(['value'=>($model->isNewRecord or empty($model->detalles_indicadores))?'Usar la función agregar indicador en la parte superior':$model->detalles_indicadores,   'disabled'=>true,  'rows' => 4,/*'disabled'=>!$model->isEditableField( 'detalles_indicadores', $tipo)*/]) ?>
   </div>
  <?php } ?>      
  

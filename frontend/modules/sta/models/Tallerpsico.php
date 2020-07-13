@@ -1,10 +1,12 @@
 <?php
 
 namespace frontend\modules\sta\models;
+use common\helpers\RangeDates;
 use common\models\masters\Trabajadores;
 use frontend\modules\sta\models\Talleresdet;
 use frontend\modules\sta\models\Citas;
 use Yii;
+use Carbon\Carbon;
 use common\interfaces\rangeInterface;
 use common\helpers\timeHelper;
 use common\helpers\h;
@@ -25,8 +27,9 @@ class Tallerpsico extends \common\models\base\modelBase
      */
     const  SCENARIO_CANTIDAD='cantidad';
     const  SCENARIO_STATUS='estado';
+    const  SCENARIO_PERSONALIZACION='per';
     const  SCENARIO_CAMBIO='cambio';
-    public $booleanFields=['calificacion'];
+    public $booleanFields=['calificacion','programar_libre'];
    // public $codtra2=null; //camo auxiliar
     public $cantidad_transferir=null;
     public static function tableName()
@@ -58,7 +61,7 @@ class Tallerpsico extends \common\models\base\modelBase
                 'except'=>self::SCENARIO_CAMBIO
                 ],
             
-            [['cantidad_transferir'], 'safe'],
+            [['cantidad_transferir','programar_libre'], 'safe'],
              //[['calificacion'], 'string', 'max' => 1],
              [['nalumnos','calificacion'], 'safe'],
             [['nalumnos'], 'validateCantidades','on'=>'default'],
@@ -72,6 +75,7 @@ class Tallerpsico extends \common\models\base\modelBase
         $scenarios[self::SCENARIO_CANTIDAD] = ['nalumnos'];
         $scenarios[self::SCENARIO_STATUS] = ['calificacion','nalumnos'];
          $scenarios[self::SCENARIO_CAMBIO] = ['codtra','cantidad_transferir'];
+          $scenarios[self::SCENARIO_PERSONALIZACION] = ['programar_libre'];
        // $scenarios[self::SCENARIO_REGISTER] = ['username', 'email', 'password'];
         return $scenarios;
     }
@@ -306,12 +310,13 @@ class Tallerpsico extends \common\models\base\modelBase
     }
     
     public function beforeSave($insert) {
-       
+      
         if($insert){
             //$this->prefijo=$this->codfac;
            
             $this->calificacion=true;
         }else{
+            
             if($this->hasChanged('codtra')){
                 $this->transfiereAlus($this->oldAttributes['codtra'],$this->codtra);
                 $this->calificacion=true;
@@ -563,4 +568,53 @@ class Tallerpsico extends \common\models\base\modelBase
        }
         
     }
+    
+    public function rangeByDay(Carbon $fecha){
+     $model=Rangos::findOne([
+           'talleres_id'=>$this->talleres_id,
+           'codtra'=>$this->codtra,
+           'dia'=>$fecha->dayOfWeek,          
+           ]); 
+     if(!is_null($model))
+      return $model->Range($fecha); 
+     return null;      
+    }
+    
+    /*
+     * Devuelve un array de model de 
+     * todas las citas dentoe de un rango determinado
+     */
+   public function citasByRange(RangeDates $range){
+       $citas=Citas::find()->andWhere([
+             'between',
+             'fechaprog'
+             ,$range->initialDate->format(timeHelper::formatMysqlDateTime()),
+             $range->initialDate->format(timeHelper::formatMysqlDateTime())
+                        ])->orderBy(['fechaprog'=>SORT_ASC])->all();
+      return $citas;
+   }
+   
+   /*
+    * Devuelvce unnrango por dia pero
+    * relleno de subrangos en ese dia
+    */
+   
+   public function rangesByDay(Carbon $fecha){
+       $rango=$this->rangeByDay($fecha);
+       if(is_null($rango))
+        return null;
+       $citas=$this->citasByRange($rango);
+       foreach($citas as $cita){
+           $rango->pushRange($cita->range());
+       }
+      return $rango;
+   }
+   
+   
+   
+   
+   
+   
+   
+    
 }

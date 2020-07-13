@@ -305,7 +305,10 @@ public function getFacultad()
            // echo $documento->files[0]->path;
             $rutaArchivo=$this->files[0]->path;
             //$infor= pathinfo($rutaArchivo);
-            $nombreAZipear= $this->codocu.'_'.$this->talleresdet->codalu.'_'.$this->talleresdet->alumno->ap.\common\helpers\FileHelper::extensionFile($rutaArchivo, true);
+            $alumno=$this->talleresdet->alumno;
+            $nombreAZipear= $this->codocu.'_'.$alumno->ap.'_'.$alumno->ap.'_'.$alumno->nombres.\common\helpers\FileHelper::extensionFile($rutaArchivo, true);
+            
+            //$nombreAZipear= $this->codocu.'_'.$this->talleresdet->codalu.'_'.$this->talleresdet->alumno->ap.\common\helpers\FileHelper::extensionFile($rutaArchivo, true);
             return $nombreAZipear;
             //$zip->addFile($rutaArchivo,$nombreAZipear);   
         }else{
