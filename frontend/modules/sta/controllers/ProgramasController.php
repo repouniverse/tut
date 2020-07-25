@@ -581,6 +581,18 @@ public function actionMakeCitaByStudent(){
          
         if(!$error) { //Sio no hay errores
             $codigotra=$model->taller->psicologoPorDia(\Carbon\Carbon::createFromFormat(\common\helpers\timeHelper::formatMysql(),$fecha));
+            if(is_null($codigotra)){
+                $profile=h::user()->profile;
+                    if($profile->tipo== \frontend\modules\sta\staModule::PROFILE_PSICOLOGO){
+                       $codigotra = $profile->codtra; 
+                    }else{
+                       $codigotra = $model->codtra; 
+                    }
+            }
+            
+            yii::error('taller id es  '.$model->taller->id);
+            yii::error('El codtra es  '.$codigotra);
+           
             $nombre= \common\models\masters\Trabajadores::findOne(['codigotra'=>$codigotra])->fullName();
             $attributes=[
                 'talleres_id'=>$model->talleres_id,
@@ -1232,7 +1244,7 @@ public function actionCreateRegular()
   public function actionAjaxCalcularPeriodo($id){
       if(h::request()->isAjax){
           $model=$this->findModel($id);
-          return $model->frecuencia();
+          return $model->frecuencia()['frecuencia'];
       }
   }
    
@@ -1321,7 +1333,19 @@ public function actionCreateRegular()
       }
   }
   
+  public function actionCorreoHorario(){
+      
+  }
   
+  public function actionActualizarPuntajes(){
+      if(h::request()->isAjax){
+            h::response()->format = \yii\web\Response::FORMAT_JSON;
+            
+          $model=$this->findModel(h::request()->post('id'));
+          $model->updatePuntajesAll();
+          return ['success'=>yii::t('sta.labels','Se actualizaron las frecuencias')];
+      }
+  }
   
   }
 

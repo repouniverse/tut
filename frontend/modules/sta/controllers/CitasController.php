@@ -361,8 +361,10 @@ public function  actionNotificaExamenDigital(){
             return ['error'=>yii::t('sta.errors','Error : NO se encontró el registro alumno')];
          if(is_null($cita))
             return ['error'=>yii::t('sta.errors','Error : NO se encontró el registro cita')];
-       if($idLastCita=$cita->lastCitaWithExamen()){
-             return ['error'=>yii::t('sta.errors','Ya existía la cita {numerocita} con evaluaciones',['numerocita'=>Citas::findOne($idLastCita)->numero])];   
+        $citaConTest=$cita->otherCitaWithTest();
+         if(!is_null($citaConTest)){
+            
+             return ['error'=>yii::t('sta.errors','Ya existía la cita {numerocita} con evaluaciones',['numerocita'=>$citaConTest->numero])];   
            }
            /*
             * Si ya se contestaron todas las preguntas para que enviar el banco
@@ -875,8 +877,10 @@ function actionBancoPreguntas($id){
          $model=$this->findModel($id);
         $codbateria=h::request()->get('bateria');
         if(in_array($codbateria, array_keys(\frontend\modules\sta\helpers\comboHelper::baterias()))){
-           if($idLastCita=$model->lastCitaWithExamen()){
-             return ['error'=>yii::t('sta.errors','Ya existía la cita {numerocita} con evaluaciones',['numerocita'=>Citas::findOne($idLastCita)->numero])];   
+            $citaConTest=$model->otherCitaWithTest();
+         if(!is_null($citaConTest)){
+            
+             return ['error'=>yii::t('sta.errors','Ya existía la cita {numerocita} con evaluaciones',['numerocita'=>$citaConTest->numero])];   
            }
             $model->agregaBateria($codbateria); 
            return ['success'=>yii::t('sta.errors','Se agregaron las pruebas de la batería')];
@@ -1383,6 +1387,20 @@ public function  actionAjaxShowLogInformes(){
        
 public function actionAsistenciasTalleres(){
     return $this->render('resumen_asistencias_taller');
+}
+
+public function actionLiberarCita($id){
+    if(h::request()->isAjax){
+       h::response()->format = \yii\web\Response::FORMAT_JSON;
+       $model=$this->findModel($id);
+       $mensajes=$model->liberarCita();
+       if(count($mensajes)>0){
+           return $mensajes;
+       }else{
+           return ['success'=>yii::t('sta.labels','Se liberó la cita')];
+       }
+    }
+    
 }
 
 }

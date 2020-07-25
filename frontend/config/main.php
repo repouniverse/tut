@@ -65,7 +65,8 @@ return [
         'view' => [
          'theme' => [
              'pathMap' => [
-                '@app/views' => '@app/views/yii2-app-frontend'
+                //'@app/views' => '@app/views/yii2-app-frontend',
+                 '@app/views' => '@app/views/skins/purple'
              ],
          ],
           ],

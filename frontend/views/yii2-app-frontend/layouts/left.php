@@ -29,7 +29,7 @@
         
     <br>  
       <?PHP 
-        if(\common\helpers\h::userName()=='administrador'){
+        if(true /*\common\helpers\h::userName()=='administrador'*/){
        ?> 
     
  

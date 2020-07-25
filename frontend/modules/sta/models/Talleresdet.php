@@ -34,7 +34,7 @@ class Talleresdet extends \common\models\base\modelBase
     const SCENARIO_BATCH='batch';
     const SCENARIO_PSICO='psico';
     const SCENARIO_TUTOR='tutor';
-    
+    const SCENARIO_PUNTAJE_FRECUENCIA='metricas';
     const CONTACTO_SIN_RESPUESTA='danger';
     const CONTACTO_CON_RESPUESTA='warning';
     const CONTACTO_CON_CITA='success';
@@ -56,7 +56,8 @@ class Talleresdet extends \common\models\base\modelBase
         $scenarios[self::SCENARIO_PSICO] = ['codtra_psico'];
         $scenarios[self::SCENARIO_TUTOR] = ['rank_tutor','detalle_tutor'];
         $scenarios[self::SCENARIO_PSICO_PSICO] = ['codtra'];
-       // $scenarios[self::SCENARIO_BATCH] = [ 'codcar', 'ap', 'am', 'nombres', 'dni','domicilio','correo','celulares','fijos'];
+       $scenarios[self::SCENARIO_PUNTAJE_FRECUENCIA]=['frecuencia','puntaje'];
+// $scenarios[self::SCENARIO_BATCH] = [ 'codcar', 'ap', 'am', 'nombres', 'dni','domicilio','correo','celulares','fijos'];
        // $scenarios[self::SCENARIO_REGISTER] = ['username', 'email', 'password'];
         return $scenarios;
     }
@@ -88,7 +89,7 @@ class Talleresdet extends \common\models\base\modelBase
             [['talleres_id', 'codalu'], 'required'],
             [['talleres_id'], 'integer'],
             [['detalles'], 'string'],
-            [['rank_psico','rank_tutor','status','codtra','clase','codocu'], 'safe'],
+            [['rank_psico','rank_tutor','status','codtra','clase','codocu','puntaje','frecuencia'], 'safe'],
             [['codalu'], 'string', 'max' => 14],
             [['fingreso'], 'string', 'max' => 10],
             [['codtra'], 'string', 'max' => 6],
@@ -356,9 +357,14 @@ public function retiraDelPrograma($retiro=true){
     $flagCita=($retiro)?'0':'1';
     $codperiodo=$this->talleres->codperiodo;
     $citasid=$this->idCitas(true); //TRUE POR SI ACASO AGARRA LOS RETIRADOS TAMBIEN
-    //yii::error($citasid);
+    yii::error('citas id',__FUNCTION__);
+    yii::error($citasid,__FUNCTION__);
+    yii::error('codperiodo',__FUNCTION__);
+    yii::error($codperiodo,__FUNCTION__);
+    yii::error('Flag cita',__FUNCTION__);
+    yii::error( $flagCita,__FUNCTION__);
  if($codperiodo == staModule::getCurrentPeriod()){
-       $transaccion=$this->getDb()->beginTransaction(\yii\db\Transaction::SERIALIZABLE);
+       //$transaccion=$this->getDb()->beginTransaction(\yii\db\Transaction::SERIALIZABLE);
     /*Mofiicando latabla ALurieso*/
      Aluriesgo::updateAll(
             ['status'=> $flag],
@@ -375,6 +381,9 @@ public function retiraDelPrograma($retiro=true){
               
               ]);
      /*Modificando la hoja de asistencia*/
+       IF($flag==Aluriesgo::FLAG_RETIRADO)
+              StaResumenasistencias::deleteAll(['codalu'=>$this->codalu]);
+       IF($flag==Aluriesgo::FLAG_NORMAL)
               StaResumenasistencias::deleteAll(['codalu'=>$this->codalu]);
       /*Modificando la tabla de informes*/              
               StaDocuAlu::updateAll(['status'=> $flag], ['talleresdet_id'=> $this->talleres_id]);
@@ -387,7 +396,8 @@ public function retiraDelPrograma($retiro=true){
      */
     $idExamenes=Examenes::find()->complete()->select(['id'])->andWhere(['citas_id'=>ARRAY_MAP('intval',$citasid)])->column();
       /*Actualizando la tabla Examenes*/
-      
+      yii::error('Id examenes',__FUNCTION__);
+    yii::error($idExamenes,__FUNCTION__);
      Examenes::updateAll( ['status'=> $flag], ['id'=>$idExamenes]);
       /*Actualizando la tabla Detalle examenes*/
      StaExamenesdet::updateAll(['status'=> $flag], ['examenes_id'=>$idExamenes]);
@@ -395,7 +405,7 @@ public function retiraDelPrograma($retiro=true){
        
        StaResultados::updateAll(['status'=> $flag], ['examen_id'=>$idExamenes]);
      
-    $transaccion->commit();
+    //$transaccion->commit();
     return true;
  }else{
    $this->addError('codalu',yii::t('sta.errors','Sólo puede retirar alumnos en el periodo activo'));
@@ -413,7 +423,7 @@ public function retiraDelPrograma($retiro=true){
  
  public function idCitas($complete=false){
     // VAR_DUMP($this->getCitas()->select(['id']));DIE();
-     if($complete){
+     if(!$complete){
        return $this->getCitas()->select(['id'])->column();  
      }else{
         return $this->getCitas()->complete()->select(['id'])->column();    
@@ -489,14 +499,16 @@ public function frecuencia(){
     $codperiodo=$this->talleres->codperiodo;
     
     $citas=$this->getCitas()->andWhere([
-        'flujo_id'=>StaFlujo::idsFlujosNoEventos($codperiodo)
+        'flujo_id'=>StaFlujo::idsFlujosNoEventos($codperiodo),
+        'asistio'=>'1'
             ])->all();
     $totales=count($citas);
+    
     $acumulado=0;
     foreach($citas as $cita){
         
         $acumulado+=$cita->diasPasadosUltimaCitaByTutoria();
-        yii::error('dias pasadosd '.$acumulado);
+        //yii::error('dias pasadosd '.$acumulado);
     }
     if($totales ==0 )
       $promedio=0;
@@ -653,30 +665,49 @@ $citas=$this->getCitas()->andWhere(['asistio'=>'1'])->all();
 public function calculatePesoToProgramar(){
     //Sacando la cita proxima 
     $query=$this->getCitas()->andWhere([
-        'flujo_id'=>StaFlujo::idsFlujosNoEventos($codperiodo)
+        'flujo_id'=>StaFlujo::idsFlujosNoEventos()
             ]);
     //cita ultima 
     $puntaje=0;
    $lastCita=$query->andWhere(['<', 'finicio',
                 date(timeHelper::formatMysqlDateTime())
                 ])->andWhere(['asistio'=>'1'])->orderBy(['finicio'=>SORT_DESC])->one();
+   /*var_dump(is_null($lastCita));
+   echo $query->andWhere(['<', 'finicio',
+                date(timeHelper::formatMysqlDateTime())
+                ])->andWhere(['asistio'=>'1'])->orderBy(['finicio'=>SORT_DESC])->createCommand()->getRawSql();
+   */
    if(is_null($lastCita)){
        $puntaje+=1000;
    }else{       
        $dias=$this->CarbonNow()->diffInDays($lastCita->toCarbon('finicio'));        
       $puntaje+=$dias;
+     
    }
     //cita proxima
-    $nextCita=$query->andWhere(['>', 'fechaprog',
+    $nextCita=$this->getCitas()->andWhere([
+        'flujo_id'=>StaFlujo::idsFlujosNoEventos()
+            ])->andWhere(['>', 'fechaprog',
                 date(timeHelper::formatMysqlDateTime())
                 ])->orderBy(['fechaprog'=>SORT_ASC])->one();
-     if(is_null($nextCita)){
+   
+    if(is_null($nextCita)){
        $puntaje+=1000;
       }else{       
        $dias=$nextCita->toCarbon('fechaprog')->diffInDays($this->CarbonNow());        
       $puntaje+=$dias;
       }
+      
    return $puntaje;
+}
+
+public function updatePuntajes(){
+    $this->setScenario(self::SCENARIO_PUNTAJE_FRECUENCIA);
+    $this->setAttributes([
+        'frecuencia'=>$this->frecuencia(),
+        'puntaje'=>$this->calculatePesoToProgramar(),
+    ]);
+    return $this->save(); 
 }
 
 public function nAsistenciasTutorias(){
@@ -703,11 +734,18 @@ public function nAsistenciasTutorias(){
   
 public function IAsistencias(){
     
-    $ncitasTotales=$this->getCitas()->count();
+    $ncitasTotales=$this->getCitas()->andWhere(['asistio'=>'1'])->count();
+    yii::error('numero de citas totales');
+     yii::error($ncitasTotales);
+      
     $IdsCitas=$this->getCitas()->select(['id'])->column();
     if($ncitasTotales>0){
         $nReprogramaciones= $this->nReprogramaciones();
-       // var_dump($ncitasTotales,$nReprogramaciones,$this->asistencias());die();
+       yii::error('Reprogramaciones');
+     yii::error($nReprogramaciones);
+     yii::error('Asistencias');
+     yii::error($this->asistencias());
+        // var_dump($ncitasTotales,$nReprogramaciones,$this->asistencias());die();
         return round(($this->asistencias()-$nReprogramaciones)*100/$ncitasTotales,2);
     }else{
         return 0;
@@ -776,5 +814,8 @@ GROUP BY talleresdet_id) t;"
     }
     
 }
-  
+
+  public function findComplete(){
+      
+  }
 }

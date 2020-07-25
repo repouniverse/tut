@@ -77,7 +77,7 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
              [['descripcion','duracioncita','codfac','codperiodo','codtra','codtra_psico','fopen','correo'], 'required'],
             [['codfac'], 'string', 'max' => 8],
             [['descripcion'], 'string', 'max' => 40],
-            [['clase','tolerancia','duracioncita','correo','periodo'], 'safe'],
+            [['clase','tolerancia','duracioncita','correo','periodo','aluactivos'], 'safe'],
             [['correo'], 'email'],
             [['duracioncita'], 'string', 'max' => 5],
             [['codtra', 'codtra_psico', 'codperiodo'], 'string', 'max' => 6],
@@ -307,6 +307,8 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
            IF(empty($this->tolerancia))
                $this->tolerancia='0.1';
             $this->numero=$this->correlativo('numero');
+        }else{
+            $this->aluactivos=$this->frecuencia()['cantidad'];
         }
         
         return parent::beforeSave($insert);
@@ -617,23 +619,36 @@ public function codPsicologos($except=[]){
      //$fecha->format(\common\helpers\timeHelper::formatMysql())
      //var_dump($fecha->dayOfWeek);die();
      $query=$this->getRanges()->where(['dia'=>$fecha->dayOfWeek]);
+     yii::error('query del psicologo por dia ');
+     yii::error($query->createCommand()->getRawSql());
      $cuantosHay=$query->count();
      if($cuantosHay > 1){//hay que desambiguar 
+         yii::error('HAY '.$cuantosHay.' PSICOS ESE DIA ');
          $profile=h::user()->profile;
         if($profile->tipo== \frontend\modules\sta\staModule::PROFILE_PSICOLOGO){
             return $profile->codtra;
         }else{ //si es secretaria u otro
             $sesion=h::session();
             if($sesion->has('psico_por_dia')){
+                yii::error(' HAY SESION');
                 return $sesion['psico_por_dia'];
             }else{
+                 yii::error('NO  HAY SESION');
+                 /*Sio no hya sesion 
+                  * por lo menos selecionar cualquiera de ellos
+                  */
+                 
+                 //$codtra=$query->select(['codtra'])->scalar();  
                 return null;
             }
         }
      }elseif($cuantosHay==0){
+         yii::error('NO HAY PSICOS ESE DIA , RETORNARA NULL');
          return null;
      }else{
+         
        $codtra=$query->select(['codtra'])->scalar();  
+        yii::error(' HAY UN PSICOS ESE DIA , RETORNARA '.$codtra);
      }
     return $codtra;     
  }
@@ -995,14 +1010,16 @@ private function prepareAttributesCreateResumen($tallerdet,$citas){
                       andWhere(['asistio'=>'1','activo'=>'1'])->
                      // andWhere(['id'=>[1036,1052,3380,4468,4479,4697]])->
                       orderBy([
-  //'flujo_id' => SORT_ASC,
+  'fechaprog' => SORT_ASC,
   'codaula'=>SORT_ASC
              ])->asArray()->all();
             $registro=StaResumenasistencias::findOne(['tallerdet_id'=>$tallerdet->id]);
               if(is_null($registro)){
+                  //yii::error('no encontro '.$tallerdet->codalu,__FUNCTION__);
                $attributes=$this->prepareAttributesCreateResumen($tallerdet, $citas); 
              $registro=new StaResumenasistencias();
                }else{
+                  // yii::error('Encontro ',__FUNCTION__);
                 $attributes=$this->prepareAttributesUpdateResumen($tallerdet, $citas); 
               }
              
@@ -1010,6 +1027,7 @@ private function prepareAttributesCreateResumen($tallerdet,$citas){
                 $registro->setAttributes($attributes);
                 
                 yii::error($registro->attributes);
+                
                 $registro->save();
                     
      }  
@@ -1090,15 +1108,21 @@ public function sincerarPsicologo(){
    */
   public function frecuencia(){
       $alumnos=$this->alumnos;
-      $cantidad=count($alumnos);
+     // $cantidad=count($alumnos);
       $acumulado=0;
+      $cantidad=0;
      foreach($alumnos as $alumno){
-         $acumulado+=$alumno->frecuencia();
+         $frecuencia=$alumno->frecuencia();
+         if($frecuencia > 0){
+            $acumulado+=$frecuencia; 
+            $cantidad++;
+         }
+         
      }
      if($cantidad==0) {
-         return 0;
+         return ['frecuencia'=>0,'cantidad'=>0];
      }  
-     return round($acumulado/$cantidad,0);
+     return  ['frecuencia'=>round($acumulado/$cantidad,0),'cantidad'=>$cantidad]; 
   }
  
   
@@ -1107,7 +1131,11 @@ public function sincerarPsicologo(){
   }
   
   
-  
+  public function updatePuntajesAll(){
+     foreach($this->alumnos as $alumno){
+         $alumno->updatePuntajes();
+     }
+  }
   
   
 }

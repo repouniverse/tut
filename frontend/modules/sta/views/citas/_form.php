@@ -302,5 +302,48 @@ $tipo=h::user()->profile->tipo;
                         });
              })", View::POS_READY);
 ?>    
-    
+ <?php
+ $this->registerJs("$('#btn-undo-liberar').on( 'click', function() { 
+      //alert(this.id);
+      $.ajax({
+              url: '".Url::toRoute(['liberar-cita'])."', 
+              type: 'get',
+              data:{id:".$model->id."},
+              dataType: 'json', 
+               error:  function(xhr, textStatus, error){               
+                            var n = Noty('id');                      
+                              $.noty.setText(n.options.id, error);
+                              $.noty.setType(n.options.id, 'error');       
+                                },  
+            success: function(json) {  
+                  
+                        var n = Noty('id');
+                       if ( !(typeof json['error']==='undefined') ) {
+                      
+                   $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-remove-sign\'></span>      '+ json['error']);
+                              $.noty.setType(n.options.id, 'error'); 
+                              }
+                         if ( !(typeof json['success']==='undefined') ) {
+                                    
+                                $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-ok-sign\'></span>' + json['success']);
+                             $.noty.setType(n.options.id, 'success');
+                             $('#btn-undo-asistencia').hide();
+                              $('#btn-conf-asistencia').show();
+                            
+                              $.pjax.reload({container: '#check-asistencia-cita',async:false});
+                              } 
+                               if ( !(typeof json['warning']==='undefined') ) {
+                                        $.noty.setText(n.options.id,'<span class=\'glyphicon glyphicon-info-sign\'></span>' +json['warning']);
+                             $.noty.setType(n.options.id, 'warning');
+                             $('#btn-undo-asistencia').hide();
+                              $('#btn-conf-asistencia').show();
+                            
+                              $.pjax.reload({container: '#check-asistencia-cita'});
+                              } 
+                              
+                      
+                        },
+                        });
+             })", View::POS_READY);
+?>       
 </diV>

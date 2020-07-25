@@ -575,6 +575,7 @@ class Tallerpsico extends \common\models\base\modelBase
            'codtra'=>$this->codtra,
            'dia'=>$fecha->dayOfWeek,          
            ]); 
+     
      if(!is_null($model))
       return $model->Range($fecha); 
      return null;      
@@ -587,32 +588,74 @@ class Tallerpsico extends \common\models\base\modelBase
    public function citasByRange(RangeDates $range){
        $citas=Citas::find()->andWhere([
              'between',
-             'fechaprog'
-             ,$range->initialDate->format(timeHelper::formatMysqlDateTime()),
-             $range->initialDate->format(timeHelper::formatMysqlDateTime())
-                        ])->orderBy(['fechaprog'=>SORT_ASC])->all();
+             'fechaprog',             
+             $range->initialDate->format(timeHelper::formatMysqlDateTime()),
+             $range->finalDate->format(timeHelper::formatMysqlDateTime())
+                        ])->andWhere(['codtra'=>$this->codtra])->orderBy(['fechaprog'=>SORT_ASC])->all();
+       
       return $citas;
    }
    
    /*
-    * Devuelvce unnrango por dia pero
+    * Devuelvce unnrango de una fecha espcifica 
     * relleno de subrangos en ese dia
+    * si no encuetra atenciones del psicolog ese dia devuleve null
     */
    
    public function rangesByDay(Carbon $fecha){
        $rango=$this->rangeByDay($fecha);
+       
        if(is_null($rango))
         return null;
        $citas=$this->citasByRange($rango);
+       //var_dump(count($citas));die();
        foreach($citas as $cita){
+           yii::error('intentando cita '.$cita->fechaprog);
            $rango->pushRange($cita->range());
        }
       return $rango;
    }
    
    
-   
-   
+   /*
+    * Esta funcion devuelve  un rango 
+    * 
+    */
+   public function nextHorarioLibre($since=null){
+       if(is_null($since) or $since->lt(self::CarbonNow()->endOfDay())){
+           $carbon=self::CarbonNow()->endOfDay();
+       } else{
+           $carbon=$since->endOfDay();
+       } 
+       $ranguitoLibre=null;
+       $rangosDia=$this->rangesByDay($carbon);
+          if(IS_NULL($rangosDia)){ 
+              yii::error('Fue nulo rangos dia en  '.$carbon->format('Y-m-d'));
+              yii::error('Ahora probando recursivamente con '.$carbon->addDay(1)->format('Y-m-d'));
+               return $this->nextHorarioLibre($carbon->addDay(1));
+          }else{
+               yii::error('Se encontro rangosdia en  '.$carbon->format('Y-m-d'));
+              
+              $ranguitoLibre=$rangosDia->findFirstFreePlace(30);
+              yii::error('Hallanod ranguitoLibre en rangosdia  '.$carbon->format('Y-m-d'));
+             
+             if(IS_NULL($ranguitoLibre)){
+                 yii::error('NO se hallo ranguitoLibre en rangosdia, probando recursovamente   '.$carbon->addDay(1)->format('Y-m-d'));
+             
+                return $this->nextHorarioLibre($carbon->addDay(1));
+             }else{
+                  yii::error('Chevere se encontr ranguito libre  y ahi te lo devuelvo '.$carbon->format('Y-m-d'));
+                yii::error($ranguitoLibre);
+                yii::error('rere');
+             
+                return $ranguitoLibre;
+             }
+              
+          }
+          yii::error('llegando alfinal '.$carbon->format('Y-m-d'));
+           yii::error($ranguitoLibre);
+       return $ranguitoLibre;
+   }
    
    
    

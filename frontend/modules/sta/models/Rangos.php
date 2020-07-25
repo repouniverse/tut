@@ -127,14 +127,28 @@ class Rangos extends \common\models\base\modelBase
   */
     
   public function Range(\Carbon\Carbon $fecha ){
-      $diaWeekOriginal=$fecha->weekDay();
+     // $diaWeekOriginal=$fecha->weekDay();
      // $carbonInicio=$fecha->copy()->endOfDay()->subHours(24)->parse;
-       $carbonInicio=$fecha->copy()->parse($this->hinicio);
-       $carbonFinal=$fecha->copy()->parse($this->hfin);
-     // $diaWeekHoy=
-      /*var_dump($fecha);
-      /*var_dump($fecha->parse($this->hinicio));
-      /*var_dump($fecha->parse($this->hfin));*/
+       //$carbonInicio=$fecha->copy()->parse($this->hinicio);
+      // $carbonFinal=$fecha->copy()->parse($this->hfin);
+    
+     // $carbon = $this->toCarbon('fechaprog');
+        $hinicio = $this->hinicio;
+        $hfinal = $this->hfin;
+        $segundosPasadosInicio = $fecha->copy()->parse($hinicio)
+                ->diffInSeconds($fecha->copy()->parse($hinicio)->startOfDay());
+        $segundosPasadosFin = $fecha->copy()->parse($hfinal)->diffInSeconds($fecha->copy()->parse($hinicio)->startOfDay());
+        $carbonInicio = $fecha->copy()->startOfDay()->addSeconds($segundosPasadosInicio);
+        $carbonFinal = $fecha->copy()->startOfDay()->addSeconds($segundosPasadosFin);
+
+      
+      
+      
+      
+      
+      
+      
+      
       $rango=New RangeDates([
               $carbonInicio,
             $carbonFinal
@@ -152,6 +166,29 @@ class Rangos extends \common\models\base\modelBase
         $this->tolerancia=0.1;
      }
      return parent::beforeSave($insert);
+ }
+ 
+ /*
+  * A esta fun solo pasale una fecha (carboN) 
+  * y te devuelve el registro mas proximo 
+  * se fija en el dia de la semana de CARBON OBVIO
+  * @fecha CARBON
+  * @CODTRA  PSICOLOGO A CARGO
+  */
+ public static function firstRangeFromFecha(\Carbon\Carbon $fecha,$codtra){
+  $query=self::find()->andWhere(['codtra'=>$codtra]);
+  $reg= $query->andWhere(['>=','dia',$fecha->dayOfWeek])->one();
+  if(is_null($reg)){//Si no encontro por arriba en tonces puede ser qe sea un sabado 
+    $reg= $query->andWhere(['<','dia',$fecha->dayOfWeek])->
+          orderBy(['dia'=>SORT_ASC])->one();   // entonces hay que porbar con un menor 
+      IF(IS_NULL($reg)){
+         return null; 
+      }else{
+         return $reg; 
+      }
+    }else{
+            return $reg;  
+    }
  }
   
 }

@@ -390,8 +390,14 @@ if (h::request()->isAjax && $model->load(h::request()->post())) {
              }
         
         if ($model->load(h::request()->post()) && $model->save()) {
-             Yii::$app->session->setFlash('success',yii::t('sta.labels','Se ha efectuado el retiro'));
-            return $this->redirect(['programas/update','id'=>$model->tallerdet->talleres->id]);
+            if($model->isActive()){
+                Yii::$app->session->setFlash('success',yii::t('sta.labels','Se ha efectuado el retiro del alumno {alumno}',['alumno'=>$model->alumno->fullName()]));
+           
+            }else{
+                Yii::$app->session->setFlash('warning',yii::t('sta.labels','Se ha dejado sin efecto el retiro del alumno {alumno}',['alumno'=>$model->alumno->fullName()]));
+           
+            }
+              return $this->redirect(['alumnos/retiros'/*,'id'=>$model->tallerdet->talleres->id*/]);
            }
           
         return $this->render('crea_retiro', [

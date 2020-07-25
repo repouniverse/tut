@@ -411,6 +411,40 @@ Datos de caché de configuración se han actualizado');
     }
 public function actionRutas(){
     
+    
+   echo " Url::home()  :   ".Url::home()."<br>";
+   echo " Url::home('https')  :   ".Url::home('https')."<br>";
+   echo " Url::base()  :   ".Url::base()."<br>";
+   echo " Url::to(['controlador/accion','param2'=>'uno','param2'=>'dos'],true)  :   ".Url::to(['controlador/accion','param1'=>'uno','param2'=>'dos'],true)."<br>";
+   echo " Url::base(true)  :   ".Url::base(true)."<br>";
+   echo " Url::base('https')  :   ".Url::base('https')."<br>";
+   echo " Url::canonical()  :   ".Url::canonical()."<br>";
+   echo " Url::current()  :   ".Url::current()."<br>";
+   echo " Url::previous()  :   ".Url::previous()."<br>";
+   echo " UrlManager::getBaseUrl()  :   ".yii::$app->urlManager->getBaseUrl()."<br>";
+   echo " UrlManager::getHostInfo()  :   ".yii::$app->urlManager->getHostInfo()."<br>";
+   echo " UrlManager::getScriptUrl()  :   ".yii::$app->urlManager->getScriptUrl()."<br>";
+   //yii::$app->urlManager->setHostInfo('');
+   //echo " Url::base()  :   ".Url::base()."<br>";
+   //echo " UrlManager::setHostInfo()   :   ".yii::$app->urlManager->setHostInfo('http://case.itekron.com/frontend/web/sta/entregas/update?id=32')."<br>";
+die();
+    
+    
+    
+    h::session()->remove('psico_por_dia');die();
+    $model= \frontend\modules\sta\models\Talleresdet::findOne(1510);
+    echo $model->frecuencia();
+    
+    die();
+     $carbon= \Carbon\Carbon::createFromFormat('Y-m-d','2020-07-18');
+     $model= \frontend\modules\sta\models\Tallerpsico::findOne(9);
+     $rango=$model->nextHorarioLibre($carbon);
+     
+     var_dump( $rango); die();
+    // $rangos=$model->rangesByDay($carbon);
+     //var_dump($rangos->findFirstFreePlace(30)); die();
+     
+    
     $model= \frontend\modules\sta\models\Talleresdet::findOne(2298);
    print_r($model->indicadoresMatriz());
    die();
@@ -892,22 +926,6 @@ var_dump(array_column($errores,'mapa'));
     }
    DIE(); 
    
-   echo " Url::home()  :   ".Url::home()."<br>";
-   echo " Url::home('https')  :   ".Url::home('https')."<br>";
-   echo " Url::base()  :   ".Url::base()."<br>";
-   echo " Url::to(['controlador/accion','param2'=>'uno','param2'=>'dos'],true)  :   ".Url::to(['controlador/accion','param1'=>'uno','param2'=>'dos'],true)."<br>";
-   echo " Url::base(true)  :   ".Url::base(true)."<br>";
-   echo " Url::base('https')  :   ".Url::base('https')."<br>";
-   echo " Url::canonical()  :   ".Url::canonical()."<br>";
-   echo " Url::current()  :   ".Url::current()."<br>";
-   echo " Url::previous()  :   ".Url::previous()."<br>";
-   echo " UrlManager::getBaseUrl()  :   ".yii::$app->urlManager->getBaseUrl()."<br>";
-   echo " UrlManager::getHostInfo()  :   ".yii::$app->urlManager->getHostInfo()."<br>";
-   echo " UrlManager::getScriptUrl()  :   ".yii::$app->urlManager->getScriptUrl()."<br>";
-   //yii::$app->urlManager->setHostInfo('');
-   //echo " Url::base()  :   ".Url::base()."<br>";
-   //echo " UrlManager::setHostInfo()   :   ".yii::$app->urlManager->setHostInfo('http://case.itekron.com/frontend/web/sta/entregas/update?id=32')."<br>";
-
     
    
    

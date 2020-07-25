@@ -1,7 +1,5 @@
 <?php
-
 namespace frontend\modules\sta\models;
-
 use common\traits\timeTrait;
 use common\behaviors\AccessDownloadBehavior;
 use Yii;
@@ -267,6 +265,7 @@ class Citas extends \common\models\base\modelBase implements rangeInterface {
     public function getIndicadores() {
         return $this->hasMany(StaCitaIndicadores::className(), ['citas_id' => 'id']);
     }
+    
 
     /**
      * {@inheritdoc}
@@ -879,11 +878,21 @@ class Citas extends \common\models\base\modelBase implements rangeInterface {
             //var_dump($CfechaInicio->format($this->formatToCarbon(self::_FDATETIME)));die();
 
             $codigotra = $this->taller->psicologoPorDia($CfechaInicio);
-
+             //Si no encuentra turno ese dia coger el pisocolo por defecto 
+            if(is_null($codigotra)){
+                $profile=h::user()->profile;
+                    if($profile->tipo== \frontend\modules\sta\staModule::PROFILE_PSICOLOGO){
+                       $codigotra = $profile->codtra; 
+                    }else{
+                       $codigotra = $this->tallerdet->codtra;   
+                    }
+            }
+              
+             
 
             $this->fechaprog = $CfechaInicio->format($this->formatToCarbon(self::_FDATETIME));
             $this->finicio = $this->fechaprog;
-            $this->codtra = (!is_null($codigotra)) ? $codigotra : $this->codtra;
+            $this->codtra = $codigotra;
             $this->ftermino = $CfechaInicio->addMinutes($this->duracion)->format($this->formatToCarbon(self::_FDATETIME));
             $oldScenario = $this->getScenario();
 
@@ -1044,18 +1053,20 @@ class Citas extends \common\models\base\modelBase implements rangeInterface {
     /* Verifica que el alumno ya ha rendido alguna prueba 
       en una cita anterior en el periodo actual
       devuelve el id de la cita , si no encuentra nada devuelve false */
-
+/*
     public function lastCitaWithExamen() {
         //$currentCodper=StaModule::getCurrentPeriod();
         //$codper=$this->talleresdet->taller->codperiodo;
         //SACANDO LOS TALLERES ID DE ESTE PERIODO
         //Sacando el id de las otras citas de este alumno ene ste periodo
+       // $IdsEvaluaciones=StaFlujo::idsFlujosEvaluaciones();
+        
         $citasId = self::find()->select(['id'])->andwhere(['talleresdet_id' => $this->talleresdet_id])
                         ->andWhere(['<>', 'id', $this->id])->column();
         
-        return Examenes::find()->select(['citas_id'])->andWhere(['citas_id' => $citasId])->orderBy('citas_id DESC')->scalar();
+        return Examenes::find()->select(['citas_id'])->andWhere(['citas_id' => $citasId,'flujo_id'=>$this->flujo_id])->orderBy('citas_id DESC')->scalar();
     }
-
+*/
     /*
      * Ejecuta los resultados 
      * segun las respuestas
@@ -1637,6 +1648,88 @@ class Citas extends \common\models\base\modelBase implements rangeInterface {
         }
        
         
+    }
+    
+    /*
+     * Verifica que hay una cita con prueba abierta
+     * O efectuada, quiere decir ue si existe devolvera 
+     * el activerecord de esta cita
+     * En caso de no existir, que da libre para 
+     * enviar el troken y generar el banco de pruebas
+     * Si noi encuentra ningna cita con
+     * prueba virgen o desarrollada devuelve null
+     */
+    public function otherCitaWithTest(){
+        /*Sacanos las ciotas 
+          de este alumno qpero que tengna el mismo 
+         * flujo y que sean diferentes a la atual
+         */
+        $citas = self::find()->andwhere(
+                [
+                    'talleresdet_id' => $this->talleresdet_id,
+                    'flujo_id'=>$this->flujo_id,
+                ])
+          ->andWhere(['<>', 'id', $this->id])->all();
+        /*Recoremos y verificams*/
+        
+       foreach($citas as $cita){
+           if($cita->hasPerformedTest()){
+               return $cita;
+           }elseif($cita->isVencida()){
+               
+           }else{
+               return $cita;
+           }
+       }
+       return null; 
+      
+    }
+  
+    public function isEvaluacion(){
+        return in_array($this->flujo_id,StaFlujo::idsFlujosEvaluaciones());
+    }
+    /*
+     * veriica si la cita es una evaluacion y esta vencida
+     * ademas no ha rendido evaluacion
+     */
+    public function isLiberable(){
+       return ($this->isEvaluacion() && $this->isVencida() && !$this->hasPerformedTest());
+    }
+    /*
+     * ESTA FUNCION VALESOLO PARA CITAS DE EVALUACIO
+     * 1) pRIMERO S EFIJA SI ES EVALUACION
+     * 2) lUEGO S EFIJA SI ESTA VENCIDA
+     * 3) lUEGO SI ESTA VENCIDA DESHACE LA ASISTENCIA
+     *    DE LA CITA Y DE SU EVENTO CORRESPONDIENTE
+     *    LUEGO LO LIBERA DEL EVENTO, CON ESTO 
+     *    DEJA LIBRE AL ALUMNO PARA QUE PUEDA SER EVALUADO
+     */
+    public function liberarCita(){
+        if($this->isLiberable()){
+            $oldScenario=$this->getScenario();
+            $this->setScenario(self::SCENARIO_ASISTIO);
+            $this->asistio=false;
+            if(!$this->save())
+            return ['error'=>yii::t('sta.labels','No se pudo '.$this->getFirstError())];
+            $this->clearErrors();
+            $this->setScenario($oldScenario);
+            /*Unicando al detalle evento*/
+            $eventodetalle=StaEventosdet::findOne(['numerocita'=>$this->numero]);
+            if(!is_null($eventodetalle)){
+               $eventodetalle->setScenario($eventodetalle::SCENARIO_ASISTENCIA);
+               $eventodetalle->asistio=false;
+               $eventodetalle->libre=true;
+              if(!$eventodetalle->save())
+               return ['error'=>yii::t('sta.labels','No se pudo '.$eventodetalle->getFirstError())];
+             
+              
+            }
+            
+            
+        }else{
+            return ['error'=>yii::t('sta.labels','Esta cita no es liberable, revise bien')];
+        }
+        return [];
     }
     
 }

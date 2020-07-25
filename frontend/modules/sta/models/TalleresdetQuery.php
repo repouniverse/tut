@@ -1,13 +1,13 @@
 <?php
 
 namespace frontend\modules\sta\models;
-use frontend\modules\sta\components\ActiveQueryScope;
+use frontend\modules\sta\components\ActiveQueryStatus;
 /**
  * This is the ActiveQuery class for [[Talleresdet]].
  *
  * @see Talleresdet
  */
-class TalleresdetQuery extends ActiveQueryScope
+class TalleresdetQuery extends ActiveQueryStatus
 {
     /*public function active()
     {
@@ -23,6 +23,7 @@ class TalleresdetQuery extends ActiveQueryScope
         return parent::all($db);
     }
 
+    
     /**
      * {@inheritdoc}
      * @return Talleresdet|array|null
