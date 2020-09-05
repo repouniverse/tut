@@ -63,7 +63,11 @@
         
        <?PHP   }
       ?>  
-        
+        <div>
+        <?php
+        \yii\helpers\Html::img('@web/img/bandera.gif', ['alt' => 'Logo','width'=>80,'height'=>180]); 
+        ?>
+    </div>
     </section>
     
     

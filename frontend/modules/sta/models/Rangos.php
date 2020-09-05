@@ -18,8 +18,10 @@ use common\helpers\RangeDates;
  *
  * @property StaTalleres $talleres
  */
-class Rangos extends \common\models\base\modelBase
+class Rangos extends \common\models\base\modelBase 
+implements \common\interfaces\rangeInterface
 {
+    use  \common\traits\timeTrait;
    const SCENARIO_HORAS='horas';
     public $booleanFields=['activo','skipferiado'];
     public $dateorTimeFields=[
@@ -126,7 +128,7 @@ class Rangos extends \common\models\base\modelBase
   * devuelve el objeto rango
   */
     
-  public function Range(\Carbon\Carbon $fecha ){
+  public function dsdsdsdRange(\Carbon\Carbon $fecha ){
      // $diaWeekOriginal=$fecha->weekDay();
      // $carbonInicio=$fecha->copy()->endOfDay()->subHours(24)->parse;
        //$carbonInicio=$fecha->copy()->parse($this->hinicio);
@@ -189,6 +191,84 @@ class Rangos extends \common\models\base\modelBase
     }else{
             return $reg;  
     }
+ }
+  /*
+   * INTERFAC
+   */
+ public function range($micarbon){
+     /*
+            * FUNCION dEL TIME TRAIT
+            */
+     /*$rag=self::RangeFromCarbonAndLimits(
+           
+           $micarbon,
+           $this->hinicio,
+           $this->hfin); 
+     YII::ERROR($rag->initialDate);
+     YII::ERROR($rag->finalDate);*/
+   return self::RangeFromCarbonAndLimits(           
+           $micarbon,
+           $this->hinicio,
+           $this->hfin); 
+ }
+ 
+ public function rangesToDay($carbon,$arrayWhere=null){
+     $queryRangos=$this->find()->select(['hinicio','hfin'])
+             ->andWhere(['dia'=>$carbon->dayOfWeek,'activo'=>'1'])->
+      orderBy(['hinicio'=>SORT_ASC]);
+    // echo $queryCitas->createCommand()->getRawSql();
+    if(is_null($arrayWhere)){
+        $rangosDia=$queryRangos->All();
+    }else{
+        $rangosDia=$queryRangos->andWhere($arrayWhere)
+            ->All();
+    }
+    /*Aqui comenzamos a crear el obejto rangeDay*/
+        if(count($rangosDia)>0){         
+            //$fecha=$citasDia[0]['fechaprog']; //Creamosd el carbons de inciializacion*/   
+            $rangodia=New \common\helpers\RangeDay($carbon);
+                    foreach($rangosDia as $rango){
+                        $rangodia->insertRange($rango->range($carbon));
+                            }
+                return $rangodia;
+        }else{
+            return null;
+        }
+  } 
+ 
+ public function  rangesToWeek(\Carbon\Carbon $carbon,$arrayWhere=null){
+     $rangoSemana=New \common\helpers\RangeWeek($carbon);
+            $rangeLunes=$this->rangesToDay($rangoSemana->initialDate, $arrayWhere);
+            if(!is_null($rangeLunes))
+             $rangoSemana->insertRange ($rangeLunes);
+             
+            $rangeMartes=$this->rangesToDay($rangoSemana->initialDate->copy()->addDay(1), $arrayWhere);
+           if(!is_null($rangeMartes))
+             $rangoSemana->insertRange ($rangeMartes);  
+               
+            $rangeMiercoles=$this->rangesToDay($rangoSemana->initialDate->copy()->addDay(2), $arrayWhere);
+           if(!is_null($rangeMiercoles))
+             $rangoSemana->insertRange ($rangeMiercoles); 
+
+            $rangeJueves=$this->rangesToDay($rangoSemana->initialDate->copy()->addDay(3), $arrayWhere);
+           if(!is_null($rangeJueves))
+             $rangoSemana->insertRange ($rangeJueves); 
+           
+           $rangeViernes=$this->rangesToDay($rangoSemana->initialDate->copy()->addDay(4), $arrayWhere);
+           if(!is_null($rangeViernes))
+             $rangoSemana->insertRange ($rangeViernes); 
+           
+            $rangeSabado=$this->rangesToDay($rangoSemana->initialDate->copy()->addDay(5), $arrayWhere);
+           if(!is_null($rangeSabado))
+             $rangoSemana->insertRange ($rangeSabado); 
+           
+           
+            $rangeDomingo=$this->rangesToDay($rangoSemana->initialDate->copy()->addDay(6), $arrayWhere);
+           if(!is_null($rangeDomingo))
+             $rangoSemana->insertRange ($rangeDomingo); 
+           
+            
+      Return $rangoSemana;
  }
   
 }

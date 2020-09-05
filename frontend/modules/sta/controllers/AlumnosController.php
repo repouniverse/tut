@@ -418,4 +418,15 @@ if (h::request()->isAjax && $model->load(h::request()->post())) {
         ]);
    }      
   
+  public function actionAjaxAdvRetiro(){
+          if (h::request()->isAjax ) {
+            $valorfiltro=h::request()->get('valorCombo');
+             //$model= \frontend\modules\sta\models\StaRetiros::findOne($id);
+             return \frontend\modules\sta\models\StaRetiros::comboTextFieldStatic('motivo',$valorfiltro);
+             
+                
+             }
+  }
+           
+   
 }

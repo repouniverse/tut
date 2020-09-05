@@ -227,7 +227,7 @@ class staModule extends \yii\base\Module
   }
 
  public static function docCodes(){
-     return ['104','105','106','107'];
+     return ['104','105','106','107','108'];
  } 
   
  

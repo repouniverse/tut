@@ -36,6 +36,7 @@ class Combovalores extends \common\models\base\modelBase
             [['nombretabla','codigo','valor'], 'required'],
             [['codigo'], 'match', 'pattern' => '/[1-9A-Z]{1}[0-9A-Z]{0,2}/'],
             [['codcen'], 'string', 'max' => 5],
+             [['detalle'], 'safe'],
             [['nombretabla', 'codigo'], 'unique', 'targetAttribute' => ['nombretabla', 'codigo']],
             [['codigo', 'valor1', 'valor2'], 'string', 'max' => 3],
             [['valor'], 'string', 'max' => 60],
@@ -87,6 +88,20 @@ class Combovalores extends \common\models\base\modelBase
       if(is_null($reg))
           return '';
        return $reg->valor;
+       
+        
+    }
+    
+     public static function getText($key,$valor,$codcentro=null){
+       if(!is_null($codcentro))
+      $reg= static::find()->where(['nombretabla'=>$key,'codigo'=>$valor,'codcen'=>$codcentro])->one();
+       $reg= static::find()->where(['nombretabla'=>$key,'codigo'=>$valor])->one();
+       //var_dump(static::find()->where(['nombretabla'=>$key,'codigo'=>$valor])->createCommand()->getRawSql());
+       //var_dump($reg);die();
+      // yii::error($reg->attributes);
+      if(is_null($reg))
+          return '';
+       return $reg->detalle;
        
         
     }

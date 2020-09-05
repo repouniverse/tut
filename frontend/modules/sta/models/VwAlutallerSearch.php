@@ -175,6 +175,7 @@ class VwAlutallerSearch extends VwAlutaller
         // grid filtering conditions
         $query->andFilterWhere(['like', 'ap', $this->ap])                
         ->andWhere(['codtra'=> $codtra])
+        // ->andWhere(['<>','justificada', '1'])        
          ->andWhere(['talleres_id'=>$talleres_id])
                  ->andFilterWhere(['like', 'am', $this->am])
             ->andFilterWhere(['like', 'dni', $this->dni])

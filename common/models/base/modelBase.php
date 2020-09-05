@@ -925,7 +925,7 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
            if(!is_null($this->prefijo)){
                
                             $diferenciatamano=$tamano-strlen(trim($this->prefijo));
-                          if($diferenciatamano < 4){
+                          if($diferenciatamano < 3){
                               //si es menor que 4 o es negativa, dejar el taaño com es y no aplicar el prefijo
                          $this->prefijo="1";
                          $tamano=$tamano-1;
@@ -1467,6 +1467,12 @@ class modelBase extends \yii\db\ActiveRecord  implements baseInterface
         public static function comboValueFieldStatic($attribute,$valor=null,$codcentro=null){
            //echo static::RawTableName().'.'.$attribute;return;
            return \common\models\masters\Combovalores::getValue(static::RawTableName().'.'.$attribute,$valor,$codcentro);
+           
+        }
+        
+         public static function comboTextFieldStatic($attribute,$valor=null,$codcentro=null){
+           //echo static::RawTableName().'.'.$attribute;return;
+           return \common\models\masters\Combovalores::getText(static::RawTableName().'.'.$attribute,$valor,$codcentro);
            
         }
         

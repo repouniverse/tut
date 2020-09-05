@@ -101,6 +101,12 @@ $this->title = '   '.yii::t('sta.labels','Datos de usuario');
             'active' => false,
              'options' => ['id' => 'myy6nID4'],
         ],
+         [
+            'label' =>'<i class="fa fa-list-ul"></i> '. yii::t('base.names','Registro Actividad'), //$this->context->countDetail() obtiene el contador del detalle
+           'content'=>$this->render('_tab_log_user'),
+            'active' => false,
+             'options' => ['id' => 'myy6nete56ID4'],
+        ],
       
     ],
 ]); 

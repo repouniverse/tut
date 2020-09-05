@@ -22,11 +22,11 @@ class StaConvocatoria extends \common\models\base\modelBase
     /**
      * {@inheritdoc}
      */
-    
+    const CANAL_CORREO='103';
     public $booleanFields=['resultado'];
     public $dateorTimeFields=[
         'fecha'=>self::_FDATE,
-        'hora'=>self::_FHOUR];
+        /*'hora'=>self::_FHOUR*/];
     public static function tableName()
     {
         return '{{%sta_convocatoria}}';
@@ -41,7 +41,7 @@ class StaConvocatoria extends \common\models\base\modelBase
             [['talleresdet_id'], 'integer'],
             [['codfac', 'canal'], 'required'],
             [['detalle'], 'string'],
-             [['canal','fecha','resultado','clase'], 'safe'], 
+             [['canal','fecha','resultado','clase','username','hora'], 'safe'], 
             [['codfac'], 'string', 'max' => 8],
             [['canal'], 'string', 'max' => 3],
            // [['resultado'], 'string', 'max' => 1],
@@ -90,7 +90,8 @@ class StaConvocatoria extends \common\models\base\modelBase
         return new StaConvocatoriaQuery(get_called_class());
     }
      public function beforeSave($insert) {
-       if($insert){            
+       if($insert){   
+           $this->username=\common\helpers\h::userName();
           $this->clase= \frontend\modules\sta\staModule::CLASE_RIESGO;
           
        }
@@ -99,4 +100,34 @@ class StaConvocatoria extends \common\models\base\modelBase
         return parent::beforeSave($insert);
        
     } 
+   /* public function afterSave($insert, $changedAttributes) {
+        parent::afterSave($insert, $changedAttributes);
+         if($insert){            
+         if($this->canal==self::CANAL_CORREO){
+              $this->enviaCorreo();
+          }
+        }
+    }*/
+    
+    public function enviaCorreo(){
+        //$nombre=$this->talleresdet->alumno->fullName();
+        $mailer = new \common\components\Mailer();
+        $message =new  \yii\swiftmailer\Message();
+            $message->setSubject('Notificación '.$this->talleresdet->talleres->descripcion)
+            ->setFrom(['neotegnia@gmail.com'=>'Tutoría UNI'])
+            ->setTo($this->talleresdet->alumno->correo)
+            ->SetHtmlBody($this->detalle);
+           
+    try {
+        
+           $result = $mailer->send($message);
+           $mensajes['success']='Se envió el correo';
+    } catch (\Swift_TransportException $Ste) {      
+         $mensajes['error']=$Ste->getMessage();
+    }
+    
+    }
+    
+   
+    
 }

@@ -20,7 +20,7 @@ use common\helpers\h;
  *
  * @property StaTalleres $talleres
  */
-class Tallerpsico extends \common\models\base\modelBase 
+class Tallerpsico extends \common\models\base\modelBase implements \common\interfaces\rangeInterface
 {
     /**
      * {@inheritdoc}
@@ -64,7 +64,7 @@ class Tallerpsico extends \common\models\base\modelBase
             [['cantidad_transferir','programar_libre'], 'safe'],
              //[['calificacion'], 'string', 'max' => 1],
              [['nalumnos','calificacion'], 'safe'],
-            [['nalumnos'], 'validateCantidades','on'=>'default'],
+            //[['nalumnos'], 'validateCantidades','on'=>'default'],
             [['talleres_id'], 'exist', 'skipOnError' => true, 'targetClass' => Talleres::className(), 'targetAttribute' => ['talleres_id' => 'id']],
         ];
     }
@@ -434,6 +434,25 @@ class Tallerpsico extends \common\models\base\modelBase
         foreach($filas as $filaCita){
             $eventos[]=$filaCita->evento();
         }
+        //*aGRGA TAMBIEN LOS TALLRESE GRUPALES
+        $filas=$this->talleresPendientes();
+        foreach($filas as $fila){
+          $eventos[]=[
+             'id' => $fila->id,
+             'title' => 'Sesión',
+             'start' => $fila->swichtDate('fecha', false),
+             'end' => $fila->toCarbon('fecha')->addHours(1)->format(timeHelper::formatMysqlDateTime()),
+             'color' => '#dddddd',
+             'codtra' => 'EEEEEE',//$fila->eventos->codtra 
+              
+          ];  
+        }
+        
+        
+        
+        
+        
+        
         return $eventos;
     }
     
@@ -475,7 +494,13 @@ class Tallerpsico extends \common\models\base\modelBase
        // $codalu=$this->tallerdet->codalu;
     $tutores= array_unique(array_column($events,'codtra'));
    
-    $colores=['#31B404','#FFBF00','#AEB404','#848484','#084B8A','#071418'];
+    $colores=['#31B404','#FFBF00','#AEB404',
+        '#848484','#08678A','#451418',
+        '#8484FF','#08778A','#071418',
+        '#848411','#08118A','#AA1418',
+        '#848467','#08338A','#221418',
+        '#848434','#08008A','#881418',
+        ];
     $colores=array_slice($colores,0,count($tutores));
    //yii::error($tutores,__FUNCTION__);
   //yii::error($colores);
@@ -557,7 +582,7 @@ class Tallerpsico extends \common\models\base\modelBase
    // \yiiunit\gii\Profile::UserIdByTrabajador($codtra);
       $profile=Profile::UserIdByTrabajador($this->codtra);
       if(is_null($profile))
-      $this->addError ('codtra',yii::t('sta.errors','Este psicólogo no está registrado cion cuenta de usuario, revise el profile'));
+      $this->addError ('codtra',yii::t('sta.errors','Este psicólogo no está registrado con cuenta de usuario, revise el profile'));
            
       
       //$this->codtra 
@@ -658,6 +683,56 @@ class Tallerpsico extends \common\models\base\modelBase
    }
    
    
-   
+ public function talleresPendientes(){
+      $horas=h::gsetting('sta', 'nhorasreprogramacion');
+     $limite=self::CarbonNow()->subHours($horas)->format(timeHelper::formatMysql());
+     $idsEventos= StaEventos::find()->select(['id'])->
+      andWhere(['talleres_id'=>$this->talleres_id,
+          'tipo'=> StaFlujo::idsFlujosEventos()])->
+          andWhere(['>=','fechaprog',$limite])->
+         column();
+     $sesiones= StaEventosSesiones::find()->andWhere(['eventos_id'=>$idsEventos])->all();
+     RETURN $sesiones;
+     
+ }  
     
+  /*
+     * Funcion de intergfae*/
+     
+ public function rangesToWeek(\Carbon\Carbon $carbon,$arrayWhere=null){
+    $iniSemana=$carbon->startOfWeek();
+    $finSemana=$carbon->copy()->endOfWeek();
+    
+    /*Sacar las citas de esta semana*/
+    
+    
+      
+  } 
+   public function rangesToDay($carbon,$arrayWhere=null){
+    $queryRangos=Rangos::find()->select(['hinicio','hfin'])->andWhere([
+        'codtra'=>$this->codtra,
+        'dia'=>$carbon->dayOfWeek
+        ]);
+    if(is_null($arrayWhere)){
+        $rangos=$queryRangos->All();
+    }else{
+        $rangos=$queryRangos->andWhere($arrayWhere)->All();
+    }
+     /*Aqui comenzamos a crear el obejto rangeDay*/
+        if(count($rangos)>0){         
+            //$fecha=$citasDia[0]['fechaprog']; //Creamosd el carbons de inciializacion*/   
+            $rangodia=New \common\helpers\RangeDay($carbon);
+                    foreach($rangos as $rango){
+                        $rangodia->insertRange($rango->range($carbon));
+                            }
+                return $rangodia;
+        }else{
+            return null;
+        }
+      
+  } 
+ 
+ public function range($carbon){
+    return true; 
+ }
 }

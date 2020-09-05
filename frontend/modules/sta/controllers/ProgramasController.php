@@ -40,6 +40,8 @@ class ProgramasController extends baseController
     /**
      * {@inheritdoc}
      */
+    
+     
     public function behaviors()
     {
         return [
@@ -643,6 +645,8 @@ public function actionTrataAlumno($id){
     //yii::error(time());
     //$inicio=time();
     $modelTallerdet = \frontend\modules\sta\models\Talleresdet::findOne($id);
+    if(is_null($modelTallerdet))    
+    throw new NotFoundHttpException(Yii::t('sta.labels', 'No se encontró este registro para el Alumno id {id}',['id'=>$id]));
     $modelPsico=$modelTallerdet->tallerPsico();
     if(is_null($modelPsico)){
         return $this->render('aviso_falta_psicologo');
@@ -667,6 +671,11 @@ public function actionTrataAlumno($id){
     //print_r($citasPendientes);die();
     //yii::error('paso 4 han pasado  '.(time()-$inicio));
    // $inicio=time();
+    
+    /*Agrenado la hora de refrigerio*/
+   /* ['title' => 'evento 1', 'start' => date('Y-m-d 10:00:00'), 'end' => date('Y-m-d 20:00:00'), 'color' => '#286090'],
+    
+    */
     
       return $this->render('_tabsCitas',
                [
@@ -1343,9 +1352,126 @@ public function actionCreateRegular()
             
           $model=$this->findModel(h::request()->post('id'));
           $model->updatePuntajesAll();
+          $model->updatePuntajesThis();
+          //var_dump($model->updatePuntajesThis());die();
           return ['success'=>yii::t('sta.labels','Se actualizaron las frecuencias')];
       }
   }
+  
+  
+  public function actionListaEsporadicos($id){
+      
+       $model=$this->findModel($id);
+       //$model->updatePuntajesAll();
+        return $this->render('index_esporadicos', [
+            'model' => $model,
+            //'dataProvider' => $dataProvider,
+        ]);
+  }
+  
+  
+  public function actionAjaxDetalleHistorial(){
+     
+      if(h::request()->isAjax){
+          
+        $id=h::request()->post('expandRowKey');
+       
+         
+         $model= \frontend\modules\sta\models\Talleresdet::findOne($id);
+         
+       $citas=$model->getCitas()->andWhere([
+         'not in','flujo_id', 
+           \frontend\modules\sta\models\StaFlujo::idsFlujosEvaluaciones()
+       ])
+           ->andWhere([
+           'activo'=>'1',
+           'asistio'=>'1',
+           //'flujo_id'=> \frontend\modules\sta\models\StaFlujo::idsFlujosNoEventos()
+           ])->all();
+       
+       $datos=[];$datos1=[];
+       foreach($citas as $cita){
+           $datos1['titulo']=$cita->numero;
+            $datos1['subtitulo']=$cita->fechaprog;
+            $datos1['texto']=$cita->flujo->proceso;
+            $datos[]=$datos1;
+            $datos1=[];
+       }
+       echo \common\widgets\timelinewidget\timeLineWidget::widget([
+            'datos'=>$datos
+        ]).$this->renderPartial('_detalle_frecuencias',[
+            'model'=>$model
+        ]).'<br>'.$this->renderPartial(
+                '/programas/convocatorias/_convocatorias',
+                ['grupo_id' => $model->id]
+                );
+       
+     /*  return $this->renderAjax(
+                '/programas/convocatorias/_convocatorias',
+                ['grupo_id' => $model->id]
+                );
+       
+            }*/
+      }   
+            
+        }
+  
+        
+     public function actionAjaxDetalleCitas($id){
+     
+      if(h::request()->isAjax){
+         $model= \frontend\modules\sta\models\Talleresdet::findOne($id);
+         
+       $citas=$model->getCitas()->andWhere(['activo'=>'1','asistio'=>'1'])->all();
+       //echo count($citas); die();
+       $datos=[];$datos1=[];
+       foreach($citas as $cita){
+           $datos1['titulo']=$cita->numero;
+            $datos1['subtitulo']=$cita->fechaprog;
+            $datos1['texto']=$cita->flujo->proceso;
+            $datos1['diaspasados']=$cita->flujo->proceso;
+            $datos[]=$datos1;
+            $datos1=[];
+       }
+        echo \common\widgets\timelinewidget\timeLineWidget::widget([
+            'datos'=>$datos
+        ]);
+            }
+        } 
+        
+        
+    public function actionSemanaTurnos(){
+        $codperiodo= staModule::getCurrentPeriod();
+        $idsProgramas=Talleres::find()->select(['id'])->andWhere(['codperiodo'=>$codperiodo])->column();
+        $talleresPsico=Tallerpsico::find()->andWhere(['talleres_id'=>$idsProgramas])->all();
+        
+         $citasPendientes=[];
+         foreach($talleresPsico as $tallerePsico){
+           if(!is_null($tallerePsico)){
+             $citasPendientes= array_merge($citasPendientes,
+                 $tallerePsico->eventosPendientes()    
+                     ); 
+                    }
+           }
+         
+         
+         
+        
+        $citasPendientes=$talleresPsico[0]->
+            putColorThisCodalu(
+                    $citasPendientes,
+              '-----','#ccddaa');
+        $modelTallerdet=$talleresPsico[0]->taller->alumnos[0];
+        
+    return $this->render('_calendario_general',
+            ['modelTallerdet'=>$modelTallerdet,
+                'codperiodo'=>$codperiodo,
+                'items'=>[['name'=>'','color'=>'#ccddaa']],
+                'citasPendientes'=>$citasPendientes,
+                'model'=>$modelTallerdet]);
+    
+    }   
+        
   
   }
 

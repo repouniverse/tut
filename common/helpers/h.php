@@ -253,6 +253,9 @@ class h {
  public static function obQuery(){
      return new \yii\db\Query();
  } 
+ 
+ 
+ 
   
 }
 ?>

@@ -15,7 +15,9 @@ class FileHelper extends FileHelperOriginal {
     public static function extImages(){
         return ['jpg','bmp','png','jpeg','gif','svg','ico'];
     }
-    
+    public static function extMedia(){
+        return ['mp4','avi'];
+    }
     
     public static function getModelsByModule($moduleName,$withExt=False){
         //$archivos=self::findFiles(yii::getAlias('@common/models')); 

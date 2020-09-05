@@ -253,6 +253,16 @@ return ArrayHelper::map(  \common\models\masters\Documentos::find()->
      andWhere(['codocu'=> \frontend\modules\sta\staModule::docCodes()])->all(),
             'codocu','desdocu'); 
     }
+    
+    
+    public static function getCboProgramasByFac($codfac){
+      
+  
+return ArrayHelper::map(  \frontend\modules\sta\models\Talleres::find()->
+        select(['id','descripcion'])-> 
+     andWhere(['codfac'=>$codfac])->all(),
+            'id','descripcion'); 
+    }
 }
 
 

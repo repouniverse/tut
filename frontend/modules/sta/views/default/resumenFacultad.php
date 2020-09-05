@@ -1,6 +1,8 @@
 <?php  
 use dosamigos\chartjs\ChartJs;
 use yii\grid\GridView;
+use yii\helpers\Url;
+use yii\helpers\Html;
 use frontend\modules\sta\models\Talleresdet;
 use miloschuman\highcharts\Highcharts;
 use miloschuman\highcharts\HighchartsAsset;
@@ -11,14 +13,14 @@ use frontend\modules\sta\components\Indicadores;
      
      
     <DIV CLASS="box-body">
-      <div class="row">
+          <div class="row">
         <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
             <h5><?= $model->desfac?></h5>
             
         </div>
         <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
             <DIV CLASS="alert alert-danger">
-                  </span><?=yii::t('sta.labels','Cantidad de Alumnos: {nalumnos}',['nalumnos'=>$nalumnos])?></p>
+                  </span><?php //echo yii::t('sta.labels','Cantidad de Alumnos: {nalumnos}',['nalumnos'=>$nalumnos])?></p>
             </DIV>
         </div>
           <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
@@ -33,6 +35,74 @@ use frontend\modules\sta\components\Indicadores;
                  
         </div>
       </div>
+        
+        
+        
+        <div class="row">
+       <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+          <!-- small box -->
+          <div class="small-box bg-aqua">
+            <div class="inner">
+              <h3><?php echo $nalumnos; ?></h3>
+
+              <p>Alumnos en riesgo</p>
+            </div>
+            <div class="icon">
+                <span style="color:white;opacity:0.5;"><i class="fa fa-users"></i></span>
+            </div>
+            <?php 
+            $url=Url::to(['cantidades-en-riesgo']);
+            echo Html::a(yii::t('sta.labels','Detalles').'<i class="fa fa-arrow-circle-right"></i>',$url, ['class'=>"botonAbre small-box-footer"]);
+            ?>
+            
+          </div>
+        </div>
+    <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+          <!-- small box -->
+          <div class="small-box bg-teal-gradient">
+            <div class="inner">
+              <h3><?php echo $frecuencia ?></h3>
+
+              <p>Periodo promedio (días)</p>
+            </div>
+            <div class="icon">
+                <span style="color:white;opacity:0.5;"><i class="fa fa-user-clock"></i></span>
+            </div>
+            <?php 
+            $url=Url::to(['/sta/programas/lista-esporadicos','id'=>$taller_id]);
+            echo Html::a(yii::t('sta.labels','Detalles').'<i class="fa fa-arrow-circle-right"></i>',$url, ['class'=>"small-box-footer"]);
+            ?>
+            
+          </div>
+        </div>
+    <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+          <!-- small box -->
+           <div class="small-box bg-yellow">
+            <div class="inner">
+              <h3><?php echo $rotacion ?>%</h3>
+
+              <p>Cobertura</p>
+            </div>
+            <div class="icon">
+                <span style="color:white;opacity:0.5;"><i class="fa fa-chart-pie"></i></span>
+            </div>
+            <?php 
+            $url=Url::to(['cantidades-en-riesgo']);
+            echo Html::a(yii::t('sta.labels','Detalles').'<i class="fa fa-arrow-circle-right"></i>',$url, ['class'=>"botonAbre small-box-footer"]);
+            ?>
+            
+          </div>
+        </div>
+  </div>
+        
+        
+        
+        
+        
+        
+        
+        
+    
         <hr>
      <div class="row">
      <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">

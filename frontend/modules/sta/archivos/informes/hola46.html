@@ -1,0 +1,139 @@
+        <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-param" content="_csrf-frontend">
+<meta name="csrf-token" content="kodMSrGIen5dDTXOnqtiaOEnQKC9MLfZpVT7UkEudNnh9gN5-tASBzBYT52o6ABQmRM6yuxKgp7UZ68gLkEbkw==">
+                                                 
+                 <title></title>
+        <link href="/frontend/web/css/bootstrap.min.css" rel="stylesheet">
+<link href="/frontend/web/css/install.css" rel="stylesheet">
+<link href="/frontend/web/css/font-awesome.min.css" rel="stylesheet">
+<link href="/frontend/web/css/AdminLTE.min.css" rel="stylesheet">
+<link href="/frontend/web/css/skin-green-light.min.css" rel="stylesheet">
+<link href="/frontend/web/css/akaunting-green.css" rel="stylesheet">
+<link href="/frontend/web/assets/26550778/css/bootstrap.css" rel="stylesheet">
+<link href="/frontend/web/assets/43c6ac6b/css/font-awesome.min.css" rel="stylesheet">
+<link href="/frontend/web/css/site.css" rel="stylesheet">
+<link href="/frontend/web/css/personal.css" rel="stylesheet">
+<link href="/frontend/web/css/font-awesome.min_1.css" rel="stylesheet">
+<link href="/frontend/web/css/ionicons.min.css" rel="stylesheet">
+<link href="/frontend/web/css/akaunting-green.css" rel="stylesheet">
+<link href="/frontend/web/css/bootstrap.min.css" rel="stylesheet">
+<link href="/frontend/web/css/install.css" rel="stylesheet">
+<link href="/frontend/web/css/select2.css" rel="stylesheet">
+<link href="/frontend/web/assets/e61887c7/demo/animate.css" rel="stylesheet">
+<link href="/frontend/web/assets/e61887c7/demo/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+<link href="/frontend/web/assets/e61887c7/demo/buttons.css" rel="stylesheet">
+<script src="/frontend/web/assets/c5891e28/jquery.js"></script>
+<script src="/frontend/web/assets/3c95b232/yii.js"></script>
+<script src="/frontend/web/assets/3c95b232/yii.activeForm.js"></script>
+<script src="/frontend/web/js/jquery-ui.js"></script>
+<script src="/frontend/web/js/modal.js"></script>
+<script src="/frontend/web/js/select2.js"></script>    </head>
+   <body class="skin-green" style="overflow-y: scroll;">
+       
+             
+
+          
+<div class="install-image"></div>
+
+        <div class="install-content">
+            <div class="install-logo">
+                <img src=" /frontend/web/img/uni-logo.png " width="80"  height="180"  alt="Atenea" />
+            </div>
+
+            <div class="box box-success box-solid">
+                <div class="box-header">
+                    <div class="col-md-12">
+                        <h3 class="box-title">
+                            <div style="display:table">
+  
+  
+</div>
+                            
+                            
+                            
+                            <div class="row">
+                                <div style="float:left;font-size:14px !important; width:210px; color:white !important;">
+                           <i class="fa fa-question" aria-hidden="true"></i>
+                            <a href="/frontend/web/site/request-password-reset">Olvidó su password</a>         
+                          </diV><div style="float:right;font-size:14px !important; color:white !important;">
+                          <i class="fa fa-address-book" aria-hidden="true"></i>
+                            <a href="/frontend/web/site/signup">Registrarse</a>                          
+                         </div>
+                            </div>
+                          
+                           </h3>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+
+                <div id="install-form">
+                    
+                    
+                       <form id="form-database" action="/frontend/web/site/login" method="post">
+<input type="hidden" name="_csrf-frontend" value="kodMSrGIen5dDTXOnqtiaOEnQKC9MLfZpVT7UkEudNnh9gN5-tASBzBYT52o6ABQmRM6yuxKgp7UZ68gLkEbkw==">                   
+                    
+                    <div class="col-md-12">
+                      
+           <div class="form-group field-loginform-username required">
+<label class="control-label" for="loginform-username">Usuario</label>
+<input type="text" id="loginform-username" class="form-control" name="LoginForm[username]" aria-required="true">
+
+<div class="help-block"></div>
+</div>                    </div>
+                     <div class="col-md-12">
+                        
+               <div class="form-group field-loginform-password required">
+<label class="control-label" for="loginform-password">Contraseña</label>
+<input type="password" id="loginform-password" class="form-control" name="LoginForm[password]" value="" aria-required="true">
+
+<div class="help-block"></div>
+</div>                         </Div>
+                    <div class="col-md-12">
+                    .
+                       </diV>
+                        <div class="row">
+                      
+                   <div class="box-footer">
+                      
+                            <div class="col-md-4 col-md-offset-8 text-right">
+                                 <button type="submit" id="next-button" class="btn btn-danger">Autenticar</button>                                
+                            </div>
+                       
+                    </div>
+                      </div> 
+            </form>                    
+                   
+                    
+                    
+                    
+                </div>
+
+                <script type="text/javascript">
+                    $('div.alert').not('.alert-important').delay(3000).fadeOut(350);
+
+                    $('#next-button').on('click', function() {
+                        $('#install-loading').html('<span class="install-loading-bar"><span class="install-loading-spin"><i class="fa fa-spinner fa-spin"></i></span></span>');
+                        $('.install-loading-bar').css({"height": $('#install-form').height() - 12});
+                    });
+                </script>
+            </div>
+        
+   
+
+    <script src="/frontend/web/assets/3c95b232/yii.validation.js"></script>
+<script src="/frontend/web/assets/e61887c7/js/noty/packaged/jquery.noty.packaged.min.js"></script>
+<script>            function Noty(widgetId, options) {
+                var finalOptions = $.extend({}, {"dismissQueue":true,"layout":"center","theme":"relax","animation":{"open":"animated flipInX","close":"animated flipOutX"},"timeout":false}, options);
+                return noty(finalOptions);
+            }</script>
+<script>jQuery(function ($) {
+jQuery('#form-database').yiiActiveForm([{"id":"loginform-username","name":"username","container":".field-loginform-username","input":"#loginform-username","validate":function (attribute, value, messages, deferred, $form) {yii.validation.required(value, messages, {"message":"Indique un nombre de usuario"});}},{"id":"loginform-password","name":"password","container":".field-loginform-password","input":"#loginform-password","validate":function (attribute, value, messages, deferred, $form) {yii.validation.required(value, messages, {"message":"Indique una contraseña"});}}], []);
+});</script>    </body>
+    </html>
+    
+
+

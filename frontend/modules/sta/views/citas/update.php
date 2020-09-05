@@ -10,7 +10,8 @@ use kartik\tabs\TabsX;
 ECHO \common\widgets\spinnerWidget\spinnerWidget::widget();
 /* @var $this yii\web\View */
 /* @var $model frontend\modules\sta\models\Citas */
-$alumno=$model->tallerdet->alumno;
+$tallerdet=$model->tallerdet;
+$alumno=$tallerdet->alumno;
 $vencida=$model->isVencida();
 $nombre=$alumno->fullName();
 $codigo=$alumno->codalu; 
@@ -161,7 +162,7 @@ $this->params['breadcrumbs'][] = Yii::t('sta.labels', 'Editar');
         ],
         [
           'label'=>'<i class="fa fa-poll"></i> '.yii::t('sta.labels','Resultados'), //$this->context->countDetail() obtiene el contador del detalle
-            'content'=> $this->render('_resultados',[ 'model' => $model,'nombre'=>$nombre,'vencida'=>$vencida,'idFirstCita'=>$idFirstCita]),
+            'content'=> $this->render('_resultados',[ 'tallerdet'=>$tallerdet,'model' => $model,'nombre'=>$nombre,'vencida'=>$vencida,'idFirstCita'=>$idFirstCita]),
             'active' => false,
              'options' => ['id' => 'myv2bgnI6'],
         ],

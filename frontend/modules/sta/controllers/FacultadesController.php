@@ -126,4 +126,41 @@ class FacultadesController extends baseController
 
         throw new NotFoundHttpException(Yii::t('sta.labels', 'The requested page does not exist.'));
     }
+    
+    public function actionResumenSemana(){
+        $codfac=h::request()->get('codfac',null);
+        $codperiodo= \frontend\modules\sta\staModule::getCurrentPeriod();
+        
+        $programa=Talleres::find()->andWhere(['codperiodo'=>$codperiodo,'codfac'=>$codfac])->one();
+        if(!is_null($programa)){
+            $consulta=\frontend\modules\sta\models\Citas::find()->andWhere([
+                'between','fechaprog',
+                $carbon->copy()->addWeek(1)->startOfWeek()->format(h::gsetting('timeBD', 'datetime')),
+                $carbon->copy()->addWeek(1)->endOfWeek()->format(h::gsetting('timeBD', 'datetime'))
+                        ])->andWhere([
+                                //'asistio'=>'1',
+                                'flujo_id'=> \frontend\modules\sta\models\StaFlujo::idsFlujosNoEventos()
+                            ]);
+            $psicologos=$programa->codPsicologos();
+            $dataProviders=[];
+            foreach($psicologos as $psicologo){
+                $dataProviders[]=new \yii\data\ActiveDataProvider([
+                    'query'=>$consulta->andWhere(['codtra'=>$psicologo])
+                ]);
+            }
+            
+           $carbon= \frontend\modules\sta\models\Citas::CarbonNow();
+           $nSemana=$carbon-> weekOfYear();
+           //$cinicio=$carbon->copy()->addWeek(1)->startOfWeek();
+            //$cfinal=$carbon->copy()->addWeek(1)->endOfWeek();
+          
+            
+        }else{
+           throw new NotFoundHttpException(Yii::t('sta.labels', 'The requested page does not exist.'));
+     
+        }
+        
+        
+    }
+            
 }

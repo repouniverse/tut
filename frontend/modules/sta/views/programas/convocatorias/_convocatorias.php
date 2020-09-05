@@ -38,7 +38,7 @@ $gridColumns = [
             ]   ;
 
     $idPjax="convocatorias_".$grupo_id;
-    Pjax::begin(['id'=>$idPjax]);
+    Pjax::begin(['id'=>$idPjax,'timeout'=>false,'enablePushState'=>false]);
 
   ?>
  
@@ -48,8 +48,8 @@ $gridColumns = [
     'dataProvider' => (new frontend\modules\sta\models\StaConvocatoriaSearch())->searchByDetalle($grupo_id),
    'columns' => $gridColumns, // check the configuration for grid columns by clicking button above
     
-    'pjax' => true, // pjax is set to always true for this demo
-   'responsive' => TRUE,
+    //'pjax' => true, // pjax is set to always true for this demo
+   //'responsive' => TRUE,
     
 ]);
  Pjax::end();

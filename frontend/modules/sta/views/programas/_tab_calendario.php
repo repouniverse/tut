@@ -17,6 +17,7 @@ use frontend\modules\sta\staModule;
 <div class="borereuccess">   
   <div class="box-body">               
 <?php
+$citasPendientes[]=$modelTallerdet->talleres->eventosPlanificacionSemana();
   IF(staModule::getCurrentPeriod()==$codperiodo){?>
     
     <div class="alert alert-info"><span class="fa fa-book-reader"></span><?='    '.$modelTallerdet->trabajador->fullName()?></div>
@@ -57,7 +58,8 @@ echo CalendarScheduleWidget::widget([
         'createCallback' => new JsExpression($jsCreateCallback)
     ],
     'fullCalendarOptions' => [
-      
+        'minTime'=>"07:00:00",
+        'maxTime'=>"21:00:00",
         
        /*  'validRange'=>[
                 'start'=>'2019-11-05',

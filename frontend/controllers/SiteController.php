@@ -339,10 +339,12 @@ class SiteController extends \frontend\controllers\base\baseController
        $datos=[];
        if(h::request()->isAjax){           
               h::settings()->invalidateCache();
+              //if(h::session()->has('psico_por_dia'))
+               h::session()->remove('psico_por_dia');
               //\console\components\Command::execute('cache/flush-all', ['interactive' => false]);
               //\console\components\Command::execute('cache/flush-schema', ['interactive' => false]);
            $datos['success']=yii::t('base.actions','
-Datos de caché de configuración se han actualizado');
+Datos de sesión y de caché se han actualizado');
            
            h::response()->format = \yii\web\Response::FORMAT_JSON;
            return $datos;
@@ -353,16 +355,17 @@ Datos de caché de configuración se han actualizado');
     public function actionRequestPasswordReset()
     {
         $this->layout="install";
+       
         $model = new PasswordResetRequestForm();
         if ($model->load(Yii::$app->getRequest()->post()) && $model->validate()) {
             try{
                 set_time_limit(300); // 5 minutes   
                 $model->sendEmail();
-                Yii::$app->getSession()->setFlash('success',yii::t('base.actions','Revisa tu correo para ver las instrucciones.'));
+                Yii::$app->getSession()->setFlash('success',yii::t('base.verbs','Revisa tu correo para ver las instrucciones.'));
                 return $this->goHome();
             } catch (\Swift_TransportException $Ste) { 
                 //echo "intenado"; die();
-                Yii::$app->getSession()->setFlash('error',yii::t('base.errors', 'Sorry, we are unable to reset password for email provided.'.$Ste->getMessage()));
+                Yii::$app->getSession()->setFlash('error',yii::t('base.verbs', 'Sorry, we are unable to reset password for email provided.'.$Ste->getMessage()));
            }
             
            
@@ -372,6 +375,10 @@ Datos de caché de configuración se han actualizado');
                 'model' => $model,
         ]);
     }
+    
+    
+    
+    
     
     public function actionManageUsers(){
         $searchModel = new UserSearch();
@@ -410,8 +417,128 @@ Datos de caché de configuración se han actualizado');
         ]);
     }
 public function actionRutas(){
+   ECHO  \frontend\modules\sta\models\Citas::SwichtFormatDate(
+            '10/08/2020 09:30:00','datetime',false);
+    ECHO "<BR>";
+    ECHO  \frontend\modules\sta\models\Citas::SwichtFormatDate(
+            '2020-08-10 09:30:00','datetime',TRUE);
+    
+    DIE();
+    $model=\frontend\modules\sta\models\Citas::findOne(1024);
+    $Rango= \frontend\modules\sta\models\Rangos::findOne(54);
+    $semanaRangos=$Rango->rangesToWeek(\Carbon\Carbon::createFromFormat('Y-m-d h:i:s','2020-08-10 12:00:00'),
+            ['codtra'=>'760011']);
+    $semana=$model->rangesToWeek(\Carbon\Carbon::createFromFormat('Y-m-d h:i:s','2020-08-10 12:00:00'),
+            ['codtra'=>'760011']);
+    
+     echo "*********HORARIOS ***************<br><br><br><br>";
+    foreach($semanaRangos->ranges as $range){
+       echo "inicia ".$range->initialDate->format('Y-m-d h:i:s')."<br>";
+       echo "termina ".$range->finalDate->format('Y-m-d h:i:s')."<br>";
+       echo "*********recorriendo rangos***************<br>";
+       foreach($range->ranges as $ranguito){
+         echo "inicia ".$ranguito->initialDate->format('Y-m-d h:i:s')."<br>";
+         echo "termina ".$ranguito->finalDate->format('Y-m-d h:i:s')."<br><br>";  
+       }
+       echo "*********Fin de horarios ***************<br><br><br><br>";
+    }
     
     
+     echo "*********CITAS ***************<br><br><br><br>";
+    foreach($semana->ranges as $range){
+       echo "inicia ".$range->initialDate->format('Y-m-d h:i:s')."<br>";
+       echo "termina ".$range->finalDate->format('Y-m-d h:i:s')."<br>";
+       echo "*********recorriendo rangos***************<br>";
+       foreach($range->ranges as $ranguito){
+         echo "inicia ".$ranguito->initialDate->format('Y-m-d h:i:s')."<br>";
+         echo "termina ".$ranguito->finalDate->format('Y-m-d h:i:s')."<br><br>";  
+       }
+       echo "*********Fin DE CITAS***************<br><br>";
+    }
+    die();
+    
+    
+    
+    //var_dump($model->attributes);die();
+    $rangodia=$model->rangesToday(\Carbon\Carbon::createFromFormat('Y-m-d h:i:s','2020-08-10 12:00:00'));
+    //echo $rangodia->initialDate->format('Y-m-d H:i:s')."<br>";
+     //echo $rangodia->finalDate->format('Y-m-d H:i:s');
+    foreach($rangodia->ranges as $rango){
+       echo $rango->initialDate->format('Y-m-d H:i:s')."<br>";
+        echo $rango->finalDate->format('Y-m-d H:i:s')."<br>";
+        echo "*******************************<br>";
+    }
+    die();
+    
+    
+    
+  h::session()->remove('psico_por_dia');die();  
+  /* $registros= \common\models\audit\Activerecordlog::find()->where([
+       'action'=>'CREATE',
+       'model'=>'frontend\modules\sta\models\Citas'])->all();
+     foreach($registros as $registro){
+        \frontend\modules\sta\models\Citas::updateAll(['creado'=>$registro->creationdate], ['id'=>$registro->clave+0]); 
+     }*/
+     $registros= \frontend\modules\sta\models\Citas::find()->where(['creado'=>null])->all();
+     foreach($registros as $registro){
+       // \frontend\modules\sta\models\Citas::updateAll(['creado'=>$registro->creationdate], ['id'=>$registro->clave+0]); 
+        $log= \common\models\audit\Activerecordlog::find()->where([
+       'action'=>'CREATE',
+       'model'=>'frontend\modules\sta\models\Citas','clave'=>$registro->id.''])->one();
+        if(!IS_NULL($log))
+        $registro->updateAll(['creado'=>$log->creationdate], ['id'=>$log->clave+0]); 
+        
+     }
+   
+   die();
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    $model= \frontend\modules\sta\models\PlantillaCorreos::findOne(1);
+   /* echo $model->replaceVariables([
+        '[$CODIGO]'=>'19930117K',
+        '[$NOMBRE]'=>'JULIAN - RAMIREZ - TENORIO ',
+        '[$PSICOLOGO]'=>'JULIAN - RAMIREZ - TENORIO ',
+    ]);*/
+    $model->layout=yii::getAlias('@frontend/mail').'/layouts/html';
+    
+    
+    //echo $model->layout;die();
+    $model->messageNoMasivo([
+        '[CODIGO]'=>'19930117K',
+        '[NOMBRE]'=>'JULIAN - RAMIREZ - TENORIO ',
+        '[PSICOLOGO]'=>'JULIAN - RAMIREZ - TENORIO ',
+    ],'neotegnia@gmail.com');
+    
+    DIE();
+    
+    $imagen= \yii\helpers\Url::to("@web/img/akaunting-logo-white.png");
+    $imagen=\yii::getAlias("@frontend/web/img/akaunting-logo-white.png");//\yii::getAlias("@web/img/akaunting-logo-white.png");
+   //echo $imagen; die();
+    $mailer = new \common\components\Mailer();
+    //$message =new  \yii\swiftmailer\Message();
+    //$cuerpo="<b>Buenas tardes, estamos trabajando para mejorar el servicio. Este es un test de correo, por favor no responder, disculpe las molestias</b>";
+   // var_dump($mailer->optionsTransport[0]);die();
+   /*$message->setSubject('Test de correo')
+            ->setFrom(['neotegnia@gmail.com'=>'Oficina de Tutoría Psicológica'])
+         ->setTo('hipogea@hotmail.com')->SetHtmlBody($cuerpo);*/
+    $mailer->compose('saludo_correo-html',['img'=>$imagen,'destinatario'=>'JULIAN RAMIREO'])->setSubject('Test de correo')
+            ->setFrom(['neotegnia@gmail.com'=>'Oficina de Tutoría Psicológica'])
+         ->setTo('hipogea@hotmail.com')->send();
+    
+    die();
+    
+      //h::session()->remove('psico_por_dia');die();
+    $model= \frontend\modules\sta\models\Talleresdet::findOne(2058);
+    echo $model->frecuencia();
+    die();
    echo " Url::home()  :   ".Url::home()."<br>";
    echo " Url::home('https')  :   ".Url::home('https')."<br>";
    echo " Url::base()  :   ".Url::base()."<br>";
@@ -1200,6 +1327,13 @@ public function actionCookies(){
    return $this->render('mantenimiento');     
          
     }
+    
+    
+  public function actionAutWithQuestion(){
+      
+  }
+    
+    
  }
  
 

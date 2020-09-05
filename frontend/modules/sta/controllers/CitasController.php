@@ -73,11 +73,13 @@ class CitasController extends baseController
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
+    public function actionCreate($id)
     {
+        
+        $modelTallerDet= \frontend\modules\sta\models\Talleresdet::findOne($id);
         $model = new Citas();
-        
-        
+        $model->talleresdet_id=$id;
+        $model->talleres_id=$modelTallerDet->talleres_id;
         if (h::request()->isAjax && $model->load(h::request()->post())) {
                 h::response()->format = Response::FORMAT_JSON;
                 return ActiveForm::validate($model);
@@ -105,8 +107,12 @@ class CitasController extends baseController
     {
         $model = $this->findModel($id);
         //print_r($model->codExamenes());die();
-     
-        if (h::request()->isAjax && $model->load(h::request()->post())) {
+        if($model->justificada){
+            h::session()->setFlash('warning',yii::t('sta.labels','Esta cita corresponde a una falta justificada'));
+            return $this->redirect(['view', 'id' => $model->id]);
+        
+         }
+         if (h::request()->isAjax && $model->load(h::request()->post())) {
            
                 h::response()->format = Response::FORMAT_JSON;
                 
@@ -137,7 +143,8 @@ class CitasController extends baseController
         }
        $eventos=$model->putColorThisCodalu($model->eventosPendientes(),$model->tallerdet->codalu,$color="#ff0000");
        //yii::error('Renderizando vista');die();
-     
+       $eventos[]=$model->taller->eventosPlanificacionSemana();
+       
         return $this->render('update', [
             'model' => $model,
             'eventos'=>$eventos,
@@ -474,11 +481,11 @@ public function actionExamenBanco($id){
                                     // $cita->generaExamenes();
                                      //yii::error('creando la cookie');
                                      //echo "hay  ".$cookiesRead->count()." cookies <br> ";
-                                     $cookiesSend = Yii::$app->response->cookies;
+                                     /*$cookiesSend = Yii::$app->response->cookies;
                                      $cookiesSend->add(new \yii\web\Cookie([
                                         'name' => 'calamaro'.$id,
                                         'value' => 'este es el valor de la cookie paloma',
-                                                    ]));
+                                                    ]));*/
                                      
                                      $session = Yii::$app->session;
                                      $session->open();

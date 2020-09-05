@@ -52,7 +52,8 @@ echo CalendarScheduleWidget::widget([
         'createCallback' => new JsExpression($jsCreateCallback)
     ],
     'fullCalendarOptions' => [
-        
+        'minTime'=>"07:00:00",
+        'maxTime'=>"21:00:00",
        /*  'validRange'=>[
                 'start'=>'2019-11-05',
                 'end'=>'2019-11-19'

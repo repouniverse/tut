@@ -7,6 +7,7 @@ $params = array_merge(
 );
 
 return [
+   'catchAll' => ['site/mantenimiento'],
     'name'=>'Tutoría_Psicológica_R',
     'sourceLanguage' => 'en',
     'id' => 'frontend',
@@ -144,6 +145,7 @@ return [
              'site/request-password-reset',
             'site/reset-password', 
            'site/logout',
+           'site/mantenimiento',
             'sta/citas/examen-banco',
             'sta/citas/arregla-for-ajax',
             'sta/citas/respuesta-examen',

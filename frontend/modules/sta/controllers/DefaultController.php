@@ -169,10 +169,17 @@ class DefaultController extends Controller
         //VAR_DUMP($nalumnos);DIE();
        $taller=\frontend\modules\sta\models\Talleres::findOne(['codfac'=>$codfac,'codperiodo'=>$codperiodo]);
         
+       $frecuencia=$taller->periodo;
+       $rotacion=round($taller->aluactivos*100/$taller->nAlumnos(),1);
+       
 //var_dump($taller->kp_contactados());die();
         return $this->render('resumenFacultad',[
+            'taller_id'=>$taller->id,
                    'model'=>$model,
              'codfac'=>$codfac,
+            'codperiodo'=>$codperiodo,
+            'frecuencia'=>$frecuencia,
+             'rotacion'=>$rotacion,
             'codperiodo'=>$codperiodo,
             'nalumnos'=>$nalumnos,
                    'provAlumnos'=>$provAlumnos,
@@ -224,15 +231,18 @@ class DefaultController extends Controller
      $nombresesion='correos_'.h::userId();
       //$codfac=h::user()->getFirstFacultad();     
       $codtra=h::user()->profile->codtra;
-      $registro=\frontend\modules\sta\models\Rangos::findOne(['codtra'=>$codtra,'codperiodo'=>$codperiodo,'dia'=>date('w')]);
-            
+      $registro=\frontend\modules\sta\models\Rangos::findOne(['codtra'=>$codtra,'activo'=>'1','codperiodo'=>$codperiodo,'dia'=>date('w')]);
+            yii::error($registro,__FUNCTION__);
       if(!is_null($registro)){
-         
+           // yii::error('se asigna del registro',__FUNCTION__);
        $codfac= $registro->talleres->codfac; 
+       // yii::error('se escogio de registro  '.$codfac,__FUNCTION__);
       }else{
+          //yii::error('se esgoge la pirmer afacultad que encuentra ',__FUNCTION__);
          $codfac=h::user()->getFirstFacultad(); 
+          //yii::error('se escogio '.$codfac,__FUNCTION__);
       }
-      
+      //yii::error('La fecha es  '.$fecha,__FUNCTION__);
      
       
       
@@ -324,11 +334,15 @@ class DefaultController extends Controller
           $sesion->remove($nombresesion);
       }
       $citasPendientes=$this->citaspendientes($codfac);
+      
       /*
       * aQUI SELECCIONAMOS LOS ALUMNOS DE ESTE PSICOLOGO
       */
       //var_dump($codtra);die();
-       $tallerId= \frontend\modules\sta\models\Talleres::findOne(['codfac'=>$codfac,'codperiodo'=>$codperiodo])->id;
+      $modelTaller=\frontend\modules\sta\models\Talleres::findOne(['codfac'=>$codfac,'codperiodo'=>$codperiodo]);
+      $citasPendientes[]=$modelTaller->eventosPlanificacionSemana();
+      
+      $tallerId= $modelTaller->id;
       $searchAlumnos = new VwAlutallerSearch();
         $providerAlu = $searchAlumnos->searchByPsicologo(
                 h::request()->queryParams,$tallerId,$codtra);
@@ -663,15 +677,16 @@ private function mailCitas($correos){
     $replyTo=empty($replyTo)?null:$replyTo;
     
    }
-    
-    
-    
+    $codalu=array_keys($correos)[0];
+    $idtalleres=Talleresdet::find()->select(['talleres_id'])->andWhere(['codalu'=>$codalu])->column();
+      $codperiodo= \frontend\modules\sta\staModule::getCurrentPeriod();
+        
     
      //yii::error($correos);
           foreach($correos as $codigo=>$valores){
              // yii::error('el codigoe s');
               //yii::error($codigo);
-         $mailer = new \common\components\Mailer();
+           $mailer = new \common\components\Mailer();
         $message =new  \yii\swiftmailer\Message();
             $message->setSubject('Tienes una cita programada')
             ->setFrom([h::gsetting('mail', 'userservermail')=>'Oficina Tutoría Psicológica UNI'])
@@ -697,6 +712,9 @@ private function mailCitas($correos){
                         
                         
                 unset($mailer);unset($message);
+                $tallerdet= Talleresdet::findOne(['codalu'=>$codigo,'talleres_id'=>$idtalleres]); 
+                 if(!is_null($tallerdet))
+                $tallerdet->logConvocatoriaMail();
              }
          return $mensajes;
     }

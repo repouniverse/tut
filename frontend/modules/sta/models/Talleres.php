@@ -39,6 +39,8 @@ use Carbon\Carbon;
 class Talleres extends \common\models\base\DocumentBase implements rangeInterface
 {
  use timeTrait;
+ const SCENARIO_FRECUENCIAS='frecuencias';
+ 
     public $dateorTimeFields=[
        'fopen'=> self::_FDATE,
          'fclose'=> self::_FDATE,
@@ -112,6 +114,22 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
         ];
     }
 
+    
+    
+     public function scenarios() {
+        $scenarios = parent::scenarios();
+       /* $scenarios[self::SCE_CREACION_BASICA] = ['talleres_id', 'talleresdet_id', 'duracion', 'fechaprog', 'codfac', 'codtra', 'asistio', 'masivo', 'flujo_id', 'codaula', 'codocu'];
+        $scenarios[self::SCENARIO_ASISTIO] = ['asistio'];
+        $scenarios[self::SCENARIO_PSICO] = ['codtra'];
+        $scenarios[self::SCENARIO_ACTIVO] = ['activo'];
+        $scenarios[self::SCENARIO_REPROGRAMA] = ['fechaprog', 'duracion', 'finicio', 'ftermino', 'codtra'];
+        */
+         $scenarios[self::SCENARIO_FRECUENCIAS] = ['periodo','aluactivos'];
+        return $scenarios;
+    }
+    
+    
+    
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -422,30 +440,15 @@ class Talleres extends \common\models\base\DocumentBase implements rangeInterfac
        * var : $fecha   Carbon
        * Ojo: solo busca dentro de los dias marcados como activos 
        */
-      public function  range($fecha=null){
-           ///Solo los dias o jornadas  activos , ooj verifique bien 
-          //la programacion
-           $rangos=$this->rangesArray();
-           //Si el dia cae dentro del rango
-           if(array_key_exists($fecha->dayOfWeek, $rangos)){
-               $hinicio=substr($rangos[$fecha->dayOfWeek]['hinicio'],0,2)+0;
-                $hfinal=substr($rangos[$fecha->dayOfWeek]['hfin'],0,2)+0;
-                $minicio=substr($rangos[$fecha->dayOfWeek]['hinicio'],3,2)+0;
-                $mfinal=substr($rangos[$fecha->dayOfWeek]['hfin'],3,2)+0;
-                /*yii::error('hora inicio '.$hinicio);
-                 yii::error('hora final '.$hfinal);
-                  yii::error($fecha->hour($hinicio)->copy());
-                  yii::error($fecha->hour($hfinal)->copy());*/
-               //$carbonInicio=$fecha->hour()->
-                $rang=new \common\helpers\RangeDates([
-                  $fecha->hour($hinicio)->minute($minicio)->copy(),
-                 $fecha->hour($hfinal)->minute($mfinal)->copy() 
-                  ]);
-           }else{
-              $rang=null;
-           }
-         unset($carbon);
-            return $rang;
+      public function  range($fecha){
+     /*
+            * FUNCION dEL TIME TRAIT
+            */
+   return self::RangeFromCarbonAndLimits(           
+           $fecha,
+           $this->hinicio,
+           $this->hfin);
+          
       }
       
       
@@ -805,6 +808,8 @@ private function prepareAttributesCreateResumen($tallerdet,$citas){
      $mayo=0;
      $junio=0;
      $julio=0;
+     $agosto=0;
+     $setiembre=0;
      foreach($fechas as $fecha){
       if((substr($fecha,5,2)+0)==4)
        $abril++;
@@ -816,7 +821,10 @@ private function prepareAttributesCreateResumen($tallerdet,$citas){
      $junio++;
       if((substr($fecha,5,2)+0)==7)
      $julio++;
-    
+      if((substr($fecha,5,2)+0)==8)
+     $agosto++;
+    if((substr($fecha,5,2)+0)==9)
+     $setiembre++;
      }
      
      
@@ -831,16 +839,24 @@ private function prepareAttributesCreateResumen($tallerdet,$citas){
         'tmarzo'=>$marzo,
         'tmayo'=>$mayo,
         'tjunio'=>$junio,
-        'tjulio'=>$julio
-        
+        'tjulio'=>$julio,
+        'tagosto'=>$agosto,
+        'tsetiembre'=>$setiembre
         ];
-    
+    $n_tutorias=0;
+    $n_talleres=0;
+     $idsEventos=StaFlujo::idsFlujosEventos();
+    $idsEventosTalleres= array_diff(StaFlujo::idsFlujosEventos(),
+            StaFlujo::idsFlujosEvaluaciones());
     $baseContadorTutorias=3;
     $baseContadorTalleres=15;
     $contenido='';
     $control_orden='x';
     $memoria='';
     foreach($citas as $cita){
+        if(!in_array($cita['flujo_id'],$idsEventos))$n_tutorias++;
+         if(in_array($cita['flujo_id'],$idsEventosTalleres))$n_talleres++;
+       
         if($cita['flujo_id']==1  ){
             IF(Citas::findOne($cita['id'])->hasPerformedTest()){
                 //if($tallerdet->codalu=='20182674G')
@@ -985,8 +1001,90 @@ private function prepareAttributesCreateResumen($tallerdet,$citas){
                            $memoria.=(strlen($memoria)>0)?'-':''.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
                            $control_orden= $ordenEvento; 
                 }
-                
-                
+                if($ordenEvento==13){
+                     if($control_orden ==$ordenEvento){
+                                $adicional['c_36']=$memoria.'-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+                           }else{
+                               $memoria='';
+                                $adicional['c_36']=substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+               
+                                //$contenido.='-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                                // $baseContadorTalleres++;
+                             }
+                      
+                           $memoria.=(strlen($memoria)>0)?'-':''.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                           $control_orden= $ordenEvento; 
+                }
+                if($ordenEvento==14){
+                     if($control_orden ==$ordenEvento){
+                                $adicional['c_40']=$memoria.'-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+                           }else{
+                               $memoria='';
+                                $adicional['c_40']=substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+               
+                                //$contenido.='-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                                // $baseContadorTalleres++;
+                             }
+                      
+                           $memoria.=(strlen($memoria)>0)?'-':''.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                           $control_orden= $ordenEvento; 
+                }
+                if($ordenEvento==15){
+                     if($control_orden ==$ordenEvento){
+                                $adicional['c_41']=$memoria.'-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+                           }else{
+                               $memoria='';
+                                $adicional['c_41']=substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+               
+                                //$contenido.='-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                                // $baseContadorTalleres++;
+                             }
+                      
+                           $memoria.=(strlen($memoria)>0)?'-':''.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                           $control_orden= $ordenEvento; 
+                }
+                if($ordenEvento==16){
+                     if($control_orden ==$ordenEvento){
+                                $adicional['c_42']=$memoria.'-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+                           }else{
+                               $memoria='';
+                                $adicional['c_42']=substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+               
+                                //$contenido.='-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                                // $baseContadorTalleres++;
+                             }
+                      
+                           $memoria.=(strlen($memoria)>0)?'-':''.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                           $control_orden= $ordenEvento; 
+                }
+                if($ordenEvento==17){
+                     if($control_orden ==$ordenEvento){
+                                $adicional['c_43']=$memoria.'-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+                           }else{
+                               $memoria='';
+                                $adicional['c_43']=substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+               
+                                //$contenido.='-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                                // $baseContadorTalleres++;
+                             }
+                      
+                           $memoria.=(strlen($memoria)>0)?'-':''.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                           $control_orden= $ordenEvento; 
+                }
+                if($ordenEvento==18){
+                     if($control_orden ==$ordenEvento){
+                                $adicional['c_44']=$memoria.'-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+                           }else{
+                               $memoria='';
+                                $adicional['c_44']=substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);    
+               
+                                //$contenido.='-'.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                                // $baseContadorTalleres++;
+                             }
+                      
+                           $memoria.=(strlen($memoria)>0)?'-':''.substr(self::SwichtFormatDate($cita['fechaprog'],'datetime',true),0,5);
+                           $control_orden= $ordenEvento; 
+                }
               } 
               
              
@@ -995,7 +1093,8 @@ private function prepareAttributesCreateResumen($tallerdet,$citas){
         }
       
     }
-     
+      $adicional['n_tutorias']=$n_tutorias;
+      $adicional['n_talleres']=$n_talleres;
     $campostotales=array_merge($base,$adicional);
     
     return $campostotales;
@@ -1014,8 +1113,11 @@ private function prepareAttributesCreateResumen($tallerdet,$citas){
   'codaula'=>SORT_ASC
              ])->asArray()->all();
             $registro=StaResumenasistencias::findOne(['tallerdet_id'=>$tallerdet->id]);
-              if(is_null($registro)){
+             $CREACION=FALSE;
+            if(is_null($registro)){
                   //yii::error('no encontro '.$tallerdet->codalu,__FUNCTION__);
+                  yii::error('CREACION');
+                  $CREACION=TRUE;
                $attributes=$this->prepareAttributesCreateResumen($tallerdet, $citas); 
              $registro=new StaResumenasistencias();
                }else{
@@ -1028,7 +1130,13 @@ private function prepareAttributesCreateResumen($tallerdet,$citas){
                 
                 yii::error($registro->attributes);
                 
-                $registro->save();
+               IF($registro->save()){
+                   IF($CREACION)
+                   yii::error('agrego una creacion');
+               }ELSE{
+                   IF($CREACION)
+                   yii::error('error al grabar creacion una creacion');
+               }
                     
      }  
                    
@@ -1111,9 +1219,10 @@ public function sincerarPsicologo(){
      // $cantidad=count($alumnos);
       $acumulado=0;
       $cantidad=0;
+      $solounavez=0;
      foreach($alumnos as $alumno){
          $frecuencia=$alumno->frecuencia();
-         if($frecuencia > 0){
+         if($frecuencia > 0){             
             $acumulado+=$frecuencia; 
             $cantidad++;
          }
@@ -1136,6 +1245,90 @@ public function sincerarPsicologo(){
          $alumno->updatePuntajes();
      }
   }
+   
+  
+  
+  public function updatePuntajesThis(){
+      $frec=$this->frecuencia();
+      $olScenario=$this->getScenario();
+      $this->setScenario(self::SCENARIO_FRECUENCIAS);
+      $this->setAttributes(['periodo'=>$frec['frecuencia'],'aluactivos'=>$frec['cantidad']]);
+      $grabo= $this->save();
+      $this->setScenario($olScenario);
+      return $grabo;
+  }
+  
+  /*
+   * Devuelve un rango de descanso en le programa
+   * solo pasale una fecah carbon 
+   * 
+   */
+  public function rangoDescanso($carbonRef){
+     return RangeDates::RangeFromCarbonAndLimits(
+             $carbonRef,
+             h::gsetting('sta.tutoria', 'hinicio.planificacion'), 
+             h::gsetting('sta.tutoria', 'hfin.planificacion') 
+             );
+  }   
+  
+  /*
+   * Devuelve los eventos reservados para
+   * planificación de semanas
+   */
+  public function eventosPlanificacionSemana(){
+      
+     return ['title' => yii::t('sta.labels','Planificación'),
+         //'startRecur' =>date('Y-m-d 00:30:00'),
+          'dow'=>$this->diasSemana(),
+         //'endRecur' =>date('2020-09-30 00:30:00'),
+         'start' =>'11:00',
+         'end' => '11:30', 
+         
+         'color' => '#5bc0de',
+        
+         ]; 
+     // ['title' => 'evento 1', 'start' => date('Y-m-d 10:00:00'), 'end' => date('Y-m-d 20:00:00'), 'color' => '#286090'],
+  
+              
+  }
+ 
+  
+  public function diasSemana(){
+      return $this->getRanges()->select(['dia'])->andWhere(['activo'=>'1'])->column();
+  }
+  
+  
+   /*
+     * Funcion de intergfae*/
+     
+  public function  rangesToWeek(\Carbon\Carbon $carbon,$arrayWhere=null){
+    $iniSemana=$carbon->startOfWeek();
+    $finSemana=$carbon->copy()->endOfWeek();
+    
+    /*Sacar las citas de esta semana*/
+    
+    
+      
+  } 
+  public function rangesToDay($carbon,$arrayWhere=null){
+   $queryRangos=Rangos::find()->select()->andWhere(['talleres_id'=>$this->id]);
+    if(is_null($arrayWhere)){
+        $rangosDia=$queryRangos->All();
+    }else{
+        $rangosDia=$queryRangos->andWhere($arrayWhere)->All();
+    }
+     if(count($rangosDia)>0){         
+            //$fecha=$citasDia[0]['fechaprog']; //Creamosd el carbons de inciializacion*/   
+            $rangodia=New \common\helpers\RangeDay($carbon);
+                    foreach($rangosDia as $rango){
+                        $rangodia->insertRange($rango->range());
+                            }
+                return $rangodia;
+        }else{
+            return null;
+        }
+      
+  } 
   
   
 }

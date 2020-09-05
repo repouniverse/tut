@@ -1,0 +1,1238 @@
+
+        <!DOCTYPE html>
+    <html lang="es_PE">
+    <head>
+          <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-param" content="_csrf-frontend">
+    <meta name="csrf-token" content="1ulOVFaTgnbh6i2VCG0Xp1ycGWyo5BetZL0mS7xtLhW5oQIhEKrPQoeAdMVrB3OXK90hPeKcJ_IO0W4ghVlnYw==">
+        <title>Create Docbotellas</title>
+        <link href="/yii-application/frontend/web/assets/30d32828/css/select2.css" rel="stylesheet">
+<link href="/yii-application/frontend/web/assets/8936596/css/bootstrap.css" rel="stylesheet">
+<link href="/yii-application/frontend/web/assets/e9b92913/css/bootstrap-datepicker3.css" rel="stylesheet">
+<link href="/yii-application/frontend/web/assets/e9b92913/css/datepicker-kv.css" rel="stylesheet">
+<link href="/yii-application/frontend/web/assets/4ff5e38a/css/kv-widgets.css" rel="stylesheet">
+<link href="/yii-application/frontend/web/assets/1f5f6490/css/multiple-input.css" rel="stylesheet">
+<link href="/yii-application/frontend/web/assets/1f5f6490/css/sorting.css" rel="stylesheet">
+<link href="/yii-application/frontend/web/assets/99fe1683/css/bootstrap-tabs-x.css" rel="stylesheet">
+<link href="/yii-application/frontend/web/css/site.css" rel="stylesheet">
+<link href="/yii-application/frontend/web/css/personal.css" rel="stylesheet">
+<link href="/yii-application/frontend/web/css/font-awesome.min.css" rel="stylesheet">
+<link href="/yii-application/frontend/web/css/ionicons.min.css" rel="stylesheet">
+<link href="/yii-application/frontend/web/css/akaunting-green.css" rel="stylesheet">
+<link href="/yii-application/frontend/web/css/bootstrap.min.css" rel="stylesheet">
+<link href="/yii-application/frontend/web/css/install.css" rel="stylesheet">
+<link href="/yii-application/frontend/web/css/select2.css" rel="stylesheet">
+<link href="/yii-application/frontend/web/assets/f0ff7eb0/css/font-awesome.min.css" rel="stylesheet">
+<link href="/yii-application/frontend/web/assets/572da7d8/css/AdminLTE.min.css" rel="stylesheet">
+<link href="/yii-application/frontend/web/assets/572da7d8/css/skins/skin-green-light.min.css" rel="stylesheet">
+<link href="/yii-application/frontend/web/assets/ebe6ca5c/css/modal-colors.css" rel="stylesheet">
+<link href="/yii-application/frontend/web/assets/e597e4ff/demo/animate.css" rel="stylesheet">
+<link href="/yii-application/frontend/web/assets/e597e4ff/demo/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+<link href="/yii-application/frontend/web/assets/e597e4ff/demo/buttons.css" rel="stylesheet">
+<link href="/yii-application/frontend/web/assets/14b04cc9/css/user.css" rel="stylesheet">
+<style>@media print{.tab-content.printable > .tab-pane{display:block;opacity:1;}}</style>
+<script src="/yii-application/frontend/web/assets/532f0abc/jquery.js"></script>
+<script src="/yii-application/frontend/web/assets/7e6da586/yii.js"></script>
+<script src="/yii-application/frontend/web/js/jquery-ui.js"></script>
+<script src="/yii-application/frontend/web/js/modal.js"></script>
+<script src="/yii-application/frontend/web/js/select2.js"></script>
+<script>window.kvDatepicker_f486b49d = {"format":"dd.mm.yyyy","changeMonth":true,"changeYear":true,"yearRange":"1980:2019"};
+
+window.tabsX_00000000 = {};
+</script>    </head>
+    <body class="skin-green-light">
+        <div class="wrapper">
+
+             
+<div id="buscarvalor" class="fade modal" role="dialog" tabindex="-1">
+<div class="modal-dialog ">
+<div class="modal-content">
+<div class="modal-header">
+<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+<span>Buscar Valor</span>
+
+</div>
+<div class="modal-body">
+
+</div>
+
+</div>
+</div>
+</div>  
+                 
+        
+<header class="main-header">
+  
+<!-- Script -->
+  
+    <a class="logo" href="/yii-application/frontend/web/"><span class="logo-mini">APP</span><span class="logo-lg"> <img src="/yii-application/frontend/web/img/logo_svg.svg" width="40" height="30" alt="Logo">Nautilus</span></a>
+    <nav class="navbar navbar-static-top" role="navigation">
+        <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+            <span class="sr-only">Toggle navigation</span>
+        </a>
+
+        <div class="navbar-custom-menu">
+
+            <ul class="nav navbar-nav">
+
+              
+                             <li class="dropdown notifications-menu">
+                    <a href="#" id="campanita" class="dropdown-toggle" data-toggle="dropdown">
+                        <i class="fa fa-eraser"></i>
+                        
+                    </a>
+                   
+                </li>
+                                             <li class="dropdown tasks-menu">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <i class="fa fa-flag-o"></i>
+                        <span class="label label-danger">9</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="header">You have 9 tasks</li>
+                        <li>
+                            <!-- inner menu: contains the actual data -->
+                            <ul class="menu">
+                                <li><!-- Task item -->
+                                    <a href="#">
+                                        <h3>
+                                            Design some buttons
+                                            <small class="pull-right">20%</small>
+                                        </h3>
+                                        <div class="progress xs">
+                                            <div class="progress-bar progress-bar-aqua" style="width: 20%"
+                                                 role="progressbar" aria-valuenow="20" aria-valuemin="0"
+                                                 aria-valuemax="100">
+                                                <span class="sr-only">20% Complete</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <!-- end task item -->
+                                <li><!-- Task item -->
+                                    <a href="#">
+                                        <h3>
+                                            Create a nice theme
+                                            <small class="pull-right">40%</small>
+                                        </h3>
+                                        <div class="progress xs">
+                                            <div class="progress-bar progress-bar-green" style="width: 40%"
+                                                 role="progressbar" aria-valuenow="20" aria-valuemin="0"
+                                                 aria-valuemax="100">
+                                                <span class="sr-only">40% Complete</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <!-- end task item -->
+                                <li><!-- Task item -->
+                                    <a href="#">
+                                        <h3>
+                                            Some task I need to do
+                                            <small class="pull-right">60%</small>
+                                        </h3>
+                                        <div class="progress xs">
+                                            <div class="progress-bar progress-bar-red" style="width: 60%"
+                                                 role="progressbar" aria-valuenow="20" aria-valuemin="0"
+                                                 aria-valuemax="100">
+                                                <span class="sr-only">60% Complete</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <!-- end task item -->
+                                <li><!-- Task item -->
+                                    <a href="#">
+                                        <h3>
+                                            Make beautiful transitions
+                                            <small class="pull-right">80%</small>
+                                        </h3>
+                                        <div class="progress xs">
+                                            <div class="progress-bar progress-bar-yellow" style="width: 80%"
+                                                 role="progressbar" aria-valuenow="20" aria-valuemin="0"
+                                                 aria-valuemax="100">
+                                                <span class="sr-only">80% Complete</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <!-- end task item -->
+                            </ul>
+                        </li>
+                        <li class="footer">
+                            <a href="#">View all tasks</a>
+                        </li>
+                    </ul>
+                </li>              <aside class="control-sidebar control-sidebar-dark">
+    <!-- Create the tabs -->
+    <ul class="nav nav-tabs nav-justified control-sidebar-tabs">
+        <li><a href="#control-sidebar-home-tab" data-toggle="tab"><i class="fa fa-home"></i></a></li>
+        <li><a href="#control-sidebar-settings-tab" data-toggle="tab"><i class="fa fa-gears"></i></a></li>
+    </ul>
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <!-- Home tab content -->
+        <div class="tab-pane" id="control-sidebar-home-tab">
+            <h3 class="control-sidebar-heading">Recent Activity</h3>
+            <ul class='control-sidebar-menu'>
+                <li>
+                    <a href='javascript::;'>
+                        <i class="menu-icon fa fa-birthday-cake bg-red"></i>
+
+                        <div class="menu-info">
+                            <h4 class="control-sidebar-subheading">Langdon's Birthday</h4>
+
+                            <p>Will be 23 on April 24th</p>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href='javascript::;'>
+                        <i class="menu-icon fa fa-user bg-yellow"></i>
+
+                        <div class="menu-info">
+                            <h4 class="control-sidebar-subheading">Frodo Updated His Profile</h4>
+
+                            <p>New phone +1(800)555-1234</p>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href='javascript::;'>
+                        <i class="menu-icon fa fa-envelope-o bg-light-blue"></i>
+
+                        <div class="menu-info">
+                            <h4 class="control-sidebar-subheading">Nora Joined Mailing List</h4>
+
+                            <p>nora@example.com</p>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href='javascript::;'>
+                        <i class="menu-icon fa fa-file-code-o bg-green"></i>
+
+                        <div class="menu-info">
+                            <h4 class="control-sidebar-subheading">Cron Job 254 Executed</h4>
+
+                            <p>Execution time 5 seconds</p>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+            <!-- /.control-sidebar-menu -->
+
+            <h3 class="control-sidebar-heading">Tasks Progress</h3>
+            <ul class='control-sidebar-menu'>
+                <li>
+                    <a href='javascript::;'>
+                        <h4 class="control-sidebar-subheading">
+                            Custom Template Design
+                            <span class="label label-danger pull-right">70%</span>
+                        </h4>
+
+                        <div class="progress progress-xxs">
+                            <div class="progress-bar progress-bar-danger" style="width: 70%"></div>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href='javascript::;'>
+                        <h4 class="control-sidebar-subheading">
+                            Update Resume
+                            <span class="label label-success pull-right">95%</span>
+                        </h4>
+
+                        <div class="progress progress-xxs">
+                            <div class="progress-bar progress-bar-success" style="width: 95%"></div>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href='javascript::;'>
+                        <h4 class="control-sidebar-subheading">
+                            Laravel Integration
+                            <span class="label label-waring pull-right">50%</span>
+                        </h4>
+
+                        <div class="progress progress-xxs">
+                            <div class="progress-bar progress-bar-warning" style="width: 50%"></div>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href='javascript::;'>
+                        <h4 class="control-sidebar-subheading">
+                            Back End Framework
+                            <span class="label label-primary pull-right">68%</span>
+                        </h4>
+
+                        <div class="progress progress-xxs">
+                            <div class="progress-bar progress-bar-primary" style="width: 68%"></div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+            <!-- /.control-sidebar-menu -->
+
+        </div>
+        <!-- /.tab-pane -->
+
+        <!-- Settings tab content -->
+        <div class="tab-pane" id="control-sidebar-settings-tab">
+            <form method="post">
+                <h3 class="control-sidebar-heading">General Settings</h3>
+
+                <div class="form-group">
+                    <label class="control-sidebar-subheading">
+                        Report panel usage
+                        <input type="checkbox" class="pull-right" checked/>
+                    </label>
+
+                    <p>
+                        Some information about this general settings option
+                    </p>
+                </div>
+                <!-- /.form-group -->
+
+                <div class="form-group">
+                    <label class="control-sidebar-subheading">
+                        Allow mail redirect
+                        <input type="checkbox" class="pull-right" checked/>
+                    </label>
+
+                    <p>
+                        Other sets of options are available
+                    </p>
+                </div>
+                <!-- /.form-group -->
+
+                <div class="form-group">
+                    <label class="control-sidebar-subheading">
+                        Expose author name in posts
+                        <input type="checkbox" class="pull-right" checked/>
+                    </label>
+
+                    <p>
+                        Allow the user to show his name in blog posts
+                    </p>
+                </div>
+                <!-- /.form-group -->
+
+                <h3 class="control-sidebar-heading">Chat Settings</h3>
+
+                <div class="form-group">
+                    <label class="control-sidebar-subheading">
+                        Show me as online
+                        <input type="checkbox" class="pull-right" checked/>
+                    </label>
+                </div>
+                <!-- /.form-group -->
+
+                <div class="form-group">
+                    <label class="control-sidebar-subheading">
+                        Turn off notifications
+                        <input type="checkbox" class="pull-right"/>
+                    </label>
+                </div>
+                <!-- /.form-group -->
+
+                <div class="form-group">
+                    <label class="control-sidebar-subheading">
+                        Delete chat history
+                        <a href="javascript::;" class="text-red pull-right"><i class="fa fa-trash-o"></i></a>
+                    </label>
+                </div>
+                <!-- /.form-group -->
+            </form>
+        </div>
+        <!-- /.tab-pane -->
+    </div>
+</aside><!-- /.control-sidebar -->                <!-- User Account: style can be found in dropdown.less -->
+
+                <li class="dropdown user user-menu">
+                    <a href="#" class="linkajustado" data-toggle="dropdown">
+                        <i class="fa fa-user" aria-hidden="true"></i>
+
+amiguito                    </a>
+                    <ul class="dropdown-menu">
+                        <!-- User image -->
+                        <li class="user-header">
+                            <div class="contenedoruser">
+    <div class="filauser">
+        <img class="imgRedonda100" src="/yii-application/frontend/web/img/anonimo.svg" alt="">    </div>
+    <div class="filauser">
+        Julio tr  -  (amiguito)       
+    </div>
+</div>
+
+
+                        </li>
+                        <!-- Menu Body -->
+                       
+                        <!-- Menu Footer-->
+                        <li class="user-footer">
+                            <div class="pull-left">
+                                <a class="btn btn-default btn-flat" href="/yii-application/frontend/web/site/profile">Profile</a>                                
+                            </div>
+                            <div class="pull-left">
+
+
+                                <button type="button" class="botonAbre btn btn-success" href="/yii-application/frontend/web/site/addfavorite" title="Add this page to Favorites...">Add Favorite</button>                            </div>
+                            <div class="pull-right">
+                                <a class="btn btn-default btn-flat" href="/yii-application/frontend/web/site/logout" data-method="post">Sign out</a>                            </div>
+                        </li>
+                    </ul>
+                </li>
+                   
+                 
+                
+                
+                
+    
+            </ul>
+            
+            
+        </div>
+    </nav>
+</header>
+
+        <aside class="main-sidebar">
+    
+    
+    
+
+    <section class="sidebar">
+        
+        
+        
+        
+        <div class="form-group field-clipro-codpro">
+            <a><i class="fa fa-bolt" aria-hidden="true"></i><label class="control-label" for="cboFavorites" >Direct Access</label></a>
+            <select id="cboFavorites" class="form-control btn btn-success " name="cboFavorites">
+<option value="">--Choose a Favorite--</option>
+<option value="masters/clipro/index">etetetete</option>
+<option value="masters/trabajadores">Los trabajadores</option>
+<option value="masters/clipro/update?id=370001">ferreyros</option>
+<option value="site/profile">Profile</option>
+<option value="bigitems/bottles/create">crear botellas</option>
+<option value="import/importacion/create">importacion</option>
+<option value="report/make/create">reporte</option>
+<option value="gii">gii</option>
+</select>        </div>
+       
+    
+
+             
+       
+        <ul class="sidebar-menu tree" data-widget="tree"><li class="treeview"><a href="#"><i class="fa fa-circle-o"></i>  <span>Configuracion</span> <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+<ul class='treeview-menu' >
+<li class="treeview"><a href="#"><i class="fa fa-circle-o"></i>  <span>Parametros</span> <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+<ul class='treeview-menu' >
+<li><a href="/yii-application/frontend/web/parameters/index"><i class="fa fa-circle-o"></i>  <span>Centros</span></a></li>
+<li><a href="/yii-application/frontend/web/parameters/indexparamdocu"><i class="fa fa-circle-o"></i>  <span>Documentos</span></a></li>
+<li><a href="/yii-application/frontend/web/settings/default/index"><i class="fa fa-circle-o"></i>  <span>Generales Variables</span></a></li>
+<li><a href="/yii-application/frontend/web/parameters/indexmaster"><i class="fa fa-circle-o"></i>  <span>Generales fijos</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="treeview"><a href="#"><i class="fa fa-circle-o"></i>  <span>Maestros</span> <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+<ul class='treeview-menu' >
+<li class="treeview"><a href="#"><i class="fa fa-circle-o"></i>  <span>Aplicacion</span> <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+<ul class='treeview-menu' >
+<li><a href="/yii-application/frontend/web/masters/clipro/index"><i class="fa fa-circle-o"></i>  <span>Compañias</span></a></li>
+</ul>
+</li>
+<li class="treeview"><a href="#"><i class="fa fa-circle-o"></i>  <span>Base</span> <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+<ul class='treeview-menu' >
+<li><a href="/yii-application/frontend/web/masters/centros/index"><i class="fa fa-circle-o"></i>  <span>Centros</span></a></li>
+<li><a href="/yii-application/frontend/web/masters/documents/index"><i class="fa fa-circle-o"></i>  <span>Documentos</span></a></li>
+<li><a href="/yii-application/frontend/web/masters/combovalores/index"><i class="fa fa-circle-o"></i>  <span>Tablas</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="treeview"><a href="#"><i class="fa fa-circle-o"></i>  <span>User</span> <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+<ul class='treeview-menu' >
+<li><a href="/yii-application/frontend/web/admin/user/change-password"><i class="fa fa-circle-o"></i>  <span>change-password</span></a></li>
+<li><a href="/yii-application/frontend/web/admin/user/login"><i class="fa fa-circle-o"></i>  <span>login</span></a></li>
+<li><a href="/yii-application/frontend/web/admin/user/logout"><i class="fa fa-circle-o"></i>  <span>logout</span></a></li>
+<li><a href="/yii-application/frontend/web/admin/user/request-password-reset"><i class="fa fa-circle-o"></i>  <span>request-password-reset</span></a></li>
+<li><a href="/yii-application/frontend/web/admin/user/reset-password"><i class="fa fa-circle-o"></i>  <span>reset-password</span></a></li>
+<li><a href="/yii-application/frontend/web/admin/user/signup"><i class="fa fa-circle-o"></i>  <span>signup</span></a></li>
+</ul>
+</li></ul>    </section>
+    
+    
+    
+    <script>$(function(){
+      // bind change event to select
+      $('#cboFavorites').on('change', function () {
+          var url = $(this).val(); // get selected value
+          var abso='http://localhost/yii-application/frontend/web/';
+          window.location=abso+url;
+          
+          return false;
+      });
+    });</script>   
+   
+
+</aside>
+
+        <div class="content-wrapper">
+    <section class="content-header">
+                    <h1>
+                            </h1>
+        
+        <ul class="breadcrumb"><li><a href="/yii-application/frontend/web/">Inicio</a></li>
+<li><a href="/yii-application/frontend/web/bigitems/bottles/index">Docbotellas</a></li>
+<li class="active">Create Docbotellas</li>
+</ul>    </section>
+
+    <section class="content">
+                <div class="docbotellas-create">
+
+    <h4>Create Docbotellas</h4>
+<div class="box box-success">
+    <br>
+<div class="docbotellas-form">
+
+    <form id="tabular-botellas" action="/yii-application/frontend/web/bigitems/bottles/create" method="post">
+<input type="hidden" name="_csrf-frontend" value="1ulOVFaTgnbh6i2VCG0Xp1ycGWyo5BetZL0mS7xtLhW5oQIhEKrPQoeAdMVrB3OXK90hPeKcJ_IO0W4ghVlnYw=="><div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">   
+  <div class="form-group field-docbotellas-numero">
+<label class="control-label" for="docbotellas-numero">Numero</label>
+<input type="text" id="docbotellas-numero" class="form-control" name="Docbotellas[numero]" disabled="true">
+
+<p class="help-block help-block-error"></p>
+</div>
+ </div> 
+    <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12"> 
+   <div class="form-group field-docbotellas-essalida required">
+<label class="control-label" for="docbotellas-essalida">Essalida</label>
+<select id="docbotellas-essalida" class="form-control" name="Docbotellas[essalida]" aria-required="true">
+<option value="">--Elija un valor--</option>
+<option value="0">INPUT</option>
+<option value="1">OUTPUT</option>
+</select>
+
+<p class="help-block help-block-error"></p>
+</div>
+ </div>  
+    
+    <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">   
+     <div class="form-group field-docbotellas-descripcion required">
+<label class="control-label" for="docbotellas-descripcion">Descripcion</label>
+<input type="text" id="docbotellas-descripcion" class="form-control" name="Docbotellas[descripcion]" maxlength="40" aria-required="true">
+
+<p class="help-block help-block-error"></p>
+</div> </div> 
+    
+    
+    
+
+    <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">  
+    <div class="form-group field-docbotellas-codpro required">
+<label class="control-label" for="docbotellas-codpro">Codpro</label>
+<select id="docbotellas-codpro" class="probandoSelect2" name="Docbotellas[codpro]" aria-required="true">
+<option value="">--Elija un valor--</option>
+</select>
+
+<p class="help-block help-block-error"></p>
+</div> 
+
+
+
+
+    </div>
+    
+     
+ <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+    
+    <div class="form-group field-docbotellas-codenvio required">
+<label class="control-label" for="docbotellas-codenvio">Codenvio</label>
+<select id="docbotellas-codenvio" class="form-control" name="Docbotellas[codenvio]" aria-required="true">
+<option value="">--Elija un valor--</option>
+<option value="10">VENTA</option>
+<option value="20">ALQUILER</option>
+<option value="30">RECARGA</option>
+</select>
+
+<p class="help-block help-block-error"></p>
+</div>       
+</div> 
+ <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12"> 
+      <div class="form-group field-docbotellas-fecdocu required">
+<label class="control-label" for="docbotellas-fecdocu">Fecdocu</label>
+<div id="docbotellas-fecdocu-kvdate" class="input-group  date"><span class="input-group-addon kv-date-picker" title="Seleccionar fecha"><i class="glyphicon glyphicon-calendar kv-dp-icon"></i></span><span class="input-group-addon kv-date-remove" title="Limpiar campo"><i class="glyphicon glyphicon-remove kv-dp-icon"></i></span><input type="text" id="docbotellas-fecdocu" class="form-control krajee-datepicker" name="Docbotellas[fecdocu]" aria-required="true" data-datepicker-source="docbotellas-fecdocu-kvdate" data-datepicker-type="2" data-krajee-kvDatepicker="kvDatepicker_f486b49d"></div>
+
+<p class="help-block help-block-error"></p>
+</div>
+ </div>  <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">   
+    <div class="form-group field-docbotellas-fectran">
+<label class="control-label" for="docbotellas-fectran">Fectran</label>
+<div id="docbotellas-fectran-kvdate" class="input-group  date"><span class="input-group-addon kv-date-picker" title="Seleccionar fecha"><i class="glyphicon glyphicon-calendar kv-dp-icon"></i></span><span class="input-group-addon kv-date-remove" title="Limpiar campo"><i class="glyphicon glyphicon-remove kv-dp-icon"></i></span><input type="text" id="docbotellas-fectran" class="form-control krajee-datepicker" name="Docbotellas[fectran]" data-datepicker-source="docbotellas-fectran-kvdate" data-datepicker-type="2" data-krajee-kvDatepicker="kvDatepicker_f486b49d"></div>
+
+<p class="help-block help-block-error"></p>
+</div> 
+ </div>  <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12"> 
+     <div class="form-group field-docbotellas-codtra">
+<label class="control-label" for="docbotellas-codtra">Codtra</label>
+<select id="docbotellas-codtra" class="probandoSelect2" name="Docbotellas[codtra]">
+<option value="">--Elija un valor--</option>
+</select>
+
+<p class="help-block help-block-error"></p>
+</div> 
+
+
+
+
+ </div> 
+ <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12"> 
+      <div class="form-group field-docbotellas-codven">
+<label class="control-label" for="docbotellas-codven">Codven</label>
+<select id="docbotellas-codven" class="probandoSelect2" name="Docbotellas[codven]">
+<option value="">--Elija un valor--</option>
+</select>
+
+<p class="help-block help-block-error"></p>
+</div> 
+
+
+
+
+
+ </div>  <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12"> 
+    <div class="form-group field-docbotellas-codplaca">
+<label class="control-label" for="docbotellas-codplaca">Codplaca</label>
+<input type="text" id="docbotellas-codplaca" class="form-control" name="Docbotellas[codplaca]" maxlength="15">
+
+<p class="help-block help-block-error"></p>
+</div>
+ </div> 
+<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">  
+    <div class="form-group field-docbotellas-ptopartida_id required">
+<label class="control-label" for="docbotellas-ptopartida_id">Ptopartida ID</label>
+<select id="docbotellas-ptopartida_id" class="probandoSelect2" name="Docbotellas[ptopartida_id]" aria-required="true">
+<option value="">--Elija un valor--</option>
+</select>
+
+<p class="help-block help-block-error"></p>
+</div> 
+
+
+
+
+    </div>
+ <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12"> 
+      <div class="form-group field-docbotellas-ptollegada_id required">
+<label class="control-label" for="docbotellas-ptollegada_id">Ptollegada ID</label>
+<select id="docbotellas-ptollegada_id" class="probandoSelect2" name="Docbotellas[ptollegada_id]" aria-required="true">
+<option value="">--Elija un valor--</option>
+</select>
+
+<p class="help-block help-block-error"></p>
+</div> 
+
+
+
+
+    </div>
+
+ 
+ <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">  
+   
+ </div> 
+ 
+ 
+ 
+
+   
+
+
+
+  
+
+
+
+ <div id="w1-container" class="tabs-x  tabs-above tab-align-left tabs-krajee"><ul id="w1" class="nav nav-tabs hidden-print" data-krajee-tabsX="tabsX_00000000" role="tablist"><li class="active"><a href="#w1-tab0" data-toggle="tab" role="tab" aria-selected="false" aria-controls="w1-tab0">Items</a></li></ul>
+<div class="tab-content  printable"><div class="h4 visible-print-block">Items</div>
+<div id="w1-tab0" class="tab-pane fade in active"><div id="w0" class="multiple-input"><table class="multiple-input-list table table-condensed table-renderer"><thead><tr><th class="list-cell__drag" style="width: 20px;"></th>
+<th class="list-cell__codigo">CODIGO</th>
+<th class="list-cell__tarifa">Tarifa</th>
+<th class="list-cell__button"></th>
+<th class="list-cell__button"><div class="multiple-input-list__btn js-input-plus btn btn-default"><i class="glyphicon glyphicon-plus"></i></div></th></tr></thead>
+<tbody><tr class="multiple-input-list__item"><td class="list-cell__drag"><div class="field-detdocbotellas-0-drag form-group"><span class="glyphicon glyphicon-menu-hamburger drag-handle"></span></div></td>
+<td class="list-cell__codigo"><div class="field-detdocbotellas-0-codigo form-group"> <div class="form-group field-detdocbotellas-codigo required">
+<label class="control-label" for="detdocbotellas-codigo">Codigo</label>
+<select id="5d355ca52d079" class="probandoSelect2" name="Detdocbotellas[codigo]" aria-required="true">
+<option value="">--Elija un valor--</option>
+</select>
+
+<p class="help-block help-block-error"></p>
+</div> 
+
+
+
+
+
+<div class="help-block help-block-error"></div></div></td>
+<td class="list-cell__tarifa"><div class="field-detdocbotellas-0-tarifa form-group"><input type="text" id="detdocbotellas-0-tarifa" class="form-control" name="Detdocbotellas[0][tarifa]" tabindex="1">
+<div class="help-block help-block-error"></div></div></td>
+<td class="list-cell__button"><div class="multiple-input-list__btn js-input-clone btn btn-info"><i class="glyphicon glyphicon-duplicate"></i></div></td>
+<td class="list-cell__button"><div class="multiple-input-list__btn js-input-remove btn btn-danger"><i class="glyphicon glyphicon-remove"></i></div></td></tr>
+<tr class="multiple-input-list__item"><td class="list-cell__drag"><div class="field-detdocbotellas-1-drag form-group"><span class="glyphicon glyphicon-menu-hamburger drag-handle"></span></div></td>
+<td class="list-cell__codigo"><div class="field-detdocbotellas-1-codigo form-group"> <div class="form-group field-detdocbotellas-codigo required">
+<label class="control-label" for="detdocbotellas-codigo">Codigo</label>
+<select id="detdocbotellas-codigo" class="probandoSelect2" name="Detdocbotellas[codigo]" aria-required="true">
+<option value="">--Elija un valor--</option>
+</select>
+
+<p class="help-block help-block-error"></p>
+</div> 
+
+
+
+
+
+<div class="help-block help-block-error"></div></div></td>
+<td class="list-cell__tarifa"><div class="field-detdocbotellas-1-tarifa form-group"><input type="text" id="detdocbotellas-1-tarifa" class="form-control" name="Detdocbotellas[1][tarifa]" tabindex="1">
+<div class="help-block help-block-error"></div></div></td>
+<td class="list-cell__button"><div class="multiple-input-list__btn js-input-clone btn btn-info"><i class="glyphicon glyphicon-duplicate"></i></div></td>
+<td class="list-cell__button"><div class="multiple-input-list__btn js-input-remove btn btn-danger"><i class="glyphicon glyphicon-remove"></i></div></td></tr>
+<tr class="multiple-input-list__item"><td class="list-cell__drag"><div class="field-detdocbotellas-2-drag form-group"><span class="glyphicon glyphicon-menu-hamburger drag-handle"></span></div></td>
+<td class="list-cell__codigo"><div class="field-detdocbotellas-2-codigo form-group"> <div class="form-group field-detdocbotellas-codigo required">
+<label class="control-label" for="detdocbotellas-codigo">Codigo</label>
+<select id="detdocbotellas-codigo" class="probandoSelect2" name="Detdocbotellas[codigo]" aria-required="true">
+<option value="">--Elija un valor--</option>
+</select>
+
+<p class="help-block help-block-error"></p>
+</div> 
+
+
+
+
+
+<div class="help-block help-block-error"></div></div></td>
+<td class="list-cell__tarifa"><div class="field-detdocbotellas-2-tarifa form-group"><input type="text" id="detdocbotellas-2-tarifa" class="form-control" name="Detdocbotellas[2][tarifa]" tabindex="1">
+<div class="help-block help-block-error"></div></div></td>
+<td class="list-cell__button"><div class="multiple-input-list__btn js-input-clone btn btn-info"><i class="glyphicon glyphicon-duplicate"></i></div></td>
+<td class="list-cell__button"><div class="multiple-input-list__btn js-input-remove btn btn-danger"><i class="glyphicon glyphicon-remove"></i></div></td></tr>
+<tr class="multiple-input-list__item"><td class="list-cell__drag"><div class="field-detdocbotellas-3-drag form-group"><span class="glyphicon glyphicon-menu-hamburger drag-handle"></span></div></td>
+<td class="list-cell__codigo"><div class="field-detdocbotellas-3-codigo form-group"> <div class="form-group field-detdocbotellas-codigo required">
+<label class="control-label" for="detdocbotellas-codigo">Codigo</label>
+<select id="detdocbotellas-codigo" class="probandoSelect2" name="Detdocbotellas[codigo]" aria-required="true">
+<option value="">--Elija un valor--</option>
+</select>
+
+<p class="help-block help-block-error"></p>
+</div> 
+
+
+
+
+
+<div class="help-block help-block-error"></div></div></td>
+<td class="list-cell__tarifa"><div class="field-detdocbotellas-3-tarifa form-group"><input type="text" id="detdocbotellas-3-tarifa" class="form-control" name="Detdocbotellas[3][tarifa]" tabindex="1">
+<div class="help-block help-block-error"></div></div></td>
+<td class="list-cell__button"><div class="multiple-input-list__btn js-input-clone btn btn-info"><i class="glyphicon glyphicon-duplicate"></i></div></td>
+<td class="list-cell__button"><div class="multiple-input-list__btn js-input-remove btn btn-danger"><i class="glyphicon glyphicon-remove"></i></div></td></tr></tbody>
+<tfoot><tr><td colspan="4">&nbsp;</td>
+<td class="list-cell__button"><div class="multiple-input-list__btn js-input-plus btn btn-default"><i class="glyphicon glyphicon-plus"></i></div></td></tr></tfoot></table></div>            </div>
+</div></div> 
+
+<div class="form-group">
+        <button type="submit" class="btn btn-success">Save</button>    </div>
+   </form>  
+ 
+</div>
+</div>
+</div>    </section>
+</div>
+
+<footer class="main-footer">
+    <div class="pull-right hidden-xs">
+       <i class="fa fa-wrench fa-1x" aria-hidden="true"></i> <b>Version</b> 2.3
+    </div>
+    Nautilus-Solver ®
+</footer>
+
+<!-- Control Sidebar -->
+<aside class="control-sidebar control-sidebar-dark">
+    <!-- Create the tabs -->
+    <ul class="nav nav-tabs nav-justified control-sidebar-tabs">
+        <li><a href="#control-sidebar-home-tab" data-toggle="tab"><i class="fa fa-home"></i></a></li>
+        <li><a href="#control-sidebar-settings-tab" data-toggle="tab"><i class="fa fa-gears"></i></a></li>
+    </ul>
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <!-- Home tab content -->
+        <div class="tab-pane" id="control-sidebar-home-tab">
+            <h3 class="control-sidebar-heading">Recent Activity</h3>
+            <ul class='control-sidebar-menu'>
+                <li>
+                    <a href='javascript::;'>
+                        <i class="menu-icon fa fa-birthday-cake bg-red"></i>
+
+                        <div class="menu-info">
+                            <h4 class="control-sidebar-subheading">Langdon's Birthday</h4>
+
+                            <p>Will be 23 on April 24th</p>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href='javascript::;'>
+                        <i class="menu-icon fa fa-user bg-yellow"></i>
+
+                        <div class="menu-info">
+                            <h4 class="control-sidebar-subheading">Frodo Updated His Profile</h4>
+
+                            <p>New phone +1(800)555-1234</p>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href='javascript::;'>
+                        <i class="menu-icon fa fa-envelope-o bg-light-blue"></i>
+
+                        <div class="menu-info">
+                            <h4 class="control-sidebar-subheading">Nora Joined Mailing List</h4>
+
+                            <p>nora@example.com</p>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href='javascript::;'>
+                        <i class="menu-icon fa fa-file-code-o bg-green"></i>
+
+                        <div class="menu-info">
+                            <h4 class="control-sidebar-subheading">Cron Job 254 Executed</h4>
+
+                            <p>Execution time 5 seconds</p>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+            <!-- /.control-sidebar-menu -->
+
+            <h3 class="control-sidebar-heading">Tasks Progress</h3>
+            <ul class='control-sidebar-menu'>
+                <li>
+                    <a href='javascript::;'>
+                        <h4 class="control-sidebar-subheading">
+                            Custom Template Design
+                            <span class="label label-danger pull-right">70%</span>
+                        </h4>
+
+                        <div class="progress progress-xxs">
+                            <div class="progress-bar progress-bar-danger" style="width: 70%"></div>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href='javascript::;'>
+                        <h4 class="control-sidebar-subheading">
+                            Update Resume
+                            <span class="label label-success pull-right">95%</span>
+                        </h4>
+
+                        <div class="progress progress-xxs">
+                            <div class="progress-bar progress-bar-success" style="width: 95%"></div>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href='javascript::;'>
+                        <h4 class="control-sidebar-subheading">
+                            Laravel Integration
+                            <span class="label label-waring pull-right">50%</span>
+                        </h4>
+
+                        <div class="progress progress-xxs">
+                            <div class="progress-bar progress-bar-warning" style="width: 50%"></div>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href='javascript::;'>
+                        <h4 class="control-sidebar-subheading">
+                            Back End Framework
+                            <span class="label label-primary pull-right">68%</span>
+                        </h4>
+
+                        <div class="progress progress-xxs">
+                            <div class="progress-bar progress-bar-primary" style="width: 68%"></div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+            <!-- /.control-sidebar-menu -->
+
+        </div>
+        <!-- /.tab-pane -->
+
+        <!-- Settings tab content -->
+        <div class="tab-pane" id="control-sidebar-settings-tab">
+            <form method="post">
+                <h3 class="control-sidebar-heading">General Settings</h3>
+
+                <div class="form-group">
+                    <label class="control-sidebar-subheading">
+                        Report panel usage
+                        <input type="checkbox" class="pull-right" checked/>
+                    </label>
+
+                    <p>
+                        Some information about this general settings option
+                    </p>
+                </div>
+                <!-- /.form-group -->
+
+                <div class="form-group">
+                    <label class="control-sidebar-subheading">
+                        Allow mail redirect
+                        <input type="checkbox" class="pull-right" checked/>
+                    </label>
+
+                    <p>
+                        Other sets of options are available
+                    </p>
+                </div>
+                <!-- /.form-group -->
+
+                <div class="form-group">
+                    <label class="control-sidebar-subheading">
+                        Expose author name in posts
+                        <input type="checkbox" class="pull-right" checked/>
+                    </label>
+
+                    <p>
+                        Allow the user to show his name in blog posts
+                    </p>
+                </div>
+                <!-- /.form-group -->
+
+                <h3 class="control-sidebar-heading">Chat Settings</h3>
+
+                <div class="form-group">
+                    <label class="control-sidebar-subheading">
+                        Show me as online
+                        <input type="checkbox" class="pull-right" checked/>
+                    </label>
+                </div>
+                <!-- /.form-group -->
+
+                <div class="form-group">
+                    <label class="control-sidebar-subheading">
+                        Turn off notifications
+                        <input type="checkbox" class="pull-right"/>
+                    </label>
+                </div>
+                <!-- /.form-group -->
+
+                <div class="form-group">
+                    <label class="control-sidebar-subheading">
+                        Delete chat history
+                        <a href="javascript::;" class="text-red pull-right"><i class="fa fa-trash-o"></i></a>
+                    </label>
+                </div>
+                <!-- /.form-group -->
+            </form>
+        </div>
+        <!-- /.tab-pane -->
+    </div>
+</aside><!-- /.control-sidebar -->
+<!-- Add the sidebar's background. This div must be placed
+     immediately after the control sidebar -->
+<div class='control-sidebar-bg'></div>
+    </div>
+
+    <script src="/yii-application/frontend/web/assets/7e6da586/yii.validation.js"></script>
+<script src="/yii-application/frontend/web/assets/30d32828/js/select2.js"></script>
+<script src="/yii-application/frontend/web/assets/e9b92913/js/bootstrap-datepicker.js"></script>
+<script src="/yii-application/frontend/web/assets/e9b92913/js/datepicker-kv.js"></script>
+<script src="/yii-application/frontend/web/assets/4ff5e38a/js/kv-widgets.js"></script>
+<script src="/yii-application/frontend/web/assets/1f5f6490/js/jquery.multipleInput.js"></script>
+<script src="/yii-application/frontend/web/assets/1f5f6490/js/jquery-sortable.js"></script>
+<script src="/yii-application/frontend/web/assets/8936596/js/bootstrap.js"></script>
+<script src="/yii-application/frontend/web/assets/99fe1683/js/bootstrap-tabs-x.js"></script>
+<script src="/yii-application/frontend/web/assets/7e6da586/yii.activeForm.js"></script>
+<script src="/yii-application/frontend/web/assets/572da7d8/js/adminlte.min.js"></script>
+<script src="/yii-application/frontend/web/assets/ebe6ca5c/js/kb-modal-ajax.js"></script>
+<script src="/yii-application/frontend/web/assets/e597e4ff/js/noty/packaged/jquery.noty.packaged.min.js"></script>
+<script>$(document).ready(function() {
+    $('#docbotellas-codpro').select2( 
+    {
+  
+  ajax: { 
+   url: '/yii-application/frontend/web/bigitems/finder/searchselect',
+   type: 'post',
+   dataType: 'json',
+   delay: 250,
+ data: function (params) {
+      var query = {      
+        searchTerm: params.term,
+        model: 'common_models_masters_Clipro',
+            // camposad:["codpro","despro","rucpro","telpro"],
+        firstField: 'codpro',
+        secondField: 'despro',
+        thirdField:["codpro","despro","rucpro","telpro"],
+        
+      }
+      // Query parameters will be ?search=[term]&type=public
+      return query;
+    },
+   processResults: function (response) {
+     return {
+        results: response
+     };
+   },
+   cache: true
+  }
+ }
+);
+     
+    
+});
+$(document).ready(function() {
+    $('#docbotellas-codtra').select2( 
+    {
+  
+  ajax: { 
+   url: '/yii-application/frontend/web/bigitems/finder/searchselect',
+   type: 'post',
+   dataType: 'json',
+   delay: 250,
+ data: function (params) {
+      var query = {      
+        searchTerm: params.term,
+        model: 'common_models_masters_Trabajadores',
+            // camposad:["codigotra","ap","am","nombres","dni"],
+        firstField: 'codigotra',
+        secondField: 'ap',
+        thirdField:["codigotra","ap","am","nombres","dni"],
+        
+      }
+      // Query parameters will be ?search=[term]&type=public
+      return query;
+    },
+   processResults: function (response) {
+     return {
+        results: response
+     };
+   },
+   cache: true
+  }
+ }
+);
+     
+    
+});
+$(document).ready(function() {
+    $('#docbotellas-codven').select2( 
+    {
+  
+  ajax: { 
+   url: '/yii-application/frontend/web/bigitems/finder/searchselect',
+   type: 'post',
+   dataType: 'json',
+   delay: 250,
+ data: function (params) {
+      var query = {      
+        searchTerm: params.term,
+        model: 'common_models_masters_Trabajadores',
+            // camposad:["codigotra","ap"],
+        firstField: 'codigotra',
+        secondField: 'ap',
+        thirdField:["codigotra","ap"],
+        
+      }
+      // Query parameters will be ?search=[term]&type=public
+      return query;
+    },
+   processResults: function (response) {
+     return {
+        results: response
+     };
+   },
+   cache: true
+  }
+ }
+);
+     
+    
+});
+$(document).ready(function() {
+    $('#docbotellas-ptopartida_id').select2( 
+    {
+  
+  ajax: { 
+   url: '/yii-application/frontend/web/bigitems/finder/searchselect',
+   type: 'post',
+   dataType: 'json',
+   delay: 250,
+ data: function (params) {
+      var query = {      
+        searchTerm: params.term,
+        model: 'common_models_masters_Direcciones',
+            // camposad:["id","direc"],
+        firstField: 'id',
+        secondField: 'direc',
+        thirdField:["id","direc"],
+        
+      }
+      // Query parameters will be ?search=[term]&type=public
+      return query;
+    },
+   processResults: function (response) {
+     return {
+        results: response
+     };
+   },
+   cache: true
+  }
+ }
+);
+     
+    
+});
+$(document).ready(function() {
+    $('#docbotellas-ptollegada_id').select2( 
+    {
+  
+  ajax: { 
+   url: '/yii-application/frontend/web/bigitems/finder/searchselect',
+   type: 'post',
+   dataType: 'json',
+   delay: 250,
+ data: function (params) {
+      var query = {      
+        searchTerm: params.term,
+        model: 'common_models_masters_Direcciones',
+            // camposad:["id","direc"],
+        firstField: 'id',
+        secondField: 'direc',
+        thirdField:["id","direc"],
+        
+      }
+      // Query parameters will be ?search=[term]&type=public
+      return query;
+    },
+   processResults: function (response) {
+     return {
+        results: response
+     };
+   },
+   cache: true
+  }
+ }
+);
+     
+    
+});
+$(document).ready(function() {
+    $('#5d355ca52d079').select2( 
+    {
+  
+  ajax: { 
+   url: '/yii-application/frontend/web/bigitems/finder/searchselect',
+   type: 'post',
+   dataType: 'json',
+   delay: 250,
+ data: function (params) {
+      var query = {      
+        searchTerm: params.term,
+        model: 'frontend_modules_bigitems_models_Activos',
+            // camposad:["codigo","descripcion"],
+        firstField: 'codigo',
+        secondField: 'descripcion',
+        thirdField:["codigo","descripcion"],
+        
+      }
+      // Query parameters will be ?search=[term]&type=public
+      return query;
+    },
+   processResults: function (response) {
+     return {
+        results: response
+     };
+   },
+   cache: true
+  }
+ }
+);
+     
+    
+});
+            function Noty(widgetId, options) {
+                var finalOptions = $.extend({}, {"dismissQueue":true,"layout":"center","theme":"relax","animation":{"open":"animated flipInX","close":"animated flipOutX"},"timeout":false}, options);
+                return noty(finalOptions);
+            }
+$('#campanita').on('click',function(){  $.ajax({url: '/yii-application/frontend/web/site/clear-cache',  type:'GET',  dataType: 'json',  success: function(json) {
+                            var n = Noty('id');
+                             $.noty.setText(n.options.id, json['success']);
+                             $.noty.setType(n.options.id, 'success'); 
+                   
+                        }   });  })</script>
+<script>jQuery(function ($) {
+jQuery.fn.kvDatepicker.dates={};
+jQuery&&jQuery.pjax&&(jQuery.pjax.defaults.maxCacheLength=0);
+if (jQuery('#docbotellas-fecdocu').data('kvDatepicker')) { jQuery('#docbotellas-fecdocu').kvDatepicker('destroy'); }
+jQuery('#docbotellas-fecdocu-kvdate').kvDatepicker(kvDatepicker_f486b49d);
+
+initDPRemove('docbotellas-fecdocu');
+initDPAddon('docbotellas-fecdocu');
+if (jQuery('#docbotellas-fectran').data('kvDatepicker')) { jQuery('#docbotellas-fectran').kvDatepicker('destroy'); }
+jQuery('#docbotellas-fectran-kvdate').kvDatepicker(kvDatepicker_f486b49d);
+
+initDPRemove('docbotellas-fectran');
+initDPAddon('docbotellas-fectran');
+jQuery('#w0').multipleInput({"id":"w0","inputId":"w0","template":"<tr class=\"multiple-input-list__item\"><td class=\"list-cell__drag\"><div class=\"field-detdocbotellas-{multiple_index_w0}-drag form-group\"><span class=\"glyphicon glyphicon-menu-hamburger drag-handle\"></span></div></td>\n<td class=\"list-cell__codigo\"><div class=\"field-detdocbotellas-{multiple_index_w0}-codigo form-group\"> <div class=\"form-group field-detdocbotellas-codigo required\">\n<label class=\"control-label\" for=\"detdocbotellas-codigo\">Codigo</label>\n<select id=\"detdocbotellas-codigo\" class=\"probandoSelect2\" name=\"Detdocbotellas[codigo]\" aria-required=\"true\">\n<option value=\"\">--Elija un valor--</option>\n</select>\n\n<p class=\"help-block help-block-error\"></p>\n</div> \n\n\n\n\n\n<div class=\"help-block help-block-error\"></div></div></td>\n<td class=\"list-cell__tarifa\"><div class=\"field-detdocbotellas-{multiple_index_w0}-tarifa form-group\"><input type=\"text\" id=\"detdocbotellas-{multiple_index_w0}-tarifa\" class=\"form-control\" name=\"Detdocbotellas[{multiple_index_w0}][tarifa]\" tabindex=\"1\">\n<div class=\"help-block help-block-error\"></div></div></td>\n<td class=\"list-cell__button\"><div class=\"multiple-input-list__btn js-input-clone btn btn-info\"><i class=\"glyphicon glyphicon-duplicate\"></i></div></td>\n<td class=\"list-cell__button\"><div class=\"multiple-input-list__btn js-input-remove btn btn-danger\"><i class=\"glyphicon glyphicon-remove\"></i></div></td></tr>","jsInit":{"e00e77e3d519a032ac022d965c3beea0":"$(document).ready(function() {\n    $('#5d355ca52d079').select2( \n    {\n  \n  ajax: { \n   url: '/yii-application/frontend/web/bigitems/finder/searchselect',\n   type: 'post',\n   dataType: 'json',\n   delay: 250,\n data: function (params) {\n      var query = {      \n        searchTerm: params.term,\n        model: 'frontend_modules_bigitems_models_Activos',\n            // camposad:[\"codigo\",\"descripcion\"],\n        firstField: 'codigo',\n        secondField: 'descripcion',\n        thirdField:[\"codigo\",\"descripcion\"],\n        \n      }\n      // Query parameters will be ?search=[term]&type=public\n      return query;\n    },\n   processResults: function (response) {\n     return {\n        results: response\n     };\n   },\n   cache: true\n  }\n }\n);\n     \n    \n});"},"jsTemplates":[],"max":9223372036854775807,"min":0,"attributes":{"detdocbotellas-codigo":{"id":"detdocbotellas-codigo","name":"codigo","container":".field-detdocbotellas-codigo","input":"#detdocbotellas-codigo","error":".help-block.help-block-error","enableAjaxValidation":true,"validateOnChange":false,"validateOnBlur":false,"enableClientValidation":false,"validateOnSubmit":true},"detdocbotellas-tarifa":{"id":"detdocbotellas-tarifa","name":"tarifa","container":".field-detdocbotellas-tarifa","input":"#detdocbotellas-tarifa","error":".help-block.help-block-error","enableAjaxValidation":true,"validate":function (attribute, value, messages, deferred, $form) {yii.validation.number(value, messages, {"pattern":/^\s*[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?\s*$/,"message":"Tarifa debe ser un número.","skipOnEmpty":1});},"enableClientValidation":true,"validateOnChange":true}},"indexPlaceholder":"multiple_index_w0","prepend":false});
+$('#w0 .multiple-input-list').sorting({"containerSelector":"table","itemPath":"> tbody","itemSelector":"tr","placeholder":"<tr class=\"placeholder\">","handle":".drag-handle","onDrop":
+                function(item, container, _super, event) {
+                    _super(item, container, _super, event);
+
+                    var wrapper = item.closest('.multiple-input').first();
+                    event = $.Event('afterDropRow');
+                    wrapper.trigger(event, [item]);
+                }
+            });
+
+jQuery("#w1-container").tabsX(tabsX_00000000);
+
+jQuery('#tabular-botellas').yiiActiveForm([{"id":"docbotellas-numero","name":"numero","container":".field-docbotellas-numero","input":"#docbotellas-numero","error":".help-block.help-block-error","enableAjaxValidation":true,"validate":function (attribute, value, messages, deferred, $form) {yii.validation.string(value, messages, {"message":"Numero debe ser una cadena de caracteres.","max":10,"tooLong":"Numero debería contener como máximo 10 letras.","skipOnEmpty":1});}},{"id":"docbotellas-essalida","name":"essalida","container":".field-docbotellas-essalida","input":"#docbotellas-essalida","error":".help-block.help-block-error","enableAjaxValidation":true,"validate":function (attribute, value, messages, deferred, $form) {yii.validation.required(value, messages, {"message":"Essalida no puede estar vacío."});}},{"id":"docbotellas-descripcion","name":"descripcion","container":".field-docbotellas-descripcion","input":"#docbotellas-descripcion","error":".help-block.help-block-error","enableAjaxValidation":true,"validate":function (attribute, value, messages, deferred, $form) {yii.validation.required(value, messages, {"message":"Descripcion no puede estar vacío."});yii.validation.string(value, messages, {"message":"Descripcion debe ser una cadena de caracteres.","max":40,"tooLong":"Descripcion debería contener como máximo 40 letras.","skipOnEmpty":1});}},{"id":"docbotellas-codpro","name":"codpro","container":".field-docbotellas-codpro","input":"#docbotellas-codpro","error":".help-block.help-block-error","enableAjaxValidation":true,"validate":function (attribute, value, messages, deferred, $form) {yii.validation.required(value, messages, {"message":"Codpro no puede estar vacío."});yii.validation.string(value, messages, {"message":"Codpro debe ser una cadena de caracteres.","max":6,"tooLong":"Codpro debería contener como máximo 6 letras.","skipOnEmpty":1});}},{"id":"docbotellas-codenvio","name":"codenvio","container":".field-docbotellas-codenvio","input":"#docbotellas-codenvio","error":".help-block.help-block-error","enableAjaxValidation":true,"validate":function (attribute, value, messages, deferred, $form) {yii.validation.required(value, messages, {"message":"Codenvio no puede estar vacío."});yii.validation.string(value, messages, {"message":"Codenvio debe ser una cadena de caracteres.","max":2,"tooLong":"Codenvio debería contener como máximo 2 letras.","skipOnEmpty":1});}},{"id":"docbotellas-fecdocu","name":"fecdocu","container":".field-docbotellas-fecdocu","input":"#docbotellas-fecdocu","error":".help-block.help-block-error","enableAjaxValidation":true,"validate":function (attribute, value, messages, deferred, $form) {yii.validation.required(value, messages, {"message":"Fecdocu no puede estar vacío."});yii.validation.string(value, messages, {"message":"Fecdocu debe ser una cadena de caracteres.","max":10,"tooLong":"Fecdocu debería contener como máximo 10 letras.","skipOnEmpty":1});}},{"id":"docbotellas-fectran","name":"fectran","container":".field-docbotellas-fectran","input":"#docbotellas-fectran","error":".help-block.help-block-error","enableAjaxValidation":true,"validate":function (attribute, value, messages, deferred, $form) {yii.validation.string(value, messages, {"message":"Fectran debe ser una cadena de caracteres.","max":10,"tooLong":"Fectran debería contener como máximo 10 letras.","skipOnEmpty":1});}},{"id":"docbotellas-codtra","name":"codtra","container":".field-docbotellas-codtra","input":"#docbotellas-codtra","error":".help-block.help-block-error","enableAjaxValidation":true,"validate":function (attribute, value, messages, deferred, $form) {yii.validation.string(value, messages, {"message":"Codtra debe ser una cadena de caracteres.","max":6,"tooLong":"Codtra debería contener como máximo 6 letras.","skipOnEmpty":1});}},{"id":"docbotellas-codven","name":"codven","container":".field-docbotellas-codven","input":"#docbotellas-codven","error":".help-block.help-block-error","enableAjaxValidation":true,"validate":function (attribute, value, messages, deferred, $form) {yii.validation.string(value, messages, {"message":"Codven debe ser una cadena de caracteres.","max":6,"tooLong":"Codven debería contener como máximo 6 letras.","skipOnEmpty":1});}},{"id":"docbotellas-codplaca","name":"codplaca","container":".field-docbotellas-codplaca","input":"#docbotellas-codplaca","error":".help-block.help-block-error","enableAjaxValidation":true,"validate":function (attribute, value, messages, deferred, $form) {yii.validation.string(value, messages, {"message":"Codplaca debe ser una cadena de caracteres.","max":15,"tooLong":"Codplaca debería contener como máximo 15 letras.","skipOnEmpty":1});}},{"id":"docbotellas-ptopartida_id","name":"ptopartida_id","container":".field-docbotellas-ptopartida_id","input":"#docbotellas-ptopartida_id","error":".help-block.help-block-error","enableAjaxValidation":true,"validate":function (attribute, value, messages, deferred, $form) {yii.validation.required(value, messages, {"message":"Ptopartida ID no puede estar vacío."});yii.validation.number(value, messages, {"pattern":/^\s*[+-]?\d+\s*$/,"message":"Ptopartida ID debe ser un número entero.","skipOnEmpty":1});}},{"id":"docbotellas-ptollegada_id","name":"ptollegada_id","container":".field-docbotellas-ptollegada_id","input":"#docbotellas-ptollegada_id","error":".help-block.help-block-error","enableAjaxValidation":true,"validate":function (attribute, value, messages, deferred, $form) {yii.validation.required(value, messages, {"message":"Ptollegada ID no puede estar vacío."});yii.validation.number(value, messages, {"pattern":/^\s*[+-]?\d+\s*$/,"message":"Ptollegada ID debe ser un número entero.","skipOnEmpty":1});}},{"id":"detdocbotellas-codigo","name":"codigo","container":".field-detdocbotellas-codigo","input":"#detdocbotellas-codigo","error":".help-block.help-block-error","enableAjaxValidation":true,"validate":function (attribute, value, messages, deferred, $form) {yii.validation.required(value, messages, {"message":"Codigo no puede estar vacío."});yii.validation.string(value, messages, {"message":"Codigo debe ser una cadena de caracteres.","max":16,"tooLong":"Codigo debería contener como máximo 16 letras.","skipOnEmpty":1});}},{"id":"detdocbotellas-codigo","name":"codigo","container":".field-detdocbotellas-codigo","input":"#detdocbotellas-codigo","error":".help-block.help-block-error","enableAjaxValidation":true,"validate":function (attribute, value, messages, deferred, $form) {yii.validation.required(value, messages, {"message":"Codigo no puede estar vacío."});yii.validation.string(value, messages, {"message":"Codigo debe ser una cadena de caracteres.","max":16,"tooLong":"Codigo debería contener como máximo 16 letras.","skipOnEmpty":1});}},{"id":"detdocbotellas-codigo","name":"codigo","container":".field-detdocbotellas-codigo","input":"#detdocbotellas-codigo","error":".help-block.help-block-error","enableAjaxValidation":true,"validate":function (attribute, value, messages, deferred, $form) {yii.validation.required(value, messages, {"message":"Codigo no puede estar vacío."});yii.validation.string(value, messages, {"message":"Codigo debe ser una cadena de caracteres.","max":16,"tooLong":"Codigo debería contener como máximo 16 letras.","skipOnEmpty":1});}},{"id":"detdocbotellas-codigo","name":"codigo","container":".field-detdocbotellas-codigo","input":"#detdocbotellas-codigo","error":".help-block.help-block-error","enableAjaxValidation":true,"validate":function (attribute, value, messages, deferred, $form) {yii.validation.required(value, messages, {"message":"Codigo no puede estar vacío."});yii.validation.string(value, messages, {"message":"Codigo debe ser una cadena de caracteres.","max":16,"tooLong":"Codigo debería contener como máximo 16 letras.","skipOnEmpty":1});}},{"id":"detdocbotellas-codigo","name":"codigo","container":".field-detdocbotellas-codigo","input":"#detdocbotellas-codigo","error":".help-block.help-block-error","enableAjaxValidation":true,"validate":function (attribute, value, messages, deferred, $form) {yii.validation.required(value, messages, {"message":"Codigo no puede estar vacío."});yii.validation.string(value, messages, {"message":"Codigo debe ser una cadena de caracteres.","max":16,"tooLong":"Codigo debería contener como máximo 16 letras.","skipOnEmpty":1});}}], []);
+jQuery('#buscarvalor').modal({"show":false,"tabindex":"","backdrop":"static","keyboard":false});
+
+            jQuery('body').on('click', '.botonAbre', function(e) {
+                e.preventDefault();
+                $(this).attr('data-toggle', 'modal');
+                $(this).attr('data-target', '#buscarvalor');
+                
+                var bs_url = $(this).attr('href');
+                var title = $(this).attr('title');
+                
+                if (!title) title = ' ';
+                
+                jQuery('#buscarvalor').find('.modal-header span').html(title);
+                jQuery('#buscarvalor').kbModalAjax({
+                    selector: $(this),
+                    url: bs_url,
+                    ajaxSubmit: 1
+                });
+            });
+        
+jQuery('#buscarvalor').on('kbModalSubmit', 
+                function(event, data, status, xhr) {
+                    if(status){
+                        
+                    }
+                }
+            )
+});</script>    </body>
+    </html>
+    

@@ -17,6 +17,8 @@ use frontend\modules\sta\helpers\comboHelper;
 <button id="boton-puntajes" type="button" class="btn btn-warning btn-lg">
     <span class="glyphicon glyphicon-refresh"></span><?=yii::t('sta.labels','  Actualizar puntajes')?>
 </button>
+<?php $url=\yii\helpers\Url::to(['lista-esporadicos','id'=>$model->id]); ?>
+ <?=Html::a('<span class="glyphicon glyphicon-scale" ></span>'.'  '.yii::t('sta.labels','Ver frecuencias'),$url,['target'=>'_blank','data-pjax'=>'0','class'=>"btn btn-danger"])?>
 
     <div class="box-body">
   
@@ -63,7 +65,7 @@ use frontend\modules\sta\helpers\comboHelper;
     // uncomment below and comment detail if you need to render via ajax
     // 'detailUrl'=>Url::to(['/site/book-details']),
     'detail' => function ($model, $key, $index, $column) {
-        return Yii::$app->controller->renderPartial('/programas/convocatorias/_convocatorias',  ['grupo_id' => $model->id]);
+       return ''; //return Yii::$app->controller->renderPartial('/programas/convocatorias/_convocatorias',  ['grupo_id' => $model->id]);
     },
     'headerOptions' => ['class' => 'kartik-sheet-style'], 
     'expandOneOnly' => true

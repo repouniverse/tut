@@ -77,7 +77,7 @@ return [
                              */
                          'console\migrations',
                              'frontend\modules\message\database\migrations',
-                         // 'nemmo\attachments\migrations', 
+                         //'nemmo\attachments\migrations', 
                           //'yii\rbac\migrations', 
                           // 'yii2mod\settings\migrations',  
                         // 'nemmo\attachments\migrations',   
@@ -132,5 +132,17 @@ return [
             ],
         ],
     ],
+    
+   /* 'i18n' => [
+            'translations' => [
+              
+                        
+                'rbac-admin'=>[
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@mdm/admin/messages',
+                    'sourceLanguage' => 'en',
+                ],
+            ],
+        ],*/
     'params' => $params,
 ];

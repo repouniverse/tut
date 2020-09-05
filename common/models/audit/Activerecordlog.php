@@ -73,4 +73,14 @@ class Activerecordlog extends \yii\db\ActiveRecord
             'clave' => Yii::t('models.labels', 'Clave'),
         ];
     }
+    
+    public static function t($word){
+      if($word=='UPDATE')RETURN 'EDITÓ';
+      if($word=='DELETE')RETURN 'BORRÓ';
+      if($word=='CREATE')RETURN 'CREÓ';
+      if($word=='POST')RETURN 'Formulario';
+      if($word=='AJAX')RETURN 'Proceso';
+      
+        
+    }
 }

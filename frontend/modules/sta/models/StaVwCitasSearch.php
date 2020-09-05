@@ -241,6 +241,7 @@ class StaVwCitasSearch extends StaVwCitas
         ]);
 
          $query->andWhere(['codfac'=> $codfac])-> 
+            andWhere(['<>','justificada', '1'])->    
              andWhere([
              'between',
              'fechaprog',

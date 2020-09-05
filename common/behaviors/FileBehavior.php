@@ -60,6 +60,15 @@ CONST FIRE_METHOD='triggerUpload';
         return $fileQuery->all();
     }
 
+    
+    public function getMedia() {
+        $exts = FileHelper::extMedia();
+        $fileQuery = $this->queryBase->andWhere(['in', 'type', $exts]);
+        $fileQuery->orderBy(['id' => SORT_ASC]);
+
+        return $fileQuery->all();
+    }
+    
     /*
      * Devuelve el objecto activeQuery
      * listo para ser usado 

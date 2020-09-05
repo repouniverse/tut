@@ -177,15 +177,15 @@ public function getTrabajador()
      */
     public function generaDocumentos(){
         
-   $orden=(StaDocuAlu::find()->where([
+   /*$orden=(StaDocuAlu::find()->where([
         'talleresdet_id'=>$this->id,
        // 'codocu'=>$this->codocu,
-        ])->count()>0)?2:1;
-
+        ])->count()>0)?2:1;*/
+$orden=1;
         $codes=staModule::docCodes();
        
         foreach($codes as $code){
-           if(!($orden==2 && $code==104)){
+           //if(!($orden==2 && $code==104)){
               StaDocuAlu::firstOrCreateStatic([
                 'talleresdet_id'=>$this->id,
                 'codocu'=>$code,
@@ -193,7 +193,7 @@ public function getTrabajador()
                  'codfac'=>$this->codfac,
                  'status'=>Aluriesgo::FLAG_NORMAL,
                     ]); 
-           }
+          // }
             
         }
         
@@ -431,6 +431,14 @@ public function retiraDelPrograma($retiro=true){
      
  }
  
+public function queryResultados(){
+    $idsEXA=Examenes::find()->select(['id'])->andWhere(['citas_id'=>$this->idCitas()])->column();
+   return StaResultados::find()->andWhere(['examen_id'=>$idsEXA]);
+}
+public function providerResultados(){
+     return $this->queryResultados()->all();
+}
+ 
 public function hasPerformedFirstExamen(){
     /*
      * Ubicando el flujo id de la primera evaluacion
@@ -496,24 +504,41 @@ public function zipea(){
     
     
 public function frecuencia(){
-    $codperiodo=$this->talleres->codperiodo;
-    
-    $citas=$this->getCitas()->andWhere([
-        'flujo_id'=>StaFlujo::idsFlujosNoEventos($codperiodo),
-        'asistio'=>'1'
+    $codperiodo=$this->talleres->codperiodo;    
+    $citas=$this->getCitas()->
+            andWhere(['not in','flujo_id', 
+                $ids=StaFlujo::idsFlujosEvaluaciones($codperiodo)
+                    ])->
+            andWhere([
+        //'flujo_id'=>StaFlujo::idsFlujosNoEventos($codperiodo),
+        'asistio'=>'1',
+        'activo'=>'1'
+         //'asistio'=>'1',
             ])->all();
     $totales=count($citas);
-    
+    //yii::error('totales  '.$totales);
     $acumulado=0;
+    // yii::error('recorreindo citas  ');
     foreach($citas as $cita){
-        
-        $acumulado+=$cita->diasPasadosUltimaCitaByTutoria();
+        // yii::error('Cita  '.$cita->numero.'  '.$cita->flujo->proceso);
+          $acumulado+=$cita->diasPasadosUltimaCitaByTutoriaOrTaller();
+       // yii::error('Dias pasados desde ultima tutoria '.$cita->diasPasadosUltimaCitaByTutoriaOrTaller().'  ');
+        //yii::error('Acumulado  '.$acumulado);
         //yii::error('dias pasadosd '.$acumulado);
     }
-    if($totales ==0 )
-      $promedio=0;
+    
+    if($totales ==0 ){
+        $promedio=0;
+    }elseif($totales==1){
+        $promedio=0; //Si encientra una sola cita, no sepuede programar
+    }else{
+        $totales=$totales-1; //POrteoría de arotmetica #numero de espacios 
+                            //Es igual a numero de postes  menos 1
+        $promedio=round($acumulado/$totales,1); 
+    }
+      
     if($totales >0 )
-      $promedio=round($acumulado/$totales,1);
+     
     return $promedio;
 }
 
@@ -664,8 +689,11 @@ $citas=$this->getCitas()->andWhere(['asistio'=>'1'])->all();
  */
 public function calculatePesoToProgramar(){
     //Sacando la cita proxima 
-    $query=$this->getCitas()->andWhere([
-        'flujo_id'=>StaFlujo::idsFlujosNoEventos()
+    $codperiodo= staModule::getCurrentPeriod();
+    $query=$this->getCitas()->andWhere(['not in',
+        'flujo_id',StaFlujo::idsFlujosEvaluaciones($codperiodo),
+        'asistio'=>'1',
+        'activo'=>'1'
             ]);
     //cita ultima 
     $puntaje=0;
@@ -815,7 +843,28 @@ GROUP BY talleresdet_id) t;"
     
 }
 
-  public function findComplete(){
-      
+  public function logConvocatoriaMail(){
+      $fechahora=self::CarbonNow();
+    $fecha=self::SwichtFormatDate(
+            $fechahora->format(timeHelper::formatMysqlDate())
+            ,'date',
+            true
+            );
+
+     $hora=$fechahora->format('H:i');
+     //echo $hora; die();
+      StaConvocatoria::firstOrCreateStatic(
+              [
+                  
+ 'talleresdet_id'=>$this->id,
+ 'codfac'=>$this->talleres->codfac,
+ 'canal'=>StaConvocatoria::CANAL_CORREO,
+ 'resultado'=>'0',
+ 'fecha'=>$fecha,
+ 'hora'=>$hora,
+ 'detalle'=>'Correo automático',
+                  
+              ]
+              );
   }
 }
